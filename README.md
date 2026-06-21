@@ -1,4 +1,4 @@
-# web-oina — Acropolis RD
+# Acropolis RD — ecosistema acropolis.org.do
 
 Monorepo para sitios públicos de Nueva Acrópolis República Dominicana.
 
@@ -21,20 +21,19 @@ npm run dev:editor
 npm run dev:editor-api
 ```
 
-## Subir a GitHub
+## GitHub
 
-Repo: **wiserlearningcenter/web-oina**
+| Repo | Uso |
+|------|-----|
+| **[Mayre16/acropolis](https://github.com/Mayre16/acropolis)** | Desarrollo, Pages preview, permisos admin |
+| `wiserlearningcenter/web-oina` | Producción org (cuando den admin) |
 
 ```powershell
 cd "c:\Users\marth\Cursor Projects\acropolis.org.do"
-& "C:\Program Files\Git\bin\git.exe" add .
-& "C:\Program Files\Git\bin\git.exe" commit -m "Publicar Acropolis, Civis, Tienda y editor OINA"
-& "C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/wiserlearningcenter/web-oina.git
-& "C:\Program Files\Git\bin\git.exe" branch -M main
-& "C:\Program Files\Git\bin\git.exe" push -u origin main
+& "C:\Program Files\Git\bin\git.exe" push origin main
 ```
 
-Tras instalar GitHub CLI: `gh auth login` y luego `gh repo sync` si hace falta.
+Preview Pages: https://mayre16.github.io/acropolis/ — ver `docs/GITHUB-PAGES.md`
 
 ## GitHub Pages + Railway
 

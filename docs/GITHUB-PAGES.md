@@ -1,8 +1,10 @@
 # GitHub Pages — tres sitios
 
-## Repo
+## Repo activo (desarrollo / preview)
 
-`wiserlearningcenter/web-oina` — monorepo con `principal/`, `civis/`, `tienda/`, `editor/`.
+**[Mayre16/acropolis](https://github.com/Mayre16/acropolis)** — monorepo con `principal/`, `civis/`, `tienda/`, `editor/`.
+
+Repo futuro de producción org: `wiserlearningcenter/web-oina` (cuando haya admin).
 
 ## Limitación importante
 
@@ -26,10 +28,10 @@ Tras cada push a `main`:
 
 | URL preview | Sitio |
 |-------------|--------|
-| https://wiserlearningcenter.github.io/web-oina/ | Índice con enlaces |
-| https://wiserlearningcenter.github.io/web-oina/principal/ | Acropolis |
-| https://wiserlearningcenter.github.io/web-oina/civis/ | Civis |
-| https://wiserlearningcenter.github.io/web-oina/tienda/ | Tienda |
+| https://mayre16.github.io/acropolis/ | Índice con enlaces |
+| https://mayre16.github.io/acropolis/principal/ | Acropolis |
+| https://mayre16.github.io/acropolis/civis/ | Civis |
+| https://mayre16.github.io/acropolis/tienda/ | Tienda |
 
 Build local del mismo preview:
 
@@ -39,6 +41,8 @@ node .github/scripts/build-github-pages.mjs
 ```
 
 La primera vez: en el repo → **Settings → Pages → Build and deployment → Deploy from a branch → Branch `gh-pages` / `/ (root)`**.
+
+**Repo privado:** GitHub Pages en cuenta personal gratuita solo funciona en repos **públicos**. Para preview con repo privado hace falta GitHub Pro, o crear el repo como **Public** (solo código del sitio; secretos van en Railway, no en git).
 
 El workflow sube el preview a la rama `gh-pages` en cada push a `main`.
 

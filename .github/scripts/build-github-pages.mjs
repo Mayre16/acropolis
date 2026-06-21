@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build principal, civis y tienda con basePath para GitHub Pages
- * (https://wiserlearningcenter.github.io/web-oina/…)
+ * (https://mayre16.github.io/acropolis/…)
  */
 import { cpSync, mkdirSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -9,8 +9,10 @@ import { spawnSync } from "node:child_process";
 
 const ROOT = join(import.meta.dirname, "../..");
 const OUT_ROOT = join(ROOT, ".pages-site");
-const ORIGIN = "https://wiserlearningcenter.github.io";
-const PAGES_BASE = "/web-oina";
+const GITHUB_USER = process.env.GITHUB_PAGES_USER?.trim() || "mayre16";
+const REPO_NAME = process.env.GITHUB_PAGES_REPO?.trim() || "acropolis";
+const ORIGIN = `https://${GITHUB_USER}.github.io`;
+const PAGES_BASE = `/${REPO_NAME}`;
 
 const sites = [
   {
