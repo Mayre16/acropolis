@@ -1,6 +1,6 @@
 /** Salones disponibles para alquiler — talleres, cursos y eventos. */
 
-import acropolisPublished from "../../editor/data/acropolis/published.json";
+import acropolisPublished from "../../principal/data/acropolis/published.json";
 
 export type LayoutKind = "butacas" | "mesas" | "herradura";
 
@@ -28,7 +28,7 @@ export const LAYOUT_LABELS: Record<LayoutKind, string> = {
   herradura: "Disposición herradura",
 };
 
-/** Fallback alineado con `editor/data/acropolis/published.json` (misma fuente que Acrópolis). */
+/** Fallback alineado con `principal/data/acropolis/published.json` (misma fuente que Acrópolis). */
 function salonesFromAcropolisPublished(): Salon[] {
   const items = acropolisPublished.sections?.salones ?? [];
   return items.map((s) => ({

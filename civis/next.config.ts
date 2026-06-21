@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
   images: { unoptimized: true },
   trailingSlash: true,
+  experimental: {
+    externalDir: true,
+  },
 };
 
 export default nextConfig;
