@@ -26,7 +26,7 @@ export function CivisFooter() {
           </div>
 
           <div className="civis-footer__na-mark">
-            <CivisNaSectionLogo size="footer" align="center" />
+            <CivisNaSectionLogo context="footer" align="center" />
           </div>
 
           <nav aria-label="Secciones del sitio" className="civis-footer__nav">

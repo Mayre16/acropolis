@@ -525,7 +525,7 @@ function NuevaAcropolisPanel() {
             />
           ) : null}
           <div className="w-fit max-w-full overflow-visible pt-1 sm:pt-1.5">
-            <CivisNaSectionLogo align="left" size="content" />
+            <CivisNaSectionLogo context="quienesSomos" align="left" />
           </div>
           <h2 className="mt-4 text-balance text-3xl font-black text-na-ink sm:mt-5 sm:text-4xl">
             {content.title ?? "Qué es Nueva Acrópolis"}

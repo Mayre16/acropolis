@@ -17,6 +17,7 @@ export const NA_BRAND_LOCKUP_SIZES = {
   hero: brandLogoHeightClass.hero,
 
   footer: brandLogoHeightClass.footer,
+  civisFooterOinadom: brandLogoHeightClass.civisFooterOinadom,
   footerSubmarca: brandLogoHeightClass.footerSubmarca,
   footerInstitutional: brandLogoHeightClass.footerInstitutional,
 
@@ -56,6 +57,9 @@ type NaBrandLockupGroupProps = {
 
   descriptorProminence?: "default" | "hero";
 
+  /** Civis: descriptor SVG al ancho del wordmark. */
+  fitDescriptorToWordmark?: boolean;
+
   className?: string;
 
   maxWidthClass?: string;
@@ -82,6 +86,8 @@ export function NaBrandLockupGroup({
 
   descriptorProminence = "default",
 
+  fitDescriptorToWordmark,
+
   className,
 
   maxWidthClass,
@@ -103,6 +109,8 @@ export function NaBrandLockupGroup({
       align={align}
 
       descriptorProminence={descriptorProminence}
+
+      fitDescriptorToWordmark={fitDescriptorToWordmark}
 
       priority={priority}
 

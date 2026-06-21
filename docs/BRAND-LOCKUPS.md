@@ -25,6 +25,15 @@ Comparación automatizada: `node principal/scripts/compare-deploy-logos.mjs`
 | Quiénes somos hero | `oina` | ORGANIZACIÓN INTERNACIONAL | `pageHero` |
 | Quiénes somos OINA | `oina` | ORGANIZACIÓN INTERNACIONAL | `sectionStacked` |
 
+### Civis (submarca)
+
+| Ubicación | Lockup | Preset | Descriptor |
+|-----------|--------|--------|------------|
+| Footer | `oinadom` | `civisFooterOinadom` (2.5 → 3rem) | SVG al ancho del wordmark · centrado en columna |
+| Quiénes somos → Nueva Acrópolis | `oina` | `quienesSomos` (1.7 → 2rem) | SVG al ancho del wordmark · alineado izquierda |
+
+Componente: `CivisNaSectionLogo` + `fitDescriptorToWordmark` en `civis/components/BrandLogo.tsx`.
+
 **Posiciones** (start/center) no cambian entre adesa y local; lo distinto es **tamaño y tipografía del descriptor**.
 
 ---

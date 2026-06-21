@@ -17,6 +17,7 @@ import {
   BRAND_WORDMARK_OFFSET_RATIO,
   BRAND_WORDMARK_WIDTH_RATIO,
   brandDescriptorStyle,
+  civisSectionDescriptorStyle,
   lockupClearSpaceVariant,
 } from "@/lib/brand-clear-space";
 
@@ -28,6 +29,8 @@ type BrandLogoProps = {
   subtitleClassName?: string;
   descriptorClassName?: string;
   descriptorProminence?: "default" | "hero";
+  /** Civis: descriptor al ancho del wordmark vía SVG textLength. */
+  fitDescriptorToWordmark?: boolean;
   align?: "start" | "center";
   priority?: boolean;
   clearSpace?: boolean;
@@ -52,56 +55,56 @@ function markAspect(asset: { width: number; height: number }) {
   return asset.width / asset.height;
 }
 
-function hybridDescriptorFill(
-  variant: BrandLogoVariant,
-  prominence: "default" | "hero",
-): string {
-  if (variant === "white") {
-    return prominence === "hero" ? "#ffffff" : "rgba(255, 255, 255, 0.85)";
-  }
-  return "#707070";
+function descriptorFill(variant: BrandLogoVariant): string {
+  return variant === "white" ? "rgba(255, 255, 255, 0.85)" : "#707070";
 }
 
-function OinadomDescriptor({
+/** Descriptor oina/oinadom — ancho = banda del wordmark «Nueva Acrópolis». */
+function WordmarkBandDescriptor({
   label,
   variant,
-  descriptorProminence,
+  lockup,
   descriptorClassName,
-  align,
 }: {
   label: string;
   variant: BrandLogoVariant;
-  descriptorProminence: "default" | "hero";
+  lockup: "oina" | "oinadom";
   descriptorClassName?: string;
-  align: "start" | "center";
 }) {
-  const styles = brandDescriptorStyle("oinadom", descriptorProminence);
+  const styles = civisSectionDescriptorStyle(lockup);
 
   return (
-    <svg
-      className={cn("block w-full overflow-visible", descriptorClassName)}
-      viewBox="0 0 1000 120"
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden
+    <span
+      className="block w-full"
       style={{
         marginTop: styles.marginTop,
-        height: `calc(${styles.fontSize} * 1.35)`,
+        paddingLeft: `${BRAND_WORDMARK_OFFSET_RATIO * 100}%`,
+        paddingRight: `${(1 - BRAND_WORDMARK_OFFSET_RATIO - BRAND_WORDMARK_WIDTH_RATIO) * 100}%`,
       }}
     >
-      <text
-        x={align === "start" ? 0 : 500}
-        y={82}
-        textAnchor={align === "start" ? "start" : "middle"}
-        fontFamily="var(--font-noto-sans), Noto Sans, sans-serif"
-        fontWeight={700}
-        fontSize={100}
-        fill={hybridDescriptorFill(variant, descriptorProminence)}
-        textLength={1000}
-        lengthAdjust="spacingAndGlyphs"
+      <svg
+        className={cn("block w-full overflow-visible", descriptorClassName)}
+        viewBox="0 0 1000 120"
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden
+        style={{ height: `calc(${styles.fontSize} * 1.3)` }}
       >
-        {label}
-      </text>
-    </svg>
+        <text
+          x={0}
+          y={82}
+          textAnchor="start"
+          fontFamily="var(--font-noto-sans), Noto Sans, sans-serif"
+          fontWeight={700}
+          fontSize={100}
+          fill={descriptorFill(variant)}
+          letterSpacing={styles.letterSpacing}
+          textLength={1000}
+          lengthAdjust="spacingAndGlyphs"
+        >
+          {label}
+        </text>
+      </svg>
+    </span>
   );
 }
 
@@ -113,6 +116,7 @@ export function BrandLogo({
   subtitleClassName,
   descriptorClassName,
   descriptorProminence = "default",
+  fitDescriptorToWordmark = false,
   align = "center",
   priority = false,
   clearSpace = false,
@@ -138,9 +142,6 @@ export function BrandLogo({
       ]
     : null;
 
-  const oinadomWordmarkFit =
-    lockup === "oinadom" && descriptorProminence !== "hero";
-
   const defaultSubtitleColor =
     variant === "white" ? "text-white/80" : "text-na-muted";
 
@@ -148,7 +149,7 @@ export function BrandLogo({
     "inline-flex max-w-full overflow-visible leading-none",
     hybrid || showSubtitle
       ? cn(
-          "flex-col",
+          "w-fit flex-col",
           align === "start" ? "self-start" : "mx-auto self-center",
         )
       : align === "start"
@@ -213,53 +214,58 @@ export function BrandLogo({
     image
   );
 
+  const descriptorStyles =
+    fitDescriptorToWordmark && (lockup === "oina" || lockup === "oinadom")
+      ? civisSectionDescriptorStyle(lockup)
+      : brandDescriptorStyle(
+          lockup as "oina" | "oinadom" | "escuela" | "trilogo",
+          descriptorProminence,
+        );
+
   const descriptorNode =
     hybrid && descriptorLabel ? (
-      oinadomWordmarkFit ? (
-        <OinadomDescriptor
+      fitDescriptorToWordmark &&
+      (lockup === "oina" || lockup === "oinadom") ? (
+        <WordmarkBandDescriptor
           label={descriptorLabel}
           variant={variant}
-          descriptorProminence={descriptorProminence}
+          lockup={lockup}
           descriptorClassName={descriptorClassName}
-          align={align}
         />
       ) : (
-        <span
-          className={cn(
-            "block w-full max-w-full uppercase leading-none",
-            variant === "white"
-              ? descriptorProminence === "hero"
-                ? "text-white"
-                : "text-white/85"
-              : "text-[#707070]",
+      <span
+        className={cn(
+          "block w-full max-w-full uppercase leading-none",
+          variant === "white"
+            ? descriptorProminence === "hero"
+              ? "text-white"
+              : "text-white/85"
+            : "text-[#707070]",
+          lockup === "oina" ||
+            lockup === "oinadom" ||
+            lockup === "trilogo" ||
+            lockup === "escuela"
+            ? "font-bold"
+            : "font-black",
+          align === "start" ? "text-left" : "text-center",
+          lockup === "trilogo" ? "whitespace-normal sm:whitespace-nowrap" : "whitespace-nowrap",
+          descriptorClassName,
+        )}
+        style={{
+          ...descriptorStyles,
+          maxWidth: "100%",
+          fontFamily: "var(--font-noto-sans), sans-serif",
+          fontWeight:
             lockup === "oina" ||
-              lockup === "oinadom" ||
-              lockup === "trilogo" ||
-              lockup === "escuela"
-              ? "font-bold"
-              : "font-black",
-            align === "start" ? "text-left" : "text-center",
-            lockup === "trilogo" ? "whitespace-normal sm:whitespace-nowrap" : "whitespace-nowrap",
-            descriptorClassName,
-          )}
-          style={{
-            ...brandDescriptorStyle(
-              lockup as "oina" | "oinadom" | "escuela" | "trilogo",
-              descriptorProminence,
-            ),
-            maxWidth: "100%",
-            fontFamily: "var(--font-noto-sans), sans-serif",
-            fontWeight:
-              lockup === "oina" ||
-              lockup === "trilogo" ||
-              lockup === "escuela" ||
-              (lockup === "oinadom" && descriptorProminence !== "hero")
-                ? 700
-                : 900,
-          }}
-        >
-          {descriptorLabel}
-        </span>
+            lockup === "trilogo" ||
+            lockup === "escuela" ||
+            (lockup === "oinadom" && descriptorProminence !== "hero")
+              ? 700
+              : 900,
+        }}
+      >
+        {descriptorLabel}
+      </span>
       )
     ) : null;
 
@@ -287,13 +293,6 @@ export function BrandLogo({
   }
 
   if (hybrid) {
-    const oinadomWordmarkBand: CSSProperties | undefined = oinadomWordmarkFit
-      ? {
-          paddingLeft: `${BRAND_WORDMARK_OFFSET_RATIO * 100}%`,
-          paddingRight: `${(1 - BRAND_WORDMARK_OFFSET_RATIO - BRAND_WORDMARK_WIDTH_RATIO) * 100}%`,
-        }
-      : undefined;
-
     return (
       <span className={rootClass} style={rootStyle}>
         <span
@@ -304,13 +303,7 @@ export function BrandLogo({
           style={{ width: markStyle.width }}
         >
           {logoBody}
-          {oinadomWordmarkBand ? (
-            <span className="block w-full" style={oinadomWordmarkBand}>
-              {descriptorNode}
-            </span>
-          ) : (
-            descriptorNode
-          )}
+          {descriptorNode}
         </span>
       </span>
     );

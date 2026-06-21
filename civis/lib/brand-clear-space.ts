@@ -37,8 +37,10 @@ export const brandLogoHeightClass = {
   headerFilial: "[--brand-logo-h:2.35rem] sm:[--brand-logo-h:2.5rem]",
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
-  footer: "[--brand-logo-h:2.65rem] sm:[--brand-logo-h:2.85rem] md:[--brand-logo-h:3rem]",
-  /** Footer submarca (Civis patrón) — `footer` menos 20px (~1.25rem) en el mark. */
+  footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
+  /** Footer Civis — oinadom (doble del compacto anterior). */
+  civisFooterOinadom:
+    "[--brand-logo-h:2.5rem] sm:[--brand-logo-h:2.75rem] md:[--brand-logo-h:3rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:
@@ -48,7 +50,7 @@ export const brandLogoHeightClass = {
   pageHeroTrilogo:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] md:[--brand-logo-h:5.35rem]",
   diplomadoHero:
-    "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] lg:[--brand-logo-h:5.35rem]",
+    "[--brand-logo-h:3.75rem] sm:[--brand-logo-h:4.15rem] lg:[--brand-logo-h:4.5rem]",
   contentDigital:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.75rem] md:[--brand-logo-h:5.1rem]",
   contenidoHub:
@@ -58,7 +60,7 @@ export const brandLogoHeightClass = {
   sectionStacked:
     "[--brand-logo-h:3.65rem] sm:[--brand-logo-h:4rem] md:[--brand-logo-h:4.25rem]",
   quienesSomos:
-    "[--brand-logo-h:1.825rem] sm:[--brand-logo-h:2rem] md:[--brand-logo-h:2.125rem]",
+    "[--brand-logo-h:1.7rem] sm:[--brand-logo-h:1.9rem] md:[--brand-logo-h:2rem]",
   /** Identificador Civis a ancho de contenedor (header / footer). */
   civisMarkSite: "w-full h-auto max-w-full",
 } as const;
@@ -84,7 +86,7 @@ export function brandDescriptorStyle(
   if (prominence === "hero") {
     return {
       marginTop: "0.3em",
-      fontSize: "clamp(0.875rem, calc(var(--brand-logo-h) * 0.058), 1.35rem)",
+      fontSize: "clamp(0.8125rem, calc(var(--brand-logo-h) * 0.055), 1.25rem)",
       letterSpacing: lockup === "oinadom" ? "0.1em" : tracking,
     };
   }
@@ -92,7 +94,7 @@ export function brandDescriptorStyle(
   if (lockup === "oina") {
     return {
       marginTop: "0.24em",
-      fontSize: "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.19), 0.625rem)",
+      fontSize: "clamp(0.5rem, calc(var(--brand-logo-h) * 0.027), 0.625rem)",
       letterSpacing: "0.038em",
     };
   }
@@ -100,7 +102,7 @@ export function brandDescriptorStyle(
   if (lockup === "oinadom") {
     return {
       marginTop: "0.24em",
-      fontSize: "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.21), 0.75rem)",
+      fontSize: "clamp(0.5625rem, calc(var(--brand-logo-h) * 0.03), 0.6875rem)",
       letterSpacing: "0.05em",
     };
   }
@@ -126,5 +128,15 @@ export function brandDescriptorStyle(
     fontSize:
       "clamp(0.5625rem, calc(var(--brand-logo-h) * 0.034), 0.6875rem)",
     letterSpacing: tracking,
+  };
+}
+
+/** Descriptor Civis — cabe en el ancho del wordmark «Nueva Acrópolis». */
+export function civisSectionDescriptorStyle(lockup: "oina" | "oinadom") {
+  const factor = lockup === "oina" ? 0.068 : 0.072;
+  return {
+    marginTop: "0.18em",
+    fontSize: `clamp(0.28rem, calc(var(--brand-logo-h) * ${factor}), calc(var(--brand-logo-h) * 0.09))`,
+    letterSpacing: lockup === "oina" ? "0.022em" : "0.032em",
   };
 }
