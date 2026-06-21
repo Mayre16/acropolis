@@ -46,7 +46,7 @@ export const brandLogoHeightClass = {
   headerFilial: "[--brand-logo-h:2.35rem] sm:[--brand-logo-h:2.5rem]",
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
-  footer: "[--brand-logo-h:2.65rem] sm:[--brand-logo-h:2.85rem] md:[--brand-logo-h:3rem]",
+  footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:
@@ -57,12 +57,12 @@ export const brandLogoHeightClass = {
   pageHeroTrilogo:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] md:[--brand-logo-h:5.35rem]",
   diplomadoHero:
-    "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] lg:[--brand-logo-h:5.35rem]",
+    "[--brand-logo-h:3.75rem] sm:[--brand-logo-h:4.15rem] lg:[--brand-logo-h:4.5rem]",
   contentDigital:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.75rem] md:[--brand-logo-h:5.1rem]",
-  /** Hub `/contenido` — misma escala que PageHero trilogo (p. ej. voluntariado). */
+  /** Hub /contenido — oina un poco mayor que pageHero para equilibrar el descriptor. */
   contenidoHub:
-    "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] md:[--brand-logo-h:5.35rem]",
+    "[--brand-logo-h:3.35rem] sm:[--brand-logo-h:3.75rem] md:[--brand-logo-h:4.1rem]",
   internationalBand:
     "[--brand-logo-h:4.75rem] sm:[--brand-logo-h:5.5rem] md:[--brand-logo-h:6rem]",
   sectionStacked:
@@ -94,20 +94,17 @@ export function brandDescriptorStyle(
   if (prominence === "hero") {
     return {
       marginTop: "0.3em",
-      fontSize:
-        lockup === "oinadom"
-          ? "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.10), 1.35rem)"
-          : "clamp(0.875rem, calc(var(--brand-logo-h) * 0.058), 1.35rem)",
+      fontSize: "clamp(0.8125rem, calc(var(--brand-logo-h) * 0.055), 1.25rem)",
       letterSpacing: lockup === "oinadom" ? "0.1em" : tracking,
     };
   }
 
-  /** oina — descriptor largo; misma escala que trilogo bajo el wordmark. */
+  /** oina — ancho máx. = «Nueva Acrópolis»; una línea. */
   if (lockup === "oina") {
     return {
-      marginTop: "0.22em",
-      fontSize: "clamp(0.5rem, calc(var(--brand-logo-h) * 0.026), 0.625rem)",
-      letterSpacing: "0.032em",
+      marginTop: "0.24em",
+      fontSize: "clamp(0.5rem, calc(var(--brand-logo-h) * 0.027), 0.625rem)",
+      letterSpacing: "0.038em",
     };
   }
 
@@ -115,7 +112,7 @@ export function brandDescriptorStyle(
   if (lockup === "oinadom") {
     return {
       marginTop: "0.24em",
-      fontSize: "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.21), 0.75rem)",
+      fontSize: "clamp(0.5625rem, calc(var(--brand-logo-h) * 0.03), 0.6875rem)",
       letterSpacing: "0.05em",
     };
   }

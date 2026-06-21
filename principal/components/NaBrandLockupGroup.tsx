@@ -12,8 +12,8 @@ export const NA_BRAND_LOCKUP_SIZES = {
   footerInstitutional: brandLogoHeightClass.footerInstitutional,
   sectionStacked: brandLogoHeightClass.sectionStacked,
   quienesSomos: brandLogoHeightClass.quienesSomos,
-  /** Igual que `pageHeroTrilogo` (voluntariado, `/contenido`). */
-  contenidoHub: brandLogoHeightClass.pageHeroTrilogo,
+  /** Referencia OINA proporcional — hub `/contenido`. */
+  contenidoHub: brandLogoHeightClass.contenidoHub,
   contentDigital: brandLogoHeightClass.contentDigital,
   internationalBand: brandLogoHeightClass.internationalBand,
   pageHero: brandLogoHeightClass.pageHero,

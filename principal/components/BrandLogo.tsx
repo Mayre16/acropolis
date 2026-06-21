@@ -14,8 +14,6 @@ import {
   BRAND_DESCRIPTOR_TEXT_RATIO,
   BRAND_CLEAR_SPACE_RATIO,
   BRAND_LOGO_HEIGHT_DEFAULT,
-  BRAND_WORDMARK_OFFSET_RATIO,
-  BRAND_WORDMARK_WIDTH_RATIO,
   brandDescriptorStyle,
   lockupClearSpaceVariant,
 } from "@/lib/brand-clear-space";
@@ -53,76 +51,6 @@ function markAspect(asset: { width: number; height: number }) {
   return asset.width / asset.height;
 }
 
-function hybridDescriptorFill(
-  variant: BrandLogoVariant,
-  prominence: "default" | "hero",
-): string {
-  if (variant === "white") {
-    return prominence === "hero" ? "#ffffff" : "rgba(255, 255, 255, 0.85)";
-  }
-  return "#707070";
-}
-
-/** Descriptor centrado bajo el wordmark «Nueva Acrópolis» (guía OINA). */
-function WordmarkFitDescriptor({
-  lockup,
-  label,
-  variant,
-  descriptorProminence,
-  descriptorClassName,
-}: {
-  lockup: "oina" | "oinadom" | "escuela" | "trilogo";
-  label: string;
-  variant: BrandLogoVariant;
-  descriptorProminence: "default" | "hero";
-  descriptorClassName?: string;
-}) {
-  const styles = brandDescriptorStyle(lockup, descriptorProminence);
-
-  return (
-    <svg
-      className={cn("block w-full overflow-visible", descriptorClassName)}
-      viewBox="0 0 1000 120"
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden
-      style={{
-        marginTop: styles.marginTop,
-        height: `calc(${styles.fontSize} * 1.35)`,
-      }}
-    >
-      <text
-        x={500}
-        y={82}
-        textAnchor="middle"
-        fontFamily="var(--font-noto-sans), Noto Sans, sans-serif"
-        fontWeight={700}
-        fontSize={100}
-        fill={hybridDescriptorFill(variant, descriptorProminence)}
-        textLength={1000}
-        lengthAdjust="spacingAndGlyphs"
-      >
-        {label}
-      </text>
-    </svg>
-  );
-}
-
-function usesWordmarkFit(
-  lockup: BrandLockupId,
-  descriptorProminence: "default" | "hero",
-): boolean {
-  if (
-    !LOCKUPS_WITH_DESCRIPTOR.includes(
-      lockup as (typeof LOCKUPS_WITH_DESCRIPTOR)[number],
-    )
-  ) {
-    return false;
-  }
-  /** Hero/footer oinadom: descriptor a ancho del lockup completo. */
-  if (lockup === "oinadom" && descriptorProminence === "hero") return false;
-  return true;
-}
-
 export function BrandLogo({
   lockup = "na",
   variant = "color",
@@ -153,9 +81,6 @@ export function BrandLogo({
         lockup as keyof typeof LOCKUP_DESCRIPTOR_LABELS
       ]
     : null;
-
-  /** Descriptor bajo el wordmark o a ancho del lockup (hero oinadom). */
-  const wordmarkFit = usesWordmarkFit(lockup, descriptorProminence);
 
   const rootClass = cn(
     "inline-flex max-w-full overflow-visible leading-none",
@@ -213,52 +138,42 @@ export function BrandLogo({
 
   const descriptorNode =
     hybrid && descriptorLabel ? (
-      wordmarkFit ? (
-        <WordmarkFitDescriptor
-          lockup={lockup as "oina" | "oinadom" | "escuela" | "trilogo"}
-          label={descriptorLabel}
-          variant={variant}
-          descriptorProminence={descriptorProminence}
-          descriptorClassName={descriptorClassName}
-        />
-      ) : (
-        <span
-          className={cn(
-            "block w-full max-w-full uppercase leading-none",
-            variant === "white"
-              ? descriptorProminence === "hero"
-                ? "text-white"
-                : "text-white/85"
-              : "text-[#707070]",
+      <span
+        className={cn(
+          "block w-full max-w-full uppercase leading-none",
+          variant === "white"
+            ? descriptorProminence === "hero"
+              ? "text-white"
+              : "text-white/85"
+            : "text-[#707070]",
+          lockup === "oina" ||
+            lockup === "oinadom" ||
+            lockup === "trilogo" ||
+            lockup === "escuela"
+            ? "font-bold"
+            : "font-black",
+          hybrid ? "text-center" : align === "start" ? "text-left" : "text-center",
+          lockup === "trilogo" ? "whitespace-normal sm:whitespace-nowrap" : "whitespace-nowrap",
+          descriptorClassName,
+        )}
+        style={{
+          ...brandDescriptorStyle(
+            lockup as "oina" | "oinadom" | "escuela" | "trilogo",
+            descriptorProminence,
+          ),
+          maxWidth: "100%",
+          fontFamily: "var(--font-noto-sans), sans-serif",
+          fontWeight:
             lockup === "oina" ||
-              lockup === "oinadom" ||
-              lockup === "trilogo" ||
-              lockup === "escuela"
-              ? "font-bold"
-              : "font-black",
-            hybrid ? "text-center" : align === "start" ? "text-left" : "text-center",
-            lockup === "trilogo" ? "whitespace-normal sm:whitespace-nowrap" : "whitespace-nowrap",
-            descriptorClassName,
-          )}
-          style={{
-            ...brandDescriptorStyle(
-              lockup as "oina" | "oinadom" | "escuela" | "trilogo",
-              descriptorProminence,
-            ),
-            maxWidth: "100%",
-            fontFamily: "var(--font-noto-sans), sans-serif",
-            fontWeight:
-              lockup === "oina" ||
-              lockup === "trilogo" ||
-              lockup === "escuela" ||
-              (lockup === "oinadom" && descriptorProminence !== "hero")
-                ? 700
-                : 900,
-          }}
-        >
-          {descriptorLabel}
-        </span>
-      )
+            lockup === "trilogo" ||
+            lockup === "escuela" ||
+            (lockup === "oinadom" && descriptorProminence !== "hero")
+              ? 700
+              : 900,
+        }}
+      >
+        {descriptorLabel}
+      </span>
     ) : null;
 
   if (showTagline) {
@@ -285,13 +200,6 @@ export function BrandLogo({
   }
 
   if (hybrid) {
-    const wordmarkBand: CSSProperties | undefined = wordmarkFit
-      ? {
-          paddingLeft: `${BRAND_WORDMARK_OFFSET_RATIO * 100}%`,
-          paddingRight: `${(1 - BRAND_WORDMARK_OFFSET_RATIO - BRAND_WORDMARK_WIDTH_RATIO) * 100}%`,
-        }
-      : undefined;
-
     return (
       <span className={rootClass}>
         <span
@@ -302,13 +210,7 @@ export function BrandLogo({
           style={{ width: markStyle.width }}
         >
           {logoBody}
-          {wordmarkBand ? (
-            <span className="block w-full" style={wordmarkBand}>
-              {descriptorNode}
-            </span>
-          ) : (
-            descriptorNode
-          )}
+          {descriptorNode}
         </span>
       </span>
     );

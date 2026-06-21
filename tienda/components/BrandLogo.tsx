@@ -86,9 +86,9 @@ function WordmarkBandDescriptor({
       }}
     >
       <text
-        x={500}
+        x={0}
         y={82}
-        textAnchor="middle"
+        textAnchor="start"
         fontFamily="var(--font-noto-sans), Noto Sans, sans-serif"
         fontWeight={700}
         fontSize={100}

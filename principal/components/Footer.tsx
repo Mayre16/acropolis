@@ -116,7 +116,6 @@ export function Footer() {
               variant="white"
               align="center"
               size="footer"
-              descriptorProminence="hero"
               maxWidthClass="max-w-[min(92vw,14.75rem)]"
             />
           </div>

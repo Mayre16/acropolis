@@ -198,8 +198,8 @@ export const DEFAULT_ESFERA_PAGE: CmsEsferaPage = {
   manualCaption: "El Manual Esfera · Edición 2018",
   manualSubtitle:
     "Carta Humanitaria, Principios de Protección y Norma Humanitaria Esencial.",
-  esferaLogoSrc: "/brand/logo-esfera-red-global.webp",
-  esferaLogoWhiteSrc: "/brand/logo-esfera-red-global-white.webp",
+  esferaLogoSrc: "/brand/logo-esfera-red-global.svg",
+  esferaLogoWhiteSrc: "/brand/logo-esfera-red-global.svg",
   esferaLogoAlt: "Estándares Humanitarios Esfera",
   brochureEyebrow: "Recursos",
   brochureTitle: ESFERA_OINADOM_BROCHURE.title,

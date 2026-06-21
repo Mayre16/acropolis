@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
+import SiteImage from "@/components/SiteImage";
 import { cn } from "@/lib/utils/cn";
+import { assetUrl } from "@/lib/asset-url";
 import { useEsferaBrandLogo } from "@/lib/cms/esfera-display";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 
@@ -24,6 +25,12 @@ const PUNTO_FOCAL_LOGO = {
   height: 72,
 } as const;
 
+function resolveLogoSrc(path: string): string {
+  const cms = resolveCmsMediaUrl(path);
+  if (cms.startsWith("http://") || cms.startsWith("https://")) return cms;
+  return assetUrl(cms);
+}
+
 /** Logo Esfera — lee la imagen del CMS cuando está publicada. */
 export function EsferaLogo({
   className,
@@ -45,15 +52,23 @@ export function EsferaLogo({
           height: 116,
         };
 
+  const src = resolveLogoSrc(tone === "white" ? logo.white : logo.color);
+  const useWhiteFilter =
+    tone === "white" && !logo.white.includes("-white");
+
   const image = (
-    <Image
-      src={tone === "white" ? logo.white : logo.color}
+    <SiteImage
+      src={src}
       alt={logo.alt}
       width={logo.width}
       height={logo.height}
       priority={priority}
       unoptimized
-      className={cn("block h-11 w-auto sm:h-12", className)}
+      className={cn(
+        "block h-11 w-auto sm:h-12",
+        useWhiteFilter && "brightness-0 invert",
+        className,
+      )}
       style={{ width: "auto", maxWidth: "none" }}
     />
   );
