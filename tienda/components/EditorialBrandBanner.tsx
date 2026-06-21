@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { SUBMARCA_LOGO } from "@/lib/site-config";
+import { assetUrl } from "@/lib/asset-url";
 
 /** Identificador oficial Editorial Logos a la izquierda; continuidad del naranja a la derecha. */
 export function EditorialBrandBanner() {
@@ -7,7 +8,7 @@ export function EditorialBrandBanner() {
     <header className="flex w-full items-stretch bg-na-amon">
       <div className="relative shrink-0">
         <Image
-          src={SUBMARCA_LOGO.src}
+          src={assetUrl(SUBMARCA_LOGO.src)}
           alt={SUBMARCA_LOGO.alt}
           width={SUBMARCA_LOGO.width}
           height={SUBMARCA_LOGO.height}

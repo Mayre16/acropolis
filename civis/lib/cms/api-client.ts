@@ -1,4 +1,5 @@
 import type { CmsDocument } from "@/lib/cms/types";
+import { assetUrl } from "@/lib/asset-url";
 
 export function cmsApiBase() {
   return (
@@ -15,7 +16,7 @@ export function resolveCmsMediaUrl(src?: string): string | undefined {
   if (uploadPath) return `${cmsApiBase()}${uploadPath}`;
   if (src.startsWith("http://") || src.startsWith("https://")) return src;
   if (src.startsWith("/uploads/")) return `${cmsApiBase()}${src}`;
-  return src;
+  return assetUrl(src);
 }
 
 export function cmsUploadPathExample(site: "acropolis" | "civis") {

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { assetUrl } from "@/lib/asset-url";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { EditorialNavigationProvider } from "@/components/EditorialNavigationProvider";
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   },
   description:
     "Librería Editorial Logos de Nueva Acrópolis RD: tienda de libros, papelería y publicaciones de la organización.",
-  icons: { icon: [{ url: "/brand/icon-na.png", type: "image/png" }] },
+  icons: { icon: [{ url: assetUrl("/brand/icon-na.png"), type: "image/png" }] },
 };
 
 export default function RootLayout({

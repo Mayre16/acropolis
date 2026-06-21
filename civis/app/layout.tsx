@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { assetUrl } from "@/lib/asset-url";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { CivisSiteHeader } from "@/components/CivisSiteHeader";
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     locale: "es_DO",
     type: "website",
   },
-  icons: { icon: [{ url: "/brand/icon-na.webp", type: "image/webp" }] },
+  icons: { icon: [{ url: assetUrl("/brand/icon-na.webp"), type: "image/webp" }] },
   ...(gscVerification
     ? { verification: { google: gscVerification } }
     : undefined),

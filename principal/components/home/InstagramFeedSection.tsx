@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { INSTAGRAM_POSTS } from "@/lib/home-content";
 import { INSTAGRAM_HANDLE, SOCIAL_LINKS } from "@/lib/site-config";
+import { assetUrl } from "@/lib/asset-url";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -91,7 +92,7 @@ export function InstagramFeedSection({ variant = "grid" }: Props) {
                 >
                   <div className="relative aspect-square w-full">
                     <Image
-                      src={post.src}
+                      src={assetUrl(post.src)}
                       alt={post.alt}
                       fill
                       className="object-cover transition duration-300 group-hover:scale-105"
@@ -135,7 +136,7 @@ export function InstagramFeedSection({ variant = "grid" }: Props) {
                   >
                     <div className="relative aspect-square w-full">
                       <Image
-                        src={post.src}
+                        src={assetUrl(post.src)}
                         alt={post.alt}
                         fill
                         className="object-cover transition duration-300 group-hover:scale-105"

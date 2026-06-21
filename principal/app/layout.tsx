@@ -7,6 +7,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { CmsProvider } from "@/lib/cms/provider";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { SITE_URL } from "@/lib/site-config";
+import { assetUrl } from "@/lib/asset-url";
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
   subsets: ["latin"],
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: [{ url: "/brand/icon-na.webp", type: "image/webp" }],
+    icon: [{ url: assetUrl("/brand/icon-na.webp"), type: "image/webp" }],
   },
   ...(gscVerification
     ? { verification: { google: gscVerification } }

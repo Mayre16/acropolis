@@ -8,6 +8,7 @@ import {
   LOCKUPS_WITH_DESCRIPTOR,
   LOCKUP_DESCRIPTOR_LABELS,
 } from "@/lib/brand-assets";
+import { assetUrl } from "@/lib/asset-url";
 import {
   BRAND_DESCRIPTOR_GAP_RATIO,
   BRAND_DESCRIPTOR_TEXT_RATIO,
@@ -122,7 +123,8 @@ export function BrandLogo({
 }: BrandLogoProps) {
   const hybrid = usesHybrid(lockup, render);
   const asset = hybrid ? BRAND_TOP_MARK : BRAND_LOCKUPS[lockup];
-  const src = variant === "white" ? asset.webpWhite : asset.webp;
+  const rawSrc = variant === "white" ? asset.webpWhite : asset.webp;
+  const src = assetUrl(rawSrc);
   const aspect = markAspect(asset);
   const spaceRatio = BRAND_CLEAR_SPACE_RATIO[lockupClearSpaceVariant(lockup)];
   const showTagline =

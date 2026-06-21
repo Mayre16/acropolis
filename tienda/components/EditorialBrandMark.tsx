@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { assetUrl } from "@/lib/asset-url";
 
 /** Identificador horizontal Editorial (footer y uso general). */
 export const EDITORIAL_SUBMARCA_LOGO = {
@@ -81,7 +82,7 @@ export function EditorialBrandMark({
 
   return (
     <Image
-      src={logo.src}
+      src={assetUrl(logo.src)}
       alt={logo.alt}
       width={logo.width}
       height={logo.height}
@@ -98,7 +99,7 @@ export function EditorialBrandMark({
             ? EDITORIAL_HEADER_SUBMARCA_LOGO.fallback
             : EDITORIAL_SUBMARCA_LOGO.fallback;
         if (!img.src.includes(fallback.split("/").pop()!)) {
-          img.src = fallback;
+          img.src = assetUrl(fallback);
         }
       }}
     />
