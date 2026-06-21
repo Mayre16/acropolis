@@ -137,10 +137,12 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
           <div className="pointer-events-none relative z-10 mx-auto flex h-full min-h-[inherit] max-w-6xl flex-col justify-end px-4 pb-10 pt-28 sm:px-6 sm:pb-12 sm:pt-32">
             <div className="mb-6 flex justify-start overflow-visible">
               <NaBrandLockupGroup
-                lockup="oina"
+                lockup="oinadom"
                 variant="white"
                 align="start"
                 size="contenidoHub"
+                descriptorProminence="hero"
+                maxWidthClass="max-w-[min(94vw,22rem)]"
               />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-helios drop-shadow-sm">
