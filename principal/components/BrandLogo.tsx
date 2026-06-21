@@ -138,9 +138,8 @@ export function BrandLogo({
       ]
     : null;
 
-  /** Footer oinadom: descriptor al ancho del wordmark (SVG). Hero: HTML proporcional grande. */
-  const oinadomWordmarkFit =
-    lockup === "oinadom" && descriptorProminence !== "hero";
+  /** Mismo lockup híbrido que el hero (anagrama + país), escalado con `--brand-logo-h`. */
+  const oinadomWordmarkFit = false;
 
   const rootClass = cn(
     "inline-flex max-w-full overflow-visible leading-none",

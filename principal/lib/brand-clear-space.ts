@@ -94,7 +94,10 @@ export function brandDescriptorStyle(
   if (prominence === "hero") {
     return {
       marginTop: "0.3em",
-      fontSize: "clamp(0.875rem, calc(var(--brand-logo-h) * 0.058), 1.35rem)",
+      fontSize:
+        lockup === "oinadom"
+          ? "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.10), 1.35rem)"
+          : "clamp(0.875rem, calc(var(--brand-logo-h) * 0.058), 1.35rem)",
       letterSpacing: lockup === "oinadom" ? "0.1em" : tracking,
     };
   }
