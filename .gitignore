@@ -4,6 +4,7 @@ node_modules/
 # Next.js / builds
 .next/
 out/
+.pages-site/
 deploy/
 upload-cpanel-*/
 

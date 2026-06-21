@@ -20,9 +20,27 @@ Alternativa: un solo dominio con rutas (`/`, `/civis/`, `/tienda/`) — requiere
 
 ## Preview sin tocar DNS
 
-Tras el workflow `Build sites`, descarga el artifact `principal-out` / `civis-out` / `tienda-out` y súbelo a preview, **o** usa:
+Workflow **Deploy GitHub Pages preview** (`.github/workflows/deploy-pages.yml`).
 
-- `https://wiserlearningcenter.github.io/web-oina/` (si publicas una carpeta combinada)
+Tras cada push a `main`:
+
+| URL preview | Sitio |
+|-------------|--------|
+| https://wiserlearningcenter.github.io/web-oina/ | Índice con enlaces |
+| https://wiserlearningcenter.github.io/web-oina/principal/ | Acropolis |
+| https://wiserlearningcenter.github.io/web-oina/civis/ | Civis |
+| https://wiserlearningcenter.github.io/web-oina/tienda/ | Tienda |
+
+Build local del mismo preview:
+
+```powershell
+node .github/scripts/build-github-pages.mjs
+# Abrir .pages-site/index.html o servir la carpeta con un servidor estático
+```
+
+La primera vez: en el repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+También existen artifacts del workflow `Build sites` (`principal-out`, etc.) por 7 días.
 
 ## Build local para Pages
 
