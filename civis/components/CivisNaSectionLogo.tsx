@@ -39,7 +39,6 @@ export function CivisNaSectionLogo({
       variant={variant}
       align={align === "center" ? "center" : "start"}
       fitDescriptorToWordmark
-      className={align === "center" ? "mx-auto block w-fit" : undefined}
       maxWidthClass={maxWidthClass}
     />
   );

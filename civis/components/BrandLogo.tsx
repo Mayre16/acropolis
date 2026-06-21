@@ -149,8 +149,8 @@ export function BrandLogo({
     "inline-flex max-w-full overflow-visible leading-none",
     hybrid || showSubtitle
       ? cn(
-          "w-fit flex-col",
-          align === "start" ? "self-start" : "mx-auto self-center",
+          "flex-col",
+          align === "start" ? "self-start" : "self-center",
         )
       : align === "start"
         ? "items-start"
@@ -197,7 +197,7 @@ export function BrandLogo({
         "block max-w-full shrink-0 object-contain",
         lockup === "na-solo" ? "h-[var(--brand-logo-h)] w-auto" : "h-auto w-auto",
         hybrid ? "object-center" : align === "start" ? "object-left" : "object-center",
-        maxWidthClass,
+        !fitDescriptorToWordmark && maxWidthClass,
       )}
       style={markStyle}
     />
@@ -298,7 +298,8 @@ export function BrandLogo({
         <span
           className={cn(
             "inline-flex max-w-full flex-col overflow-visible pt-0.5",
-            align === "start" ? "items-start" : "items-center",
+            fitDescriptorToWordmark ? "items-stretch" : align === "start" ? "items-start" : "items-center",
+            fitDescriptorToWordmark && maxWidthClass,
           )}
           style={{ width: markStyle.width }}
         >

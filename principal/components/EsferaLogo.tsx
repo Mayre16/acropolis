@@ -26,7 +26,7 @@ const PUNTO_FOCAL_LOGO = {
 } as const;
 
 function resolveLogoSrc(path: string): string {
-  const cms = resolveCmsMediaUrl(path);
+  const cms = resolveCmsMediaUrl(path) ?? path;
   if (cms.startsWith("http://") || cms.startsWith("https://")) return cms;
   return assetUrl(cms);
 }

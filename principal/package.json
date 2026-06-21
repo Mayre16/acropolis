@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 3100",
-    "dev:webpack": "next dev -p 3100",
+    "dev": "next dev -p 3100",
+    "dev:turbopack": "next dev --turbopack -p 3100",
     "build": "node scripts/fetch_mundo_feed.mjs && next build",
     "build:cpanel": "node scripts/build-cpanel.mjs",
     "pack:diplomado": "node scripts/pack-diplomado-cpanel.mjs",

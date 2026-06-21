@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
   },
+  turbopack: {
+    resolveAlias: {
+      "next/image": path.join(__dirname, "components/SiteImage.tsx"),
+      "next-original/image": require.resolve("next/image"),
+    },
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
