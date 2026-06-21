@@ -12,7 +12,7 @@ export const NA_BRAND_LOCKUP_SIZES = {
   footerInstitutional: brandLogoHeightClass.footerInstitutional,
   sectionStacked: brandLogoHeightClass.sectionStacked,
   quienesSomos: brandLogoHeightClass.quienesSomos,
-  /** Referencia oinadom proporcional — hub `/contenido`. */
+  /** Referencia oina proporcional — hub `/contenido`. */
   contenidoHub: brandLogoHeightClass.contenidoHub,
   contentDigital: brandLogoHeightClass.contentDigital,
   internationalBand: brandLogoHeightClass.internationalBand,

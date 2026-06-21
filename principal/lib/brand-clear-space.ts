@@ -60,7 +60,7 @@ export const brandLogoHeightClass = {
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] lg:[--brand-logo-h:5.35rem]",
   contentDigital:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.75rem] md:[--brand-logo-h:5.1rem]",
-  /** Hub `/contenido` — oinadom alineado con hero/footer del sitio RD. */
+  /** Hub `/contenido` — oina; descriptor bajo el wordmark. */
   contenidoHub:
     "[--brand-logo-h:3.35rem] sm:[--brand-logo-h:3.75rem] md:[--brand-logo-h:4.1rem]",
   internationalBand:

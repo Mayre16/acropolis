@@ -62,20 +62,20 @@ function hybridDescriptorFill(
   return "#707070";
 }
 
-function OinadomDescriptor({
+function WordmarkFitDescriptor({
+  lockup,
   label,
   variant,
   descriptorProminence,
   descriptorClassName,
-  align,
 }: {
+  lockup: "oina" | "oinadom" | "escuela" | "trilogo";
   label: string;
   variant: BrandLogoVariant;
   descriptorProminence: "default" | "hero";
   descriptorClassName?: string;
-  align: "start" | "center";
 }) {
-  const styles = brandDescriptorStyle("oinadom", descriptorProminence);
+  const styles = brandDescriptorStyle(lockup, descriptorProminence);
 
   return (
     <svg
@@ -89,9 +89,9 @@ function OinadomDescriptor({
       }}
     >
       <text
-        x={align === "start" ? 0 : 500}
+        x={500}
         y={82}
-        textAnchor={align === "start" ? "start" : "middle"}
+        textAnchor="middle"
         fontFamily="var(--font-noto-sans), Noto Sans, sans-serif"
         fontWeight={700}
         fontSize={100}
@@ -103,6 +103,21 @@ function OinadomDescriptor({
       </text>
     </svg>
   );
+}
+
+function usesWordmarkFit(
+  lockup: BrandLockupId,
+  descriptorProminence: "default" | "hero",
+): boolean {
+  if (
+    !LOCKUPS_WITH_DESCRIPTOR.includes(
+      lockup as (typeof LOCKUPS_WITH_DESCRIPTOR)[number],
+    )
+  ) {
+    return false;
+  }
+  if (lockup === "oinadom" && descriptorProminence === "hero") return false;
+  return true;
 }
 
 export function BrandLogo({
@@ -138,8 +153,7 @@ export function BrandLogo({
       ]
     : null;
 
-  const oinadomWordmarkFit =
-    lockup === "oinadom" && descriptorProminence !== "hero";
+  const wordmarkFit = usesWordmarkFit(lockup, descriptorProminence);
 
   const defaultSubtitleColor =
     variant === "white" ? "text-white/80" : "text-na-muted";
@@ -215,13 +229,13 @@ export function BrandLogo({
 
   const descriptorNode =
     hybrid && descriptorLabel ? (
-      oinadomWordmarkFit ? (
-        <OinadomDescriptor
+      wordmarkFit ? (
+        <WordmarkFitDescriptor
+          lockup={lockup as "oina" | "oinadom" | "escuela" | "trilogo"}
           label={descriptorLabel}
           variant={variant}
           descriptorProminence={descriptorProminence}
           descriptorClassName={descriptorClassName}
-          align={align}
         />
       ) : (
         <span
@@ -287,7 +301,7 @@ export function BrandLogo({
   }
 
   if (hybrid) {
-    const oinadomWordmarkBand: CSSProperties | undefined = oinadomWordmarkFit
+    const wordmarkBand: CSSProperties | undefined = wordmarkFit
       ? {
           paddingLeft: `${BRAND_WORDMARK_OFFSET_RATIO * 100}%`,
           paddingRight: `${(1 - BRAND_WORDMARK_OFFSET_RATIO - BRAND_WORDMARK_WIDTH_RATIO) * 100}%`,
@@ -304,8 +318,8 @@ export function BrandLogo({
           style={{ width: markStyle.width }}
         >
           {logoBody}
-          {oinadomWordmarkBand ? (
-            <span className="block w-full" style={oinadomWordmarkBand}>
+          {wordmarkBand ? (
+            <span className="block w-full" style={wordmarkBand}>
               {descriptorNode}
             </span>
           ) : (
