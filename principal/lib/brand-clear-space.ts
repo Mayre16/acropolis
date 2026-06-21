@@ -60,9 +60,9 @@ export const brandLogoHeightClass = {
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] lg:[--brand-logo-h:5.35rem]",
   contentDigital:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.75rem] md:[--brand-logo-h:5.1rem]",
-  /** Hub `/contenido` — oina; descriptor bajo el wordmark. */
+  /** Hub `/contenido` — misma escala que PageHero trilogo (p. ej. voluntariado). */
   contenidoHub:
-    "[--brand-logo-h:3.35rem] sm:[--brand-logo-h:3.75rem] md:[--brand-logo-h:4.1rem]",
+    "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] md:[--brand-logo-h:5.35rem]",
   internationalBand:
     "[--brand-logo-h:4.75rem] sm:[--brand-logo-h:5.5rem] md:[--brand-logo-h:6rem]",
   sectionStacked:
@@ -102,12 +102,12 @@ export function brandDescriptorStyle(
     };
   }
 
-  /** oina — ancho máx. = «Nueva Acrópolis»; una línea. */
+  /** oina — descriptor largo; misma escala que trilogo bajo el wordmark. */
   if (lockup === "oina") {
     return {
-      marginTop: "0.24em",
-      fontSize: "clamp(0.4375rem, calc(var(--brand-logo-h) * 0.19), 0.625rem)",
-      letterSpacing: "0.038em",
+      marginTop: "0.22em",
+      fontSize: "clamp(0.5rem, calc(var(--brand-logo-h) * 0.026), 0.625rem)",
+      letterSpacing: "0.032em",
     };
   }
 

@@ -140,8 +140,8 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
                 lockup="oina"
                 variant="white"
                 align="center"
-                size="contenidoHub"
-                maxWidthClass="max-w-[min(94vw,22rem)]"
+                size="pageHeroTrilogo"
+                maxWidthClass="max-w-[min(92vw,22rem)]"
               />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-helios drop-shadow-sm">
