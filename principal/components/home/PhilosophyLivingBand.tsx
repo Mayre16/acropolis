@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
-const FILOSOFIA_PARA_VIVIR_BG = "/img/home/filosofia-para-vivir.webp";
+import { assetUrl } from "@/lib/asset-url";
+
+const FILOSOFIA_PARA_VIVIR_BG = assetUrl("/img/home/filosofia-para-vivir.webp");
 
 /** Banda «Filosofía para Vivir» — foto de paisaje como acropolis.org/es. */
 export function PhilosophyLivingBand() {

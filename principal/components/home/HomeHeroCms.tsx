@@ -8,6 +8,7 @@ import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { assetUrl } from "@/lib/asset-url";
 
 const HERO_OVERLAY = "bg-na-heket/[0.78]";
 const HERO_CTA =
@@ -41,8 +42,9 @@ export function HomeHeroCms() {
       : isCmsEnabled()
         ? published?.background?.alt
         : undefined) ?? HOME_HERO_BACKGROUND.alt;
-  const resolvedBackgroundSrc =
-    resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc;
+  const resolvedBackgroundSrc = assetUrl(
+    resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc,
+  );
 
   return (
     <section

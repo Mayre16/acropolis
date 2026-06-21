@@ -7,6 +7,7 @@ import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { DEFAULT_HOME_PAGE, mergeHomePage } from "@/lib/cms/home-page-edit";
 import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { assetUrl } from "@/lib/asset-url";
 
 export function PhilosophyLivingBandCms() {
   const cms = useCmsDocument();
@@ -15,10 +16,11 @@ export function PhilosophyLivingBandCms() {
     ? mergeHomePage({ ...DEFAULT_HOME_PAGE, ...edit.homePage })
     : mergeHomePage(isCmsEnabled() ? cms?.sections.homePage : undefined);
   const band = page.philosophyBand ?? DEFAULT_HOME_PAGE.philosophyBand!;
-  const bgSrc =
+  const bgSrc = assetUrl(
     resolveCmsMediaUrl(band.imageSrc) ??
-    band.imageSrc ??
-    "/img/home/filosofia-para-vivir.webp";
+      band.imageSrc ??
+      "/img/home/filosofia-para-vivir.webp",
+  );
 
   return (
     <section className="relative overflow-hidden">

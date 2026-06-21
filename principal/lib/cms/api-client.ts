@@ -1,5 +1,4 @@
 import type { CmsDocument } from "@/lib/cms/types";
-import { assetUrl } from "@/lib/asset-url";
 
 export function cmsApiBase() {
   return (
@@ -16,7 +15,7 @@ export function resolveCmsMediaUrl(src?: string): string | undefined {
   if (uploadPath) return `${cmsApiBase()}${uploadPath}`;
   if (src.startsWith("http://") || src.startsWith("https://")) return src;
   if (src.startsWith("/uploads/")) return `${cmsApiBase()}${src}`;
-  return assetUrl(src);
+  return src;
 }
 
 /** Ruta sugerida al subir o pegar una imagen del CMS. */

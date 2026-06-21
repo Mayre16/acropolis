@@ -5,10 +5,7 @@ import Image from "next/image";
 import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
 
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
-
-
-
-/** Overlay y CTA alineados con acropolis.org/es (Heket #086357 al 78%). */
+import { assetUrl } from "@/lib/asset-url";
 
 const HERO_OVERLAY = "bg-na-heket/[0.78]";
 
@@ -19,6 +16,8 @@ const HERO_CTA =
 
 export function Hero() {
 
+  const heroBg = assetUrl(HOME_HERO_BACKGROUND.src);
+
   return (
 
     <section className="relative flex min-h-screen items-center justify-center overflow-x-hidden">
@@ -27,7 +26,7 @@ export function Hero() {
 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat md:bg-fixed"
 
-        style={{ backgroundImage: `url(${HOME_HERO_BACKGROUND.src})` }}
+        style={{ backgroundImage: `url(${heroBg})` }}
 
         aria-hidden
 
@@ -35,7 +34,7 @@ export function Hero() {
 
       <Image
 
-        src={HOME_HERO_BACKGROUND.src}
+        src={heroBg}
 
         alt={HOME_HERO_BACKGROUND.alt}
 
