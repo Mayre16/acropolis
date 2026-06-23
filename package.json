@@ -11,6 +11,7 @@
     "build:tienda": "npm run build --prefix tienda",
     "build:all": "npm run build:principal && npm run build:civis && npm run build:tienda",
     "cms:deploy": "node editor/scripts/trigger-cms-deploy.mjs",
+    "cms:deploy:all": "node editor/scripts/trigger-cms-deploy.mjs all",
     "cms:deploy:both": "node editor/scripts/trigger-cms-deploy.mjs both"
   }
 }

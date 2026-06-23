@@ -47,6 +47,7 @@ for (const dir of [OUT, NEXT]) {
 }
 
 const assetSteps = [
+  ["npm", ["run", "sedes:sync"]],
   ["npm", ["run", "covers:webp"]],
   ["npm", ["run", "hero:build"]],
   ["npm", ["run", "regalos:webp"]],

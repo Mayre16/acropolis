@@ -180,13 +180,11 @@ if (preg_match('#^/content/(acropolis|civis)/publish$#', $uri, $m) && $_SERVER['
         jsonOut(400, ['error' => 'Sin borrador']);
     }
     copy($draft, $published);
-    $deploy = cms_trigger_deploy_webhook($config, $m[1]);
+    $deploy = cms_trigger_deploy_after_publish($config, $m[1]);
     jsonOut(200, [
         'ok' => true,
         'deploy' => $deploy,
-        'message' => !empty($deploy['queued'])
-            ? 'Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).'
-            : 'Publicado. El contenido ya está disponible; recarga la página si no lo ves.',
+        'message' => cms_publish_user_message($deploy),
     ]);
 }
 

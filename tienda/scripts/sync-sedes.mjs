@@ -14,11 +14,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PUBLISHED = path.join(ROOT, "../editor/data/acropolis/published.json");
+const PUBLISHED_CANDIDATES = [
+  path.join(ROOT, "../editor/data/acropolis/published.json"),
+  path.join(ROOT, "../principal/data/acropolis/published.json"),
+];
+const PUBLISHED = PUBLISHED_CANDIDATES.find((p) => fs.existsSync(p));
 const OUT = path.join(ROOT, "lib/editorial-sedes.generated.ts");
 
-if (!fs.existsSync(PUBLISHED)) {
-  console.error("No se encontró el contenido publicado del sitio principal:", PUBLISHED);
+if (!PUBLISHED) {
+  console.error(
+    "No se encontró el contenido publicado del sitio principal. Rutas probadas:\n",
+    PUBLISHED_CANDIDATES.map((p) => `  - ${p}`).join("\n"),
+  );
   process.exit(1);
 }
 

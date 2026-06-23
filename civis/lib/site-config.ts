@@ -2,7 +2,7 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
   (process.env.NODE_ENV === "development"
     ? "http://localhost:3200"
-    : "https://civis.acropolis.org.do")
+    : "https://civis.acropolis.adesa.com.do")
 ).replace(/\/$/, "");
 
 export const PRINCIPAL_SITE_URL = (

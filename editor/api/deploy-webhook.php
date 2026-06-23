@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 function cms_trigger_deploy_webhook(array $config, string $site): array
 {
-    if (!preg_match('/^(acropolis|civis)$/', $site)) {
+    if (!preg_match('/^(acropolis|civis|tienda)$/', $site)) {
         return ['queued' => false, 'reason' => 'invalid_site'];
     }
 
@@ -99,4 +99,28 @@ function cms_trigger_deploy_webhook(array $config, string $site): array
         'status' => $code,
         'detail' => is_string($body) ? substr($body, 0, 200) : '',
     ];
+}
+
+/** Tras publicar Acropolis, también reconstruye Editorial (sedes sincronizadas en build). */
+function cms_trigger_deploy_after_publish(array $config, string $site): array
+{
+    $primary = cms_trigger_deploy_webhook($config, $site);
+    if ($site !== 'acropolis') {
+        return ['site' => $site, 'primary' => $primary];
+    }
+    $tienda = cms_trigger_deploy_webhook($config, 'tienda');
+    return ['site' => $site, 'primary' => $primary, 'tienda' => $tienda];
+}
+
+function cms_publish_user_message(array $deploy): string
+{
+    $queued = !empty($deploy['queued'])
+        || !empty($deploy['primary']['queued'])
+        || !empty($deploy['tienda']['queued']);
+
+    if ($queued) {
+        return 'Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).';
+    }
+
+    return 'Publicado. El contenido ya está disponible; recarga la página si no lo ves.';
 }

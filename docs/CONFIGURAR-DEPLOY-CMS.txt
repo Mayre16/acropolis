@@ -24,16 +24,22 @@ Carpeta remota FTP:    _________________________
   (ejemplo: /public_html/  o  /acropolis.adesa.com.do/)
 
 --- CIVIS (si aplica) ---
-URL pública:           https://_________________________
+URL pública:           https://civis.acropolis.adesa.com.do
+FTP servidor:          _________________________
+FTP usuario:           _________________________
+FTP contraseña:        _________________________
+Carpeta remota FTP:    _________________________
+
+--- EDITORIAL / TIENDA ---
+URL pública:           https://tienda.acropolis.adesa.com.do
 FTP servidor:          _________________________
 FTP usuario:           _________________________
 FTP contraseña:        _________________________
 Carpeta remota FTP:    _________________________
 
 --- EDITOR (CMS) ---
-URL del editor:        https://_________________________
-URL de la API:         https://_________________________/api
-  (ejemplo: https://editor.acropolis.org.do/api)
+URL del editor:        https://editor.acropolis.adesa.com.do
+URL de la API:         https://editor.acropolis.adesa.com.do/api
 
 --- GITHUB ---
 Repo:                  Mayre16/acropolis   (o el que uses)
@@ -54,6 +60,7 @@ PARTE B — cPanel: DÓNDE SACAR CADA COSA
     - Ahí verás algo como:
         acropolis.adesa.com.do  →  carpeta: public_html/acropolis.adesa.com.do
         civis.acropolis...      →  carpeta: public_html/civis...
+        tienda.acropolis...     →  carpeta: public_html/tienda...
         editor.acropolis...     →  carpeta: public_html/editor...
     - ANOTA la carpeta de cada uno → eso es PRINCIPAL_FTP_REMOTE_DIR (con / al final).
     - Ejemplo de ruta FTP correcta: /public_html/acropolis.adesa.com.do/
@@ -94,7 +101,7 @@ PARTE B — cPanel: DÓNDE SACAR CADA COSA
     - Edita config.php y pon:
         github_repo       → Mayre16/acropolis
         github_deploy_token → el PAT de GitHub (Parte C)
-        allowed_origins   → URLs de tus sitios (principal, civis, editor)
+        allowed_origins   → URLs de tus sitios (principal, civis, tienda, editor)
     - Permisos carpeta data/: 755 o 775 (debe poder escribir published.json).
 
 [ ] 7. PERMISOS CARPETA data/
@@ -125,24 +132,34 @@ PARTE C — GITHUB: TOKEN Y SECRETS
 
     Nombre del secret          Valor (de tu plantilla arriba)
     -------------------------  ------------------------------------------
-    CMS_API_URL                https://editor.TUDOMINIO/api
-    PRINCIPAL_SITE_URL         https://acropolis... (URL pública del sitio)
+    CMS_API_URL                https://editor.acropolis.adesa.com.do/api
+    PRINCIPAL_SITE_URL         https://acropolis.adesa.com.do
     PRINCIPAL_FTP_SERVER       ftp.tudominio.com (o hostname del paso 3)
     PRINCIPAL_FTP_USERNAME     usuario FTP del paso 3
     PRINCIPAL_FTP_PASSWORD     contraseña FTP del paso 3
     PRINCIPAL_FTP_REMOTE_DIR   /public_html/.../  (carpeta del paso 2)
 
-    Para Civis (opcional, mismos nombres con prefijo CIVIS_):
-    CIVIS_SITE_URL
+    Para Civis (prefijo CIVIS_):
+    CIVIS_SITE_URL             https://civis.acropolis.adesa.com.do
     CIVIS_FTP_SERVER
     CIVIS_FTP_USERNAME
     CIVIS_FTP_PASSWORD
     CIVIS_FTP_REMOTE_DIR
 
+    Para Editorial / tienda (prefijo TIENDA_):
+    TIENDA_SITE_URL            https://tienda.acropolis.adesa.com.do
+    TIENDA_FTP_SERVER
+    TIENDA_FTP_USERNAME
+    TIENDA_FTP_PASSWORD
+    TIENDA_FTP_REMOTE_DIR
+
+    Opcional (catálogo de libros en build tienda):
+    STORE_API_URL              https://biblioteca-oina.adesa.com.do
+
 [ ] 10. PROBAR EL WORKFLOW A MANO
     - GitHub → pestaña Actions
     - Workflow: "CMS publish — rebuild and deploy"
-    - Run workflow → elige site: acropolis (o civis)
+    - Run workflow → elige site: all (recomendado), acropolis, civis o tienda
     - Espera 5–10 min. Si FTP está bien, el sitio se actualiza solo.
     - Si falla FTP: en esa misma ejecución baja el "artifact" cms-acropolis-out
       y sube manualmente UNA VEZ mientras revisas credenciales FTP.

@@ -15,7 +15,7 @@ export type SyncedSede = {
 export const PRINCIPAL_SEDES: SyncedSede[] = [
   {
     id: "sede-naco",
-    name: "Sede Naco",
+    name: "Naco",
     zone: "Ens. Naco",
     city: "Santo Domingo",
     address: "Calle Cub Scouts No. 6, 3er nivel",
@@ -24,11 +24,19 @@ export const PRINCIPAL_SEDES: SyncedSede[] = [
   },
   {
     id: "sede-los-prados",
-    name: "Sede Los Prados",
+    name: "Los Prados",
     zone: "Los Prados",
     city: "Santo Domingo",
     address: "Eugenio Deschamps No. 81",
     reference: "Plaza Los Prados",
     mapsQuery: "Eugenio Deschamps 81 Los Prados Santo Domingo República Dominicana",
+  },
+  {
+    id: "sede-santiago",
+    name: "Santiago",
+    zone: "Santiago de los Caballeros",
+    city: "Santiago",
+    address: "Dirección próximamente",
+    mapsQuery: "Nueva Acrópolis Santiago de los Caballeros República Dominicana",
   },
 ];

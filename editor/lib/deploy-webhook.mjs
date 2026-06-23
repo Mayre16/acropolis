@@ -3,7 +3,7 @@
  * Variables: CMS_GITHUB_REPO, CMS_GITHUB_DEPLOY_TOKEN
  */
 export async function triggerDeployWebhook(site) {
-  if (!/^(acropolis|civis)$/.test(site)) {
+  if (!/^(acropolis|civis|tienda)$/.test(site)) {
     return { queued: false, reason: "invalid_site" };
   }
 
@@ -56,6 +56,18 @@ export const CMS_PUBLISH_LIVE_MSG =
   "Publicado. El contenido ya está disponible; recarga la página si no lo ves.";
 
 export function cmsPublishUserMessage(deploy) {
-  if (deploy?.queued) return CMS_PUBLISH_DEPLOY_MSG;
+  if (deploy?.queued || deploy?.primary?.queued || deploy?.tienda?.queued) {
+    return CMS_PUBLISH_DEPLOY_MSG;
+  }
   return CMS_PUBLISH_LIVE_MSG;
+}
+
+/** Tras publicar Acropolis, también reconstruye Editorial (sedes/regalos estáticos). */
+export async function triggerDeployAfterPublish(site) {
+  const primary = await triggerDeployWebhook(site);
+  if (site !== "acropolis") {
+    return { site, primary };
+  }
+  const tienda = await triggerDeployWebhook("tienda");
+  return { site, primary, tienda };
 }

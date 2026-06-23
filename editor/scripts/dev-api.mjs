@@ -25,7 +25,7 @@ import { sendEsferaSolicitudMail } from "../lib/esfera-solicitud-mail.mjs";
 import { sendVolunteerSolicitudMail } from "../lib/volunteer-solicitud-mail.mjs";
 import { sendSiteInquiryMail } from "../lib/site-inquiry-mail.mjs";
 import {
-  triggerDeployWebhook,
+  triggerDeployAfterPublish,
   cmsPublishUserMessage,
 } from "../lib/deploy-webhook.mjs";
 import {
@@ -466,7 +466,7 @@ const server = http.createServer(async (req, res) => {
       draft.updatedAt = new Date().toISOString();
       fs.writeFileSync(publishedPath(site), JSON.stringify(draft, null, 2));
       fs.writeFileSync(draftPath(site), JSON.stringify(draft, null, 2));
-      const deploy = await triggerDeployWebhook(site);
+      const deploy = await triggerDeployAfterPublish(site);
       json(
         res,
         200,
