@@ -181,11 +181,12 @@ function CollaborateCta({
   onOpenInquiry: (kind: CollaborateInquiry) => void;
 }) {
   if (tab.id === "donar" || tab.id === "alianzas") {
+    const inquiryKind = tab.id;
     return (
       <button
         type="button"
         className={primaryClass}
-        onClick={() => onOpenInquiry(tab.id)}
+        onClick={() => onOpenInquiry(inquiryKind)}
       >
         {tab.cta}
       </button>

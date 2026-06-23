@@ -1,6 +1,5 @@
 import { WHATSAPP_URL, DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
 import type { AgendaCategory } from "@/lib/agenda";
-import { buildInscribeMessage, whatsAppHref, whatsAppUrlForCategory } from "@/lib/whatsapp-messages";
 
 export type InscribeActivity = {
   title: string;
