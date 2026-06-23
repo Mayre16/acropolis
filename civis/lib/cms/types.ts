@@ -248,7 +248,7 @@ export type CmsSalon = {
 
   name: string;
 
-  sede: "Naco" | "Los Prados";
+  sede: "Naco" | "Los Prados" | "Santiago";
 
   city: string;
 

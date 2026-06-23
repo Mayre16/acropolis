@@ -5,8 +5,14 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://acropolis.adesa.com.do"
 ).replace(/\/$/, "");
 
-/** Lockup del header — anagrama + «Nueva Acrópolis» (sin descriptor de país). */
+/** Logo NA en header (todas las páginas — sin país). */
 export const HEADER_BRAND_LOCKUP: BrandLockupId = "na";
+
+/** @deprecated Mismo lockup en home e interiores. */
+export const HEADER_HOME_LOCKUP: BrandLockupId = HEADER_BRAND_LOCKUP;
+
+/** @deprecated Mismo lockup en home e interiores. */
+export const HEADER_INNER_LOCKUP: BrandLockupId = HEADER_BRAND_LOCKUP;
 
 /** WhatsApp cursos, talleres y conferencias. */
 export const CURSOS_WHATSAPP_NUMBER = "18495174144";
@@ -33,6 +39,12 @@ export const VOLUNTARIADO_EMAIL =
   process.env.NEXT_PUBLIC_VOLUNTARIADO_EMAIL?.trim() ||
   "voluntariado.humanitario-RD@acropolis.org";
 
+/** Nombre visible del buzón (Contáctenos Esfera / voluntariado). */
+export const VOLUNTARIADO_EMAIL_NAME = "Voluntariado Humanitario";
+
+/** Etiqueta legible: "Voluntariado Humanitario" <correo> */
+export const VOLUNTARIADO_EMAIL_LABEL = `"${VOLUNTARIADO_EMAIL_NAME}" <${VOLUNTARIADO_EMAIL}>`;
+
 /** Domicilio legal de Nueva Acrópolis RD (Sede Naco). */
 export const LEGAL_DOMICILE =
   "Calle Cub Scouts No. 6, Ens. Naco, Santo Domingo";
@@ -57,18 +69,23 @@ export const SEDES = [
     city: "Santo Domingo",
     map: { x: 559, y: 411 },
     venues: [
-      { name: "Sede Naco", note: "Naco" },
-      { name: "Sede Los Prados", note: "Los Prados" },
+      { name: "Naco", note: "Naco" },
+      { name: "Los Prados", note: "Los Prados" },
     ],
+  },
+  {
+    city: "Santiago",
+    map: { x: 370, y: 158 },
+    venues: [{ name: "Santiago", note: "Santiago de los Caballeros" }],
   },
 ] as const;
 
-/** Centros culturales — espacios de eventos y encuentros. */
+/** Puntos culturales — espacios de eventos y encuentros. */
 export const CENTROS_CULTURALES = [
   {
     city: "Santo Domingo",
     venues: [
-      { name: "Punto Cultural Roberto Pastoriza", note: "Centro cultural" },
+      { name: "Roberto Pastoriza", note: "Punto cultural" },
     ],
   },
 ] as const;
@@ -165,11 +182,12 @@ export const NAV_CONTENIDO = {
 } as const;
 
 export const INSTAGRAM_HANDLE = "nuevaacropolisdominicana";
+export const YOUTUBE_HANDLE = "NuevaAcrópolisRD";
 
 /** Redes sociales — pie de página y conexión institucional. */
 export const SOCIAL_LINKS = {
   instagram: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
-  youtube: "https://www.youtube.com/@NuevaAcr%C3%B3polisEspa%C3%B1a",
+  youtube: "https://www.youtube.com/@NuevaAcr%C3%B3polisRD",
   facebook: "https://www.facebook.com/nuevaacropolisrd",
 } as const;
 
@@ -330,6 +348,7 @@ export function getNavContenidoItems(): NavContenidoItem[] {
   return [
     { href: "/articulos", label: "Artículos" },
     { href: "/eventos", label: "Eventos" },
+    { href: "/agenda", label: "Agenda" },
     {
       href: "https://www.revistaesfinge.com/",
       label: "Revista Esfinge",

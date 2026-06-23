@@ -5,7 +5,7 @@ import { VenuesPageShell } from "@/components/cms/VenuesPageShell";
 export const metadata: Metadata = {
   title: "Dónde estamos",
   description:
-    "Sedes en Naco y Los Prados (Santo Domingo) y Punto Cultural Roberto Pastoriza. Direcciones, mapa y contacto de Nueva Acrópolis República Dominicana.",
+    "Sedes en Naco, Los Prados y Roberto Pastoriza (Santo Domingo) y Santiago. Direcciones, mapa y contacto de Nueva Acrópolis República Dominicana.",
   alternates: { canonical: "/donde-estamos" },
 };
 

@@ -16,7 +16,7 @@ export const DIPLOMADO_PROXIMAS_SESIONES: AgendaEntry[] = [
     imageAlt:
       "Diplomado de Filosofía para la Vida — Parthenon, libros y pensamiento clásico",
     description:
-      "Nueva convocatoria del Diplomado de Filosofía para la Vida: filosofía comparada de Oriente y Occidente en sesiones presenciales. Cuatro meses, tres módulos, sin requisitos previos. Inversión RD$ 2,500.",
+      "Nueva convocatoria del Diplomado de Filosofía para la Vida: filosofía comparada de Oriente y Occidente en sesiones presenciales. Cuatro meses, tres módulos, sin requisitos previos.",
     inscribeMessage: DIPLOMADO_INSCRIBE_WHATSAPP,
     detailHref: "/filosofia",
     detailLabel: "Ver programa completo",
@@ -55,24 +55,6 @@ export const DIPLOMADO_PROXIMAS_SESIONES: AgendaEntry[] = [
       "Grupo del Diplomado de Filosofía para la Vida en horario nocturno, Sede Naco. Programa de cinco meses con enfoque práctico: autoconocimiento, convivencia y futuro.",
     inscribeMessage:
       "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Sede Naco, martes 9 de junio, 7:00 p.m. ¿Me pueden dar más información?",
-    detailHref: "/filosofia",
-    detailLabel: "Ver programa completo",
-  },
-  {
-    id: "diplomado-leon-jun17",
-    category: "diplomado",
-    title: "Diplomado de Filosofía para la Vida",
-    startsAt: "2026-06-17",
-    date: "Miércoles 17 de junio",
-    time: "7:00 p.m.",
-    sede: "Centro León · Centro cultural",
-    image: "/img/filosofia/diplomado/diplomado-03.webp",
-    imageAlt:
-      "Diplomado de Filosofía para la Vida — símbolos de Oriente y tradiciones universales",
-    description:
-      "Apertura del Diplomado en Santiago de los Caballeros, en el Centro León. Mismo programa introductorio de cinco meses, impartido en un centro cultural aliado.",
-    inscribeMessage:
-      "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Centro León (Santiago), miércoles 17 de junio, 7:00 p.m. ¿Me pueden dar más información?",
     detailHref: "/filosofia",
     detailLabel: "Ver programa completo",
   },

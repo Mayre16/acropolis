@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, HeartHandshake } from "lucide-react";
+import { EsferaLogo } from "@/components/EsferaLogo";
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
 import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useRelacionesCmsEdit } from "@/components/cms/InstitutionalPageCmsEditContext";
@@ -188,12 +189,27 @@ export function RelacionesPageBody() {
               </h2>
               <p className="mt-4 text-na-muted">{page.rdIntro}</p>
               <ul className="mt-6 space-y-3">
-                {(page.rdItems ?? []).map((r) => (
-                  <li key={r.id} className="flex gap-3 text-na-heketDark">
-                    <HeartHandshake className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer" />
-                    <span className="text-sm leading-relaxed">{r.text}</span>
-                  </li>
-                ))}
+                {(page.rdItems ?? []).map((r) => {
+                  const showEsferaLogo =
+                    r.id === "rd2" || /esfera/i.test(r.text);
+                  return (
+                    <li key={r.id} className="flex gap-3 text-na-heketDark">
+                      <HeartHandshake className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer" />
+                      <div className="min-w-0">
+                        <span className="text-sm leading-relaxed">{r.text}</span>
+                        {showEsferaLogo ? (
+                          <div className="mt-3 max-w-[14rem]">
+                            <EsferaLogo
+                              variant="punto-focal"
+                              tone="color"
+                              className="!h-auto !w-full"
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="relative rounded-[1.5rem] bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-8 text-center shadow-na-card sm:p-10">

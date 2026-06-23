@@ -24,6 +24,8 @@ import {
 } from "@/lib/cms/filosofia-display";
 import { DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
 import { accentCardClass, accentCardShell, accentTokens } from "@/lib/brand-accents";
+import { filosofiaSedeEntries } from "@/lib/filosofia-content";
+import { mapsUrl } from "@/lib/locations";
 import type { CmsFilosofiaFaqIcon } from "@/lib/cms/types";
 
 const FAQ_ICONS: Record<CmsFilosofiaFaqIcon, LucideIcon> = {
@@ -361,22 +363,75 @@ export function FilosofiaPageBody() {
             {esParaTi.title}
           </h2>
         </div>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {esParaTi.items.map(({ id, icon = "book", title, text }, i) => {
-            const Icon = FAQ_ICONS[icon] ?? BookOpen;
-            return (
-              <li key={id} className={accentCardClass(i)}>
-                <Icon className={`h-6 w-6 ${accentTokens(i).icon}`} strokeWidth={1.8} />
-                <OfertaFormativaItem
-                  title={title}
-                  intro={text}
-                  titleClassName="mt-3 text-base"
-                  introClassName="mt-2"
-                />
-              </li>
-            );
-          })}
-        </ul>
+        <div className="mt-10 flex flex-col gap-4">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {esParaTi.items.slice(0, 3).map(({ id, icon = "book", title, text }, i) => {
+              const Icon = FAQ_ICONS[icon] ?? BookOpen;
+              return (
+                <li key={id} className={accentCardClass(i)}>
+                  <Icon className={`h-6 w-6 ${accentTokens(i).icon}`} strokeWidth={1.8} />
+                  <OfertaFormativaItem
+                    title={title}
+                    intro={text}
+                    titleClassName="mt-3 text-base"
+                    introClassName="mt-2 whitespace-pre-line"
+                  />
+                </li>
+              );
+            })}
+          </ul>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {esParaTi.items.slice(3).map(({ id, icon = "book", title, text }, j) => {
+              const i = j + 3;
+              const Icon = FAQ_ICONS[icon] ?? BookOpen;
+              const isSedes = id === "sedes";
+              return (
+                <li
+                  key={id}
+                  className={accentCardClass(
+                    i,
+                    isSedes ? "lg:col-span-2 sm:p-6" : "lg:col-span-1",
+                  )}
+                >
+                  <Icon
+                    className={`${isSedes ? "h-7 w-7" : "h-6 w-6"} ${accentTokens(i).icon}`}
+                    strokeWidth={1.8}
+                  />
+                  {isSedes ? (
+                    <>
+                      <h3 className="mt-3 text-lg font-black text-na-heketDark">
+                        {title}
+                      </h3>
+                      <ul className="mt-2 space-y-2 text-sm leading-relaxed sm:text-base">
+                        {filosofiaSedeEntries().map(({ id: venueId, label, address, mapsQuery }) => (
+                          <li key={venueId}>
+                            <span className="font-semibold text-na-heketDark">{label}</span>
+                            {" — "}
+                            <a
+                              href={mapsUrl(mapsQuery)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-na-heket underline-offset-2 transition hover:text-na-kefer hover:underline"
+                            >
+                              {address}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : (
+                    <OfertaFormativaItem
+                      title={title}
+                      intro={text}
+                      titleClassName="mt-3 text-base"
+                      introClassName="mt-2 whitespace-pre-line"
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </section>
 
       <section

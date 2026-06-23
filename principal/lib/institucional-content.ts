@@ -1,7 +1,7 @@
 /** Textos institucionales alineados con acropolis.org (OINA). */
 
 export const NA_INTRO_PARAGRAPHS = [
-  "Nueva Acrópolis es una Escuela de Filosofía que promueve la cultura y practica el voluntariado. Propone un ideal de valores permanentes para contribuir a la evolución individual y colectiva.",
+  "Nueva Acrópolis es una Escuela de Filosofía que promueve la cultura y practica el voluntariado. Propone un ideal de valores permanentes para contribuir al desarrollo individual y colectivo.",
   "Desde hace más de 65 años, en más de 50 países, los programas de la Escuela de Filosofía han transformado la vida de miles de personas en todo el mundo.",
 ] as const;
 
@@ -10,6 +10,11 @@ export const FUNDACION_ORGANIZACION_BLOCKS = [
     title: "Fundación",
     question: "¿Cuándo se fundó Nueva Acrópolis?",
     text: "Nueva Acrópolis fue fundada en 1957 en Buenos Aires (Argentina) por el profesor Jorge Ángel Livraga Rizzi. De 1992 a 2020 fue Directora Internacional Delia Steinberg Guzmán. Desde 2020 la presidencia de la Organización Internacional está a cargo de Carlos Adelantado Puchal. Nueva Acrópolis está inscrita en el Registro Internacional de Asociaciones del Reino de Bélgica, con sede en Bruselas, como una asociación internacional sin fines de lucro.",
+  },
+  {
+    title: "Fundación en RD",
+    question: "¿Cuándo se fundó Nueva Acrópolis en República Dominicana?",
+    text: "La Organización Internacional Nueva Acrópolis llegó al país en 1998. OINADOM es una asociación cultural sin fines de lucro, reconocida mediante Decreto No. 44-99 y Registro No. 3724 del Centro Nacional de Fomento y Promoción de las Asociaciones sin Fines de Lucro (22 de enero de 2009). Desde entonces impulsa la escuela de filosofía, la cultura y el voluntariado en República Dominicana.",
   },
   {
     title: "Organización",
@@ -41,7 +46,7 @@ export const SIMBOLISMO_NOMBRE = {
 export const PRINCIPIOS_OINA = [
   {
     title: "Fraternidad",
-    text: "Promover un ideal de fraternidad basado en el respeto a la dignidad humana, más allá de las diferencias de sexo, culturales, religiosas, sociales, etc. Es necesario promover el respeto por las diversas identidades y tradiciones, y a la vez fortalecer la unión más allá de las diferencias.",
+    text: "Promover un ideal de fraternidad basado en el respeto a la dignidad humana, más allá de las diferencias de sexo, culturales, religiosas, sociales, etc.",
   },
   {
     title: "Conocimiento",

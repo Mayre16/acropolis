@@ -13,7 +13,7 @@ function isSameSite(href: string): boolean {
 /** Enlaces que muestran aviso antes de salir del sitio principal. */
 export function urlNeedsLeavePrompt(href: string): boolean {
   if (!href) return false;
-  if (/instagram\.com/i.test(href)) return true;
+  if (/instagram\.com/i.test(href)) return false;
   if (href === bibliotecaLibreriaUrl() || /tienda\.acropolis\.adesa\.com\.do/i.test(href))
     return true;
   if (/^https?:\/\//i.test(href) && !isSameSite(href)) return true;

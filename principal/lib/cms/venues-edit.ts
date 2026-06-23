@@ -103,7 +103,7 @@ export function formatCentrosSummary(venues: VenueLocation[]): string {
   const byCity = new Map<string, string[]>();
   for (const v of centros) {
     const list = byCity.get(v.city) ?? [];
-    list.push(v.name);
+    list.push(v.name.replace(/^Punto\s+Cultural\s+/i, "").trim() || v.name);
     byCity.set(v.city, list);
   }
   return [...byCity.entries()]
@@ -120,6 +120,11 @@ const DEFAULT_MAP: Record<
     mapX: 565,
     mapY: 398,
     kind: "centro-cultural",
+  },
+  "Santiago:sede": {
+    mapX: 370,
+    mapY: 158,
+    kind: "sede",
   },
 };
 

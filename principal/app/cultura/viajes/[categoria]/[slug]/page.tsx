@@ -24,8 +24,7 @@ import {
 
 import { getMergedViaje, getViajeStaticParams } from "@/lib/cms/static-params";
 
-import { inscribeWhatsAppHref } from "@/lib/whatsapp-messages";
-
+import { ViajeInquiryButton } from "@/components/ViajeInquiryButton";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 
 
@@ -113,26 +112,6 @@ export default async function ViajeDestinoPage({
   const idx = hermanos.findIndex((v) => v.slug === destino.slug);
 
   const otro = hermanos[(idx + 1) % hermanos.length];
-
-
-
-  const ctaHref =
-
-    destino.link ||
-
-    inscribeWhatsAppHref({
-
-      title: `Viaje cultural: ${destino.title}`,
-
-      kind: "actividad",
-
-      sede: destino.location,
-
-    });
-
-  const ctaExternal = Boolean(destino.link);
-
-
 
   const jsonLd = {
 
@@ -356,42 +335,22 @@ export default async function ViajeDestinoPage({
 
         <div className="mt-10 flex flex-wrap gap-4">
 
-          {ctaExternal ? (
-
+          {destino.link ? (
             <LeaveSiteLink
-
-              href={ctaHref}
-
-              className="inline-flex items-center gap-2 rounded-full bg-na-kefer px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-105"
-
+              href={destino.link}
+              className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 px-5 py-2.5 text-sm font-bold text-na-heketDark transition hover:border-na-kefer hover:text-na-kefer"
             >
-
-              Solicitar información
-
+              Más información
               <ArrowRight className="h-4 w-4" />
-
             </LeaveSiteLink>
-
           ) : (
-
-            <a
-
-              href={ctaHref}
-
-              target="_blank"
-
-              rel="noopener noreferrer"
-
+            <ViajeInquiryButton
+              title={destino.title}
+              location={destino.location}
+              proximaFecha={destino.proximaFecha}
+              label="Solicitar información"
               className="inline-flex items-center gap-2 rounded-full bg-na-kefer px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-105"
-
-            >
-
-              Solicitar información
-
-              <ArrowRight className="h-4 w-4" />
-
-            </a>
-
+            />
           )}
 
           <Link

@@ -65,7 +65,7 @@ Contenido de cada `out/` → hosting estático.
 
 ## Backend (no va en Pages)
 
-- Editor API → Railway
+- Editor API → cPanel (PHP) + deploy automático al publicar — ver `docs/CMS-DEPLOY.md`
 - Tienda catálogo/checkout → Biblioteca hoy, Harmonía mañana (PostgreSQL)
 
 Ver `docs/HARMONIA-TIENDA-API.md`.

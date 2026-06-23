@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { EditorialBrandMark } from "@/components/EditorialBrandMark";
@@ -11,6 +12,7 @@ import {
 } from "@/lib/cms/hooks";
 import type { EditorialNavItem } from "@/lib/editorial-content";
 import { navItemIsActive } from "@/lib/editorial-navigation";
+import { footerNavGridColumns } from "@/lib/footer-nav-grid";
 import {
   BIBLIOTECA_URL,
   CIVIS_URL,
@@ -53,6 +55,8 @@ export function EditorialFooter() {
   const pathname = usePathname();
   const headerNav = useEditorialHeaderNav();
   const tagline = useEditorialFooterTagline();
+  const siteNav = headerNav.filter((item) => item.id !== "sesion");
+  const institutionalNavCount = 3;
 
   return (
     <footer className="editorial-footer">
@@ -77,10 +81,15 @@ export function EditorialFooter() {
           <div className="editorial-footer__nav-col">
             <nav aria-label="Secciones de Editorial Logos">
               <p className="editorial-footer__nav-label">Navegación</p>
-              <ul className="editorial-footer__nav-list">
-                {headerNav
-                  .filter((item) => item.id !== "sesion")
-                  .map((item) => (
+              <ul
+                className="editorial-footer__nav-list"
+                style={
+                  {
+                    "--footer-nav-cols": footerNavGridColumns(siteNav.length),
+                  } as CSSProperties
+                }
+              >
+                {siteNav.map((item) => (
                     <li key={item.id}>
                       <FooterNavLink item={item} pathname={pathname} />
                     </li>
@@ -90,7 +99,15 @@ export function EditorialFooter() {
 
             <nav aria-label="Enlaces institucionales">
               <p className="editorial-footer__nav-label">Nueva Acrópolis</p>
-              <ul className="editorial-footer__nav-list">
+              <ul
+                className="editorial-footer__nav-list"
+                style={
+                  {
+                    "--footer-nav-cols":
+                      footerNavGridColumns(institutionalNavCount),
+                  } as CSSProperties
+                }
+              >
                 <li>
                   <a
                     href={PRINCIPAL_SITE_URL}

@@ -19,6 +19,7 @@ export function agendaEntryToCms(e: AgendaEntry): CmsAgendaEntry {
     detailHref: e.detailHref,
     detailLabel: e.detailLabel,
     showOnHome: e.showOnHome,
+    eventoSlug: e.eventoSlug,
   };
 }
 
@@ -39,6 +40,7 @@ export function cmsEntryToAgenda(e: CmsAgendaEntry): AgendaEntry {
     detailHref: e.detailHref,
     detailLabel: e.detailLabel,
     showOnHome: e.showOnHome,
+    eventoSlug: e.eventoSlug,
   };
 }
 
@@ -74,7 +76,37 @@ export function getVoluntariadoEntries(
   doc: CmsDocument,
   fallback: AgendaEntry[],
 ): CmsAgendaEntry[] {
-  return getAgendaEntriesForCategory(doc, "voluntariado", fallback);
+  return getVoluntariadoPageAgendaEntries(doc, fallback);
+}
+
+/** Voluntariado + Esfera en la página /voluntariado. */
+export function getVoluntariadoPageAgendaEntries(
+  doc: CmsDocument,
+  fallback: AgendaEntry[],
+): CmsAgendaEntry[] {
+  const categories = new Set<AgendaEntry["category"]>(["voluntariado", "esfera"]);
+  const hidden = new Set(doc.sections.agendaHidden ?? []);
+  const cmsById = new Map(
+    (doc.sections.agenda ?? [])
+      .filter((e) => categories.has(e.category))
+      .map((e) => [e.id, e]),
+  );
+  const items: CmsAgendaEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const e of fallback) {
+    if (!categories.has(e.category) || hidden.has(e.id)) continue;
+    items.push(cmsById.get(e.id) ?? agendaEntryToCms(e));
+    seen.add(e.id);
+  }
+
+  for (const e of doc.sections.agenda ?? []) {
+    if (categories.has(e.category) && !seen.has(e.id) && !hidden.has(e.id)) {
+      items.push(e);
+    }
+  }
+
+  return items;
 }
 
 export function mergeVoluntariadoIntoDoc(

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LayoutGrid, MapPin, Pencil, UsersRound } from "lucide-react";
 import {
   LAYOUT_LABELS,
+  SALON_SEDES,
   type LayoutKind,
   type Salon,
 } from "@/lib/salones";
@@ -81,10 +82,12 @@ function SalonCard({
   salon,
   styles,
   onEdit,
+  compact = false,
 }: {
   salon: Salon;
   styles: (typeof VARIANT)[keyof typeof VARIANT];
   onEdit?: () => void;
+  compact?: boolean;
 }) {
   const { capacities, featuredLayout } = salon;
   const imageSrc = resolveCmsMediaUrl(salon.image.src) ?? salon.image.src;
@@ -103,13 +106,21 @@ function SalonCard({
           <Pencil className="h-4 w-4" />
         </button>
       ) : null}
-      <div className="relative aspect-[16/10] w-full bg-black/5">
+      <div
+        className={`relative w-full bg-black/5 ${
+          compact ? "aspect-[4/3]" : "aspect-[16/10]"
+        }`}
+      >
         <Image
           src={imageSrc}
           alt={salon.image.alt}
           fill
           className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 33vw"
+          sizes={
+            compact
+              ? "(max-width: 640px) 100vw, 280px"
+              : "(max-width: 1024px) 100vw, 33vw"
+          }
           unoptimized
         />
         <span
@@ -119,12 +130,24 @@ function SalonCard({
           {LAYOUT_LABELS[featuredLayout]}
         </span>
       </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h4 className="text-lg font-black text-na-ink">{salon.name}</h4>
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-na-muted">
+      <div className={`flex flex-1 flex-col ${compact ? "p-4" : "p-5"}`}>
+        <h4
+          className={`font-black text-na-ink ${compact ? "text-base" : "text-lg"}`}
+        >
+          {salon.name}
+        </h4>
+        <p
+          className={`mt-2 flex-1 leading-relaxed text-na-muted ${
+            compact ? "text-xs" : "text-sm"
+          }`}
+        >
           {salon.summary}
         </p>
-        <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-na-muted">
+        <p
+          className={`font-bold uppercase tracking-[0.18em] text-na-muted ${
+            compact ? "mt-3 text-[10px]" : "mt-4 text-xs"
+          }`}
+        >
           Capacidad máxima por disposición
         </p>
         <ul className="mt-2 space-y-1">
@@ -155,20 +178,12 @@ export function SalonesAlquiler({
   const staticPageCopy = useCmsSalonesPage();
 
   const groups = edit?.ready
-    ? [
-        {
-          sede: "Naco" as const,
-          salones: edit.items
-            .filter((s) => s.sede === "Naco")
-            .map(cmsToSalon),
-        },
-        {
-          sede: "Los Prados" as const,
-          salones: edit.items
-            .filter((s) => s.sede === "Los Prados")
-            .map(cmsToSalon),
-        },
-      ]
+    ? SALON_SEDES.map((sede) => ({
+        sede,
+        salones: edit.items
+          .filter((s) => s.sede === sede)
+          .map(cmsToSalon),
+      })).filter((group) => group.salones.length > 0)
     : staticGroups;
 
   const pageCopy = edit?.ready ? edit.page : staticPageCopy;
@@ -227,17 +242,22 @@ export function SalonesAlquiler({
         </div>
       )}
 
-      {groups.map((group) => (
+      {groups.map((group) => {
+        const compactCards = group.sede === "Los Prados";
+
+        return (
         <div key={group.sede} className={embedded ? "mt-10" : "mt-12"}>
           <div className={`flex items-center gap-2 ${styles.sede}`}>
             <MapPin className="h-4 w-4" aria-hidden />
             <h3 className="text-lg font-black">Sede {group.sede}</h3>
           </div>
           <ul
-            className={`mt-6 grid gap-7 ${
-              group.salones.length === 2
-                ? "sm:grid-cols-2"
-                : "sm:grid-cols-2 lg:grid-cols-3"
+            className={`mt-6 grid gap-5 ${
+              compactCards
+                ? "mx-auto max-w-2xl sm:grid-cols-2 sm:gap-4"
+                : group.salones.length === 2
+                  ? "sm:grid-cols-2"
+                  : "sm:grid-cols-2 lg:grid-cols-3"
             }`}
           >
             {group.salones.map((salon) => (
@@ -245,6 +265,7 @@ export function SalonesAlquiler({
                 <SalonCard
                   salon={salon}
                   styles={styles}
+                  compact={compactCards}
                   onEdit={
                     edit?.ready
                       ? () => edit.setSelectedId(salon.id)
@@ -255,7 +276,8 @@ export function SalonesAlquiler({
             ))}
           </ul>
         </div>
-      ))}
+        );
+      })}
 
       <p className="mt-10 text-center">
         {variant === "civis" ? (

@@ -14,6 +14,7 @@ import {
 } from "@/lib/voluntariado-content";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
+import { getVoluntariadoRecientesFromEventos } from "@/lib/voluntariado-eventos-recientes";
 import type {
   CmsVoluntariadoCard,
   CmsVoluntariadoInfoCard,
@@ -189,13 +190,19 @@ function resolveRecienteItem(
 }
 
 export function useVoluntariadoRecientesDisplay() {
+  const cms = useCmsDocument();
+  const edit = useVoluntariadoCmsEdit();
   const page = useVoluntariadoPageDisplay();
+  const fromEventos = getVoluntariadoRecientesFromEventos(cms);
+  const items =
+    edit?.ready && edit.page.recientesItems?.length
+      ? edit.page.recientesItems.map(resolveRecienteItem)
+      : fromEventos.map(resolveRecienteItem);
+
   return {
     eyebrow: page.recientesEyebrow ?? VOLUNTARIADO_RECIENTES_SECTION.eyebrow,
     title: page.recientesTitle ?? VOLUNTARIADO_RECIENTES_SECTION.title,
     intro: page.recientesIntro ?? VOLUNTARIADO_RECIENTES_SECTION.intro,
-    items: (page.recientesItems ?? VOLUNTARIADO_RECIENTES_DEFAULTS).map(
-      resolveRecienteItem,
-    ),
+    items,
   };
 }

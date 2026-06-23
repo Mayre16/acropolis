@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { SolicitudEsferaDialog } from "@/components/SolicitudEsferaDialog";
-import { EsferaBrochureSection } from "@/components/cms/EsferaBrochureSection";
+import { EsferaInquiryButton } from "@/components/EsferaInquiryButton";
 import { EsferaEstandaresSection } from "@/components/cms/EsferaEstandaresSection";
 import { EsferaModalidadesSection } from "@/components/cms/EsferaModalidadesSection";
 import { EsferaHero } from "@/components/cms/EsferaHero";
-import { EsferaCollaborate } from "@/components/EsferaCollaborate";
 import { EsferaAudienciaSection } from "@/components/cms/EsferaAudienciaSection";
 import { EsferaBeneficiosSection } from "@/components/cms/EsferaBeneficiosSection";
 import { EsferaImpactoSection } from "@/components/cms/EsferaImpactoSection";
@@ -33,6 +31,10 @@ export default function EsferaPage() {
 
       <EsferaQuienesSomosSection />
 
+      <EsferaWorkshopLinesSection />
+
+      <EsferaProximosEntrenamientos />
+
       <EsferaEstandaresSection />
 
       <EsferaModalidadesSection />
@@ -45,12 +47,6 @@ export default function EsferaPage() {
 
       <EsferaAlianzasSection />
 
-      <EsferaWorkshopLinesSection />
-
-      <EsferaProximosEntrenamientos />
-
-      <EsferaBrochureSection />
-
       <section className="border-t border-na-heket/10 bg-na-heket/[0.06] py-14 sm:py-16">
         <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
           <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
@@ -61,12 +57,11 @@ export default function EsferaPage() {
           </h2>
           <EsferaContactInfo />
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <SolicitudEsferaDialog triggerLabel="Solicitar taller Esfera" />
+            <EsferaInquiryButton triggerLabel="Solicitar información" />
           </div>
         </div>
       </section>
 
-      <EsferaCollaborate />
       <EsferaSolicitudAutoOpen />
     </>
     </VenuesPageShell>

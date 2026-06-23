@@ -18,7 +18,7 @@ export function CivisInscribete() {
           datos prepararemos una propuesta personalizada para su organización.
         </p>
         <div className="mt-10">
-          <SolicitudPropuestaForm />
+          <SolicitudPropuestaForm collapsedInitially />
         </div>
       </div>
     </section>

@@ -137,13 +137,23 @@ export async function saveDraft(site: SiteId, token: string, doc: CmsDocument) {
   return res.json();
 }
 
-export async function publish(site: SiteId, token: string) {
+export type PublishResult = {
+  ok?: boolean;
+  deploy?: {
+    queued?: boolean;
+    site?: string;
+    reason?: string;
+  };
+  message?: string;
+};
+
+export async function publish(site: SiteId, token: string): Promise<PublishResult> {
   const res = await fetch(`${API_URL}/content/${site}/publish`, {
     method: "POST",
     headers: authHeaders(token),
   });
   if (!res.ok) throw new Error("Error al publicar");
-  return res.json();
+  return res.json() as Promise<PublishResult>;
 }
 
 export async function listBackups(site: SiteId, token: string) {

@@ -1,0 +1,205 @@
+================================================================================
+  CONFIGURAR DEPLOY AUTOMÁTICO DEL CMS
+  (Publicar en el editor → rebuild en GitHub → subida a cPanel)
+================================================================================
+
+Haz esto UNA VEZ. Cuando termines, cada "Publicar" en el editor actualizará
+el sitio en unos 3–5 minutos sin que tú subas ZIPs a mano.
+
+Marca cada paso cuando lo completes: [ ]
+
+
+================================================================================
+PARTE A — DATOS QUE NECESITAS ANOTAR
+================================================================================
+
+Copia esta plantilla y rellénala mientras avanzas:
+
+--- SITIO PRINCIPAL (Acropolis) ---
+URL pública:           https://_________________________
+FTP servidor:          _________________________
+FTP usuario:           _________________________
+FTP contraseña:        _________________________
+Carpeta remota FTP:    _________________________
+  (ejemplo: /public_html/  o  /acropolis.adesa.com.do/)
+
+--- CIVIS (si aplica) ---
+URL pública:           https://_________________________
+FTP servidor:          _________________________
+FTP usuario:           _________________________
+FTP contraseña:        _________________________
+Carpeta remota FTP:    _________________________
+
+--- EDITOR (CMS) ---
+URL del editor:        https://_________________________
+URL de la API:         https://_________________________/api
+  (ejemplo: https://editor.acropolis.org.do/api)
+
+--- GITHUB ---
+Repo:                  Mayre16/acropolis   (o el que uses)
+Token (PAT):           ghp_________________________
+  (NO lo compartas; solo va en config.php del servidor)
+
+
+================================================================================
+PARTE B — cPanel: DÓNDE SACAR CADA COSA
+================================================================================
+
+[ ] 1. ENTRAR A cPanel
+    - Abre el enlace que te dio el hosting (adesa u otro).
+    - Usuario y contraseña de cPanel (no confundir con FTP ni con el editor).
+
+[ ] 2. VER TUS SUBDOMINIOS Y CARPETAS
+    - En cPanel busca: "Subdominios" o "Subdomains".
+    - Ahí verás algo como:
+        acropolis.adesa.com.do  →  carpeta: public_html/acropolis.adesa.com.do
+        civis.acropolis...      →  carpeta: public_html/civis...
+        editor.acropolis...     →  carpeta: public_html/editor...
+    - ANOTA la carpeta de cada uno → eso es PRINCIPAL_FTP_REMOTE_DIR (con / al final).
+    - Ejemplo de ruta FTP correcta: /public_html/acropolis.adesa.com.do/
+    - Si el sitio está en la raíz del dominio principal, suele ser: /public_html/
+
+[ ] 3. CREAR O REVISAR CUENTA FTP
+    - En cPanel busca: "Cuentas FTP" o "FTP Accounts".
+    - Opción A (recomendada): crear un usuario solo para deploy, por ejemplo:
+        Usuario: deploy-acropolis
+        Directorio: la carpeta del subdominio (paso 2)
+        Contraseña: genera una fuerte y guárdala
+    - Opción B: usar la cuenta FTP principal de cPanel (menos recomendable).
+    - ANOTA:
+        Servidor FTP → suele aparecer en la misma pantalla, tipo:
+          ftp.tudominio.com
+          o el hostname del servidor (ej. server123.adesa.com.do)
+        Usuario FTP → el que creaste (a veces es usuario@dominio.com)
+        Contraseña FTP → la que pusiste al crear la cuenta
+
+[ ] 4. PROBAR FTP (opcional pero útil)
+    - Con FileZilla o el "Administrador de archivos" de cPanel:
+        Conecta con servidor, usuario y contraseña del paso 3.
+    - Debes ver index.html, .htaccess, na-assets/, img/, etc. en la carpeta del sitio.
+    - Si conectas pero la carpeta está vacía, la ruta remota del paso 2 está mal.
+
+[ ] 5. SUBDOMINIO DEL EDITOR
+    - Si aún no existe: Subdominios → crear "editor" → apunta a carpeta editor/.
+    - En esa carpeta deben estar:
+        index.html          (panel del editor, build de editor/out/)
+        api/                (PHP: index.php, config.php, deploy-webhook.php)
+        data/               (JSON del CMS; permiso de ESCRITURA)
+    - La URL pública del editor será: https://editor.TUDOMINIO...
+    - La API es esa misma URL + /api  (sin barra final en secrets de GitHub).
+
+[ ] 6. config.php DEL EDITOR (en el servidor, NO en git)
+    - cPanel → Administrador de archivos → carpeta del editor → api/
+    - Copia config.php.example → config.php (si no existe).
+    - Edita config.php y pon:
+        github_repo       → Mayre16/acropolis
+        github_deploy_token → el PAT de GitHub (Parte C)
+        allowed_origins   → URLs de tus sitios (principal, civis, editor)
+    - Permisos carpeta data/: 755 o 775 (debe poder escribir published.json).
+
+[ ] 7. PERMISOS CARPETA data/
+    - editor/data/acropolis/  → escribible por PHP
+    - editor/data/civis/      → escribible por PHP
+    - Si publicar falla con error de permisos, sube a 775 en data/ y subcarpetas.
+
+
+================================================================================
+PARTE C — GITHUB: TOKEN Y SECRETS
+================================================================================
+
+[ ] 8. CREAR TOKEN (PAT) EN GITHUB
+    - Entra a github.com → icono perfil → Settings
+    - Abajo: Developer settings → Personal access tokens
+    - Fine-grained token (recomendado):
+        Repository access: Only select → Mayre16/acropolis
+        Permissions:
+          - Actions: Read and write
+          - Contents: Read
+          - Metadata: Read
+    - Genera y COPIA el token (ghp_...) → solo se muestra una vez.
+    - Pégalo en editor/api/config.php → github_deploy_token
+
+[ ] 9. SECRETS EN EL REPO (GitHub, no cPanel)
+    - Repo Mayre16/acropolis → Settings → Secrets and variables → Actions
+    - New repository secret — crea cada uno:
+
+    Nombre del secret          Valor (de tu plantilla arriba)
+    -------------------------  ------------------------------------------
+    CMS_API_URL                https://editor.TUDOMINIO/api
+    PRINCIPAL_SITE_URL         https://acropolis... (URL pública del sitio)
+    PRINCIPAL_FTP_SERVER       ftp.tudominio.com (o hostname del paso 3)
+    PRINCIPAL_FTP_USERNAME     usuario FTP del paso 3
+    PRINCIPAL_FTP_PASSWORD     contraseña FTP del paso 3
+    PRINCIPAL_FTP_REMOTE_DIR   /public_html/.../  (carpeta del paso 2)
+
+    Para Civis (opcional, mismos nombres con prefijo CIVIS_):
+    CIVIS_SITE_URL
+    CIVIS_FTP_SERVER
+    CIVIS_FTP_USERNAME
+    CIVIS_FTP_PASSWORD
+    CIVIS_FTP_REMOTE_DIR
+
+[ ] 10. PROBAR EL WORKFLOW A MANO
+    - GitHub → pestaña Actions
+    - Workflow: "CMS publish — rebuild and deploy"
+    - Run workflow → elige site: acropolis (o civis)
+    - Espera 5–10 min. Si FTP está bien, el sitio se actualiza solo.
+    - Si falla FTP: en esa misma ejecución baja el "artifact" cms-acropolis-out
+      y sube manualmente UNA VEZ mientras revisas credenciales FTP.
+
+
+================================================================================
+PARTE D — PROBAR DESDE EL EDITOR
+================================================================================
+
+[ ] 11. PUBLICAR EN EL CMS
+    - Entra al editor → edita algo → Publicar.
+    - Debe decir algo como:
+      "Los cambios estarán visibles en el sitio en 3–5 minutos..."
+    - En GitHub Actions debe aparecer una ejecución nueva en ~1 minuto.
+
+[ ] 12. SI NO DISPARA EL REBUILD
+    - Revisa config.php: github_repo y github_deploy_token correctos.
+    - El token debe tener permiso Actions en ese repo.
+    - Mira error_log de PHP en cPanel (o respuesta de /api/content/.../publish).
+
+[ ] 13. SI EL BUILD FALLA EN GITHUB
+    - Abre la ejecución roja → lee el log del paso "Build principal".
+    - CMS_API_URL debe ser accesible desde internet (HTTPS, sin bloqueo).
+
+
+================================================================================
+RESUMEN RÁPIDO — ¿DÓNDE ESTÁ CADA COSA?
+================================================================================
+
+  ¿Qué necesito?              ¿Dónde lo saco?
+  --------------------------  ----------------------------------------------
+  Carpeta del sitio en FTP      cPanel → Subdominios → columna "Directorio"
+  Servidor FTP                  cPanel → Cuentas FTP → "Servidor FTP"
+  Usuario / contraseña FTP      cPanel → Cuentas FTP → crear o ver cuenta
+  URL del editor                Tu subdominio editor (DNS + cPanel)
+  URL API del CMS               URL editor + /api
+  Token GitHub                  GitHub → Settings → Developer settings → PAT
+  Secrets para Actions          GitHub → repo → Settings → Secrets → Actions
+  config.php del editor         cPanel → archivos → editor/api/config.php
+
+
+================================================================================
+NOTAS
+================================================================================
+
+- El token de GitHub NUNCA va en el repositorio git. Solo en config.php del
+  servidor y en Secrets de GitHub (son cosas distintas: PAT en config.php
+  dispara Actions; secrets FTP los usa Actions para subir archivos).
+
+- Si usas GitHub Pages para el sitio público en lugar de cPanel, el FTP no
+  aplica: habría que adaptar el workflow para deploy a gh-pages (otro paso).
+
+- Documentación técnica adicional: docs/CMS-DEPLOY.md
+
+- Cuando tengas todo configurado, los editores publican solos; tú solo
+  intervienes si falla FTP o si cambias de dominio/hosting.
+
+================================================================================
+Fin del checklist — acropolis.org.do
+================================================================================

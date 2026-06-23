@@ -216,12 +216,10 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     setStatus("Publicando…");
     try {
       await persist();
-      await publishCms("acropolis", token);
-      await publishCms("civis", token);
+      const acropolisResult = await publishCms("acropolis", token);
+      const civisResult = await publishCms("civis", token);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
+      setStatus(civisResult.message ?? acropolisResult.message ?? "Publicado.");
     } catch (e) {
       const text = String(e);
       setStatus(text);
@@ -395,6 +393,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
               >
                 <option value="Naco">Naco</option>
                 <option value="Los Prados">Los Prados</option>
+                <option value="Santiago">Santiago</option>
               </select>
             </label>
             <label className="block text-sm">

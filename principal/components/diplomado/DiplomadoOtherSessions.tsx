@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Pencil, Plus } from "lucide-react";
 import { DiplomadoSessionsCarousel } from "@/components/diplomado/DiplomadoSessionsCarousel";
-import { getUpcomingAgendaItems } from "@/lib/agenda";
+import { getActiveAgendaItems } from "@/lib/agenda";
 import { cmsEntryToAgenda } from "@/lib/cms/agenda-edit";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { useCmsDiplomadoSessions } from "@/lib/cms/hooks";
@@ -17,14 +17,14 @@ export function DiplomadoOtherSessions() {
   const edit = useFilosofiaCmsEdit();
   const pageText = useDiplomadoPageDisplay();
   const cmsItems = useCmsDiplomadoSessions();
-  const fallback = getUpcomingAgendaItems(DIPLOMADO_PROXIMAS_SESIONES);
+  const fallback = getActiveAgendaItems(DIPLOMADO_PROXIMAS_SESIONES);
   const items = edit?.ready
-    ? getUpcomingAgendaItems(
-        edit.diplomadoAgenda.map(cmsEntryToAgenda),
-      ).map((e) => ({
-        ...e,
-        image: resolveCmsMediaUrl(e.image),
-      }))
+    ? getActiveAgendaItems(edit.diplomadoAgenda.map(cmsEntryToAgenda)).map(
+        (e) => ({
+          ...e,
+          image: resolveCmsMediaUrl(e.image),
+        }),
+      )
     : isCmsEnabled()
       ? cmsItems
       : fallback;
@@ -58,9 +58,11 @@ export function DiplomadoOtherSessions() {
           >
             {pageText.otrasSesionesTitle}
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--dip-muted)]">
-            {pageText.otrasSesionesIntro}
-          </p>
+          {pageText.otrasSesionesIntro ? (
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--dip-muted)]">
+              {pageText.otrasSesionesIntro}
+            </p>
+          ) : null}
         </div>
         <Link
           href="/filosofia"

@@ -211,13 +211,10 @@ function CivisCmsEditInner({ children }: { children: ReactNode }) {
       const latest = await fetchCmsDraft("civis");
       const next = buildCivisDoc(latest, state);
       await saveCmsDraft("civis", token, next);
-      await publishCms("civis", token);
+      const publishResult = await publishCms("civis", token);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-      postToEditor({ type: "cms-published" });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       setStatus(String(e));
       postToEditor({ type: "cms-status", text: String(e), ok: false });
     } finally {

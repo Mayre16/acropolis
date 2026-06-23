@@ -4,10 +4,13 @@ import { VOLUNTARIADO_EMAIL } from "@/lib/site-config";
 
 /** Referencias oficiales Sphere (Estándares Humanitarios). */
 export const SPHERE_OFFICIAL = {
+  home: "https://spherestandards.org/",
   about: "https://spherestandards.org/about/",
   focalPoints: "https://spherestandards.org/focal-points/",
   handbook: "https://spherestandards.org/handbook/",
 } as const;
+
+export const ESFERA_OFFICIAL_SITE_LABEL = "Visitar la página oficial de Esfera";
 
 export const ESFERA_OINADOM_BROCHURE = {
   href: "/docs/brochure-talleres-charlas-oinadom-esfera.pdf",
@@ -47,15 +50,15 @@ export const ESFERA_QUIENES_PANELS: Record<
     points: [
       {
         title: "Red global",
-        text: "Desde 1997 impulsada por ONG y el Movimiento de la Cruz Roja y Media Luna Roja; hoy es referencia en respuestas humanitarias.",
+        text: "Desde 1997 impulsada por ONG's y el Movimiento de la Cruz Roja y Media Luna Roja; hoy es referencia en respuestas humanitarias.",
       },
       {
         title: "Puntos focales",
-        text: "Entidades nacionales — universidades, ONG, movimientos humanitarios — que difunden los Estándares Esfera en cada país.",
+        text: "Entidades nacionales — universidades, ONG's, movimientos humanitarios — que difunden los Estándares Esfera en cada país.",
       },
       {
-        title: "Nueva Acrópolis en RD",
-        text: "Somos punto focal desde 2024: acropolitans de distintas edades que acompañan a instituciones en el uso del Manual Esfera.",
+        title: "Nueva Acrópolis",
+        text: "Somos punto focal desde 2024: acompañamos a instituciones en el uso del Manual Esfera.",
       },
     ],
   },
@@ -85,7 +88,7 @@ export const ESFERA_QUIENES_PANELS: Record<
 
 /** @deprecated Use ESFERA_QUIENES_PANELS.quienes */
 export const ESFERA_QUIENES_SOMOS =
-  "Esfera es una red mundial de personas y organizaciones comprometidas con una acción humanitaria basada en principios, responsable y de calidad. Los puntos focales nacionales son entidades que promueven y difunden los Estándares Esfera en cada país; pertenecen a ONG, movimientos humanitarios, universidades y otras organizaciones — no todos son Nueva Acrópolis, aunque varias escuelas de la organización desempeñan ese rol en el mundo. En República Dominicana, Nueva Acrópolis es uno de esos puntos focales: acropolitans de distintas edades que acompañan a instituciones en el uso del Manual Esfera.";
+  "Esfera es una red mundial de personas y organizaciones comprometidas con una acción humanitaria basada en principios, responsable y de calidad. Los puntos focales nacionales son entidades que promueven y difunden los Estándares Esfera en cada país; pertenecen a ONG, movimientos humanitarios, universidades y otras organizaciones — no todos son Nueva Acrópolis, aunque varias escuelas de la organización desempeñan ese rol en el mundo. En República Dominicana, Nueva Acrópolis es uno de esos puntos focales y acompaña a instituciones en el uso del Manual Esfera.";
 
 /** @deprecated Use ESFERA_QUIENES_PANELS.hacemos */
 export const ESFERA_QUE_HACEMOS =
@@ -99,20 +102,26 @@ export const ESFERA_HOME = {
   lede:
     "El Manual Esfera reúne la Carta Humanitaria, los Principios de Protección, la Norma Humanitaria Esencial y estándares mínimos en agua y saneamiento, seguridad alimentaria, alojamiento y salud — referencia global para respuestas de calidad.",
   detail:
-    "Desde 2024, Nueva Acrópolis República Dominicana actúa como punto focal de Esfera en el país: uno de los pocos centros de Nueva Acrópolis con este rol en el mundo, dentro de una red internacional de organizaciones que promueven estos estándares.",
+    "Desde 2024, Nueva Acrópolis República Dominicana actúa como punto focal de Esfera en el país, dentro de una red internacional de organizaciones que promueven estos estándares.",
 } as const;
 
-/** Portada El Manual Esfera — recorte con fondo transparente. */
+/** Portada El Manual Esfera (edición en español, 2018). */
 export const MANUAL_ESFERA_COVER = {
-  src: "/img/esfera/manual-esfera-portada-transparent-v2.webp",
-  alt: "El Manual Esfera — Carta Humanitaria y normas mínimas para la respuesta humanitaria, edición 2018",
+  src: "/img/esfera/manual-esfera-portada-es.webp",
+  alt: "El Manual Esfera — Carta Humanitaria y normas mínimas para la respuesta humanitaria, edición en español 2018",
+} as const;
+
+/** Misma portada, encuadrada 16:10 para tarjetas de agenda (portada completa visible). */
+export const MANUAL_ESFERA_COVER_CARD = {
+  src: "/img/esfera/manual-esfera-portada-es-card.webp",
+  alt: MANUAL_ESFERA_COVER.alt,
 } as const;
 
 export const ESFERA_ESTANDARES = {
   title: "Qué son los Estándares Esfera",
   subtitle: "El referente humanitario más reconocido internacionalmente",
   puntoFocal:
-    "Desde 2024, Nueva Acrópolis Dominicana es punto focal de Esfera en República Dominicana. Los puntos focales nacionales promueven la aplicación de los estándares a nivel país; somos uno de los centros de Nueva Acrópolis con este rol en el mundo.",
+    "Desde 2024, Nueva Acrópolis Dominicana es punto focal de Esfera en República Dominicana. Los puntos focales nacionales promueven la aplicación de los estándares a nivel país.",
   text: "Esfera nació en 1997 impulsada por organizaciones no gubernamentales y el Movimiento Internacional de la Cruz Roja y de la Media Luna Roja. Hoy es una red global que reúne a quienes trabajan por respuestas humanitarias de calidad y rendición de cuentas. El Manual Esfera es una de las herramientas más utilizadas por ONG, agencias de la ONU y gobiernos en situaciones de crisis.",
   detail:
     "Se basa en el principio de que toda persona afectada por una crisis tiene derecho a vivir con dignidad y a recibir asistencia y protección.",

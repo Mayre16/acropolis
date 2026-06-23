@@ -21,6 +21,13 @@ const DEFAULTS = {
       subject_prefix: "[CIVIS] Solicitud de propuesta",
       copy_to_sender: true,
     },
+    esfera_solicitud: {
+      to_email: "voluntariado.humanitario-RD@acropolis.org",
+      to_name: "Voluntariado Humanitario",
+      cc_email: "Santiago.a@acropolis.org",
+      subject_prefix: "[Esfera] Solicitud taller",
+      copy_to_sender: true,
+    },
   },
 };
 
@@ -58,6 +65,10 @@ export function loadSmtpConfig() {
       civis_solicitud: {
         ...DEFAULTS.forms.civis_solicitud,
         ...(stored.forms?.civis_solicitud ?? {}),
+      },
+      esfera_solicitud: {
+        ...DEFAULTS.forms.esfera_solicitud,
+        ...(stored.forms?.esfera_solicitud ?? {}),
       },
     },
   };
@@ -107,6 +118,29 @@ export function saveSmtpConfig(next, { keepPasswordIfBlank = true } = {}) {
         copy_to_sender:
           next.forms?.civis_solicitud?.copy_to_sender ??
           current.forms.civis_solicitud.copy_to_sender,
+      },
+      esfera_solicitud: {
+        ...current.forms.esfera_solicitud,
+        ...(next.forms?.esfera_solicitud ?? {}),
+        to_email: String(
+          next.forms?.esfera_solicitud?.to_email ??
+            current.forms.esfera_solicitud.to_email,
+        ).trim(),
+        to_name: String(
+          next.forms?.esfera_solicitud?.to_name ??
+            current.forms.esfera_solicitud.to_name,
+        ).trim(),
+        cc_email: String(
+          next.forms?.esfera_solicitud?.cc_email ??
+            current.forms.esfera_solicitud.cc_email,
+        ).trim(),
+        subject_prefix: String(
+          next.forms?.esfera_solicitud?.subject_prefix ??
+            current.forms.esfera_solicitud.subject_prefix,
+        ).trim(),
+        copy_to_sender:
+          next.forms?.esfera_solicitud?.copy_to_sender ??
+          current.forms.esfera_solicitud.copy_to_sender,
       },
     },
   };

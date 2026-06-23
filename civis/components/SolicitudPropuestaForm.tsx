@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { submitCivisSolicitud } from "@/lib/submit-solicitud";
+import {
+  resetTurnstileWidget,
+  TurnstileWidget,
+} from "@/components/TurnstileWidget";
 import { TALLERES_CIVIS } from "@/lib/talleres";
 import { CheckCircle2, Loader2 } from "lucide-react";
 
@@ -161,18 +165,28 @@ const fieldLabel = "mb-1.5 block text-sm font-semibold text-na-muted";
 const inputClass =
   "w-full rounded-xl border border-na-civis/20 bg-white px-3 py-2.5 text-sm text-na-ink outline-none transition placeholder:text-na-muted/70 focus:border-na-civis focus:ring-2 focus:ring-na-civis/20";
 
-export function SolicitudPropuestaForm() {
+export function SolicitudPropuestaForm({
+  collapsedInitially = false,
+}: {
+  collapsedInitially?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(!collapsedInitially);
   const [values, setValues] = useState<FormState>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<"idle" | "done">("idle");
   const [submittedDev, setSubmittedDev] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [website, setWebsite] = useState("");
 
   const onSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSubmitError("");
     const v = validate(values);
+    if (!turnstileToken) {
+      v.turnstile = "Marca la casilla «No soy un robot».";
+    }
     setErrors(v);
     if (Object.keys(v).length > 0) return;
 
@@ -184,11 +198,15 @@ export function SolicitudPropuestaForm() {
       email: values.email.trim(),
       telefono: values.telefono.trim(),
       message: buildBody(values),
+      turnstileToken,
+      website,
     });
     setSubmitting(false);
 
     if (!result.ok) {
       setSubmitError(result.error);
+      setTurnstileToken("");
+      resetTurnstileWidget();
       return;
     }
 
@@ -202,6 +220,10 @@ export function SolicitudPropuestaForm() {
     setSubmitted("idle");
     setSubmittedDev(false);
     setSubmitError("");
+    setTurnstileToken("");
+    setWebsite("");
+    resetTurnstileWidget();
+    if (collapsedInitially) setExpanded(false);
   };
 
   const toggleTema = (id: string) => {
@@ -251,6 +273,24 @@ export function SolicitudPropuestaForm() {
         >
           Enviar otra solicitud
         </button>
+      </div>
+    );
+  }
+
+  if (!expanded) {
+    return (
+      <div className="mx-auto max-w-2xl text-center">
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="inline-flex items-center justify-center rounded-full bg-na-civis px-7 py-3.5 text-sm font-bold text-white shadow-md shadow-na-civis/25 transition hover:bg-na-civisDark"
+        >
+          Completar solicitud
+        </button>
+        <p className="mt-3 text-sm text-na-muted">
+          Abre el formulario, completa tus datos y confirma que eres una persona
+          real antes de enviar.
+        </p>
       </div>
     );
   }
@@ -606,6 +646,27 @@ export function SolicitudPropuestaForm() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden>
+        <label htmlFor="civis-website">Sitio web</label>
+        <input
+          id="civis-website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <div className="mt-6">
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+        {errors.turnstile && (
+          <p className="mt-2 text-xs text-red-500">{errors.turnstile}</p>
+        )}
       </div>
 
       {submitError ? (

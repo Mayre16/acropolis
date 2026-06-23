@@ -21,6 +21,13 @@ import {
   verifyTwoFactor,
 } from "../lib/auth-service.mjs";
 import { sendCivisSolicitudMail } from "../lib/civis-solicitud-mail.mjs";
+import { sendEsferaSolicitudMail } from "../lib/esfera-solicitud-mail.mjs";
+import { sendVolunteerSolicitudMail } from "../lib/volunteer-solicitud-mail.mjs";
+import { sendSiteInquiryMail } from "../lib/site-inquiry-mail.mjs";
+import {
+  triggerDeployWebhook,
+  cmsPublishUserMessage,
+} from "../lib/deploy-webhook.mjs";
 import {
   loadSmtpConfig,
   publicSmtpConfig,
@@ -178,8 +185,9 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/forms/civis-solicitud" && req.method === "POST") {
       const body = await readBody(req);
+      const remoteIp = req.socket?.remoteAddress ?? null;
       try {
-        const result = await sendCivisSolicitudMail(body ?? {});
+        const result = await sendCivisSolicitudMail(body ?? {}, remoteIp);
         if (!result.ok) {
           const status = result.error?.includes("SMTP") ? 503 : 400;
           json(res, status, result, origin);
@@ -197,6 +205,87 @@ const server = http.createServer(async (req, res) => {
             error: msg.includes("SMTP")
               ? msg
               : "No se pudo enviar la solicitud. Compruebe la configuración SMTP en el editor.",
+          },
+          origin,
+        );
+      }
+      return;
+    }
+
+    if (pathname === "/forms/esfera-solicitud" && req.method === "POST") {
+      const body = await readBody(req);
+      const remoteIp = req.socket?.remoteAddress ?? null;
+      try {
+        const result = await sendEsferaSolicitudMail(body ?? {}, remoteIp);
+        if (!result.ok) {
+          const status = result.error?.includes("SMTP") ? 503 : 400;
+          json(res, status, result, origin);
+          return;
+        }
+        json(res, 200, { ok: true, dev: result.dev === true }, origin);
+      } catch (e) {
+        console.error(e);
+        const msg = String(e?.message ?? e);
+        json(
+          res,
+          500,
+          {
+            ok: false,
+            error: msg.includes("SMTP")
+              ? msg
+              : "No se pudo enviar la solicitud. Compruebe la configuración SMTP en el editor.",
+          },
+          origin,
+        );
+      }
+      return;
+    }
+
+    if (pathname === "/forms/voluntariado-solicitud" && req.method === "POST") {
+      const body = await readBody(req);
+      const remoteIp = req.socket?.remoteAddress ?? null;
+      try {
+        const result = await sendVolunteerSolicitudMail(body ?? {}, remoteIp);
+        if (!result.ok) {
+          const status = result.error?.includes("SMTP") ? 503 : 400;
+          json(res, status, result, origin);
+          return;
+        }
+        json(res, 200, { ok: true, dev: result.dev === true }, origin);
+      } catch (e) {
+        console.error(e);
+        json(
+          res,
+          500,
+          {
+            ok: false,
+            error: "No se pudo enviar la solicitud. Compruebe la configuración SMTP en el editor.",
+          },
+          origin,
+        );
+      }
+      return;
+    }
+
+    if (pathname === "/forms/site-inquiry" && req.method === "POST") {
+      const body = await readBody(req);
+      const remoteIp = req.socket?.remoteAddress ?? null;
+      try {
+        const result = await sendSiteInquiryMail(body ?? {}, remoteIp);
+        if (!result.ok) {
+          const status = result.error?.includes("SMTP") ? 503 : 400;
+          json(res, status, result, origin);
+          return;
+        }
+        json(res, 200, { ok: true, dev: result.dev === true }, origin);
+      } catch (e) {
+        console.error(e);
+        json(
+          res,
+          500,
+          {
+            ok: false,
+            error: "No se pudo enviar la solicitud. Compruebe la configuración SMTP en el editor.",
           },
           origin,
         );
@@ -377,7 +466,18 @@ const server = http.createServer(async (req, res) => {
       draft.updatedAt = new Date().toISOString();
       fs.writeFileSync(publishedPath(site), JSON.stringify(draft, null, 2));
       fs.writeFileSync(draftPath(site), JSON.stringify(draft, null, 2));
-      json(res, 200, { ok: true, updatedAt: draft.updatedAt }, origin);
+      const deploy = await triggerDeployWebhook(site);
+      json(
+        res,
+        200,
+        {
+          ok: true,
+          updatedAt: draft.updatedAt,
+          deploy,
+          message: cmsPublishUserMessage(deploy),
+        },
+        origin,
+      );
       return;
     }
 

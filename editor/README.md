@@ -61,8 +61,10 @@ Si las listas del CMS están vacías, el sitio sigue mostrando las fotos del có
 
 1. Subdominio en cPanel apuntando a `editor/` (build estático + carpeta `api/` PHP).
 2. `npm run build` en `editor/` → subir `out/` + `api/` + `data/` (permisos escritura).
-3. Copiar `api/config.php.example` → `config.php` con contraseña admin y rutas.
+3. Copiar `api/config.php.example` → `config.php` con contraseña admin, `github_repo` y `github_deploy_token`.
 4. En builds de principal/civis: `NEXT_PUBLIC_CMS_URL=https://editor.acropolis.adesa.com.do/api` (sin barra final).
+
+**Deploy automático al publicar:** ver `docs/CMS-DEPLOY.md` (webhook → GitHub Actions → FTP cPanel).
 
 ## Secciones conectadas al sitio
 

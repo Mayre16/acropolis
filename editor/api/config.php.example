@@ -13,4 +13,8 @@ return [
         'http://localhost:3200',
         'http://127.0.0.1:3200',
     ],
+    /** Repo GitHub para rebuild automático al publicar (ej. Mayre16/acropolis). */
+    'github_repo' => 'Mayre16/acropolis',
+    /** PAT con scope repo + workflow (Actions). NO subir a git. */
+    'github_deploy_token' => 'ghp_XXXXXXXXXXXXXXXXXXXX',
 ];

@@ -266,6 +266,20 @@ export const CIVIS_HEADER_NAV: CivisNavItem[] = [
   { href: "/inscribete", label: "Inscríbete", id: "inscribete" },
 ];
 
+/** Menú del footer — Talleres antes que Clientes & Aliados (grid 3+3). */
+export const CIVIS_FOOTER_NAV: CivisNavItem[] = [
+  { href: "/", label: "Inicio", id: "inicio" },
+  { href: CIVIS_QUIENES_SOMOS_PATH, label: "Quiénes somos", id: "quienes-somos" },
+  { href: "/talleres", label: "Talleres", id: "talleres" },
+  {
+    href: CIVIS_CLIENTES_ALIADOS_PATH,
+    label: "Clientes & Aliados",
+    id: "clientes",
+  },
+  { href: "/salones", label: "Salones", id: "salones" },
+  { href: "/inscribete", label: "Inscríbete", id: "inscribete" },
+];
+
 /** @deprecated Usar CIVIS_HEADER_NAV */
 export const CIVIS_NAV = CIVIS_HEADER_NAV;
 

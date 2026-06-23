@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CheckCircle2, Quote } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Quote } from "lucide-react";
 import { CmsSectionEditBar, CmsEditPencil } from "@/components/cms/CmsEditPencil";
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
 import { EsferaLogo } from "@/components/EsferaLogo";
@@ -13,6 +13,10 @@ import {
 import { useEsferaPageDisplay } from "@/lib/cms/esfera-display";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { accentEyebrowClass } from "@/lib/brand-accents";
+import {
+  ESFERA_OFFICIAL_SITE_LABEL,
+  SPHERE_OFFICIAL,
+} from "@/lib/esfera-content";
 
 export function EsferaEstandaresSection() {
   const edit = useEsferaCmsEdit();
@@ -90,7 +94,10 @@ export function EsferaEstandaresSection() {
             ) : null}
             <div className="overflow-hidden rounded-2xl border border-na-kefer/15 bg-gradient-to-br from-na-heket/[0.06] via-na-surface to-na-kefer/[0.1] p-6 shadow-na-card sm:p-8">
               <div className="flex justify-center border-b border-na-heket/10 pb-6">
-                <EsferaLogo className="h-16 w-auto sm:h-[4.5rem] md:h-20" />
+                <EsferaLogo
+                  variant="punto-focal"
+                  className="h-auto w-full max-w-[14rem] sm:max-w-[16rem]"
+                />
               </div>
               <div className="relative mx-auto mt-6 aspect-[5/4] w-full max-w-[360px]">
                 {manualSrc ? (
@@ -113,6 +120,17 @@ export function EsferaEstandaresSection() {
               </p>
               <p className="mt-2 text-center text-sm leading-relaxed text-na-muted">
                 {page.manualSubtitle}
+              </p>
+              <p className="mt-4 text-center">
+                <a
+                  href={SPHERE_OFFICIAL.home}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 text-sm font-bold text-na-kefer transition hover:gap-2 hover:text-na-heket"
+                >
+                  {ESFERA_OFFICIAL_SITE_LABEL}
+                  <ArrowUpRight className="h-4 w-4" aria-hidden />
+                </a>
               </p>
             </div>
           </div>

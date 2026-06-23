@@ -6,6 +6,9 @@ export type ActivityPhoto = {
   caption?: string;
 };
 
+/** Máximo de fotos visibles en la home. */
+export const HOME_ACTIVITY_PHOTOS_LIMIT = 6;
+
 /** Fotos de actividades — imágenes limpias para la home. */
 export const ACTIVITY_PHOTOS: ActivityPhoto[] = [
   {
@@ -24,11 +27,6 @@ export const ACTIVITY_PHOTOS: ActivityPhoto[] = [
     caption: "Formación de líderes",
   },
   {
-    src: "/img/actividades/dia-mundial-filosofia.webp",
-    alt: "Celebración del Día Mundial de la Filosofía",
-    caption: "Día Mundial de la Filosofía",
-  },
-  {
     src: "/img/actividades/liderazgo-juvenil.webp",
     alt: "Campamento de liderazgo juvenil",
     caption: "Liderazgo juvenil",
@@ -37,16 +35,6 @@ export const ACTIVITY_PHOTOS: ActivityPhoto[] = [
     src: "/img/actividades/dia-madre-tierra.webp",
     alt: "Día Internacional de la Madre Tierra",
     caption: "Día de la Tierra",
-  },
-  {
-    src: "/img/actividades/feria-salud.webp",
-    alt: "Participación en la Feria de la Salud",
-    caption: "Feria de la Salud",
-  },
-  {
-    src: "/img/actividades/encuentro-cultural.webp",
-    alt: "Encuentro cultural de Nueva Acrópolis",
-    caption: "Encuentro cultural",
   },
   {
     src: "/img/actividades/dia-medio-ambiente.webp",
@@ -64,33 +52,33 @@ export type InstagramPost = {
 /** Publicaciones recientes — @nuevaacropolisdominicana (imágenes locales WebP). */
 export const INSTAGRAM_POSTS: InstagramPost[] = [
   {
-    src: "/img/instagram/383.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/DTCD1NHjusg.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DTCD1NHjusg/",
   },
   {
-    src: "/img/instagram/382.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/C9vFlxtvJCl.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/C9vFlxtvJCl/",
   },
   {
-    src: "/img/instagram/381.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/DBCAWHxN9KE.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DBCAWHxN9KE/",
   },
   {
-    src: "/img/instagram/380.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/DF2xM_5uMgW.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DF2xM_5uMgW/",
   },
   {
-    src: "/img/instagram/379-1.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/DML_C8Rvrxa.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DML_C8Rvrxa/",
   },
   {
-    src: "/img/instagram/05-5.webp",
-    alt: "Publicación reciente de @nuevaacropolisdominicana",
-    href: SOCIAL_LINKS.instagram,
+    src: "/img/instagram/DJNajckqkUA.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DJNajckqkUA/",
   },
 ];

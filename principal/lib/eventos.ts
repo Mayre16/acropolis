@@ -5,6 +5,8 @@ export type EventoItem = {
   slug: string;
   title: string;
   date: string;
+  /** ISO YYYY-MM-DD para ordenar crónicas. */
+  sortAt?: string;
   category: string;
   excerpt: string;
   image: { src: string; alt: string };
@@ -16,6 +18,7 @@ export const EVENTOS: EventoItem[] = [
     slug: "el-arte-de-respirar",
     title: 'Encuentro "El arte de respirar"',
     date: "6 de mayo de 2026",
+    sortAt: "2026-05-06",
     category: "Cultura",
     excerpt:
       "Una jornada para redescubrir la respiración consciente como herramienta de calma, atención y bienestar interior.",
@@ -34,18 +37,18 @@ export const EVENTOS: EventoItem[] = [
     slug: "dia-de-la-tierra",
     title: "Día de la Tierra con ciencia, filosofía y acción",
     date: "22 de abril de 2026",
+    sortAt: "2026-04-22",
     category: "Voluntariado",
     excerpt:
       "Celebramos el Día de la Tierra uniendo reflexión filosófica y acción concreta por el medio ambiente.",
     image: {
       src: "/img/eventos/tierra.webp",
-      alt: "Actividad por el Día de la Tierra con ciencia y filosofía",
+      alt: "Voluntarios en jornada de reforestación — Día de la Tierra",
     },
     body: [
-      "Nueva Acrópolis Dominicana celebró durante el mes de abril una programación especial en conmemoración del Día de la Tierra, integrando ciencia, filosofía y acción ecológica a través de una trilogía de encuentros y una jornada de reforestación.",
-      "Bajo el concepto “De la colmena al cosmos: un viaje de ciencia y filosofía para redescubrir nuestro lugar en la naturaleza”, la organización reunió a decenas de participantes en tres encuentros temáticos sobre la inteligencia de la naturaleza, el equilibrio de los ecosistemas y la relación del ser humano con el universo.",
-      "El ciclo inició el 8 de abril con “El secreto de las abejas”; continuó el 15 de abril con la charla “Bosques: el equilibrio de la Tierra”; y cerró el 22 de abril, Día de la Tierra, con “Astronomía: nuestro lugar en el cosmos”, ampliando la mirada hacia el universo para comprender la profunda interconexión entre la Tierra y el cosmos.",
-      "Como cierre de la celebración se realizó una jornada de reforestación en La Jagua, Yaguate, San Cristóbal, con la participación de 53 voluntarios, quienes sembraron 1,080 plántulas de caoba dominicana y guázara, reafirmando el compromiso con la educación ambiental y la acción consciente en favor del planeta.",
+      "En el marco del Día Internacional de la Madre Tierra, Nueva Acrópolis Dominicana llevó a cabo una trilogía de encuentros sobre la naturaleza —abejas, bosques y cosmos— y cerró con una jornada de reforestación en La Jagua, Yaguate (San Cristóbal).",
+      "Cincuenta y tres voluntarios sembraron 1.080 plántulas de caoba dominicana y guázara, uniendo reflexión filosófica y acción ecológica en favor de nuestro entorno.",
+      "La programación integró charlas abiertas y trabajo de campo, reafirmando el compromiso de la escuela con el servicio a la comunidad y el cuidado del planeta.",
     ],
   },
   {
@@ -53,6 +56,7 @@ export const EVENTOS: EventoItem[] = [
     title:
       "Charla sobre el valor de las abejas y apertura del nuevo Centro Cultural",
     date: "20 de abril de 2026",
+    sortAt: "2026-04-20",
     category: "Cultura",
     excerpt:
       "Una charla sobre el papel esencial de las abejas en la naturaleza, junto al anuncio de nuestro nuevo Centro Cultural.",
@@ -71,53 +75,18 @@ export const EVENTOS: EventoItem[] = [
     slug: "feria-de-la-salud",
     title: "Participación en la Feria de la Salud Ferries del Caribe",
     date: "10 de marzo de 2026",
+    sortAt: "2026-03-10",
     category: "Comunidad",
     excerpt:
       "Estuvimos presentes en la 13ª Feria de la Salud, acercando filosofía práctica y bienestar a la comunidad.",
     image: {
       src: "/img/eventos/feria-salud.webp",
-      alt: "Voluntarios de Nueva Acrópolis en la Feria de la Salud Ferries del Caribe",
+      alt: "Voluntarios de Nueva Acrópolis en la Feria de la Salud",
     },
     body: [
-      "Nueva Acrópolis Dominicana se hizo presente en la 13ª Feria de la Salud de la Fundación Ferries del Caribe, integrándose a una de las iniciativas solidarias de mayor alcance en el país. La jornada logró brindar más de 9,000 consultas en múltiples especialidades médicas.",
-      "Más de un centenar de voluntarios de Nueva Acrópolis asumieron con compromiso y eficiencia labores clave de orientación, organización y acompañamiento de los pacientes, sosteniendo el orden y el trato humano en cada etapa del proceso.",
-      "Esta experiencia reafirma una convicción central: que el voluntariado consciente no es solo ayuda puntual, sino una forma de acción organizada, disciplinada y profundamente humana, capaz de responder con eficacia a necesidades reales y de fortalecer el tejido social.",
-    ],
-  },
-  {
-    slug: "gestion-de-emergencias",
-    title: "Voluntarios se capacitan en gestión de emergencias",
-    date: "14 de marzo de 2026",
-    category: "Esfera",
-    excerpt:
-      "Simulacros y formación práctica en respuesta a emergencias, en el marco de nuestro Punto Focal Esfera.",
-    image: {
-      src: "/img/eventos/simulacros.webp",
-      alt: "Voluntarios capacitándose en gestión de emergencias",
-    },
-    body: [
-      "Nueva Acrópolis Dominicana realizó una jornada de simulacros y capacitación orientada a fortalecer la respuesta ante desastres, dirigida a voluntarios y participantes interesados en la preparación comunitaria y el servicio solidario. La actividad recreó distintos escenarios de emergencia para entrenar habilidades prácticas.",
-      "Durante la jornada se desarrollaron ejercicios de Evaluación de Daños y Análisis de Necesidades (EDAN), herramienta clave para identificar el impacto de un evento adverso, y prácticas de Primeros Auxilios Psicológicos, enfocadas en brindar contención emocional a personas en situación de crisis.",
-      "El programa incluyó también formación sobre el Sistema de Comando de Incidentes (ICS) y prácticas vinculadas a los Equipos Comunitarios de Respuesta a Emergencias (CERTS). Con estas iniciativas, Nueva Acrópolis Dominicana reafirma su compromiso con una cultura de resiliencia, solidaridad y servicio.",
-    ],
-  },
-  {
-    slug: "diplomado-filosofia-santiago",
-    title:
-      "Santiago abraza la filosofía: lanzamiento del Diplomado Filosofía para la Vida",
-    date: "12 de abril de 2026",
-    category: "Filosofía",
-    excerpt:
-      "Con gran acogida lanzamos el nuevo Diplomado de Filosofía para la Vida en Santiago de los Caballeros.",
-    image: {
-      src: "/img/eventos/santiago.webp",
-      alt: "Lanzamiento del Diplomado de Filosofía para la Vida en Santiago",
-    },
-    body: [
-      "Con una respuesta que ha superado las expectativas y un ambiente cargado de entusiasmo, Nueva Acrópolis Dominicana ha consolidado su presencia en la “Ciudad Corazón”. Tras dos exitosas charlas informativas, el nuevo Diplomado en Filosofía Comparada completó sus primeras sesiones formales con un sólido grupo de 23 inscritos.",
-      "El proceso de apertura ha generado comentarios sumamente positivos entre los participantes, quienes destacan la profundidad de los temas y la calidez del grupo. La transición de las sesiones informativas a las clases del programa académico ha sido fluida, manteniendo un alto nivel de compromiso.",
-      "La llegada a Santiago ha contado con el respaldo constante de los miembros de la sede de Santo Domingo, fortaleciendo el sentido de unidad institucional y permitiendo que la mística y los valores de Nueva Acrópolis se sientan presentes desde el primer día.",
-      "Debido al éxito de este primer grupo, abriremos una nueva promoción. Invitamos a los interesados a inscribirse desde ya en nuestra lista de espera para asegurar su cupo y recibir información prioritaria.",
+      "Nueva Acrópolis Dominicana participó en la 13ª Feria de la Salud organizada por la Fundación Ferries del Caribe, con un stand de voluntarios que acercó a la comunidad ideas de filosofía práctica, bienestar y servicio.",
+      "Durante la jornada compartimos materiales sobre nuestros programas de voluntariado, actividades abiertas y la Escuela de Filosofía, en un espacio de encuentro orientado al cuidado integral de las personas.",
+      "La presencia en ferias comunitarias forma parte de nuestro compromiso de llevar la cultura y el voluntariado a espacios públicos, dialogando con quienes buscan mejorar su calidad de vida.",
     ],
   },
 ];

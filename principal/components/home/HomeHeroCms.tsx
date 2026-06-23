@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Images, Pencil } from "lucide-react";
-import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
+import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
@@ -92,14 +92,11 @@ export function HomeHeroCms() {
       ) : null}
 
       <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-12 pt-[150px] text-center md:px-12 md:pb-[50px] md:pt-[100px]">
-        <NaBrandLockupGroup
-          lockup="oinadom"
-          variant="white"
+        <HeroOinadomLogo
           priority
           align="center"
           size="hero"
-          descriptorProminence="hero"
-          maxWidthClass="max-w-[min(94vw,28rem)]"
+          maxWidthClass="max-w-[min(94vw,32rem)]"
         />
         <h1 className="sr-only">{h1}</h1>
         {h2 ? (
@@ -108,9 +105,15 @@ export function HomeHeroCms() {
           </h2>
         ) : null}
         {lede ? (
-          <h3 className="mt-3 max-w-lg text-balance text-sm font-normal leading-relaxed text-white/85 drop-shadow sm:text-base">
-            {lede}
-          </h3>
+          h2 ? (
+            <p className="mt-3 max-w-lg text-balance text-sm font-normal leading-relaxed text-white/85 drop-shadow sm:text-base">
+              {lede}
+            </p>
+          ) : (
+            <h2 className="mt-6 max-w-xl text-balance text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-xl">
+              {lede}
+            </h2>
+          )
         ) : null}
         <Link
           href="/quienes-somos"

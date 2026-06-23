@@ -21,6 +21,7 @@ import {
 import { useMergedVenues } from "@/lib/cms/hooks";
 import { getMapPinsFromVenues, cmsToVenue } from "@/lib/cms/venues-edit";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
+import { VenueNameLockup } from "@/components/VenueNameLockup";
 
 /** Trazado de República Dominicana (Simplemaps, libre uso comercial · proyección Mercator). */
 const DR_PATH =
@@ -113,7 +114,7 @@ function MapPanel({ venues }: { venues: VenueLocation[] }) {
         </li>
         <li className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-na-kefer ring-2 ring-na-kefer/30" />
-          Centros culturales
+          Puntos culturales
         </li>
       </ul>
     </div>
@@ -127,7 +128,7 @@ function VenueCard({
   venue: VenueLocation;
   onEdit?: () => void;
 }) {
-  const isSede = venue.kind === "sede";
+  const mapsReady = !venue.address.toLowerCase().includes("próximamente");
 
   return (
     <li className="relative rounded-2xl border border-na-heket/10 bg-na-surface p-5 shadow-na-soft sm:p-6">
@@ -143,31 +144,22 @@ function VenueCard({
       ) : null}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <span
-            className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
-              isSede
-                ? "bg-na-amon/15 text-na-amon"
-                : "bg-na-kefer/10 text-na-kefer"
-            }`}
-          >
-            {isSede ? "Sede" : "Centro cultural"}
-          </span>
-          <h3 className="mt-3 text-lg font-black text-na-heketDark">
-            {venue.name}
-          </h3>
+          <VenueNameLockup name={venue.name} kind={venue.kind} size="card" />
           <p className="mt-0.5 text-sm font-semibold text-na-muted">
             {venue.zone} · {venue.city}
           </p>
         </div>
-        <a
-          href={mapsUrl(venue.mapsQuery)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-na-heket/20 px-3.5 py-2 text-xs font-bold text-na-heket transition hover:bg-na-heket/10"
-        >
-          Cómo llegar
-          <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-        </a>
+        {mapsReady ? (
+          <a
+            href={mapsUrl(venue.mapsQuery)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-na-heket/20 px-3.5 py-2 text-xs font-bold text-na-heket transition hover:bg-na-heket/10"
+          >
+            Cómo llegar
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+          </a>
+        ) : null}
       </div>
 
       <ul className="mt-4 space-y-2.5 text-sm text-na-muted">
@@ -188,19 +180,7 @@ function VenueCard({
             </a>
           </li>
         ) : null}
-        {venue.email ? (
-          <li className="flex items-center gap-2">
-            <Mail className="h-4 w-4 shrink-0 text-na-heket" aria-hidden />
-            <a href={`mailto:${venue.email}`} className="hover:text-na-heket">
-              {venue.email}
-            </a>
-          </li>
-        ) : null}
       </ul>
-
-      {venue.note ? (
-        <p className="mt-4 text-sm leading-relaxed text-na-muted">{venue.note}</p>
-      ) : null}
     </li>
   );
 }
@@ -275,7 +255,7 @@ function EncuentranosPanel({
             className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 px-4 py-2 text-xs font-bold uppercase text-na-heket"
           >
             <Plus className="h-4 w-4" />
-            Añadir centro cultural
+            Añadir punto cultural
           </button>
         </div>
       ) : null}
@@ -287,7 +267,7 @@ function EncuentranosPanel({
         onEditVenue={onEditVenue}
       />
       <VenueGroup
-        title="Centros culturales"
+        title="Puntos culturales"
         icon={Landmark}
         venues={centros}
         dotClassName="bg-na-kefer/10 text-na-kefer"
@@ -295,10 +275,10 @@ function EncuentranosPanel({
       />
 
       <div className="rounded-2xl border border-na-heket/10 bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-6 text-white shadow-na-card sm:p-8">
-        <h3 className="text-lg font-black">¿Necesitas orientación?</h3>
+        <h3 className="text-lg font-black">¿Necesitas más información?</h3>
         <p className="mt-2 max-w-2xl text-sm text-white/85">
-          Escríbenos por WhatsApp o correo y te indicamos la sede o centro más
-          cercano según la actividad que te interese.
+          Escríbenos por WhatsApp o correo y te indicamos la sede o el punto
+          cultural más cercano según la actividad que te interese.
         </p>
         <ul className="mt-4 space-y-2 text-sm text-white/90">
           <li className="flex items-center gap-2">
@@ -349,7 +329,7 @@ export function WhereWeAre() {
           Dónde estamos
         </p>
         <h2 className="mx-auto mt-3 max-w-3xl text-balance text-center text-3xl font-black text-na-heketDark sm:text-4xl">
-          Sedes y centros culturales en República Dominicana
+          Sedes y puntos culturales en República Dominicana
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-na-muted">
           Consulta el mapa y, al continuar, direcciones, teléfonos y cómo llegar

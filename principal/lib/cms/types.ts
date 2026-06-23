@@ -10,11 +10,13 @@ export type CmsAgendaEntry = {
   id: string;
   category:
     | "diplomado"
+    | "filosofia"
     | "curso"
     | "taller"
     | "conferencia"
     | "cultura"
-    | "voluntariado";
+    | "voluntariado"
+    | "esfera";
   title: string;
   startsAt: string;
   date: string;
@@ -28,6 +30,8 @@ export type CmsAgendaEntry = {
   detailHref?: string;
   detailLabel?: string;
   showOnHome?: boolean;
+  /** Crónica en /eventos generada desde esta actividad. */
+  eventoSlug?: string;
 };
 
 export type CmsArticulo = {
@@ -53,6 +57,10 @@ export type CmsEvento = {
   image: CmsMedia;
   gallery?: CmsMedia[];
   body: string[];
+  /** `false` = borrador oculto en /eventos hasta publicar. */
+  published?: boolean;
+  /** Actividad de agenda que originó este borrador. */
+  sourceAgendaId?: string;
 };
 
 export type CmsMedioKind =
@@ -104,6 +112,7 @@ export type CmsDiplomadoInscription = {
   eyebrow?: string;
   title?: string;
   intro?: string;
+  capacityNote?: string;
   feeMain?: string;
   feeNote?: string;
   paymentNote?: string;
@@ -120,6 +129,9 @@ export type CmsDiplomadoPage = {
   heroLede?: string;
   otrasSesionesTitle?: string;
   otrasSesionesIntro?: string;
+  testimonialEyebrow?: string;
+  testimonialQuote?: string;
+  testimonialVideoUrl?: string;
 };
 
 export type CmsPageHeroText = {
@@ -205,6 +217,8 @@ export type CmsCulturaCard = {
   date?: string;
   /** Sede o lugar (ej. «Sede Naco»). */
   sede?: string;
+  /** Enlace interno (ej. crónica en /eventos/…). */
+  href?: string;
 };
 
 export type CmsCirculoAmigosPromo = {
@@ -668,7 +682,7 @@ export type CmsSalonLayout = "butacas" | "mesas" | "herradura";
 export type CmsSalon = {
   id: string;
   name: string;
-  sede: "Naco" | "Los Prados";
+  sede: "Naco" | "Los Prados" | "Santiago";
   city: string;
   summary: string;
   featuredLayout: CmsSalonLayout;

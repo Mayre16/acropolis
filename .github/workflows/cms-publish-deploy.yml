@@ -1,0 +1,111 @@
+name: CMS publish — rebuild and deploy
+
+on:
+  repository_dispatch:
+    types: [cms-publish]
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Sitio CMS (acropolis | civis)"
+        required: true
+        default: acropolis
+        type: choice
+        options:
+          - acropolis
+          - civis
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cms-deploy-${{ github.event.client_payload.site || github.event.inputs.site || 'acropolis' }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CMS_SITE: ${{ github.event.client_payload.site || github.event.inputs.site || 'acropolis' }}
+      CMS_API_URL: ${{ secrets.CMS_API_URL }}
+      PRINCIPAL_FTP_SERVER: ${{ secrets.PRINCIPAL_FTP_SERVER }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sync Civis CMS seed from principal
+        run: |
+          mkdir -p editor/data/acropolis
+          if [ -f principal/data/acropolis/published.json ]; then
+            cp principal/data/acropolis/published.json editor/data/acropolis/published.json
+          fi
+
+      - name: Build principal (Acropolis)
+        if: env.CMS_SITE == 'acropolis'
+        working-directory: principal
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
+          NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
+        run: npm ci && npm run build:cpanel
+
+      - name: Check principal FTP
+        id: principal_ftp
+        if: env.CMS_SITE == 'acropolis'
+        env:
+          FTP_SERVER: ${{ secrets.PRINCIPAL_FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"
+          else echo "ready=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Deploy principal to cPanel (FTP)
+        if: env.CMS_SITE == 'acropolis' && steps.principal_ftp.outputs.ready == '1'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRINCIPAL_FTP_SERVER }}
+          username: ${{ secrets.PRINCIPAL_FTP_USERNAME }}
+          password: ${{ secrets.PRINCIPAL_FTP_PASSWORD }}
+          local-dir: principal/out/
+          server-dir: ${{ secrets.PRINCIPAL_FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false
+
+      - name: Build civis
+        if: env.CMS_SITE == 'civis'
+        working-directory: civis
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.CIVIS_SITE_URL || 'https://civis.acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_PRINCIPAL_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL }}
+        run: npm ci && npm run build:cpanel
+
+      - name: Check civis FTP
+        id: civis_ftp
+        if: env.CMS_SITE == 'civis'
+        env:
+          FTP_SERVER: ${{ secrets.CIVIS_FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"
+          else echo "ready=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Deploy civis to cPanel (FTP)
+        if: env.CMS_SITE == 'civis' && steps.civis_ftp.outputs.ready == '1'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.CIVIS_FTP_SERVER }}
+          username: ${{ secrets.CIVIS_FTP_USERNAME }}
+          password: ${{ secrets.CIVIS_FTP_PASSWORD }}
+          local-dir: civis/out/
+          server-dir: ${{ secrets.CIVIS_FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false
+
+      - name: Upload build artifact (si FTP no configurado)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-${{ env.CMS_SITE }}-out
+          path: ${{ env.CMS_SITE == 'civis' && 'civis/out/' || 'principal/out/' }}
+          if-no-files-found: ignore
+          retention-days: 7

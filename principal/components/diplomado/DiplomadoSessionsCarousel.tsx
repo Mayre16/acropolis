@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -12,17 +13,12 @@ import {
   Pencil,
 } from "lucide-react";
 import type { AgendaEntry } from "@/lib/agenda";
-import { agendaInscribeHref } from "@/lib/whatsapp-messages";
 
 type Props = {
   items: AgendaEntry[];
   intervalMs?: number;
   onEditItem?: (id: string) => void;
 };
-
-function inscribeHref(item: AgendaEntry) {
-  return agendaInscribeHref(item);
-}
 
 function usePerView() {
   const [perView, setPerView] = useState(1);
@@ -47,8 +43,6 @@ function SessionCard({
   item: AgendaEntry;
   onEdit?: () => void;
 }) {
-  const whatsapp = inscribeHref(item);
-
   const card = (
     <article className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--dip-teal)]/10 bg-white shadow-[0_6px_20px_rgba(17,22,49,0.07)]">
       <div className="relative aspect-[4/3] w-full shrink-0 bg-[var(--dip-panel)]">
@@ -113,16 +107,14 @@ function SessionCard({
         </dl>
 
         <div className="mt-auto flex flex-wrap gap-2 pt-3">
-          {whatsapp ? (
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full bg-[var(--dip-gold)] px-3 py-1.5 text-[11px] font-bold text-[#1a1a18] transition hover:brightness-105"
+          {item.detailHref ? (
+            <Link
+              href={item.detailHref}
+              className="inline-flex items-center gap-1 rounded-full border border-[var(--dip-teal)]/25 px-3 py-1.5 text-[11px] font-bold text-[var(--dip-teal)] transition hover:bg-[var(--dip-teal)]/8"
             >
-              Inscribirme
+              Ver programa
               <ArrowRight className="h-3 w-3" aria-hidden />
-            </a>
+            </Link>
           ) : null}
         </div>
       </div>

@@ -268,8 +268,11 @@ function EditSitePageInner() {
     setStatus("Publicando…");
     try {
       if (doc) await saveDraft(site, token, doc);
-      await publish(site, token);
-      setStatus("Publicado. Recarga el sitio público para ver cambios.");
+      const result = await publish(site, token);
+      setStatus(
+        result.message ??
+          "Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).",
+      );
       await load();
     } catch (e) {
       setStatus(String(e));

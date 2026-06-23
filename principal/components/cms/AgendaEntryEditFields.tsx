@@ -7,6 +7,8 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
+import { AGENDA_CATEGORY_LABEL, type AgendaCategory } from "@/lib/agenda";
+import { isAgendaEntryPromotable } from "@/lib/agenda-evento";
 import type { CmsAgendaEntry } from "@/lib/cms/types";
 
 export function AgendaEntryImageField({
@@ -96,28 +98,60 @@ export function AgendaEntryImageField({
   );
 }
 
+const AGENDA_CATEGORY_OPTIONS = Object.entries(AGENDA_CATEGORY_LABEL) as [
+  AgendaCategory,
+  string,
+][];
+
 export function AgendaEntryEditFields({
   entry,
   token,
   onChange,
   onDelete,
+  onPromoteToEvento,
   showHomeToggle = true,
+  showCategorySelect = true,
 }: {
   entry: CmsAgendaEntry;
   token: string | null;
   onChange: (patch: Partial<CmsAgendaEntry>) => void;
   onDelete?: () => void;
+  /** Crea borrador de crónica en /eventos (no aplica al Diplomado). */
+  onPromoteToEvento?: (entry: CmsAgendaEntry) => void;
   showHomeToggle?: boolean;
+  showCategorySelect?: boolean;
 }) {
+  const canPromote = isAgendaEntryPromotable(entry);
+
   return (
     <div className="space-y-4">
-          <EditField
+      {showCategorySelect ? (
+        <label className="block text-sm">
+          <span className="mb-1 block font-semibold text-slate-700">
+            Categoría (página y carrusel)
+          </span>
+          <select
+            value={entry.category}
+            onChange={(e) =>
+              onChange({ category: e.target.value as CmsAgendaEntry["category"] })
+            }
+            className="w-full rounded-lg border border-slate-300 px-3 py-2"
+          >
+            {AGENDA_CATEGORY_OPTIONS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      <EditField
         label="Título"
         value={entry.title}
         onChange={(v) => onChange({ title: v })}
       />
       <EditField
-        label="Etiqueta"
+        label="Etiqueta visible en tarjeta"
         value={entry.tag ?? ""}
         onChange={(v) => onChange({ tag: v })}
       />
@@ -134,8 +168,8 @@ export function AgendaEntryEditFields({
         />
       </div>
       <p className="text-xs text-slate-600">
-        La fecha ISO ordena y filtra actividades pasadas. La fecha visible es el
-        texto que ve el visitante (ej. «Sábado 20 de junio»).
+        La fecha ISO filtra la agenda: desaparece 2 días después (15 días si es
+        Diplomado). La fecha visible es el texto del visitante.
       </p>
       <div className="grid gap-2 sm:grid-cols-2">
         <EditField
@@ -176,6 +210,22 @@ export function AgendaEntryEditFields({
           />
           Mostrar en carrusel del home
         </label>
+      ) : null}
+      {entry.eventoSlug ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+          Crónica vinculada:{" "}
+          <code className="font-mono">/eventos/{entry.eventoSlug}</code> — edita
+          y publica en la página Eventos.
+        </p>
+      ) : null}
+      {canPromote && onPromoteToEvento ? (
+        <button
+          type="button"
+          onClick={() => onPromoteToEvento(entry)}
+          className="w-full rounded-lg border border-na-heket/25 bg-na-heket/5 py-2.5 text-sm font-semibold text-na-heket"
+        >
+          Crear borrador de crónica en /eventos
+        </button>
       ) : null}
       {onDelete ? (
         <button

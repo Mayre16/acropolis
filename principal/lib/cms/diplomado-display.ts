@@ -6,6 +6,7 @@ import {
   DIPLOMADO_INFO_BANNER,
   DIPLOMADO_INSCRIBE_WHATSAPP,
   DIPLOMADO_INSCRIPTION,
+  DIPLOMADO_TESTIMONIAL,
 } from "@/lib/diplomado-content";
 import { useCmsDiplomadoBadge, useCmsDiplomadoInfo } from "@/lib/cms/hooks";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
@@ -17,10 +18,12 @@ import type {
 
 const DEFAULT_DIPLOMADO_PAGE: CmsDiplomadoPage = {
   heroLede:
-    "Un viaje de 4 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
-  otrasSesionesTitle: "Otras sesiones",
-  otrasSesionesIntro:
-    "Próximas clases del Diplomado en distintas sedes y horarios. Se comparten con la página de Filosofía — edítalas aquí o allí.",
+    "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
+  otrasSesionesTitle: "Cupos disponibles",
+  otrasSesionesIntro: "",
+  testimonialEyebrow: DIPLOMADO_TESTIMONIAL.eyebrow,
+  testimonialQuote: DIPLOMADO_TESTIMONIAL.quote,
+  testimonialVideoUrl: DIPLOMADO_TESTIMONIAL.videoUrl,
 };
 
 function mergeInscription(patch?: CmsDiplomadoInscription | null) {
@@ -28,6 +31,7 @@ function mergeInscription(patch?: CmsDiplomadoInscription | null) {
     eyebrow: patch?.eyebrow ?? DIPLOMADO_INSCRIPTION.eyebrow,
     title: patch?.title ?? DIPLOMADO_INSCRIPTION.title,
     intro: patch?.intro ?? DIPLOMADO_INSCRIPTION.intro,
+    capacityNote: patch?.capacityNote ?? DIPLOMADO_INSCRIPTION.capacityNote,
     feeMain: patch?.feeMain ?? DIPLOMADO_INSCRIPTION.feeMain,
     feeNote: patch?.feeNote ?? DIPLOMADO_INSCRIPTION.feeNote,
     paymentNote: patch?.paymentNote ?? DIPLOMADO_INSCRIPTION.paymentNote,
@@ -54,7 +58,6 @@ function badgeFromHero(h: CmsDiplomadoHero) {
 
 function infoFromHero(h: CmsDiplomadoHero) {
   const bannerFallback = DIPLOMADO_INFO_BANNER;
-  const scheduleFallback = DIPLOMADO_INSCRIPTION.schedule;
 
   return {
     banner: [
@@ -70,29 +73,8 @@ function infoFromHero(h: CmsDiplomadoHero) {
         value: h.activeModality ?? bannerFallback[2].value,
         label: bannerFallback[2].label,
       },
-      {
-        value: h.bannerFee ?? bannerFallback[3].value,
-        label: bannerFallback[3].label,
-      },
     ],
-    schedule: [
-      {
-        label: scheduleFallback[0].label,
-        value: h.activeDate ?? scheduleFallback[0].value,
-      },
-      {
-        label: scheduleFallback[1].label,
-        value: h.activeTime ?? scheduleFallback[1].value,
-      },
-      {
-        label: scheduleFallback[2].label,
-        value: h.activeModality ?? scheduleFallback[2].value,
-      },
-      {
-        label: scheduleFallback[3].label,
-        value: h.bannerDuration ?? scheduleFallback[3].value,
-      },
-    ],
+    schedule: [],
   };
 }
 

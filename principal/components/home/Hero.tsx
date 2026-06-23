@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import Image from "next/image";
 
-import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
+import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
 import { assetUrl } from "@/lib/asset-url";
@@ -62,15 +62,13 @@ export function Hero() {
 
       <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-12 pt-[150px] text-center md:px-12 md:pb-[50px] md:pt-[100px]">
 
-        <NaBrandLockupGroup
-          lockup="oinadom"
-          variant="white"
+        <HeroOinadomLogo
           priority
           align="center"
           size="hero"
-          descriptorProminence="hero"
-          maxWidthClass="max-w-[min(94vw,28rem)]"
+          maxWidthClass="max-w-[min(94vw,32rem)]"
         />
+        <h1 className="sr-only">Nueva Acrópolis República Dominicana</h1>
 
         <Link
           href="/quienes-somos"

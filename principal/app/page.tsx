@@ -8,6 +8,8 @@ import { HomePageShell } from "@/components/cms/HomePageShell";
 import { EsferaHomeSection } from "@/components/home/EsferaHomeSection";
 import { CirculoAmigosPromoCms } from "@/components/cms/CirculoAmigosPromoCms";
 import { UpcomingActivitiesHome } from "@/components/home/UpcomingActivitiesHome";
+import { HomeTalleresYCursosSection } from "@/components/home/HomeTalleresYCursosSection";
+import { HomeSalonesCarousel } from "@/components/home/HomeSalonesCarousel";
 import { InstagramFeedSection } from "@/components/home/InstagramFeedSection";
 import { ContentDigitalSection } from "@/components/home/ContentDigitalSection";
 import { SITE_URL, SOCIAL_LINKS } from "@/lib/site-config";
@@ -42,11 +44,13 @@ export default function Home() {
       <PhilosophyLivingBandCms />
       <PhilosophyWheel />
       <CirculoAmigosPromoCms />
-      <HomeActivityPhotosSection />
       <EsferaHomeSection />
       <UpcomingActivitiesHome />
-      <InstagramFeedSection variant="carousel" />
+      <HomeTalleresYCursosSection />
+      <HomeActivityPhotosSection />
+      <HomeSalonesCarousel />
       <ContentDigitalSection />
+      <InstagramFeedSection variant="carousel" showSocialHeader={false} />
     </>
     </HomePageShell>
   );

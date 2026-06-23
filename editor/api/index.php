@@ -16,6 +16,7 @@ if (!is_file($configFile)) {
 
 $config = require $configFile;
 require __DIR__ . '/mail.php';
+require __DIR__ . '/deploy-webhook.php';
 $dataRoot = rtrim($config['data_root'] ?? (__DIR__ . '/../data'), '/\\');
 $adminPassword = (string) ($config['admin_password'] ?? '');
 $allowedOrigins = $config['allowed_origins'] ?? [];
@@ -130,7 +131,38 @@ if ($uri === '/forms/civis-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     if (!is_array($body)) {
         jsonOut(400, ['ok' => false, 'error' => 'JSON inválido']);
     }
-    $result = cms_send_civis_solicitud($body, $config);
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+    $result = cms_send_civis_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
+}
+
+if ($uri === '/forms/esfera-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $body = json_decode(file_get_contents('php://input') ?: '{}', true);
+    if (!is_array($body)) {
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inválido']);
+    }
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+    $result = cms_send_esfera_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
+}
+
+if ($uri === '/forms/voluntariado-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $body = json_decode(file_get_contents('php://input') ?: '{}', true);
+    if (!is_array($body)) {
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inválido']);
+    }
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+    $result = cms_send_voluntariado_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
+}
+
+if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $body = json_decode(file_get_contents('php://input') ?: '{}', true);
+    if (!is_array($body)) {
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inválido']);
+    }
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+    $result = cms_send_site_inquiry($body, $config, is_string($remoteIp) ? $remoteIp : null);
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
@@ -148,7 +180,14 @@ if (preg_match('#^/content/(acropolis|civis)/publish$#', $uri, $m) && $_SERVER['
         jsonOut(400, ['error' => 'Sin borrador']);
     }
     copy($draft, $published);
-    jsonOut(200, ['ok' => true]);
+    $deploy = cms_trigger_deploy_webhook($config, $m[1]);
+    jsonOut(200, [
+        'ok' => true,
+        'deploy' => $deploy,
+        'message' => !empty($deploy['queued'])
+            ? 'Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).'
+            : 'Publicado. El contenido ya está disponible; recarga la página si no lo ves.',
+    ]);
 }
 
 jsonOut(404, ['error' => 'Not found']);

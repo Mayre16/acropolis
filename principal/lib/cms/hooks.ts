@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  getHomeAgendaItems,
+  getActiveAgendaItems,
   getUpcomingAgendaItems,
   type AgendaEntry,
 } from "@/lib/agenda";
@@ -32,16 +32,15 @@ import {
   DIPLOMADO_INSCRIPTION,
 } from "@/lib/diplomado-content";
 import { CULTURA_PROXIMAS_ACTIVIDADES } from "@/lib/cultura-agenda";
-import { CURSOS_PROXIMAS_CONVOCATORIAS } from "@/lib/cursos-agenda";
+import { filterCursosAgendaEntries } from "@/lib/cursos-agenda";
 import { VOLUNTARIADO_PROXIMAS_ACTIVIDADES } from "@/lib/voluntariado-agenda";
-import { ACTIVITY_PHOTOS } from "@/lib/home-content";
+import { ACTIVITY_PHOTOS, HOME_ACTIVITY_PHOTOS_LIMIT } from "@/lib/home-content";
 import {
   cmsEntryToAgenda,
   getCulturaEntries,
   getVoluntariadoEntries,
-  getCursosAgendaEntries,
 } from "@/lib/cms/agenda-edit";
-import { ALL_AGENDA_ENTRIES } from "@/lib/agenda-registry";
+import { ALL_AGENDA_ENTRIES, buildHomeAgenda } from "@/lib/agenda-registry";
 import { DIPLOMADO_PROXIMAS_SESIONES } from "@/lib/diplomado-sessions";
 
 export function useCmsAllAgenda(fallback = ALL_AGENDA_ENTRIES): AgendaEntry[] {
@@ -50,15 +49,39 @@ export function useCmsAllAgenda(fallback = ALL_AGENDA_ENTRIES): AgendaEntry[] {
 }
 
 export function useCmsHomeAgenda(reference = new Date()) {
+  const cms = useCmsDocument();
   const entries = useCmsAllAgenda();
-  return getHomeAgendaItems(entries, reference);
+  const esferaTrainings = getEsferaTrainings(cms ?? null);
+  return buildHomeAgenda(entries, esferaTrainings, reference);
+}
+
+/** @deprecated Usar useCmsHomeAgenda */
+export function useCmsHomePrimaryAgenda(reference = new Date()) {
+  return useCmsHomeAgenda(reference);
+}
+
+/** @deprecated Usar useCmsHomeAgenda */
+export function useCmsHomeCulturaCursosAgenda(reference = new Date()) {
+  return useCmsHomeAgenda(reference);
 }
 
 export function useCmsDiplomadoSessions(reference = new Date()) {
   const cms = useCmsDocument();
   const base = resolveAgendaFromCms(cms, DIPLOMADO_PROXIMAS_SESIONES);
-  return getUpcomingAgendaItems(
+  return getActiveAgendaItems(
     base.filter((e) => e.category === "diplomado"),
+    reference,
+  );
+}
+
+/** Sesiones del Diplomado y actividades de filosofía en /filosofia. */
+export function useCmsFilosofiaPageAgenda(reference = new Date()) {
+  const cms = useCmsDocument();
+  const base = resolveAgendaFromCms(cms, ALL_AGENDA_ENTRIES);
+  return getActiveAgendaItems(
+    base.filter(
+      (e) => e.category === "diplomado" || e.category === "filosofia",
+    ),
     reference,
   );
 }
@@ -77,12 +100,11 @@ export function useCmsDiplomadoInfo() {
   const cms = useCmsDocument();
   const h = cms?.sections.diplomadoHero;
   const bannerFallback = DIPLOMADO_INFO_BANNER;
-  const scheduleFallback = DIPLOMADO_INSCRIPTION.schedule;
 
   if (!isCmsEnabled() || !h) {
     return {
       banner: [...bannerFallback],
-      schedule: [...scheduleFallback],
+      schedule: [],
     };
   }
 
@@ -100,29 +122,8 @@ export function useCmsDiplomadoInfo() {
         value: h.activeModality ?? bannerFallback[2].value,
         label: bannerFallback[2].label,
       },
-      {
-        value: h.bannerFee ?? bannerFallback[3].value,
-        label: bannerFallback[3].label,
-      },
     ],
-    schedule: [
-      {
-        label: scheduleFallback[0].label,
-        value: h.activeDate ?? scheduleFallback[0].value,
-      },
-      {
-        label: scheduleFallback[1].label,
-        value: h.activeTime ?? scheduleFallback[1].value,
-      },
-      {
-        label: scheduleFallback[2].label,
-        value: h.activeModality ?? scheduleFallback[2].value,
-      },
-      {
-        label: scheduleFallback[3].label,
-        value: h.bannerDuration ?? scheduleFallback[3].value,
-      },
-    ],
+    schedule: [],
   };
 }
 
@@ -162,17 +163,15 @@ export function useCmsVoluntariadoSectionText() {
     title: vp?.proximasTitle ?? "Próximas actividades",
     intro:
       vp?.proximasIntro ??
-      "Jornadas y encuentros de voluntariado en nuestras sedes. Haz clic para ver más.",
+      "Jornadas de voluntariado y formación Esfera en nuestras sedes. Haz clic para ver más.",
   };
 }
 
+/** Convocatorias de cursos, talleres y conferencias — misma fuente que /agenda. */
 export function useCmsCursosAgenda(reference = new Date()) {
   const cms = useCmsDocument();
-  if (!isCmsEnabled() || !cms) {
-    return getUpcomingAgendaItems(CURSOS_PROXIMAS_CONVOCATORIAS, reference);
-  }
-  const entries = getCursosAgendaEntries(cms, CURSOS_PROXIMAS_CONVOCATORIAS);
-  return getUpcomingAgendaItems(entries.map(cmsEntryToAgenda), reference);
+  const base = resolveAgendaFromCms(cms, ALL_AGENDA_ENTRIES);
+  return getActiveAgendaItems(filterCursosAgendaEntries(base), reference);
 }
 
 export function useCmsCursosSectionText() {
@@ -182,7 +181,7 @@ export function useCmsCursosSectionText() {
     title: cp?.proximasTitle ?? "Próximas convocatorias",
     intro:
       cp?.proximasIntro ??
-      "Cursos, talleres y conferencias con fecha próxima. Haz clic para inscribirte o pedir más información.",
+      "Cursos, talleres y conferencias con fecha próxima — la misma agenda que en /agenda. Haz clic para inscribirte o pedir más información.",
   };
 }
 
@@ -210,7 +209,7 @@ export function useCmsActivityPhotos() {
   const cms = useCmsDocument();
   const photos = cms?.sections.activityPhotos;
   if (!isCmsEnabled() || !photos?.length) return ACTIVITY_PHOTOS;
-  return photos;
+  return photos.slice(0, HOME_ACTIVITY_PHOTOS_LIMIT);
 }
 
 export function useMergedArticulos() {

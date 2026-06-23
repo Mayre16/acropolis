@@ -3,9 +3,6 @@
 import { ArrowRight } from "lucide-react";
 import { InquiryMailForm } from "@/components/InquiryMailForm";
 import { buildVoluntariadoDonacionMailto } from "@/lib/contact-routing";
-import { VOLUNTARIADO_EMAIL } from "@/lib/site-config";
-
-const DELIVERY_NOTE = `Tu mensaje llegará a ${VOLUNTARIADO_EMAIL}.`;
 
 type VoluntariadoDonacionInquiryProps = {
   triggerLabel: string;
@@ -18,18 +15,18 @@ export function VoluntariadoDonacionInquiry({
 }: VoluntariadoDonacionInquiryProps) {
   return (
     <InquiryMailForm
+      formKey="voluntariado_donacion"
       triggerLabel={triggerLabel}
       triggerClassName={triggerClassName}
       triggerIcon={<ArrowRight className="h-4 w-4" />}
       triggerIconAfter
       modalTitle="Quiero donar"
-      modalIntro={DELIVERY_NOTE}
+      modalIntro="Completa tus datos y enviaremos tu consulta al equipo de voluntariado."
       contextLines={[
         "Donación para proyectos de ecología, apoyo social y formación humanitaria.",
       ]}
       defaultMensaje="Indique monto, forma de aporte o cualquier detalle que debamos conocer (opcional)."
       buildMailto={buildVoluntariadoDonacionMailto}
-      deliveryNote={DELIVERY_NOTE}
     />
   );
 }

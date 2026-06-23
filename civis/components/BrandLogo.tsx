@@ -21,6 +21,8 @@ import {
   lockupClearSpaceVariant,
 } from "@/lib/brand-clear-space";
 
+type DescriptorStyle = ReturnType<typeof brandDescriptorStyle>;
+
 type BrandLogoProps = {
   lockup?: BrandLockupId;
   variant?: BrandLogoVariant;
@@ -29,8 +31,9 @@ type BrandLogoProps = {
   subtitleClassName?: string;
   descriptorClassName?: string;
   descriptorProminence?: "default" | "hero";
-  /** Civis: descriptor al ancho del wordmark vía SVG textLength. */
+  /** Ajusta oina/oinadom al ancho del wordmark (p. ej. Quiénes somos). */
   fitDescriptorToWordmark?: boolean;
+  descriptorStyleOverride?: DescriptorStyle;
   align?: "start" | "center";
   priority?: boolean;
   clearSpace?: boolean;
@@ -59,7 +62,7 @@ function descriptorFill(variant: BrandLogoVariant): string {
   return variant === "white" ? "rgba(255, 255, 255, 0.85)" : "#707070";
 }
 
-/** Descriptor oina/oinadom — ancho = banda del wordmark «Nueva Acrópolis». */
+/** Descriptor oina/oinadom — cabe en la banda del wordmark «Nueva Acrópolis». */
 function WordmarkBandDescriptor({
   label,
   variant,
@@ -117,6 +120,7 @@ export function BrandLogo({
   descriptorClassName,
   descriptorProminence = "default",
   fitDescriptorToWordmark = false,
+  descriptorStyleOverride,
   align = "center",
   priority = false,
   clearSpace = false,
@@ -158,6 +162,7 @@ export function BrandLogo({
     !hybrid && !showSubtitle && align === "center" && "justify-center",
     !markHeightRem &&
       !lockupWidthRem &&
+      !className &&
       `[--brand-logo-h:${BRAND_LOGO_HEIGHT_DEFAULT}]`,
     className,
   );
@@ -167,23 +172,32 @@ export function BrandLogo({
       ? ({ "--brand-logo-h": `${markHeightRem}rem` } as CSSProperties)
       : undefined;
 
+  const fixedMarkHeightRem = markHeightRem;
+  const fixedMarkWidthRem =
+    fixedMarkHeightRem !== undefined ? fixedMarkHeightRem * aspect : undefined;
+
   const markStyle: CSSProperties =
     lockupWidthRem !== undefined
       ? {
           width: `${lockupWidthRem}rem`,
           height: `${(asset.height / asset.width) * lockupWidthRem}rem`,
         }
-      : lockup === "na-solo"
-        ? { height: "var(--brand-logo-h)", width: "auto" }
-        : hybrid
-          ? {
-              height: "var(--brand-logo-h)",
-              width: `calc(var(--brand-logo-h) * ${aspect})`,
-            }
-          : {
-              height: "var(--brand-logo-h)",
-              width: "auto",
-            };
+      : fixedMarkHeightRem !== undefined
+        ? {
+            height: `${fixedMarkHeightRem}rem`,
+            width: `${fixedMarkWidthRem}rem`,
+          }
+        : lockup === "na-solo"
+          ? { height: "var(--brand-logo-h)", width: "auto" }
+          : hybrid
+            ? {
+                height: "var(--brand-logo-h)",
+                width: `calc(var(--brand-logo-h) * ${aspect})`,
+              }
+            : {
+                height: "var(--brand-logo-h)",
+                width: "auto",
+              };
 
   const image = (
     <img
@@ -194,10 +208,16 @@ export function BrandLogo({
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : undefined}
       className={cn(
-        "block max-w-full shrink-0 object-contain",
-        lockup === "na-solo" ? "h-[var(--brand-logo-h)] w-auto" : "h-auto w-auto",
+        "block shrink-0 object-contain",
+        fixedMarkHeightRem === undefined && "max-w-full",
+        fixedMarkHeightRem === undefined &&
+          (lockup === "na-solo"
+            ? "h-[var(--brand-logo-h)] w-auto"
+            : "h-auto w-auto"),
         hybrid ? "object-center" : align === "start" ? "object-left" : "object-center",
-        !fitDescriptorToWordmark && maxWidthClass,
+        fixedMarkHeightRem === undefined &&
+          !fitDescriptorToWordmark &&
+          maxWidthClass,
       )}
       style={markStyle}
     />
@@ -213,14 +233,6 @@ export function BrandLogo({
   ) : (
     image
   );
-
-  const descriptorStyles =
-    fitDescriptorToWordmark && (lockup === "oina" || lockup === "oinadom")
-      ? civisSectionDescriptorStyle(lockup)
-      : brandDescriptorStyle(
-          lockup as "oina" | "oinadom" | "escuela" | "trilogo",
-          descriptorProminence,
-        );
 
   const descriptorNode =
     hybrid && descriptorLabel ? (
@@ -252,7 +264,11 @@ export function BrandLogo({
           descriptorClassName,
         )}
         style={{
-          ...descriptorStyles,
+          ...(descriptorStyleOverride ??
+            brandDescriptorStyle(
+              lockup as "oina" | "oinadom" | "escuela" | "trilogo",
+              descriptorProminence,
+            )),
           maxWidth: "100%",
           fontFamily: "var(--font-noto-sans), sans-serif",
           fontWeight:
@@ -301,7 +317,12 @@ export function BrandLogo({
             fitDescriptorToWordmark ? "items-stretch" : align === "start" ? "items-start" : "items-center",
             fitDescriptorToWordmark && maxWidthClass,
           )}
-          style={{ width: markStyle.width }}
+          style={{
+            width:
+              fixedMarkWidthRem !== undefined
+                ? `${fixedMarkWidthRem}rem`
+                : markStyle.width,
+          }}
         >
           {logoBody}
           {descriptorNode}

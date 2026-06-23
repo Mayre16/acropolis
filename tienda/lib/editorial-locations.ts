@@ -20,9 +20,9 @@ export type EditorialSede = {
 export const EDITORIAL_STORE_HOURS = "Lunes a Jueves · 6:45 p.m. – 8:45 p.m.";
 
 export const EDITORIAL_STORE_PHOTO = {
-  src: "/img/editorial/tienda-naco.svg",
-  fallbackSrc: "/img/editorial/tienda-naco.svg",
-  alt: "Interior de la Librería Editorial Logos en la Sede Naco",
+  src: "/img/editorial/libreria-bazar.webp",
+  fallbackSrc: "/img/editorial/libreria-bazar.webp",
+  alt: "Librería Editorial Logos — libros, separadores, camisetas, bolsas pintadas y recuerdos",
 } as const;
 
 /**

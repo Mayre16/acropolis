@@ -38,9 +38,9 @@ export const brandLogoHeightClass = {
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
   footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
-  /** Footer Civis — oinadom (doble del compacto anterior). */
+  /** Footer Civis — oinadom (−2px vs tamaño anterior). */
   civisFooterOinadom:
-    "[--brand-logo-h:2.5rem] sm:[--brand-logo-h:2.75rem] md:[--brand-logo-h:3rem]",
+    "[--brand-logo-h:2.375rem] sm:[--brand-logo-h:2.625rem] md:[--brand-logo-h:2.875rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:
@@ -59,8 +59,7 @@ export const brandLogoHeightClass = {
     "[--brand-logo-h:4.75rem] sm:[--brand-logo-h:5.5rem] md:[--brand-logo-h:6rem]",
   sectionStacked:
     "[--brand-logo-h:3.65rem] sm:[--brand-logo-h:4rem] md:[--brand-logo-h:4.25rem]",
-  quienesSomos:
-    "[--brand-logo-h:1.7rem] sm:[--brand-logo-h:1.9rem] md:[--brand-logo-h:2rem]",
+  quienesSomos: "[--brand-logo-h:3.875rem]",
   /** Identificador Civis a ancho de contenedor (header / footer). */
   civisMarkSite: "w-full h-auto max-w-full",
 } as const;
@@ -131,12 +130,32 @@ export function brandDescriptorStyle(
   };
 }
 
-/** Descriptor Civis — cabe en el ancho del wordmark «Nueva Acrópolis». */
+/** Footer Civis oinadom @ md — 11px / 46px mark (referencia de proporción). */
+export const CIVIS_LOCKUP_DESCRIPTOR_LOGO_RATIO = 0.6875 / 2.875;
+
+/** Footer Civis — oinadom descriptor fijo (aprobado −2px del mark). */
+export function civisFooterDescriptorStyle() {
+  return {
+    marginTop: "0.24em",
+    fontSize: "0.6875rem",
+    letterSpacing: "0.05em",
+  };
+}
+
+/** Quiénes somos (oina) — descriptor fijo; no escalar con la proporción del footer. */
+export function civisQuienesSomosDescriptorStyle() {
+  return {
+    marginTop: "0.24em",
+    fontSize: "0.5rem",
+    letterSpacing: "0.05em",
+  };
+}
+
+/** SVG al wordmark (reservado; Quiénes somos usa HTML). */
 export function civisSectionDescriptorStyle(lockup: "oina" | "oinadom") {
-  const factor = lockup === "oina" ? 0.068 : 0.072;
   return {
     marginTop: "0.18em",
-    fontSize: `clamp(0.28rem, calc(var(--brand-logo-h) * ${factor}), calc(var(--brand-logo-h) * 0.09))`,
-    letterSpacing: lockup === "oina" ? "0.022em" : "0.032em",
+    fontSize: `calc(var(--brand-logo-h) * ${lockup === "oina" ? 0.055 : 0.072})`,
+    letterSpacing: lockup === "oina" ? "0.044em" : "0.032em",
   };
 }

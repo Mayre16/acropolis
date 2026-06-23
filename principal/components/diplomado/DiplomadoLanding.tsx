@@ -2,49 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronDown,
-  Landmark,
 } from "lucide-react";
 import { ConstellationHero } from "@/components/diplomado/ConstellationHero";
 import { DiplomadoHeroIntro } from "@/components/diplomado/DiplomadoHeroIntro";
+import { DiplomadoTestimonialVideo } from "@/components/diplomado/DiplomadoTestimonialVideo";
 import { DiplomadoInscriptionBlock } from "@/components/diplomado/DiplomadoInscriptionBlock";
 import { DiplomadoOtherSessions } from "@/components/diplomado/DiplomadoOtherSessions";
-import { BrandLogo } from "@/components/BrandLogo";
-import { brandLogoHeightClass } from "@/lib/brand-clear-space";
 import { DiplomadoImpactSection } from "@/components/diplomado/DiplomadoImpactSection";
-import { DiplomadoInfoBannerSection } from "@/components/diplomado/DiplomadoInfoBannerSection";
 import {
   DIPLOMADO_ABOUT,
   DIPLOMADO_FRAMER_ASSETS,
   DIPLOMADO_MODULOS,
   DIPLOMADO_PROGRAM,
 } from "@/lib/diplomado-content";
-
-function DiplomadoMarquee() {
-  const chip = (
-    <span className="mx-5 inline-flex shrink-0 items-center gap-2 text-[13px] font-bold text-white">
-      <Landmark className="h-4 w-4 text-[var(--dip-gold)]" aria-hidden />
-      Diplomado
-    </span>
-  );
-  const row = (
-    <>
-      {chip}
-      {chip}
-      {chip}
-      {chip}
-      {chip}
-      {chip}
-    </>
-  );
-  return (
-    <div className="diplomado-marquee-bar overflow-hidden py-2.5" aria-hidden>
-      <div className="diplomado-marquee-track flex w-max">
-        {row}
-        {row}
-      </div>
-    </div>
-  );
-}
 
 function ModuloCard({
   n,
@@ -88,22 +58,7 @@ export function DiplomadoLanding() {
       <section className="px-4 pb-0 pt-6 text-center text-white lg:px-8 lg:pb-6 lg:pt-12">
         <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-x-12 lg:gap-y-8 lg:text-left">
           <div className="hero-diplomado-copy">
-            <Link
-              href="/"
-              aria-label="Inicio — Nueva Acrópolis"
-              className="mx-auto inline-flex justify-center overflow-visible transition-opacity hover:opacity-90 lg:mx-0 lg:justify-start"
-            >
-              <BrandLogo
-                lockup="escuela"
-                variant="white"
-                align="start"
-                priority
-                className={brandLogoHeightClass.diplomadoHero}
-                maxWidthClass="max-w-[min(92vw,18rem)]"
-              />
-            </Link>
-
-            <h1 className="mx-auto mt-6 max-w-[320px] font-bold leading-[1.05] tracking-tight lg:mx-0 lg:max-w-none">
+            <h1 className="mx-auto max-w-[320px] font-bold leading-[1.05] tracking-tight lg:mx-0 lg:max-w-none">
               <span className="block text-[2.65rem] text-white lg:text-[3.25rem]">Filosofía</span>
               <span className="block text-[1.75rem] font-semibold text-white/95 lg:text-[2rem]">
                 para la
@@ -119,21 +74,17 @@ export function DiplomadoLanding() {
           <div className="hero-diplomado-visual order-3 mt-6 lg:order-2 lg:mt-0">
             <ConstellationHero />
           </div>
-
-          <div className="hero-diplomado-marquee order-2 -mx-4 lg:order-3 lg:col-span-2 lg:mx-0 lg:mt-2">
-            <DiplomadoMarquee />
-          </div>
         </div>
       </section>
 
-      <DiplomadoInfoBannerSection />
+      <DiplomadoTestimonialVideo />
 
       <section className="diplomado-info-banner -mx-0 bg-white px-3 pb-4 lg:px-8 lg:pb-5">
         <a
           href="#otras-sesiones"
           className="mx-auto flex w-full max-w-[280px] items-center justify-center gap-2 rounded-full border-2 border-[var(--dip-teal)]/25 bg-[var(--dip-panel)] px-5 py-2.5 text-sm font-semibold text-[var(--dip-teal)] transition hover:border-[var(--dip-teal)]/45 hover:bg-[var(--dip-teal)]/5"
         >
-          Otras sesiones
+          Cupos disponibles
           <ChevronDown className="h-4 w-4" aria-hidden />
         </a>
       </section>

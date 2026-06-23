@@ -12,7 +12,8 @@
     "pack:footer": "node scripts/pack-footer-cpanel.mjs",
     "images:webp": "node scripts/convert-to-webp.mjs",
     "brand:lockups": "node scripts/generate-brand-lockups.mjs",
-    "images:localize": "node scripts/localize-instagram-images.mjs && node scripts/fetch_mundo_feed.mjs",
+    "images:localize": "node scripts/fetch-instagram-posts.mjs && node scripts/fetch_mundo_feed.mjs",
+    "fetch:instagram": "node scripts/fetch-instagram-posts.mjs",
     "fetch:mundo": "node scripts/fetch_mundo_feed.mjs",
     "start": "next start",
     "lint": "next lint"

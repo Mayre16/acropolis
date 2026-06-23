@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, Plus } from "lucide-react";
+import { Clock, FileDown, Plus } from "lucide-react";
 import { SolicitudEsferaDialog } from "@/components/SolicitudEsferaDialog";
 import { CmsSectionEditBar, CmsEditPencil } from "@/components/cms/CmsEditPencil";
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import {
+  ESFERA_BROCHURE_SECTION_ID,
   ESFERA_MODALIDADES_SECTION_ID,
   esferaModalidadSelectedId,
 } from "@/lib/cms/esfera-page-edit";
@@ -17,6 +18,10 @@ export function EsferaModalidadesSection() {
   const edit = useEsferaCmsEdit();
   const page = useEsferaPageDisplay();
   const modalidades = page.modalidades ?? [];
+  const brochureHref =
+    resolveCmsMediaUrl(page.brochureHref) ?? page.brochureHref ?? "";
+  const brochureLabel =
+    page.brochureButtonLabel ?? "Descarga nuestro brochure";
 
   return (
     <section className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
@@ -112,8 +117,27 @@ export function EsferaModalidadesSection() {
         })}
       </ul>
 
-      <div className="mt-6 text-center">
+      <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <SolicitudEsferaDialog triggerLabel="Solicitar taller o charla para mi organización" />
+        {brochureHref ? (
+          <a
+            href={brochureHref}
+            download
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-na-heket px-6 py-3 text-sm font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
+          >
+            <FileDown className="h-4 w-4" aria-hidden />
+            {brochureLabel}
+          </a>
+        ) : edit?.ready ? (
+          <button
+            type="button"
+            onClick={() => edit.setSelectedId(ESFERA_BROCHURE_SECTION_ID)}
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-dashed border-amber-400 px-6 py-3 text-sm font-bold text-amber-900"
+          >
+            <FileDown className="h-4 w-4" aria-hidden />
+            Configurar brochure PDF
+          </button>
+        ) : null}
       </div>
     </section>
   );

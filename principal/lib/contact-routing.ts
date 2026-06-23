@@ -168,6 +168,47 @@ export function buildEsferaMailto(
 
 export type EsferaCollaborateKind = "donar" | "alianzas";
 
+export type EsferaInfoFormValues = InquiryContactValues & {
+  taller?: string;
+  date?: string;
+  time?: string;
+  sede?: string;
+};
+
+export function buildEsferaInfoMessage(v: EsferaInfoFormValues): string {
+  return [
+    "=== CONSULTA — PUNTO FOCAL ESFERA ===",
+    "",
+    v.taller
+      ? `Taller / actividad de interés: «${v.taller.trim()}»`
+      : "Consulta general sobre Punto Focal Esfera.",
+    v.date ? `Fecha: ${v.date}` : null,
+    v.time ? `Hora: ${v.time}` : null,
+    v.sede ? `Sede: ${v.sede}` : null,
+    "",
+    `Nombre: ${v.nombre.trim()}`,
+    `Teléfono / WhatsApp: ${v.telefono.trim()}`,
+    v.email.trim() ? `Correo: ${v.email.trim()}` : null,
+    "",
+    "Solicito más información.",
+    v.mensaje.trim() ? `\nComentario:\n${v.mensaje.trim()}` : null,
+    "",
+    "---",
+    "Enviado desde acropolis.org.do/esfera",
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
+export function buildEsferaInfoMailto(
+  values: EsferaInfoFormValues,
+): MailtoResult {
+  const subject = values.taller
+    ? `[Esfera] Consulta — ${values.taller.trim()}`
+    : `[Esfera] Más información — ${values.nombre.trim()}`;
+  return buildEsferaMailto(subject, buildEsferaInfoMessage(values));
+}
+
 export function buildEsferaCollaborateMessage(
   kind: EsferaCollaborateKind,
   v: InquiryContactValues,
@@ -296,6 +337,45 @@ export function buildSalonInquiryMailto(
   return buildMailtoLink(
     [CURSOS_EMAIL],
     `[Nueva Acrópolis RD] Consulta alquiler de salones — ${values.nombre.trim()}`,
+    body,
+  );
+}
+
+export type ViajeInfoFormValues = InquiryContactValues & {
+  viaje: string;
+  location?: string;
+  proximaFecha?: string;
+};
+
+export function buildViajeInfoMessage(v: ViajeInfoFormValues): string {
+  return [
+    "=== CONSULTA — VIAJES CULTURALES ===",
+    "",
+    `Viaje de interés: «${v.viaje.trim()}»`,
+    v.location ? `Destino / ubicación: ${v.location}` : null,
+    v.proximaFecha ? `Próxima salida: ${v.proximaFecha}` : null,
+    "",
+    `Nombre: ${v.nombre.trim()}`,
+    `Teléfono / WhatsApp: ${v.telefono.trim()}`,
+    v.email.trim() ? `Correo: ${v.email.trim()}` : null,
+    "",
+    "Solicito información sobre fechas, itinerario e inscripción.",
+    v.mensaje.trim() ? `\nComentario:\n${v.mensaje.trim()}` : null,
+    "",
+    "---",
+    "Enviado desde acropolis.org.do/cultura/viajes",
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
+export function buildViajeInfoMailto(
+  values: ViajeInfoFormValues,
+): { href: string; recipients: string[]; body: string } {
+  const body = buildViajeInfoMessage(values);
+  return buildMailtoLink(
+    [INFO_EMAIL],
+    `[Nueva Acrópolis RD] Consulta viaje cultural — ${values.viaje.trim()}`,
     body,
   );
 }

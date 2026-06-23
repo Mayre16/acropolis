@@ -4,6 +4,7 @@ import type {
   CmsFilosofiaLabeledValue,
   CmsFilosofiaPage,
 } from "@/lib/cms/types";
+import { VENUE_LOCATIONS } from "@/lib/locations";
 
 export const FILOSOFIA_PROGRAMA_DEFAULTS = {
   eyebrow: "Programa de estudios",
@@ -158,7 +159,9 @@ export const FILOSOFIA_AVANZADOS_DEFAULTS = {
     "Sociopolítica",
     "Oratoria",
     "Historia de la Filosofía",
-    "Religiones comparadas",
+    "Historia de la Filosofía moderna",
+    "Historia de la Filosofía contemporánea",
+    "Historia de la Filosofía oriental",
     "Antropogénesis y cosmogénesis",
     "Astrología",
     "Filosofía de la ciencia",
@@ -169,6 +172,35 @@ export const FILOSOFIA_AVANZADOS_DEFAULTS = {
   imageCaption: "Materias avanzadas en sedes de todo el mundo",
 } as const;
 
+export type FilosofiaSedeEntry = {
+  id: string;
+  label: string;
+  address: string;
+  mapsQuery: string;
+};
+
+const FILOSOFIA_SEDE_VENUES = [
+  { venueId: "sede-naco", label: "Naco" },
+  { venueId: "sede-los-prados", label: "Los Prados" },
+  { venueId: "sede-santiago", label: "Santiago" },
+  { venueId: "punto-cultural-roberto-pastoriza", label: "Izbira" },
+] as const;
+
+/** Sedes del diplomado con dirección y consulta de Google Maps desde `locations.ts`. */
+export function filosofiaSedeEntries(): FilosofiaSedeEntry[] {
+  return FILOSOFIA_SEDE_VENUES.flatMap(({ venueId, label }) => {
+    const venue = VENUE_LOCATIONS.find((v) => v.id === venueId);
+    if (!venue) return [];
+
+    const address =
+      venueId === "sede-naco" || venueId === "punto-cultural-roberto-pastoriza"
+        ? `${venue.address}, ${venue.zone}`
+        : venue.address;
+
+    return [{ id: venueId, label, address, mapsQuery: venue.mapsQuery }];
+  });
+}
+
 export const FILOSOFIA_ES_PARA_TI_DEFAULTS = {
   title: "¿Es para ti?",
   items: [
@@ -176,44 +208,38 @@ export const FILOSOFIA_ES_PARA_TI_DEFAULTS = {
       id: "quien",
       icon: "users",
       title: "¿Quién puede venir?",
-      text: "Mayores de 18 años. No necesitas haber leído a Kant — aunque después querrás saber quién era.",
+      text: "Personas mayores de 18 años. No se requiere formación previa en filosofía.",
     },
     {
       id: "saber",
       icon: "check",
-      title: "¿Hace falta saber filosofía?",
-      text: "Para nada. Solo curiosidad, ganas de pensar y tolerancia a que Platón te cambie un poco la cabeza.",
+      title: "¿Hace falta haber estudiado filosofía?",
+      text: "No. Basta con curiosidad, disposición al diálogo e interés por profundizar en las grandes preguntas de la vida.",
     },
     {
       id: "tiempo",
       icon: "clock",
       title: "¿Cuánto tiempo?",
-      text: "5 meses, una sesión presencial a la semana. Tiempo de sobra para digerir ideas y aún llegar a cenar.",
+      text: "5 meses, una sesión presencial a la semana.",
     },
     {
       id: "sedes",
       icon: "map",
-      title: "Sedes en Santo Domingo",
-      text: "Naco o Los Prados — elige la que te quede más cómoda.",
-    },
-    {
-      id: "tambien",
-      icon: "map",
-      title: "También en…",
-      text: "Punto Cultural Roberto Pastoriza (SD). La filosofía no se queda solo en la capital.",
+      title: "Sedes",
+      text: "Naco — Calle Cub Scouts No. 6, 3er nivel, Ens. Naco\nLos Prados — Eugenio Deschamps No. 81\nSantiago — Dirección próximamente\nIzbira — Roberto Pastoriza No. 709, Evaristo Morales",
     },
     {
       id: "reconoces",
       icon: "book",
       title: "¿Te reconoces?",
-      text: "Si buscas respuestas prácticas, quieres conocerte mejor o te intriga la sabiduría de Oriente y Occidente — este es tu sitio.",
+      text: "Si buscas comprender con mayor profundidad la vida, el ser humano y las tradiciones de sabiduría de Oriente y Occidente, este programa puede ser para ti.",
     },
   ] satisfies CmsFilosofiaFaqItem[],
 } as const;
 
 export const FILOSOFIA_CTA_DEFAULTS = {
-  title: "¿Te animas?",
-  text: "Escríbenos por WhatsApp: te contamos fechas, horarios y cómo reservar tu cupo. Sin formularios eternos.",
+  title: "Información e inscripción",
+  text: "Escríbenos por WhatsApp para conocer fechas, horarios y el proceso de inscripción.",
   whatsappMessage:
     "Hola, me interesa el Diplomado de Filosofía para la Vida. ¿Me dan información de fechas e inscripción?",
   buttonLabel: "Quiero inscribirme",

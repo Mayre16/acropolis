@@ -28,8 +28,8 @@ export const BRAND_LOCKUPS: Record<BrandLockupId, LockupAsset> = {
     webp: "/brand/logo-na-solo.webp",
     webpWhite: "/brand/logo-na-solo-white.webp",
     alt: "Nueva Acrópolis",
-    width: 855,
-    height: 910,
+    width: 2220,
+    height: 905,
   },
   oina: {
     webp: "/brand/logo-oina.webp",
@@ -44,8 +44,8 @@ export const BRAND_LOCKUPS: Record<BrandLockupId, LockupAsset> = {
     webpWhite: "/brand/logo-oinadom-white.webp",
     png: "/brand/logo-oinadom.png",
     alt: "Nueva Acrópolis — República Dominicana",
-    width: 2429,
-    height: 1633,
+    width: 2817,
+    height: 1587,
   },
   escuela: {
     webp: "/brand/logo-escuela.webp",
@@ -73,10 +73,11 @@ export const BRAND_NA_MAP_MONOGRAM = {
   height: 316,
 } as const;
 
-/** Lockups con descriptor integrado en la banda gris (no añadir subtítulo externo). */
+/**
+ * Lockups con descriptor en HTML (modo híbrido).
+ * NA y oinadom usan raster completo del kit — no entrar aquí.
+ */
 export const LOCKUPS_WITH_DESCRIPTOR = [
-  "oina",
-  "oinadom",
   "trilogo",
   "escuela",
 ] as const satisfies readonly BrandLockupId[];
@@ -86,8 +87,6 @@ export const LOCKUP_DESCRIPTOR_LABELS: Record<
   (typeof LOCKUPS_WITH_DESCRIPTOR)[number],
   string
 > = {
-  oina: "ORGANIZACIÓN INTERNACIONAL",
-  oinadom: "REPÚBLICA DOMINICANA",
   trilogo: "FILOSOFÍA • CULTURA • VOLUNTARIADO",
   escuela: "ESCUELA DE FILOSOFÍA",
 };

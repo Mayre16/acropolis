@@ -28,7 +28,7 @@ export function VenueEditFields({
           className="w-full rounded-lg border border-slate-200 px-3 py-2"
         >
           <option value="sede">Sede</option>
-          <option value="centro-cultural">Centro cultural</option>
+          <option value="centro-cultural">Punto cultural</option>
         </select>
       </label>
       <EditField
@@ -36,6 +36,9 @@ export function VenueEditFields({
         value={venue.name}
         onChange={(v) => onChange({ name: v })}
       />
+      <p className="-mt-2 text-xs text-slate-500">
+        Sin «Sede» ni «Punto cultural» — la etiqueta de tipo lo indica arriba.
+      </p>
       <div className="grid gap-2 sm:grid-cols-2">
         <EditField
           label="Ciudad"

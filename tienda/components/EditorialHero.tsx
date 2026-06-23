@@ -68,9 +68,9 @@ export function EditorialHero({
             <h1 className="max-w-3xl text-balance text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
               {title}
             </h1>
-            <p className="mt-4 max-w-2xl text-balance text-lg text-white/92 sm:text-xl">
+            <h2 className="mt-4 max-w-2xl text-balance text-lg text-white/92 sm:text-xl">
               {lede}
-            </p>
+            </h2>
           </div>
 
           <CompactCoverCarousel images={carouselImages} />

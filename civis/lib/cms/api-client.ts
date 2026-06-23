@@ -1,5 +1,19 @@
 import type { CmsDocument } from "@/lib/cms/types";
 
+export type CmsDeployStatus = {
+  queued?: boolean;
+  site?: string;
+  reason?: string;
+  status?: number;
+  detail?: string;
+};
+
+export type CmsPublishResult = {
+  ok?: boolean;
+  deploy?: CmsDeployStatus;
+  message?: string;
+};
+
 export function cmsApiBase() {
   return (
     process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "") ||
@@ -55,12 +69,16 @@ export async function saveCmsDraft(
 export async function publishCms(
   site: "acropolis" | "civis",
   token: string,
-): Promise<void> {
+): Promise<CmsPublishResult> {
   const res = await fetch(`${cmsApiBase()}/content/${site}/publish`, {
     method: "POST",
     headers: authHeaders(token),
   });
   if (!res.ok) throw new Error("Error al publicar");
+  const result = (await res.json()) as CmsPublishResult;
+  const { notifyCmsPublishSuccess } = await import("@/lib/cms/publish-notify");
+  notifyCmsPublishSuccess(result);
+  return result;
 }
 
 export async function uploadCmsImage(

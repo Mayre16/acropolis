@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { CulturaHero } from "@/components/cms/CulturaHero";
-import { CirculoAmigosPromoCms } from "@/components/cms/CirculoAmigosPromoCms";
 import { CulturaEventosPreview } from "@/components/cms/CulturaEventosPreview";
 import { CulturaProximasActividades } from "@/components/cms/CulturaProximasActividades";
 import { CulturaTalleresSection } from "@/components/cms/CulturaTalleresSection";
@@ -22,11 +21,9 @@ export default function CulturaPage() {
 
         <CulturaTalleresSection />
 
-        <CirculoAmigosPromoCms variant="compact" />
+        <CulturaViajesSection />
 
         <CulturaEventosPreview />
-
-        <CulturaViajesSection />
 
         <CulturaProximasActividades />
       </>

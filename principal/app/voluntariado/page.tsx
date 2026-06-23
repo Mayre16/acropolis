@@ -7,7 +7,6 @@ import { VoluntariadoActividadesRecientes } from "@/components/voluntariado/Volu
 import { VoluntariadoQueHacemosSection } from "@/components/voluntariado/VoluntariadoQueHacemosSection";
 import { VoluntariadoEsferaSection } from "@/components/voluntariado/VoluntariadoEsferaSection";
 import { VoluntariadoSostenibilidadSection } from "@/components/voluntariado/VoluntariadoSostenibilidadSection";
-import { VoluntariadoParticipacionSection } from "@/components/voluntariado/VoluntariadoParticipacionSection";
 
 export const metadata: Metadata = {
   title: "Voluntariado",
@@ -22,12 +21,11 @@ export default function VoluntariadoPage() {
       <>
         <VoluntariadoHero />
         <VoluntariadoQueHacemosSection />
-        <VoluntariadoProximasActividades />
         <VoluntariadoEsferaSection />
         <VoluntariadoSostenibilidadSection />
         <VoluntariadoActividadesRecientes />
         <EsferaCollaborate />
-        <VoluntariadoParticipacionSection />
+        <VoluntariadoProximasActividades />
       </>
     </VoluntariadoPageShell>
   );

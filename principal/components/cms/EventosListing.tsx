@@ -175,6 +175,11 @@ export function EventosListing() {
               >
                 <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-na-heketDark backdrop-blur">
                   {ev.category}
+                  {edit?.ready && "published" in ev && ev.published === false ? (
+                    <span className="ml-2 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] text-amber-950">
+                      Borrador
+                    </span>
+                  ) : null}
                 </span>
               </ContentCardImage>
 

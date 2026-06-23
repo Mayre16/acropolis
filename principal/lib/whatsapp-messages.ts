@@ -1,5 +1,6 @@
 import { WHATSAPP_URL, DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
 import type { AgendaCategory } from "@/lib/agenda";
+import { buildInscribeMessage, whatsAppHref, whatsAppUrlForCategory } from "@/lib/whatsapp-messages";
 
 export type InscribeActivity = {
   title: string;
@@ -42,10 +43,27 @@ export function whatsAppUrlForCategory(category: AgendaCategory): string {
 
 export function agendaInscribeHref(item: {
   category: AgendaCategory;
+  title?: string;
+  sede?: string;
   inscribeMessage?: string;
 }): string | null {
-  if (!item.inscribeMessage) return null;
-  return whatsAppHref(item.inscribeMessage, whatsAppUrlForCategory(item.category));
+  if (item.category === "esfera") return null;
+  const message =
+    item.inscribeMessage ??
+    (item.title
+      ? buildInscribeMessage({
+          title: item.title,
+          kind:
+            item.category === "taller"
+              ? "taller"
+              : item.category === "conferencia"
+                ? "conferencia"
+                : "curso",
+          sede: item.sede,
+        })
+      : null);
+  if (!message) return null;
+  return whatsAppHref(message, whatsAppUrlForCategory(item.category));
 }
 
 export function inscribeWhatsAppHref(activity: InscribeActivity): string {

@@ -10,6 +10,10 @@ import {
   useVoluntariadoEsferaDisplay,
   VOLUNTARIADO_ESFERA_SECTION_ID,
 } from "@/lib/cms/voluntariado-display";
+import {
+  ESFERA_OFFICIAL_SITE_LABEL,
+  SPHERE_OFFICIAL,
+} from "@/lib/esfera-content";
 
 export function VoluntariadoEsferaSection() {
   const edit = useVoluntariadoCmsEdit();
@@ -53,7 +57,10 @@ export function VoluntariadoEsferaSection() {
           </div>
           <div className="overflow-hidden rounded-2xl border border-na-amon/25 bg-gradient-to-br from-na-amon/10 via-na-surface to-na-kefer/10 p-7 shadow-na-card">
             <div className="flex justify-center">
-              <EsferaLogo className="h-10 sm:h-11" />
+              <EsferaLogo
+                variant="punto-focal"
+                className="h-14 max-w-[16rem] sm:h-16"
+              />
             </div>
             <div className="relative mx-auto mt-6 aspect-[5/4] w-full max-w-[280px]">
               <Image
@@ -68,6 +75,15 @@ export function VoluntariadoEsferaSection() {
             <p className="mt-6 text-sm font-semibold leading-relaxed text-na-heketDark">
               {esfera.manualCaption}
             </p>
+            <a
+              href={SPHERE_OFFICIAL.home}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-na-kefer transition hover:gap-2 hover:text-na-heket"
+            >
+              {ESFERA_OFFICIAL_SITE_LABEL}
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </a>
             <Link
               href="/esfera"
               className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-na-amon transition hover:gap-2"

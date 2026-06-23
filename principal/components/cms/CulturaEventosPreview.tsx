@@ -111,7 +111,7 @@ export function CulturaEventosPreview() {
           </Link>
         </div>
         <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {section.cards.map(({ id, src, alt, title, text, date, sede }, i) => (
+          {section.cards.map(({ id, src, alt, title, text, date, sede, href }, i) => (
             <li key={id} className="relative">
               {edit?.ready ? (
                 <button
@@ -157,7 +157,7 @@ export function CulturaEventosPreview() {
                 </div>
               ) : (
                 <Link
-                  href="/eventos"
+                  href={href ?? "/eventos"}
                   className={`group flex h-full flex-col overflow-hidden ${accentCardShell(i)}`}
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">

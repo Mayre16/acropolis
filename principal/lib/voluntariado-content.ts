@@ -93,7 +93,7 @@ export const VOLUNTARIADO_RECIENTES_SECTION = {
   eyebrow: "Voluntariado en acción",
   title: "Nuestras actividades recientes",
   intro:
-    "Limpieza de playas, siembra de árboles, entrega solidaria de regalos y jornadas del Día de la Tierra: así vivimos el servicio a la comunidad y a la naturaleza.",
+    "Crónicas de nuestro voluntariado, la línea Esfera y encuentros comunitarios recientes. Cada tarjeta enlaza a la nota completa en Eventos.",
 } as const;
 
 export const VOLUNTARIADO_RECIENTES_DEFAULTS: CmsVoluntariadoReciente[] = [

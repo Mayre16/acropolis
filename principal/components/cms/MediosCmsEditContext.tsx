@@ -134,13 +134,11 @@ function MediosCmsEditInner({ children }: { children: ReactNode }) {
       const latest = await fetchCmsDraft("acropolis");
       const next = getBuiltDoc(latest);
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDoc(next);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       const text = String(e);
       setStatus(text);
       postToEditor({ type: "cms-status", text, ok: false });

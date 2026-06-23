@@ -20,20 +20,25 @@ import {
 import type { CmsVoluntariadoReciente } from "@/lib/cms/types";
 import { accentCardShell, accentEyebrowClass } from "@/lib/brand-accents";
 
-const CAROUSEL_THRESHOLD = 4;
-
-function useCarouselPerView() {
+function useCarouselPerView(itemCount: number) {
   const [perView, setPerView] = useState(1);
 
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
-      setPerView(w >= 1024 ? 4 : w >= 640 ? 2 : 1);
+      const maxVisible = Math.min(itemCount, 3);
+      setPerView(
+        w >= 1024
+          ? maxVisible
+          : w >= 640
+            ? Math.min(2, maxVisible)
+            : 1,
+      );
     };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, []);
+  }, [itemCount]);
 
   return perView;
 }
@@ -114,8 +119,8 @@ function VoluntariadoRecientesCarousel({
   editing?: boolean;
   onEditItem?: (id: string) => void;
 }) {
-  const perView = useCarouselPerView();
   const n = items.length;
+  const perView = useCarouselPerView(n);
   const maxStart = Math.max(0, n - perView);
   const [start, setStart] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -223,7 +228,7 @@ export function VoluntariadoActividadesRecientes() {
     ...item,
     src: resolveCmsMediaUrl(item.src) ?? item.src,
   }));
-  const useCarousel = items.length > CAROUSEL_THRESHOLD;
+  const useCarousel = items.length > 0;
 
   return (
     <section

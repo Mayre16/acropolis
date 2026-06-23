@@ -7,13 +7,13 @@ import {
   CURSOS_TALLERES_DEFAULTS,
   mergeCursosCards,
 } from "@/lib/cms/cursos-oferta-edit";
+import { CURSOS_ACTIVOS_INTRO } from "@/lib/cursos-permanentes";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import type { CmsCursosCard, CmsCursosPage } from "@/lib/cms/types";
 
 export const DEFAULT_OFERTA_COPY = {
   eyebrow: "Nuestra oferta",
-  cursosIntro:
-    "Una selección de nuestras actividades formativas. Fechas, horarios e inversión se anuncian al inicio de cada temporada; escríbenos para conocer las próximas convocatorias.",
+  cursosIntro: CURSOS_ACTIVOS_INTRO,
   conferenciasIntro:
     "Charlas y conferencias abiertas al público sobre filosofía, cultura y valores. Muchas son gratuitas; consulta fechas y sedes por WhatsApp.",
 };

@@ -180,6 +180,7 @@ export function EsferaImpactoSection() {
           {page.impactTestimonial}
         </p>
 
+        {hasGallery || edit?.ready ? (
         <div className="relative mt-10">
           {edit?.ready ? (
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -211,7 +212,7 @@ export function EsferaImpactoSection() {
                 edit?.setSelectedId(esferaImpactGallerySelectedId(id))
               }
             />
-          ) : (
+          ) : edit?.ready ? (
             <div className="rounded-2xl border border-dashed border-na-heket/25 bg-na-surface/60 px-6 py-10 text-center">
               <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
                 {page.impactGalleryTitle}
@@ -219,14 +220,13 @@ export function EsferaImpactoSection() {
               <p className="mt-3 text-sm text-na-muted">
                 {page.impactGalleryEmptyText}
               </p>
-              {edit?.ready ? (
-                <p className="mt-2 text-xs font-semibold text-amber-800">
-                  Usa <strong>Añadir foto</strong> para crear el carrusel.
-                </p>
-              ) : null}
+              <p className="mt-2 text-xs font-semibold text-amber-800">
+                Usa <strong>Añadir foto</strong> para crear el carrusel.
+              </p>
             </div>
-          )}
+          ) : null}
         </div>
+        ) : null}
       </div>
     </section>
   );

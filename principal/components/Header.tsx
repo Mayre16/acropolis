@@ -280,8 +280,10 @@ export function Header() {
               priority
               align="start"
               lockup={HEADER_BRAND_LOCKUP}
+              render="raster"
               clearSpace={false}
               className={brandLogoHeightClass.headerFilial}
+              maxWidthClass="max-w-[min(92vw,13rem)]"
             />
           </Link>
 

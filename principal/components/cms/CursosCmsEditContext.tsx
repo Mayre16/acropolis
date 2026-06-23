@@ -77,7 +77,7 @@ const LAYOUT_OPTIONS = [
 const DEFAULT_PAGE: CmsCursosPage = {
   proximasTitle: "Próximas convocatorias",
   proximasIntro:
-    "Cursos, talleres y conferencias con fecha próxima. Haz clic para inscribirte o pedir más información.",
+    "Cursos, talleres y conferencias con fecha próxima — la misma agenda que en /agenda. Haz clic para inscribirte o pedir más información.",
   ofertaEyebrow: DEFAULT_OFERTA_COPY.eyebrow,
   ofertaCursosIntro: DEFAULT_OFERTA_COPY.cursosIntro,
   ofertaConferenciasIntro: DEFAULT_OFERTA_COPY.conferenciasIntro,
@@ -228,12 +228,10 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
         circuloAmigos,
       );
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       setStatus(String(e));
       postToEditor({ type: "cms-status", text: String(e), ok: false });
     } finally {
@@ -637,6 +635,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
               >
                 <option value="Naco">Naco</option>
                 <option value="Los Prados">Los Prados</option>
+                <option value="Santiago">Santiago</option>
               </select>
             </label>
             <label className="block text-sm">

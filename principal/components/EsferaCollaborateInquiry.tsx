@@ -5,9 +5,6 @@ import {
   buildEsferaCollaborateMailto,
   type EsferaCollaborateKind,
 } from "@/lib/contact-routing";
-import { ESFERA_CC_EMAIL, VOLUNTARIADO_EMAIL } from "@/lib/site-config";
-
-const DELIVERY_NOTE = `Tu mensaje llegará a ${VOLUNTARIADO_EMAIL} con copia a ${ESFERA_CC_EMAIL}.`;
 
 type EsferaCollaborateInquiryProps = {
   kind: EsferaCollaborateKind;
@@ -28,13 +25,13 @@ export function EsferaCollaborateInquiry({
 
   return (
     <InquiryMailForm
+      formKey={kind === "donar" ? "esfera_donar" : "esfera_alianzas"}
       triggerLabel={triggerLabel}
       triggerClassName={triggerClassName}
       modalTitle={modalTitle}
-      modalIntro={DELIVERY_NOTE}
+      modalIntro="Completa tus datos y enviaremos tu solicitud al equipo de Punto Focal Esfera."
       contextLines={contextLines}
       buildMailto={(base) => buildEsferaCollaborateMailto(kind, base)}
-      deliveryNote={DELIVERY_NOTE}
     />
   );
 }

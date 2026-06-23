@@ -23,14 +23,19 @@ const INFO_ICONS: Record<NonNullable<CmsVoluntariadoInfoCard["icon"]>, LucideIco
   heart: HeartHandshake,
 };
 
+function isRealExternalHref(href: string | undefined) {
+  const h = href?.trim();
+  if (!h || h.startsWith("#")) return false;
+  return true;
+}
+
 function CardCta({ card }: { card: CmsVoluntariadoInfoCard }) {
   if (!card.cta?.trim()) return null;
 
-  const customHref = card.ctaHref?.trim();
   const buttonClass =
     "mt-5 inline-flex items-center gap-2 rounded-full bg-na-amon px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-amon/25 transition hover:brightness-105";
 
-  if (card.id === "donacion" && !customHref) {
+  if (card.id === "donacion" && !isRealExternalHref(card.ctaHref)) {
     return (
       <VoluntariadoDonacionInquiry
         triggerLabel={card.cta}
@@ -39,6 +44,7 @@ function CardCta({ card }: { card: CmsVoluntariadoInfoCard }) {
     );
   }
 
+  const customHref = card.ctaHref?.trim();
   if (!customHref) return null;
 
   return (

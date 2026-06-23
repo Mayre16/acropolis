@@ -1,6 +1,16 @@
 import type { CmsCollaborateBlock, CmsCollaborateTab } from "@/lib/cms/types";
 
+const COLLABORATE_TAB_ORDER = ["voluntario", "donar", "alianzas"] as const;
+
 export const DEFAULT_COLLABORATE_TABS: CmsCollaborateTab[] = [
+  {
+    id: "voluntario",
+    label: "Voluntariado",
+    title: "Quiero ser voluntario/a",
+    text: "Cuéntanos si te interesa el voluntariado humanitario, actividades con niños, ancianos, ecología o la línea Punto Focal Esfera. Te contactaremos para las próximas convocatorias.",
+    cta: "Enviar solicitud",
+    href: "#voluntario",
+  },
   {
     id: "donar",
     label: "Donar",
@@ -20,9 +30,9 @@ export const DEFAULT_COLLABORATE_TABS: CmsCollaborateTab[] = [
 ];
 
 export const DEFAULT_COLLABORATE_BLOCK: CmsCollaborateBlock = {
-  title: "Colabora junto a nosotros",
+  title: "Colabora con nosotros",
   intro:
-    "La formación y la acción solidaria se fortalecen con quienes aportan recursos o alianzas institucionales. Usa los formularios de cada pestaña para contactarnos.",
+    "La formación y la acción solidaria se fortalecen con quienes aportan recursos, alianzas o tiempo. Usa los formularios de cada pestaña para contactarnos.",
   tabs: DEFAULT_COLLABORATE_TABS,
 };
 
@@ -31,11 +41,13 @@ export function mergeCollaborateBlock(
 ): CmsCollaborateBlock {
   if (!overrides) return DEFAULT_COLLABORATE_BLOCK;
   const byId = new Map((overrides.tabs ?? []).map((t) => [t.id, t]));
+  const defaultsById = new Map(DEFAULT_COLLABORATE_TABS.map((t) => [t.id, t]));
   return {
     ...DEFAULT_COLLABORATE_BLOCK,
     ...overrides,
-    tabs: DEFAULT_COLLABORATE_TABS.map((d) => {
-      const o = byId.get(d.id);
+    tabs: COLLABORATE_TAB_ORDER.map((id) => {
+      const d = defaultsById.get(id)!;
+      const o = byId.get(id);
       return o ? { ...d, ...o } : d;
     }),
   };

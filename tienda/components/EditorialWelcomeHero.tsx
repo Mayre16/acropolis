@@ -95,9 +95,9 @@ export function EditorialWelcomeHero() {
             >
               {welcome.title}
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-na-muted sm:text-lg">
+            <h2 className="mt-5 max-w-xl text-base leading-relaxed text-na-muted sm:text-lg">
               {welcome.lede}
-            </p>
+            </h2>
 
             <ul className="mt-6 flex flex-wrap gap-2">
               {taglineItems.map((item) => (

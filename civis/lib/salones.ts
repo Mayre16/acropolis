@@ -10,11 +10,15 @@ export type SalonCapacities = {
   herradura: number;
 };
 
+export const SALON_SEDES = ["Naco", "Los Prados", "Santiago"] as const;
+export type SalonSede = (typeof SALON_SEDES)[number];
+export type SalonCity = "Santo Domingo" | "Santiago";
+
 export type Salon = {
   id: string;
   name: string;
-  sede: "Naco" | "Los Prados";
-  city: "Santo Domingo";
+  sede: SalonSede;
+  city: SalonCity;
   summary: string;
   /** Disposición que muestra la foto de referencia. */
   featuredLayout: LayoutKind;
@@ -28,14 +32,18 @@ export const LAYOUT_LABELS: Record<LayoutKind, string> = {
   herradura: "Disposición herradura",
 };
 
+function salonCityFromPublished(city?: string): SalonCity {
+  return city === "Santiago" ? "Santiago" : "Santo Domingo";
+}
+
 /** Fallback alineado con `principal/data/acropolis/published.json` (misma fuente que Acrópolis). */
 function salonesFromAcropolisPublished(): Salon[] {
   const items = acropolisPublished.sections?.salones ?? [];
   return items.map((s) => ({
     id: s.id,
     name: s.name,
-    sede: s.sede as Salon["sede"],
-    city: "Santo Domingo",
+    sede: s.sede as SalonSede,
+    city: salonCityFromPublished(s.city),
     summary: s.summary,
     featuredLayout: s.featuredLayout as LayoutKind,
     capacities: { ...s.capacities },
@@ -45,13 +53,7 @@ function salonesFromAcropolisPublished(): Salon[] {
 
 export const SALONES: Salon[] = salonesFromAcropolisPublished();
 
-export const SALONES_BY_SEDE = [
-  {
-    sede: "Naco" as const,
-    salones: SALONES.filter((s) => s.sede === "Naco"),
-  },
-  {
-    sede: "Los Prados" as const,
-    salones: SALONES.filter((s) => s.sede === "Los Prados"),
-  },
-];
+export const SALONES_BY_SEDE = SALON_SEDES.map((sede) => ({
+  sede,
+  salones: SALONES.filter((s) => s.sede === sede),
+})).filter((group) => group.salones.length > 0);

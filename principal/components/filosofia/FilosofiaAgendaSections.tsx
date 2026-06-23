@@ -1,11 +1,11 @@
 "use client";
 
 import { Pencil, Plus } from "lucide-react";
-import { getUpcomingAgendaItems, type AgendaEntry } from "@/lib/agenda";
+import { getActiveAgendaItems, type AgendaEntry } from "@/lib/agenda";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { cmsEntryToAgenda } from "@/lib/cms/agenda-edit";
 import type { CmsAgendaEntry } from "@/lib/cms/types";
-import { useCmsDiplomadoSessions } from "@/lib/cms/hooks";
+import { useCmsFilosofiaPageAgenda } from "@/lib/cms/hooks";
 import { UpcomingAgenda } from "@/components/UpcomingAgenda";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
 import { accentCardShell, accentTokens } from "@/lib/brand-accents";
@@ -16,7 +16,7 @@ const DEFAULT_INSCRIBE =
   "Hola, me interesa el Diplomado de Filosofía para la Vida. ¿Me dan información de fechas e inscripción?";
 
 function toDisplay(entries: CmsAgendaEntry[]): AgendaEntry[] {
-  return getUpcomingAgendaItems(entries.map(cmsEntryToAgenda)).map((e) => ({
+  return getActiveAgendaItems(entries.map(cmsEntryToAgenda)).map((e) => ({
     ...e,
     image: resolveCmsMediaUrl(e.image),
   }));
@@ -179,7 +179,7 @@ export function FilosofiaAgendaEditZones() {
 
 export function FilosofiaAgendaPublic() {
   const cms = useCmsDocument();
-  const sessions = useCmsDiplomadoSessions();
+  const sessions = useCmsFilosofiaPageAgenda();
   const fp = cms?.sections.filosofiaPage;
 
   const items = sessions.map((e) => ({

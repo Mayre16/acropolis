@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarClock,
+  Flag,
   Globe2,
   MapPin,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import { FUNDACION_ORGANIZACION_BLOCKS } from "@/lib/institucional-content";
 
 const STATS = [
   { icon: CalendarClock, value: "1957", label: "Fundación en Buenos Aires" },
+  { icon: Flag, value: "1998", label: "Fundación en República Dominicana" },
   { icon: Globe2, value: "+50 países", label: "Presencia internacional" },
   { icon: MapPin, value: "~500 sedes", label: "En todo el mundo" },
   { icon: Building2, value: "Bruselas", label: "Sede internacional (OINA)" },
@@ -56,19 +58,19 @@ export function FundacionOrganizacionSection() {
               </p>
               <p className="mt-4 max-w-xl text-white/80">
                 Una red mundial con una misma Carta Fundacional. Nueva
-                Acrópolis República Dominicana forma parte de esta familia
-                internacional sin fines de lucro.
+                Acrópolis República Dominicana forma parte de NA Internacional.
               </p>
             </div>
             <div className="rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
               <div className="flex justify-center overflow-visible">
                 <BrandLogo
-                  lockup="oina"
+                  lockup="oinadom"
                   variant="white"
+                  render="raster"
                   className={brandLogoHeightClass.sectionStacked}
                 />
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {STATS.map(({ icon: Icon, value, label }) => (
                   <div key={label} className="rounded-xl bg-white/5 p-4">
                     <Icon className="h-5 w-5 text-na-helios" strokeWidth={1.8} />

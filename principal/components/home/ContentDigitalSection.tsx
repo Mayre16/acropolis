@@ -17,13 +17,22 @@ export function ContentDigitalSection() {
   return (
     <section className="border-t border-na-heket/10 bg-[#eef0f2] py-14 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <div className="flex justify-center overflow-visible py-2">
+        <div
+          className={`mx-auto flex items-center justify-center overflow-visible ${brandLogoHeightClass.contentDigitalAnagramBox}`}
+        >
           <BrandLogo
-            lockup="trilogo"
+            lockup="na-solo"
+            variant="color"
+            render="raster"
             align="center"
-            clearSpace
-            className={brandLogoHeightClass.contentDigital}
-            maxWidthClass="max-w-[min(94vw,22rem)]"
+            className={brandLogoHeightClass.contentDigitalAnagram}
+            maxWidthClass="max-w-full"
+            imageStyle={{
+              height: "auto",
+              maxHeight: "var(--brand-logo-h)",
+              width: "auto",
+              maxWidth: "100%",
+            }}
           />
         </div>
         <h2

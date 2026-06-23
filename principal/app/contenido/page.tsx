@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Contenido digital",
   description:
-    "Artículos, eventos, Revista Esfinge, biblioteca y librería de Nueva Acrópolis República Dominicana.",
+    "Artículos, eventos, agenda, cursos recurrentes, talleres, Revista Esfinge, biblioteca y librería de Nueva Acrópolis República Dominicana.",
 };
 
 export default function ContenidoPage() {

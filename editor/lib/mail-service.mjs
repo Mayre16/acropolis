@@ -33,8 +33,11 @@ export async function sendPlainMail({
     subject,
     text: body,
     replyTo: replyTo || undefined,
-    cc: cc || undefined,
   };
+
+  if (cc) {
+    mail.cc = Array.isArray(cc) ? cc.filter(Boolean).join(", ") : cc;
+  }
 
   await transporter.sendMail(mail);
 }

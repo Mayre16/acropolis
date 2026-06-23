@@ -12,10 +12,12 @@ import {
 import { whatsAppHref, whatsAppUrlForCategory } from "@/lib/whatsapp-messages";
 import type { AgendaCategory } from "@/lib/agenda";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
+import { EsferaInquiryButton } from "@/components/EsferaInquiryButton";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
 import { accentCardShell, accentTokens } from "@/lib/brand-accents";
 
 export type AgendaItem = {
+  id?: string;
   title: string;
   date: string;
   time: string;
@@ -32,9 +34,11 @@ export type AgendaItem = {
 
 type Props = {
   eyebrow?: string;
-  title: string;
+  title?: string;
   intro?: string;
   items: AgendaItem[];
+  /** Sin cabecera ni sección externa — para incrustar en otra página. */
+  embedded?: boolean;
   /** Fondo alterno suave para separar visualmente la sección. */
   tinted?: boolean;
   /** Etiqueta del botón de inscripción en el popup. */
@@ -55,11 +59,41 @@ function inscribeUrlFor(
   return whatsAppHref(text, whatsAppUrlForCategory(whatsappCategory));
 }
 
+function itemCategory(item: AgendaItem): AgendaCategory | undefined {
+  return "category" in item
+    ? (item as AgendaItem & { category?: AgendaCategory }).category
+    : undefined;
+}
+
+function modalInscribeLabel(item: AgendaItem) {
+  const category = itemCategory(item);
+  if (category === "conferencia" && item.tag?.toLowerCase().includes("gratuita")) {
+    return "Quiero asistir";
+  }
+  if (
+    category === "esfera" ||
+    category === "curso" ||
+    category === "taller" ||
+    category === "conferencia"
+  ) {
+    return "Solicitar info";
+  }
+  if (category === "voluntariado") {
+    return "Quiero participar";
+  }
+  return "Quiero inscribirme";
+}
+
+function itemKey(item: AgendaItem, index: number) {
+  return item.id ?? `${item.title}-${item.date}-${item.sede}-${index}`;
+}
+
 export function UpcomingAgenda({
   eyebrow = "Agenda",
   title,
   intro,
   items,
+  embedded = false,
   tinted = false,
   inscribeLabel = "Quiero inscribirme",
   defaultInscribeMessage,
@@ -83,65 +117,78 @@ export function UpcomingAgenda({
     };
   }, [selected, close]);
 
-  const inscribeHref = selected
-    ? inscribeUrlFor(selected, defaultInscribeMessage, whatsappCategory)
-    : null;
+  const selectedCategory = selected ? itemCategory(selected) : undefined;
+  const inscribeHref =
+    selected && selectedCategory !== "esfera"
+      ? inscribeUrlFor(
+          selected,
+          defaultInscribeMessage,
+          selectedCategory ?? whatsappCategory,
+        )
+      : null;
+
+  const grid = (
+    <ul className={embedded ? "mt-8 grid gap-4 sm:grid-cols-2" : "mt-10 grid gap-4 sm:grid-cols-2"}>
+      {items.map((it, i) => {
+        const a = accentTokens(i);
+        return (
+          <li key={itemKey(it, i)} className="flex">
+            <button
+              type="button"
+              onClick={() => setSelected(it)}
+              className={`flex h-full w-full items-stretch gap-4 overflow-hidden p-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-kefer ${accentCardShell(i)}`}
+            >
+              <AgendaCardThumbnail
+                src={it.image}
+                alt={it.imageAlt ?? it.title}
+              />
+              <AgendaCardBody
+                tag={it.tag}
+                title={it.title}
+                date={it.date}
+                time={it.time}
+                sede={it.sede}
+                iconClass={a.icon}
+                iconWrapClass={a.iconWrap}
+                footer={
+                  <p className={`text-xs font-medium ${a.link}`}>
+                    Ver detalles →
+                  </p>
+                }
+              />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
     <>
-      <section
-        className={
-          tinted
-            ? "border-t border-na-heket/10 bg-na-heket/[0.04] py-14 sm:py-16"
-            : "border-t border-na-heket/10 py-14 sm:py-16"
-        }
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
-            {eyebrow}
-          </p>
-          <h2 className="mt-2 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
-            {title}
-          </h2>
-          {intro ? (
-            <p className="mt-3 max-w-2xl text-na-muted">{intro}</p>
-          ) : null}
-
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2">
-            {items.map((it, i) => {
-              const a = accentTokens(i);
-              return (
-              <li key={`${it.title}-${it.date}`} className="flex">
-                <button
-                  type="button"
-                  onClick={() => setSelected(it)}
-                  className={`flex h-full w-full items-stretch gap-4 overflow-hidden p-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-kefer ${accentCardShell(i)}`}
-                >
-                  <AgendaCardThumbnail
-                    src={it.image}
-                    alt={it.imageAlt ?? it.title}
-                  />
-                  <AgendaCardBody
-                    tag={it.tag}
-                    title={it.title}
-                    date={it.date}
-                    time={it.time}
-                    sede={it.sede}
-                    iconClass={a.icon}
-                    iconWrapClass={a.iconWrap}
-                    footer={
-                      <p className={`text-xs font-medium ${a.link}`}>
-                        Ver detalles →
-                      </p>
-                    }
-                  />
-                </button>
-              </li>
-              );
-            })}
-          </ul>
-        </div>
-      </section>
+      {embedded ? (
+        grid
+      ) : (
+        <section
+          className={
+            tinted
+              ? "border-t border-na-heket/10 bg-na-heket/[0.04] py-14 sm:py-16"
+              : "border-t border-na-heket/10 py-14 sm:py-16"
+          }
+        >
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
+              {eyebrow}
+            </p>
+            <h2 className="mt-2 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
+              {title ?? "Próximas actividades"}
+            </h2>
+            {intro ? (
+              <p className="mt-3 max-w-2xl text-na-muted">{intro}</p>
+            ) : null}
+            {grid}
+          </div>
+        </section>
+      )}
 
       {selected ? (
         <div
@@ -246,14 +293,22 @@ export function UpcomingAgenda({
                 ) : null}
               </dl>
 
-              {inscribeHref ? (
+              {selectedCategory === "esfera" ? (
+                <EsferaInquiryButton
+                  taller={selected.title}
+                  date={selected.date}
+                  time={selected.time}
+                  sede={selected.sede}
+                  triggerClassName="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105 sm:w-auto sm:self-start"
+                />
+              ) : inscribeHref ? (
                 <a
                   href={inscribeHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105 sm:w-auto sm:self-start"
                 >
-                  {inscribeLabel}
+                  {modalInscribeLabel(selected)}
                   <ArrowRight className="h-4 w-4" />
                 </a>
               ) : null}

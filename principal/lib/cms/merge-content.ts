@@ -5,6 +5,7 @@ import type { ViajeDestino } from "@/lib/viajes";
 import { viajeKey } from "@/lib/viajes";
 import type { VenueLocation } from "@/lib/locations";
 import { cmsToVenue } from "@/lib/cms/venues-edit";
+import acropolisPublished from "@/data/acropolis/published.json";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import type {
   CmsArticulo,
@@ -14,6 +15,7 @@ import type {
   CmsMedia,
   CmsViaje,
 } from "@/lib/cms/types";
+import { isEventoPublished } from "@/lib/agenda-evento";
 
 function cmsMedia(m: CmsMedia) {
   return {
@@ -75,6 +77,7 @@ export function mergeEventos(
     if (!hidden.has(e.slug)) map.set(e.slug, e);
   }
   for (const e of cms?.sections.eventos ?? []) {
+    if (!isEventoPublished(e)) continue;
     map.set(e.slug, cmsToEvento(e));
   }
   return Array.from(map.values());
@@ -147,12 +150,20 @@ export function mergeVenues(
   code: VenueLocation[],
   cms: CmsDocument | null | undefined,
 ): VenueLocation[] {
-  const hidden = new Set(cms?.sections.venuesHidden ?? []);
+  const publishedFallback: CmsDocument | null =
+    cms ??
+    ({
+      version: 1,
+      site: "acropolis",
+      updatedAt: "",
+      sections: acropolisPublished.sections,
+    } as CmsDocument);
+  const hidden = new Set(publishedFallback?.sections.venuesHidden ?? []);
   const map = new Map<string, VenueLocation>();
   for (const v of code) {
     if (!hidden.has(v.id)) map.set(v.id, v);
   }
-  for (const v of cms?.sections.venues ?? []) {
+  for (const v of publishedFallback?.sections.venues ?? []) {
     map.set(v.id, cmsToVenue(v));
   }
   return Array.from(map.values());

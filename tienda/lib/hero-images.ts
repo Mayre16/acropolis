@@ -4,8 +4,13 @@ export type HeroImage = {
   objectPosition?: string;
 };
 
-/** Fotos del hero editorial (generadas con npm run hero:build). */
+/** Fotos del hero editorial (bazar + portadas vía npm run hero:build). */
 export const EDITORIAL_HERO_IMAGES: HeroImage[] = [
+  {
+    src: "/img/hero/libreria-bazar.webp",
+    alt: "Librería Editorial Logos — libros, separadores, camisetas y artículos de regalo",
+    objectPosition: "50% 45%",
+  },
   {
     src: "/img/hero/libros-1.webp",
     alt: "Libros de filosofía y cultura de Editorial Nueva Acrópolis",

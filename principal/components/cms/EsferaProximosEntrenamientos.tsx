@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { CalendarDays, Clock, MapPin, Pencil, Plus } from "lucide-react";
+import { EsferaInquiryButton } from "@/components/EsferaInquiryButton";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
   useCmsEsferaSectionText,
@@ -120,6 +121,15 @@ export function EsferaProximosEntrenamientos() {
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-na-muted">
                   {item.blurb}
                 </p>
+                <div className="mt-5 border-t border-na-heket/8 pt-4">
+                  <EsferaInquiryButton
+                    taller={item.title}
+                    date={item.date}
+                    time={item.time}
+                    sede={item.sede}
+                    triggerClassName="inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-heket/20 transition hover:bg-na-kefer sm:w-auto"
+                  />
+                </div>
               </div>
             </li>
           );

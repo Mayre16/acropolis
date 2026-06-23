@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ConstellationSky } from "@/components/diplomado/ConstellationSky";
-import { DiplomadoHeroBadgeText } from "@/components/diplomado/DiplomadoHeroBadgeText";
 import { DIPLOMADO_HERO } from "@/lib/diplomado-content";
 import { cn } from "@/lib/utils/cn";
 
@@ -12,6 +11,7 @@ function ConstellationHeroCanvas({ variant }: { variant: HeroVariant }) {
 
   return (
     <div
+      id="diplomado-hero"
       className={cn(
         "constellation-hero relative overflow-hidden bg-[#021a18]",
         isDesktop
@@ -73,19 +73,6 @@ function ConstellationHeroCanvas({ variant }: { variant: HeroVariant }) {
       </div>
 
       <ConstellationSky />
-
-      <div
-        className={cn(
-          "diplomado-hero-badge absolute left-1/2 z-10 -translate-x-1/2 text-center text-white",
-          isDesktop ? "top-[38%]" : "top-[40%]",
-        )}
-        id="diplomado-hero"
-      >
-        <DiplomadoHeroBadgeText
-          weekdayClass="diplomado-hero-badge__weekday"
-          dateClass="diplomado-hero-badge__date"
-        />
-      </div>
     </div>
   );
 }

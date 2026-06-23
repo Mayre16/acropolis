@@ -25,9 +25,9 @@ export function DiplomadoHeroIntro() {
           Editar
         </button>
       ) : null}
-      <h3 className="mx-auto mt-4 max-w-[300px] text-[15px] font-normal leading-relaxed text-white/82 lg:mx-0 lg:max-w-md lg:text-base">
+      <h2 className="mx-auto mt-4 max-w-[300px] text-[15px] font-normal leading-relaxed text-white/82 lg:mx-0 lg:max-w-md lg:text-base">
         {page.heroLede}
-      </h3>
+      </h2>
       <a
         href={inscribeHref}
         target="_blank"

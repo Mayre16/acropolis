@@ -3,11 +3,19 @@ import Link from "next/link";
 import { CivisBrandMark } from "@/components/CivisBrandMark";
 import { CivisNaSectionLogo } from "@/components/CivisNaSectionLogo";
 
-import { CIVIS_HEADER_NAV } from "@/lib/civis-content";
+import { CIVIS_FOOTER_NAV } from "@/lib/civis-content";
+import { footerNavGridColumns } from "@/lib/footer-nav-grid";
 
 import "./CivisFooter.css";
 
+function footerNavRows(items: typeof CIVIS_FOOTER_NAV) {
+  const split = footerNavGridColumns(items.length);
+  return [items.slice(0, split), items.slice(split)] as const;
+}
+
 export function CivisFooter() {
+  const [navRowTop, navRowBottom] = footerNavRows(CIVIS_FOOTER_NAV);
+
   return (
     <footer className="civis-footer">
       <div className="civis-footer__inner">
@@ -31,13 +39,17 @@ export function CivisFooter() {
 
           <nav aria-label="Secciones del sitio" className="civis-footer__nav">
             <p className="civis-footer__nav-label">Navegación</p>
-            <ul className="civis-footer__nav-list">
-              {CIVIS_HEADER_NAV.map(({ href, label, id }) => (
-                <li key={id}>
-                  <Link href={href}>{label}</Link>
-                </li>
+            <div className="civis-footer__nav-rows">
+              {[navRowTop, navRowBottom].map((row) => (
+                <ul key={row.map((item) => item.id).join("-")} className="civis-footer__nav-row">
+                  {row.map(({ href, label, id }) => (
+                    <li key={id}>
+                      <Link href={href}>{label}</Link>
+                    </li>
+                  ))}
+                </ul>
               ))}
-            </ul>
+            </div>
           </nav>
         </div>
 

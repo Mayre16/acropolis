@@ -21,7 +21,7 @@ export function ofertaToCmsCard(
   index: number,
 ): CmsCursosCard {
   return {
-    id: stableCardId(c.title, prefix, index),
+    id: c.id ?? stableCardId(c.title, prefix, index),
     src: c.src,
     alt: c.alt,
     title: c.title,
@@ -29,6 +29,7 @@ export function ofertaToCmsCard(
     facilitador: c.facilitador,
     sede: c.sede,
     tag: c.tag,
+    fechaApertura: c.horario,
     accessLabel: c.accessLabel,
     inscribeKind: c.inscribeKind,
     inscribeLabel: c.inscribeLabel,

@@ -43,26 +43,38 @@ export const BRAND_WORDMARK_OFFSET_RATIO = 850 / 2429;
 
 /** Alturas del anagrama + nombre (descriptor va debajo en HTML). */
 export const brandLogoHeightClass = {
-  headerFilial: "[--brand-logo-h:2.35rem] sm:[--brand-logo-h:2.5rem]",
+  headerFilial: "[--brand-logo-h:2.975rem] sm:[--brand-logo-h:3.125rem]",
+  /** Header interior — oinadom completo (+20 px vs headerFilial). */
+  headerInnerOinadom:
+    "[--brand-logo-h:4.225rem] sm:[--brand-logo-h:4.375rem]",
+  /** Footer — oinadom blanco, más grande que header (misma lógica `--brand-logo-h`). */
+  footerOinadom:
+    "[--brand-logo-h:5.5rem] sm:[--brand-logo-h:5.875rem] md:[--brand-logo-h:6.25rem]",
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
-  hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
+  hero: "[--brand-logo-h:7.5rem] sm:[--brand-logo-h:8.5rem] md:[--brand-logo-h:9.25rem] lg:[--brand-logo-h:10rem]",
   footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:
     "[--brand-logo-h:3.9rem] sm:[--brand-logo-h:4.15rem] md:[--brand-logo-h:4.4rem]",
   pageHero:
-    "[--brand-logo-h:2.85rem] sm:[--brand-logo-h:3.15rem] md:[--brand-logo-h:3.35rem]",
+    "[--brand-logo-h:4.1rem] sm:[--brand-logo-h:4.4rem] md:[--brand-logo-h:4.6rem]",
   /** PageHero con trilogo — logo dominante sobre el descriptor. */
   pageHeroTrilogo:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.85rem] md:[--brand-logo-h:5.35rem]",
   diplomadoHero:
-    "[--brand-logo-h:3.75rem] sm:[--brand-logo-h:4.15rem] lg:[--brand-logo-h:4.5rem]",
+    "[--brand-logo-h:5rem] sm:[--brand-logo-h:5.4rem] lg:[--brand-logo-h:5.75rem]",
   contentDigital:
     "[--brand-logo-h:4.25rem] sm:[--brand-logo-h:4.75rem] md:[--brand-logo-h:5.1rem]",
+  /** Anagrama NA — sección «Descubre nuestro contenido digital». */
+  contentDigitalAnagram:
+    "[--brand-logo-h:2.875rem] sm:[--brand-logo-h:3.125rem] md:[--brand-logo-h:3.375rem]",
+  /** Marco exterior del anagrama en contenido digital (logo más pequeño dentro). */
+  contentDigitalAnagramBox:
+    "min-h-[3.5rem] w-[min(88vw,14rem)] overflow-visible pb-4 pt-1 sm:min-h-[3.75rem] md:min-h-[4rem]",
   /** Hub /contenido — oina un poco mayor que pageHero para equilibrar el descriptor. */
   contenidoHub:
-    "[--brand-logo-h:3.35rem] sm:[--brand-logo-h:3.75rem] md:[--brand-logo-h:4.1rem]",
+    "[--brand-logo-h:4.6rem] sm:[--brand-logo-h:5rem] md:[--brand-logo-h:5.35rem]",
   internationalBand:
     "[--brand-logo-h:4.75rem] sm:[--brand-logo-h:5.5rem] md:[--brand-logo-h:6rem]",
   sectionStacked:

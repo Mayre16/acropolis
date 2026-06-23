@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ContenidoSlide } from "@/lib/contenido-content";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
-import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
 
 type ContenidoHubProps = {
   slides: ContenidoSlide[];
@@ -14,7 +13,7 @@ type ContenidoHubProps = {
 };
 
 const thumbClass =
-  "group block w-full overflow-hidden rounded-lg bg-na-heket/5 text-left transition hover:ring-2 hover:ring-na-heket/40 hover:ring-offset-2 hover:ring-offset-[#eef0f2] sm:rounded-xl";
+  "group block w-full overflow-hidden rounded-xl bg-na-heket/5 text-left transition hover:ring-2 hover:ring-na-heket/40 hover:ring-offset-2 hover:ring-offset-[#eef0f2] sm:rounded-2xl";
 
 function ThumbCard({ slide }: { slide: ContenidoSlide }) {
   const inner = slide.icon ? (
@@ -27,7 +26,7 @@ function ThumbCard({ slide }: { slide: ContenidoSlide }) {
         unoptimized
         className="h-auto w-[90%] max-w-[9.5rem] object-contain"
       />
-      <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-na-ink/75 to-transparent px-2.5 pb-2.5 pt-8 text-xs font-bold text-white sm:px-3 sm:pb-3 sm:text-sm">
+      <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-na-ink/75 to-transparent px-3 pb-3 pt-10 text-sm font-bold text-white sm:px-4 sm:pb-4 sm:text-base">
         {slide.label}
       </span>
     </div>
@@ -39,13 +38,13 @@ function ThumbCard({ slide }: { slide: ContenidoSlide }) {
         fill
         unoptimized
         className="object-cover transition duration-300 group-hover:scale-105"
-        sizes="(max-width: 640px) 33vw, 200px"
+        sizes="(max-width: 640px) 50vw, 280px"
       />
       <div
         className="absolute inset-0 bg-gradient-to-t from-na-ink/70 via-na-ink/10 to-transparent transition group-hover:from-na-heketDark/75"
         aria-hidden
       />
-      <span className="absolute bottom-0 left-0 right-0 px-2.5 pb-2.5 text-xs font-bold text-white sm:px-3 sm:pb-3 sm:text-sm">
+      <span className="absolute bottom-0 left-0 right-0 px-3 pb-3 text-sm font-bold text-white sm:px-4 sm:pb-4 sm:text-base">
         {slide.label}
       </span>
     </div>
@@ -135,14 +134,6 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
           />
 
           <div className="pointer-events-none relative z-10 mx-auto flex h-full min-h-[inherit] max-w-6xl flex-col justify-end px-4 pb-10 pt-28 sm:px-6 sm:pb-12 sm:pt-32">
-            <div className="mb-6 flex justify-start overflow-visible">
-              <NaBrandLockupGroup
-                lockup="oina"
-                variant="white"
-                align="start"
-                size="contenidoHub"
-              />
-            </div>
             <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-helios drop-shadow-sm">
               Contenido digital
             </p>
@@ -153,57 +144,53 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
               {lede}
             </p>
 
-            <div
-              key={slide.href}
-              className="mt-8 max-w-xl rounded-2xl border border-white/15 bg-na-heketDark/35 p-5 backdrop-blur-sm sm:p-6"
-            >
-              {slide.icon ? (
-                <div className="mb-4 inline-flex rounded-xl bg-white/95 px-4 py-3 shadow-sm">
-                  <Image
-                    src={slide.icon}
-                    alt={slide.iconAlt ?? slide.label}
-                    width={1050}
-                    height={330}
-                    unoptimized
-                    className="h-10 w-auto max-w-[min(100%,14rem)] object-contain object-left sm:h-12"
-                  />
+            <div className="relative mt-8 min-h-[15rem] max-w-xl sm:min-h-[16rem]">
+              {slides.map((s, i) => (
+                <div
+                  key={s.href}
+                  className="absolute inset-0 rounded-2xl border border-white/15 bg-na-heketDark/35 p-5 backdrop-blur-sm transition-opacity duration-500 ease-in-out sm:p-6"
+                  style={{ opacity: i === index ? 1 : 0 }}
+                  aria-hidden={i !== index}
+                >
+                  {s.icon ? (
+                    <div className="mb-3 inline-flex rounded-xl bg-white/95 px-4 py-2.5 shadow-sm">
+                      <Image
+                        src={s.icon}
+                        alt={s.iconAlt ?? s.label}
+                        width={1050}
+                        height={330}
+                        unoptimized
+                        className="h-9 w-auto max-w-[min(100%,14rem)] object-contain object-left sm:h-10"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-na-helios">
+                      {s.label}
+                    </p>
+                  )}
+                  <h2 className="mt-1 text-xl font-black text-white sm:text-2xl">
+                    {s.title}
+                  </h2>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/90 sm:text-base">
+                    {s.description}
+                  </p>
+                  <div
+                    className={`pointer-events-auto relative z-20 mt-4 ${i === index ? "" : "invisible"}`}
+                  >
+                    {s.external ? (
+                      <LeaveSiteLink href={s.href} className={ctaClass}>
+                        {s.cta}
+                        <ArrowRight className="h-4 w-4" />
+                      </LeaveSiteLink>
+                    ) : (
+                      <Link href={s.href} className={ctaClass}>
+                        {s.cta}
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-na-helios">
-                  {slide.label}
-                </p>
-              )}
-              <h2 className="mt-1 text-xl font-black text-white sm:text-2xl">
-                {slide.title}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-white/90 sm:text-base">
-                {slide.description}
-              </p>
-              {slide.topics && slide.topics.length > 0 ? (
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {slide.topics.map((topic) => (
-                    <li
-                      key={topic}
-                      className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/90"
-                    >
-                      {topic}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <div className="pointer-events-auto relative z-20 mt-5">
-                {slide.external ? (
-                  <LeaveSiteLink href={slide.href} className={ctaClass}>
-                    {slide.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </LeaveSiteLink>
-                ) : (
-                  <Link href={slide.href} className={ctaClass}>
-                    {slide.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                )}
-              </div>
+              ))}
             </div>
 
             <div className="pointer-events-auto relative z-20 mt-6 max-w-3xl">
@@ -261,9 +248,9 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
 
       <section
         aria-label="Acceso al contenido"
-        className="border-b border-na-heket/10 bg-[#eef0f2] py-10 sm:py-12"
+        className="border-b border-na-heket/10 bg-[#eef0f2] py-12 sm:py-14"
       >
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
             Acceso al contenido
           </p>
@@ -271,9 +258,9 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
             Elige una sección para entrar directamente.
           </p>
 
-          <ul className="mt-5 flex gap-2.5 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-5">
+          <ul className="mt-8 grid grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
             {slides.map((s) => (
-              <li key={s.href} className="min-w-[9.5rem] flex-1 snap-start sm:min-w-0">
+              <li key={s.href}>
                 <ThumbCard slide={s} />
               </li>
             ))}

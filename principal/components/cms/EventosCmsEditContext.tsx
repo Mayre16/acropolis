@@ -51,6 +51,7 @@ type EventosCmsEditContextValue = {
   patchPage: (patch: Partial<CmsEventosPage>) => void;
   addItem: () => void;
   hideItem: (slug: string) => void;
+  publishItem: (slug: string) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
   dirty: boolean;
@@ -140,13 +141,11 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
     if (!next) return;
     try {
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDoc(next);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       const text = String(e);
       setStatus(text);
       postToEditor({ type: "cms-status", text, ok: false });
@@ -205,12 +204,20 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
         image: { src: "", alt: "" },
         gallery: [],
         body: [""],
+        published: false,
       };
       setSelectedSlug(slug);
       return [...list, entry];
     });
     markDirty();
   }, [markDirty]);
+
+  const publishItem = useCallback(
+    (slug: string) => {
+      patchItem(slug, { published: true });
+    },
+    [patchItem],
+  );
 
   const hideItem = useCallback(
     (slug: string) => {
@@ -241,6 +248,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
       patchPage,
       addItem,
       hideItem,
+      publishItem,
       saveDraft,
       publish,
       dirty,
@@ -256,6 +264,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
       patchPage,
       addItem,
       hideItem,
+      publishItem,
       saveDraft,
       publish,
       dirty,
@@ -362,6 +371,32 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
               token={token}
               onChange={(gallery) => patchItem(selected.slug, { gallery })}
             />
+            {selected.published === false ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
+                <p className="font-semibold">Borrador — oculto en /eventos</p>
+                <p className="mt-1 text-xs">
+                  Completa la crónica y publícala cuando esté lista.
+                  {selected.sourceAgendaId
+                    ? ` Origen: agenda ${selected.sourceAgendaId}.`
+                    : null}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => publishItem(selected.slug)}
+                  className="mt-3 w-full rounded-lg bg-na-heket py-2 text-sm font-bold text-white"
+                >
+                  Publicar crónica
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => patchItem(selected.slug, { published: false })}
+                className="w-full rounded-lg border border-slate-200 py-2 text-sm font-semibold text-slate-700"
+              >
+                Pasar a borrador
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, Landmark, MapPin, Pencil, Plus } from "lucide-react";
+import { MapPin, Pencil, Plus } from "lucide-react";
 import { useMergedVenues } from "@/lib/cms/hooks";
 import { mapsUrl } from "@/lib/locations";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
+import { VenueNameLockup } from "@/components/VenueNameLockup";
 
 export function VenuesTeaser() {
   const venues = useMergedVenues();
@@ -21,7 +22,7 @@ export function VenuesTeaser() {
               Dónde estamos
             </p>
             <h2 className="mt-2 text-2xl font-black text-na-heketDark sm:text-3xl">
-              Sedes y centros culturales
+              Sedes y puntos culturales
             </h2>
           </div>
           <Link
@@ -48,7 +49,7 @@ export function VenuesTeaser() {
               className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 px-4 py-2 text-xs font-bold uppercase text-na-heket"
             >
               <Plus className="h-4 w-4" />
-              Añadir centro cultural
+              Añadir punto cultural
             </button>
           </div>
         ) : null}
@@ -69,15 +70,7 @@ export function VenuesTeaser() {
                   <Pencil className="h-3 w-3" />
                 </button>
               ) : null}
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-na-kefer">
-                {v.kind === "sede" ? (
-                  <Building2 className="h-3.5 w-3.5" aria-hidden />
-                ) : (
-                  <Landmark className="h-3.5 w-3.5" aria-hidden />
-                )}
-                {v.kind === "sede" ? "Sede" : "Centro cultural"}
-              </span>
-              <h3 className="mt-2 font-black text-na-heketDark">{v.name}</h3>
+              <VenueNameLockup name={v.name} kind={v.kind} size="teaser" />
               <p className="mt-1 flex items-start gap-1.5 text-sm text-na-muted">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
                 <span>

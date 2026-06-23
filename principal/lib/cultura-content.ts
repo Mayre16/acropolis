@@ -52,37 +52,36 @@ export const CULTURA_EVENTOS_SECTION = {
   eyebrow: "Eventos",
   title: "Eventos",
   intro:
-    "A lo largo del año realizamos eventos y celebraciones en nuestras sedes. Estos son algunos; consulta la programación completa.",
+    "Crónicas de encuentros culturales que ya realizamos. Pulsa cada tarjeta para leer la nota completa.",
 } as const;
 
 export const CULTURA_EVENTOS_PREVIEW_DEFAULTS: CmsCulturaCard[] = [
   {
-    id: "bienvenida-primavera",
-    src: "/img/cultura/eventos/midsommar.webp",
-    alt: "Celebración Bienvenida Primavera al aire libre",
-    title: "Bienvenida Primavera!",
-    text: "Damos la bienvenida a la nueva estación con un encuentro al aire libre: música, símbolos y celebración de la naturaleza.",
+    id: "el-arte-de-respirar",
+    src: "/img/eventos/respirar.webp",
+    alt: "Encuentro de respiración consciente en Nueva Acrópolis",
+    title: 'Encuentro "El arte de respirar"',
+    text: "Una jornada para redescubrir la respiración consciente como herramienta de calma, atención y bienestar interior.",
+    date: "6 de mayo de 2026",
+    sede: "Izbira Event Venue",
+    href: "/eventos/el-arte-de-respirar",
   },
   {
-    id: "veladas",
-    src: "/img/cultura/eventos/velada.webp",
-    alt: "Velada cultural con un cuarteto de cuerdas a la luz de las velas",
-    title: "Veladas culturales",
-    text: "Conciertos, recitales de poesía y veladas artísticas para disfrutar de la belleza y el encuentro entre socios y voluntarios.",
-  },
-  {
-    id: "foros",
-    src: "/img/cultura/eventos/filosofia.webp",
-    alt: "Foro de filosofía al aire libre en un jardín",
-    title: "Foros y encuentros",
-    text: "Charlas, foros y conmemoraciones como el Día Mundial de la Filosofía, para pensar juntos los grandes temas del ser humano.",
+    id: "valor-de-las-abejas",
+    src: "/img/eventos/abejas.webp",
+    alt: "Charla sobre el valor de las abejas y apertura del nuevo Centro Cultural",
+    title: "El valor de las abejas",
+    text: "Charla sobre el papel esencial de las abejas en la naturaleza, con invitadas de Miel Nucayní y la apertura de nuestro nuevo Centro Cultural.",
+    date: "8 de abril de 2026",
+    sede: "Izbira Event Venue",
+    href: "/eventos/valor-de-las-abejas",
   },
 ];
 
 export const CULTURA_CIRCULO_AMIGOS_DEFAULTS: CmsCirculoAmigosPromo = {
   eyebrow: "Abierto al público",
   title: "¿Quieres ser amigo de Nueva Acrópolis?",
-  lede: "Un espacio para quienes aman la filosofía, la cultura y el voluntariado — jóvenes adultos, personas de mediana edad y mayores — y desean seguir vinculados a Nueva Acrópolis sin integrarse al plan de estudios regular. Incluye diálogos semanales sobre filosofía y temas de actualidad, junto al círculo de lectura y otras actividades abiertas a quienes no pueden formar parte del plan de estudios.",
+  lede: "Un espacio para quienes aman la filosofía, la cultura y el voluntariado — jóvenes adultos, personas de mediana edad y mayores — y desean seguir vinculados a Nueva Acrópolis sin integrarse al plan de estudios regular. Incluye diálogos semanales sobre filosofía y temas de actualidad, y otras actividades abiertas a quienes no pueden formar parte del plan de estudios.",
   imageSrc: "/img/circulo-amigos/conversacion.webp",
   imageAlt:
     "Hombres y mujeres de distintas edades conversando juntos en círculo sobre filosofía y temas de actualidad",

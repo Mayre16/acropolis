@@ -17,7 +17,7 @@ import {
   mergeAgendaEntriesIntoDoc,
   newAgendaId,
 } from "@/lib/cms/agenda-edit";
-import { ACTIVITY_PHOTOS } from "@/lib/home-content";
+import { ACTIVITY_PHOTOS, HOME_ACTIVITY_PHOTOS_LIMIT } from "@/lib/home-content";
 import { DEFAULT_HOME_PAGE, mergeHomePage } from "@/lib/cms/home-page-edit";
 import {
   CIRCULO_AMIGOS_SELECTED_ID,
@@ -46,6 +46,7 @@ import type {
   CmsCirculoAmigosPromo,
   CmsDocument,
   CmsEsferaHomePromo,
+  CmsEvento,
   CmsHomePage,
   CmsHomePillar,
 } from "@/lib/cms/types";
@@ -59,6 +60,8 @@ import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditField
 import { EsferaHomeEditFields } from "@/components/cms/EsferaHomeEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
+import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
+import { promoteAgendaEntryLocally } from "@/lib/agenda-evento";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import { useCmsActivityPhotos } from "@/lib/cms/hooks";
 
@@ -105,6 +108,7 @@ type HomeCmsEditContextValue = {
   addPhoto: () => void;
   deletePhoto: (index: number) => void;
   deleteCarousel: (id: string) => void;
+  promoteCarouselToEvento: (entry: CmsAgendaEntry) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
   dirty: boolean;
@@ -136,6 +140,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     mergeEsferaHomePromo(),
   );
   const [hidden, setHidden] = useState<string[]>([]);
+  const [eventoDrafts, setEventoDrafts] = useState<CmsEvento[]>([]);
   const [selectedKind, setSelectedKind] = useState<HomeSelectedKind>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -175,10 +180,11 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const buildDoc = useCallback(
     (base: CmsDocument): CmsDocument => {
       const merged = mergeAgendaEntriesIntoDoc(base, carousel, hidden);
+      const withDrafts = appendEventoDraftsToDoc(merged, eventoDrafts);
       return mergeHeroCarouselsIntoDoc({
-        ...merged,
+        ...withDrafts,
         sections: {
-          ...merged.sections,
+          ...withDrafts.sections,
           activityPhotos: photos,
           homeHero,
           homePage,
@@ -193,7 +199,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         },
       });
     },
-    [carousel, photos, hidden, homeHero, homePage, circuloAmigos, esferaHomePromo],
+    [carousel, photos, hidden, eventoDrafts, homeHero, homePage, circuloAmigos, esferaHomePromo],
   );
 
   const saveDraft = useCallback(async () => {
@@ -220,10 +226,9 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     try {
       const latest = await fetchCmsDraft("acropolis");
       await saveCmsDraft("acropolis", token, buildDoc(latest));
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDirty(false);
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
+      setStatus(publishResult.message ?? "Publicado.");
     } catch (e) {
       postToEditor({ type: "cms-status", text: String(e), ok: false });
     } finally {
@@ -380,6 +385,21 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         setSelected(null, null);
         markDirty();
       },
+      promoteCarouselToEvento: (entry) => {
+        const existingSlugs = eventoDrafts.map((e) => e.slug);
+        const { updatedEntry, draft } = promoteAgendaEntryLocally(
+          entry,
+          existingSlugs,
+        );
+        setCarousel((list) =>
+          list.map((e) => (e.id === entry.id ? updatedEntry : e)),
+        );
+        setEventoDrafts((list) => [...list, draft]);
+        markDirty();
+        window.alert(
+          `Borrador creado: /eventos/${draft.slug}. Edítalo y publícalo en Eventos.`,
+        );
+      },
       saveDraft,
       publish,
       dirty,
@@ -408,6 +428,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       busy,
       token,
       markDirty,
+      eventoDrafts,
       photos.length,
     ],
   );
@@ -454,6 +475,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
             entry={selectedCarousel}
             token={token}
             onChange={(patch) => value.patchCarousel(selectedCarousel.id, patch)}
+            onPromoteToEvento={value.promoteCarouselToEvento}
             onDelete={() => {
               if (window.confirm("¿Quitar del carrusel del home?")) {
                 value.deleteCarousel(selectedCarousel.id);
@@ -785,7 +807,9 @@ export function HomeActivityPhotosSection() {
   const edit = useHomeCmsEdit();
   const photos = useCmsActivityPhotos();
 
-  const list = edit?.ready ? edit.photos : photos;
+  const list = edit?.ready
+    ? edit.photos
+    : photos.slice(0, HOME_ACTIVITY_PHOTOS_LIMIT);
 
   return (
     <section

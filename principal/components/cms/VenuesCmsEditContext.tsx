@@ -128,13 +128,11 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
       const latest = await fetchCmsDraft("acropolis");
       const next = buildDocWithVenues(latest, items, hidden);
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDoc(next);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       const text = String(e);
       setStatus(text);
       postToEditor({ type: "cms-status", text, ok: false });
@@ -182,7 +180,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
       const id = newVenueId();
       const entry: CmsVenue = {
         id,
-        name: kind === "sede" ? "Nueva sede" : "Nuevo centro cultural",
+        name: kind === "sede" ? "Nueva ubicación" : "Nuevo punto",
         kind,
         city: "",
         zone: "",
@@ -242,7 +240,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
   return (
     <VenuesCmsEditContext.Provider value={value}>
       <EditToolbar
-        label="Sedes y centros culturales"
+        label="Sedes y puntos culturales"
         dirty={dirty}
         busy={busy}
         status={status}
@@ -257,7 +255,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
       {children}
       {selected ? (
         <EditPanelChrome
-          title="Editar sede o centro"
+          title="Editar sede o punto cultural"
           dirty={dirty}
           busy={busy}
           status={status}

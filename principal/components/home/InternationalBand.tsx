@@ -14,8 +14,9 @@ export function InternationalBand() {
       <div className="rounded-[1.75rem] bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-8 text-center shadow-na-card sm:p-14">
         <div className="flex justify-center overflow-visible">
           <BrandLogo
-            lockup="oina"
+            lockup="oinadom"
             variant="white"
+            render="raster"
             align="center"
             className={brandLogoHeightClass.internationalBand}
             maxWidthClass="max-w-[min(92vw,22rem)]"

@@ -72,7 +72,7 @@ export const CURSOS_HERO_IMAGES: HeroImage[] = [
   { src: "/img/cursos/respirar.webp", alt: "Taller El arte de respirar" },
   { src: "/img/cursos/pintura.webp", alt: "Taller de pintura" },
   { src: "/img/cursos/chi-kung-salon.webp", alt: "Grupo visto de espaldas practicando Chi Kung en salón con espejo y piso de madera" },
-  { src: "/img/cursos/lectura.webp", alt: "Círculo de lectura" },
+  { src: "/img/cursos/astrologia.webp", alt: "Astrología filosófica" },
 ];
 
 /** Eventos — programación y celebraciones. */
@@ -85,13 +85,14 @@ export const EVENTOS_HERO_IMAGES: HeroImage[] = [
   { src: "/img/cultura/viajes/zona-colonial.webp", alt: "Viaje cultural a la Zona Colonial" },
 ];
 
-/** Artículos — reflexión, lectura y pensamiento. */
+/** Artículos — imágenes alegóricas (lectura, sabiduría clásica, símbolos). */
 export const ARTICULOS_HERO_IMAGES: HeroImage[] = [
-  { src: "/img/articulos/el-hombre-interior-y-el-hombre-exterior.webp", alt: "El hombre interior y el hombre exterior" },
-  { src: "/img/articulos/el-reto-de-la-convivencia.webp", alt: "El reto de la convivencia" },
+  { src: "/img/hero/filosofia/01.webp", alt: "Libro abierto en la biblioteca — filosofía como búsqueda" },
+  { src: "/img/hero/filosofia/05.webp", alt: "Biblioteca circular — el camino del saber" },
+  { src: "/img/hero/filosofia/02.webp", alt: "Biblioteca y la luz del conocimiento filosófico" },
+  { src: "/img/filosofia/modulos/etica.webp", alt: "Busto clásico — ética y autoconocimiento" },
+  { src: "/img/filosofia/modulos/historia.webp", alt: "Templo griego — historia del pensamiento" },
   { src: "/img/articulos/simbolismo-de-la-escalera.webp", alt: "Simbolismo de la escalera" },
-  { src: "/img/filosofia/modulos/convivencia.webp", alt: "Convivencia y relaciones humanas" },
-  { src: "/img/actividades/cineforum.webp", alt: "Diálogo filosófico en cine-fórum" },
 ];
 
 /** Quiénes somos — la organización y su gente. */
@@ -101,6 +102,19 @@ export const QUIENES_SOMOS_HERO_IMAGES: HeroImage[] = [
   { src: "/img/cultura/viajes/egipto.webp", alt: "Expedición cultural internacional" },
   { src: "/img/cultura/talleres/coro.webp", alt: "Comunidad cultural de Nueva Acrópolis" },
   { src: "/img/actividades/unibe.webp", alt: "Presencia en la Feria de Voluntariado universitaria" },
+];
+
+/** Agenda — actividades programadas con fecha próxima. */
+export const AGENDA_HERO_IMAGES: HeroImage[] = [
+  {
+    src: "/img/contenido/agenda-itinerario.webp",
+    alt: "Agenda e itinerario de actividades — calendario, fechas y sedes",
+  },
+  { src: "/img/eventos/feria-salud.webp", alt: "Voluntarios de Nueva Acrópolis en la Feria de la Salud" },
+  { src: "/img/actividades/cineforum.webp", alt: "Cine-fórum filosófico de Nueva Acrópolis" },
+  { src: "/img/cultura/talleres/danza.webp", alt: "Clase de danza en actividad cultural" },
+  { src: "/img/eventos/abejas.webp", alt: "Charla sobre el valor de las abejas y la naturaleza" },
+  { src: "/img/actividades/noche-estrellas.webp", alt: "Celebración cultural al aire libre" },
 ];
 
 /** Relaciones institucionales — alianzas y presencia pública. */

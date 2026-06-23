@@ -248,7 +248,7 @@ export function QuienesSomosDireccionSection() {
           Dirección Nacional
         </h2>
         <p className="mt-4 max-w-2xl text-na-muted">
-          La sede de Nueva Acrópolis en República Dominicana está guiada por su
+          La sede de Nueva Acrópolis en República Dominicana está dirigida por su
           Director Nacional, junto al equipo de voluntarios que sostiene cada
           actividad.
         </p>
@@ -257,6 +257,7 @@ export function QuienesSomosDireccionSection() {
             p={director}
             badge="Director Nacional · Actual"
             badgeClassName="bg-na-helios/15 text-na-amon"
+            photoSize="large"
             onEdit={
               edit?.ready
                 ? () => edit.setSelectedId(`persona:${director.id}`)
@@ -270,6 +271,7 @@ export function QuienesSomosDireccionSection() {
               badge={d.role}
               badgeClassName="bg-na-kefer/10 text-na-kefer"
               flip
+              photoSize="large"
               onEdit={
                 edit?.ready
                   ? () => edit.setSelectedId(`persona:${d.id}`)

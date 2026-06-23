@@ -30,9 +30,7 @@ export function CirculoAmigosPromo({ variant = "home" }: CirculoAmigosPromoProps
               ¿Quieres ser amigo de Nueva Acrópolis?
             </h1>
             <h2 className="mt-3 text-sm font-normal leading-relaxed text-na-muted sm:text-base">
-              {CIRCULO_AMIGOS_LEDE} Incluye diálogos semanales sobre filosofía y
-              temas de actualidad, junto al círculo de lectura y otras actividades
-              abiertas a quienes no pueden formar parte del plan de estudios.
+              {CIRCULO_AMIGOS_LEDE}
             </h2>
             <div className="mt-6 flex flex-wrap gap-3">
               <a

@@ -8,9 +8,9 @@ import { CursosProximasActividades } from "@/components/cms/CursosProximasActivi
 
 import { CursosOfertaTabs } from "@/components/CursosOfertaTabs";
 
-import { SalonesAlquiler } from "@/components/SalonesAlquiler";
+import { CursosEventosRecientes } from "@/components/cursos/CursosEventosRecientes";
 
-import { CirculoAmigosPromoCms } from "@/components/cms/CirculoAmigosPromoCms";
+import { SalonesAlquiler } from "@/components/SalonesAlquiler";
 
 import { WHATSAPP_URL } from "@/lib/site-config";
 
@@ -24,7 +24,7 @@ import {
 export const metadata: Metadata = {
   title: "Cursos y Talleres",
   description:
-    "Cursos, talleres y conferencias culturales de Nueva Acrópolis RD: el arte de respirar, pintura, círculo de lectura, Tai Chi y Chi Kung, astrología filosófica, oratoria, El arte de vivir con propósito y más.",
+    "Cursos, talleres y programas de bienestar de Nueva Acrópolis RD: el arte de respirar, pintura, círculo de lectura, Tai Chi y Chi Kung, astrología filosófica, oratoria y más.",
   alternates: { canonical: "/cursos" },
 };
 
@@ -47,13 +47,11 @@ export default function CursosPage() {
       <>
         <CursosHero />
 
-        <CursosProximasActividades />
-
         <CursosOfertaTabs />
 
-        <CirculoAmigosPromoCms variant="compact" />
-
         <SalonesAlquiler />
+
+        <CursosEventosRecientes />
 
         <section className="border-t border-na-heket/10 bg-gradient-to-b from-na-heket/[0.05] via-na-surface to-na-amon/[0.04] py-14 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -127,6 +125,8 @@ export default function CursosPage() {
             ))}
           </ul>
         </section>
+
+        <CursosProximasActividades />
       </>
     </CursosPageShell>
   );

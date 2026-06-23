@@ -166,12 +166,10 @@ function VoluntariadoCmsEditInner({ children }: { children: ReactNode }) {
       const latest = await fetchCmsDraft("acropolis");
       const next = buildDoc(latest, items, page, collaborate);
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       setStatus(String(e));
       postToEditor({ type: "cms-status", text: String(e), ok: false });
     } finally {

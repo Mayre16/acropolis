@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
-import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
+import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import {
   BRAND_FOOTER_TAGLINE,
   FOOTER_NAV_PRIMARY,
@@ -111,12 +111,10 @@ export function Footer() {
           </div>
 
           <div className="principal-footer__na-mark">
-            <NaBrandLockupGroup
-              lockup="oinadom"
-              variant="white"
+            <HeroOinadomLogo
               align="center"
-              size="footer"
-              maxWidthClass="max-w-[min(92vw,14.75rem)]"
+              size="footerOinadom"
+              maxWidthClass="max-w-[min(92vw,14rem)]"
             />
           </div>
 
@@ -151,7 +149,7 @@ export function Footer() {
           <span>
             © {new Date().getFullYear()} Nueva Acrópolis República Dominicana
           </span>
-          <span>Organización Internacional sin fines de lucro</span>
+          <span>ONG sin fines de lucro</span>
         </div>
       </div>
     </footer>

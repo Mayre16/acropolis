@@ -46,7 +46,7 @@ export const DIPLOMADO_ACTIVE_SESSION = {
 } as const;
 
 export const DIPLOMADO_INSCRIBE_WHATSAPP =
-  "Hola, me interesa inscribirme al Diplomado Filosofía para la Vida (Nueva Acrópolis) — sesión del lunes 3 de agosto, 7:00 a 9:15 p.m. ¿Me pueden dar más información?";
+  "Hola, me interesa inscribirme al Diplomado Filosofía para la Vida (Nueva Acrópolis). ¿Me pueden dar información sobre fechas, sedes e inscripción?";
 
 /** Badge sobre el collage del hero (sin hora; solo día y fecha). */
 export const DIPLOMADO_HERO_BADGE = {
@@ -54,12 +54,17 @@ export const DIPLOMADO_HERO_BADGE = {
   date: "03 AGO",
 } as const;
 
+export const DIPLOMADO_TESTIMONIAL = {
+  eyebrow: "Como tú",
+  quote: "«Conócete a ti mismo» — el primer paso para vivir con mayor sentido y claridad.",
+  videoUrl: "https://www.youtube.com/watch?v=4sMY_gaAadE",
+} as const;
+
 /** Franja blanca bajo el hero (como Framer). */
 export const DIPLOMADO_INFO_BANNER = [
   { value: "03 AGO", label: "Inicio" },
   { value: "5 meses", label: "Duración" },
   { value: "Presencial", label: "Modalidad" },
-  { value: "2500", label: "Inversión" },
 ] as const;
 
 export const DIPLOMADO_ABOUT = {
@@ -75,7 +80,7 @@ export const DIPLOMADO_ABOUT = {
 export const DIPLOMADO_PROGRAM = {
   eyebrow: "Programa · 3 módulos",
   title: "3 Módulos,",
-  titleAccent: "4 Meses de Filosofía Viva",
+  titleAccent: "5 Meses de Filosofía Viva",
 } as const;
 
 export const DIPLOMADO_MODULOS = [
@@ -107,8 +112,7 @@ export const DIPLOMADO_IMPACT = {
   title: "Personas en el mundo han realizado este diplomado.",
   subtitle: "Nuestra escuela de filosofía tiene presencia en todo el mundo.",
   stats: [
-    { end: 400, suffix: "+", label: "Escuelas en el mundo" },
-    { end: 1000, suffix: "+", label: "Miembros activos en el país" },
+    { end: 500, suffix: "+", label: "Escuelas en el mundo" },
     { end: 60, suffix: "+", label: "Países" },
     { end: 27, suffix: " años", label: "En la República Dominicana" },
   ],
@@ -118,21 +122,16 @@ export const DIPLOMADO_INSCRIPTION = {
   eyebrow: "Más información",
   title: "¿Quieres unirte a esta aventura?",
   intro:
-    "Para reservar tu cupo, realiza el pago de inscripción.",
-  feeMain: "RD$2,500",
-  feeNote: "+ 4 mensualidades de RD$1,500",
-  paymentNote: "Pago por depósito o transferencia · BHD León",
-  account: "0255360-001-7",
-  accountLabel: "Cta. Corriente:",
-  rnc: "4-01-50913-1",
-  rncLabel: "RNC:",
-  email: "nueva.acropolis@codetel.net.do",
-  schedule: [
-    { label: "Inicio", value: "Lunes 3 de agosto" },
-    { label: "Horario", value: "7:00 p.m. – 9:15 p.m." },
-    { label: "Modalidad", value: "Presencial" },
-    { label: "Duración", value: "5 meses" },
-  ],
-  footnote:
-    "Tras la inscripción, las cuatro contribuciones mensuales se abonan en los cuatro meses siguientes al inicio del programa.",
+    "Escríbenos por WhatsApp y te orientamos sobre fechas, sedes disponibles y el proceso de inscripción.",
+  capacityNote: "Cupo limitado · Requiere inscripción previa",
+  feeMain: "",
+  feeNote: "",
+  paymentNote: "",
+  account: "",
+  accountLabel: "",
+  rnc: "",
+  rncLabel: "",
+  email: "",
+  footnote: "",
+  schedule: [],
 } as const;

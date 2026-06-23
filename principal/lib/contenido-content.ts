@@ -10,8 +10,6 @@ export type ContenidoSlide = NavContenidoItem & {
   /** Logo de marca (p. ej. Revista Esfinge) para tab y tarjeta del hero. */
   icon?: string;
   iconAlt?: string;
-  /** Temas o secciones destacadas (p. ej. rubricas de la revista). */
-  topics?: readonly string[];
 };
 
 const SLIDE_META: Record<
@@ -22,17 +20,26 @@ const SLIDE_META: Record<
     title: "Pensamientos filosóficos",
     description:
       "Reflexiones de filosofía práctica para pensar mejor y vivir con sentido.",
-    image: "/img/articulos/el-hombre-interior-y-el-hombre-exterior.webp",
-    imageAlt: "Artículos de filosofía práctica de Nueva Acrópolis",
+    image: "/img/hero/filosofia/01.webp",
+    imageAlt: "Libro abierto en biblioteca — reflexión y filosofía práctica",
     cta: "Leer artículos",
   },
   Eventos: {
     title: "Eventos y noticias",
     description:
       "Encuentros, celebraciones, viajes culturales y noticias de nuestras sedes.",
-    image: "/img/cultura/eventos/midsommar.webp",
-    imageAlt: "Celebración cultural de Nueva Acrópolis",
+    image: "/img/eventos/abejas.webp",
+    imageAlt:
+      "Charla sobre el valor de las abejas y la naturaleza — Nueva Acrópolis",
     cta: "Ver eventos",
+  },
+  Agenda: {
+    title: "Próximos talleres",
+    description:
+      "Talleres y charlas Esfera, voluntariado, cultura y más — fechas, sedes e inscripciones.",
+    image: "/img/contenido/agenda-itinerario.webp",
+    imageAlt: "Agenda e itinerario de actividades — calendario, fechas y sedes",
+    cta: "Ver agenda completa",
   },
   "Revista Esfinge": {
     title: "Revista Esfinge",
@@ -42,15 +49,6 @@ const SLIDE_META: Record<
     imageAlt: "Artículos de divulgación filosófica y cultural — Revista Esfinge",
     icon: "/img/contenido/revista-esfinge-logo.webp",
     iconAlt: "Revista Esfinge — conocimiento, reflexión y diálogo",
-    topics: [
-      "Filosofía",
-      "Ciencia",
-      "Sociedad",
-      "Culturas",
-      "Naturaleza",
-      "Historia",
-      "Arte",
-    ],
     cta: "Leer la revista",
   },
   Biblioteca: {
@@ -65,8 +63,9 @@ const SLIDE_META: Record<
     title: "Librería editorial",
     description:
       "Libros y publicaciones de Nueva Acrópolis y Logos, disponibles en nuestra librería en línea.",
-    image: "/img/hero/filosofia/01.webp",
-    imageAlt: "Publicaciones de la librería Nueva Acrópolis",
+    image: "/img/contenido/libreria-bazar.webp",
+    imageAlt:
+      "Librería Editorial Logos — libros, separadores, camisetas, bolsas y recuerdos en mostrador",
     cta: "Ir a la librería",
   },
   "Redes sociales": {
@@ -92,4 +91,4 @@ export function getContenidoHubSlides(): ContenidoSlide[] {
 }
 
 export const CONTENIDO_HUB_LEDE =
-  "Artículos, eventos, la Revista Esfinge, nuestra biblioteca y la librería editorial — todo el ecosistema digital de Nueva Acrópolis en República Dominicana.";
+  "Artículos, eventos, agenda, la Revista Esfinge, nuestra biblioteca y la librería editorial — todo el ecosistema digital de Nueva Acrópolis en República Dominicana.";

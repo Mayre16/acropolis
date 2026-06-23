@@ -43,6 +43,7 @@ export function eventoToCms(e: EventoItem): CmsEvento {
     image: { src: e.image.src, alt: e.image.alt },
     body: e.body,
     gallery: [],
+    published: true,
   };
 }
 
@@ -120,6 +121,26 @@ export function buildDocWithEventos(
       ...base.sections,
       eventos: items,
       eventosHidden: hidden,
+    },
+  };
+}
+
+/** Fusiona borradores nuevos de crónicas sin duplicar slugs. */
+export function appendEventoDraftsToDoc(
+  doc: CmsDocument,
+  drafts: CmsEvento[],
+): CmsDocument {
+  if (drafts.length === 0) return doc;
+  const existing = new Set((doc.sections.eventos ?? []).map((e) => e.slug));
+  const merged = [
+    ...(doc.sections.eventos ?? []),
+    ...drafts.filter((d) => !existing.has(d.slug)),
+  ];
+  return {
+    ...doc,
+    sections: {
+      ...doc.sections,
+      eventos: merged,
     },
   };
 }

@@ -3,23 +3,12 @@
 import { Mail, MapPin, Pencil } from "lucide-react";
 import { usePrimarySedeContact } from "@/lib/cms/hooks";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
-import { buildEsferaMailto } from "@/lib/contact-routing";
-import { ESFERA_CC_EMAIL, VOLUNTARIADO_EMAIL } from "@/lib/site-config";
-
-const ESFERA_CONTACT_SUBJECT = "Consulta — Punto Focal Esfera";
-const ESFERA_CONTACT_BODY = [
-  "Hola, me gustaría solicitar información sobre talleres o charlas Esfera para mi organización.",
-  "",
-  "¿Me pueden contactar con más detalles?",
-].join("\n");
+import { VOLUNTARIADO_EMAIL } from "@/lib/site-config";
 
 export function EsferaContactInfo() {
   const contacto = usePrimarySedeContact();
   const edit = useVenuesCmsEdit();
-  const mailtoHref = buildEsferaMailto(
-    ESFERA_CONTACT_SUBJECT,
-    ESFERA_CONTACT_BODY,
-  ).href;
+  const mailtoHref = `mailto:${VOLUNTARIADO_EMAIL}`;
 
   const openEdit = () => {
     const naco = edit?.items.find((v) => v.id === "sede-naco");
@@ -52,9 +41,6 @@ export function EsferaContactInfo() {
             <Mail className="h-4 w-4 shrink-0" aria-hidden />
             {VOLUNTARIADO_EMAIL}
           </a>
-        </p>
-        <p className="text-xs text-na-muted/90">
-          Copia automática: {ESFERA_CC_EMAIL}
         </p>
       </div>
     </div>

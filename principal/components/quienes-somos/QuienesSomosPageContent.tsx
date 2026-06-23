@@ -13,7 +13,7 @@ import { Values } from "@/components/home/Values";
 import { FundacionOrganizacionSection } from "@/components/quienes-somos/FundacionOrganizacionSection";
 import { SimbolismoSection } from "@/components/quienes-somos/SimbolismoSection";
 import { AreasActuacionInstitucionalSection } from "@/components/quienes-somos/AreasActuacionInstitucionalSection";
-import { bibliotecaLibreriaUrl, WHATSAPP_URL } from "@/lib/site-config";
+import { bibliotecaLibreriaUrl } from "@/lib/site-config";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 import {
   ANUARIO_INTERNACIONAL_URL,
@@ -166,14 +166,6 @@ export function QuienesSomosPageContent({ initialSection }: Props) {
                 Ver anuarios en acropolis.org
                 <ExternalLink className="h-4 w-4" aria-hidden />
               </LeaveSiteLink>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-na-heket/20 bg-na-surface px-5 py-2.5 text-sm font-bold text-na-heketDark transition hover:border-na-heket/40"
-              >
-                Consultar por WhatsApp
-              </a>
             </div>
           </div>
         </div>

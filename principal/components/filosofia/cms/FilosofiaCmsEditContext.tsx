@@ -42,6 +42,7 @@ import type {
 import {
   DIPLOMADO_INSCRIBE_WHATSAPP,
   DIPLOMADO_INSCRIPTION,
+  DIPLOMADO_TESTIMONIAL,
 } from "@/lib/diplomado-content";
 import { DEFAULT_FILOSOFIA_PAGE_BODY } from "@/lib/filosofia-content";
 import {
@@ -143,16 +144,19 @@ const DEFAULT_FILOSOFIA_PAGE: FilosofiaPageContent = {
 
 const DEFAULT_DIPLOMADO_PAGE: CmsDiplomadoPage = {
   heroLede:
-    "Un viaje de 4 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
-  otrasSesionesTitle: "Otras sesiones",
-  otrasSesionesIntro:
-    "Próximas clases del Diplomado en distintas sedes y horarios. Se comparten con la página de Filosofía — edítalas aquí o allí.",
+    "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
+  otrasSesionesTitle: "Cupos disponibles",
+  otrasSesionesIntro: "",
+  testimonialEyebrow: DIPLOMADO_TESTIMONIAL.eyebrow,
+  testimonialQuote: DIPLOMADO_TESTIMONIAL.quote,
+  testimonialVideoUrl: DIPLOMADO_TESTIMONIAL.videoUrl,
 };
 
 const DEFAULT_DIPLOMADO_INSCRIPTION: CmsDiplomadoInscription = {
   eyebrow: DIPLOMADO_INSCRIPTION.eyebrow,
   title: DIPLOMADO_INSCRIPTION.title,
   intro: DIPLOMADO_INSCRIPTION.intro,
+  capacityNote: DIPLOMADO_INSCRIPTION.capacityNote,
   feeMain: DIPLOMADO_INSCRIPTION.feeMain,
   feeNote: DIPLOMADO_INSCRIPTION.feeNote,
   paymentNote: DIPLOMADO_INSCRIPTION.paymentNote,
@@ -303,14 +307,11 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
     if (!next) return;
     try {
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDoc(next);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-      postToEditor({ type: "cms-published" });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       const text = String(e);
       setStatus(text);
       postToEditor({ type: "cms-status", text, ok: false });
@@ -436,18 +437,30 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
         title:
           category === "diplomado"
             ? "Diplomado de Filosofía para la Vida"
-            : "Nueva actividad",
+            : category === "filosofia"
+              ? "Nueva actividad de filosofía"
+              : "Nueva actividad",
         startsAt: new Date().toISOString().slice(0, 10),
         date: "",
         time: "",
         sede: "",
-        tag: category === "diplomado" ? "Cupos abiertos" : "Abierta y gratuita",
+        tag:
+          category === "diplomado"
+            ? "Cupos abiertos"
+            : category === "filosofia"
+              ? "Filosofía"
+              : "Abierta y gratuita",
         showOnHome: true,
-        detailHref: category === "diplomado" ? "/filosofia" : "/cursos",
+        detailHref:
+          category === "diplomado" || category === "filosofia"
+            ? "/filosofia"
+            : "/cursos",
         detailLabel:
           category === "diplomado"
             ? "Ver programa completo"
-            : "Ver cursos y conferencias",
+            : category === "filosofia"
+              ? "Ver Escuela de Filosofía"
+              : "Ver cursos y conferencias",
         image: undefined,
         imageAlt: "",
       };
@@ -571,8 +584,8 @@ const FILOSOFIA_SECTIONS: { id: FilosofiaEditSection; label: string; anchor: str
 const DIPLOMADO_SECTIONS: { id: FilosofiaEditSection; label: string; anchor: string }[] = [
   { id: "intro", label: "Texto hero", anchor: "diplomado-hero-copy" },
   { id: "badge", label: "Badge y fechas", anchor: "diplomado-hero" },
-  { id: "inscripcion", label: "Inscripción y precios", anchor: "inscripcion" },
-  { id: "sesiones", label: "Otras sesiones", anchor: "otras-sesiones" },
+  { id: "inscripcion", label: "Inscripción", anchor: "inscripcion" },
+  { id: "sesiones", label: "Cupos disponibles", anchor: "otras-sesiones" },
 ];
 
 function FilosofiaEditToolbar() {
@@ -851,10 +864,29 @@ function DiplomadoIntroPanel() {
         multiline
       />
       <EditField
-        label="Mensaje WhatsApp (botones inscribirme)"
+        label="Mensaje WhatsApp (botón de inscripción)"
         value={ins.inscribeWhatsApp ?? ""}
         onChange={(v) => ctx.patchDiplomadoInscription({ inscribeWhatsApp: v })}
         multiline
+      />
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+        Tarjeta de testimonio (video)
+      </p>
+      <EditField
+        label="Etiqueta (ej. Como tú)"
+        value={p.testimonialEyebrow ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ testimonialEyebrow: v })}
+      />
+      <EditField
+        label="Frase o cita"
+        value={p.testimonialQuote ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ testimonialQuote: v })}
+        multiline
+      />
+      <EditField
+        label="URL de YouTube (opcional)"
+        value={p.testimonialVideoUrl ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ testimonialVideoUrl: v })}
       />
     </div>
   );
@@ -866,9 +898,8 @@ function InscriptionPanel() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600">
-        Bloque «¿Quieres unirte a esta aventura?» — título, precios, cuenta bancaria y
-        nota al pie. Las fechas del cuadro de abajo se editan en{' '}
-        <strong>Badge y fechas</strong>.
+        Bloque «¿Quieres unirte a esta aventura?» — aviso de cupo, texto introductorio y
+        botón de WhatsApp.
       </p>
       <EditField
         label="Etiqueta superior"
@@ -881,55 +912,20 @@ function InscriptionPanel() {
         onChange={(v) => ctx.patchDiplomadoInscription({ title: v })}
       />
       <EditField
+        label="Aviso de cupo"
+        value={ins.capacityNote ?? ""}
+        onChange={(v) => ctx.patchDiplomadoInscription({ capacityNote: v })}
+      />
+      <EditField
         label="Introducción"
         value={ins.intro ?? ""}
         onChange={(v) => ctx.patchDiplomadoInscription({ intro: v })}
         multiline
       />
       <EditField
-        label="Precio principal (tarjeta oscura)"
-        value={ins.feeMain ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ feeMain: v })}
-      />
-      <EditField
-        label="Nota de precio (mensualidades)"
-        value={ins.feeNote ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ feeNote: v })}
-      />
-      <EditField
-        label="Nota de pago (banco)"
-        value={ins.paymentNote ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ paymentNote: v })}
-      />
-      <EditField
-        label="Etiqueta cuenta"
-        value={ins.accountLabel ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ accountLabel: v })}
-      />
-      <EditField
-        label="Número de cuenta"
-        value={ins.account ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ account: v })}
-      />
-      <EditField
-        label="Etiqueta RNC"
-        value={ins.rncLabel ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ rncLabel: v })}
-      />
-      <EditField
-        label="RNC"
-        value={ins.rnc ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ rnc: v })}
-      />
-      <EditField
-        label="Correo de contacto"
-        value={ins.email ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ email: v })}
-      />
-      <EditField
-        label="Nota al pie"
-        value={ins.footnote ?? ""}
-        onChange={(v) => ctx.patchDiplomadoInscription({ footnote: v })}
+        label="Mensaje WhatsApp"
+        value={ins.inscribeWhatsApp ?? ""}
+        onChange={(v) => ctx.patchDiplomadoInscription({ inscribeWhatsApp: v })}
         multiline
       />
     </div>
@@ -954,7 +950,7 @@ function AgendaPanel({ mode }: { mode: "diplomado" | "otras" }) {
         <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50/60 p-3">
           <p className="text-xs font-bold uppercase tracking-wide text-amber-900">
             {onDiplomado
-              ? "Título del bloque «Otras sesiones»"
+              ? "Título del bloque «Cupos disponibles»"
               : "Título del bloque «Próximas sesiones»"}
           </p>
           {onDiplomado ? (

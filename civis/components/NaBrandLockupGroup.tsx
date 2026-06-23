@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils/cn";
 import type { BrandLockupId, BrandLogoVariant } from "@/lib/brand-assets";
 
 import { brandLogoHeightClass } from "@/lib/brand-clear-space";
-
 import { BrandLogo } from "@/components/BrandLogo";
+import type { ComponentProps } from "react";
 
 
 
@@ -57,12 +57,16 @@ type NaBrandLockupGroupProps = {
 
   descriptorProminence?: "default" | "hero";
 
-  /** Civis: descriptor SVG al ancho del wordmark. */
+  descriptorStyleOverride?: ComponentProps<typeof BrandLogo>["descriptorStyleOverride"];
+
   fitDescriptorToWordmark?: boolean;
 
   className?: string;
 
   maxWidthClass?: string;
+
+  /** Altura fija del anagrama + nombre (rem); gana sobre clases Tailwind. */
+  markHeightRem?: number;
 
   priority?: boolean;
 
@@ -86,11 +90,15 @@ export function NaBrandLockupGroup({
 
   descriptorProminence = "default",
 
+  descriptorStyleOverride,
+
   fitDescriptorToWordmark,
 
   className,
 
   maxWidthClass,
+
+  markHeightRem,
 
   priority,
 
@@ -110,18 +118,24 @@ export function NaBrandLockupGroup({
 
       descriptorProminence={descriptorProminence}
 
+      descriptorStyleOverride={descriptorStyleOverride}
+
       fitDescriptorToWordmark={fitDescriptorToWordmark}
 
       priority={priority}
 
       render={render}
 
-      className={cn(NA_BRAND_LOCKUP_SIZES[size], className)}
+      className={cn(
+        markHeightRem === undefined ? NA_BRAND_LOCKUP_SIZES[size] : undefined,
+        className,
+      )}
 
       maxWidthClass={maxWidthClass}
 
-    />
+      markHeightRem={markHeightRem}
 
+      />
   );
 
 }

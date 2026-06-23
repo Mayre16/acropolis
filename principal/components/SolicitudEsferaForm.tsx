@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
-import { buildEsferaMailto } from "@/lib/contact-routing";
+import { submitEsferaSolicitud } from "@/lib/submit-esfera-solicitud";
 import {
-  ESFERA_CC_EMAIL,
-  VOLUNTARIADO_EMAIL,
-} from "@/lib/site-config";
-import { CheckCircle2, ClipboardCopy, Mail } from "lucide-react";
+  resetTurnstileWidget,
+  TurnstileWidget,
+} from "@/components/TurnstileWidget";
+import { CheckCircle2 } from "lucide-react";
 
 const MAX_PERSONAS = 25;
 
@@ -192,7 +192,11 @@ export function SolicitudEsferaForm({
   const [values, setValues] = useState<FormState>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<"idle" | "done">("idle");
-  const [copyOk, setCopyOk] = useState(false);
+  const [submittedDev, setSubmittedDev] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [website, setWebsite] = useState("");
 
   const fieldLabel = () =>
     cn("mb-1.5 block text-sm font-medium text-na-muted");
@@ -203,38 +207,47 @@ export function SolicitudEsferaForm({
 
   const onSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    setCopyOk(false);
+    setSubmitError("");
     const v = validate(values);
+    if (!turnstileToken) {
+      v.turnstile = "Marca la casilla «No soy un robot».";
+    }
     setErrors(v);
     if (Object.keys(v).length > 0) return;
 
-    const body = buildBody(values);
-    const { href } = buildEsferaMailto(
-      `[Esfera] Solicitud taller — ${values.empresa.trim()}`,
-      body,
-    );
+    setSubmitting(true);
+    const result = await submitEsferaSolicitud({
+      empresa: values.empresa.trim(),
+      contactoNombre: values.contactoNombre.trim(),
+      contactoApellido: values.contactoApellido.trim(),
+      email: values.email.trim(),
+      telefono: values.telefono.trim(),
+      message: buildBody(values),
+      turnstileToken,
+      website,
+    });
+    setSubmitting(false);
 
-    try {
-      await navigator.clipboard.writeText(body);
-      setCopyOk(true);
-    } catch {
-      setCopyOk(false);
+    if (!result.ok) {
+      setSubmitError(result.error);
+      setTurnstileToken("");
+      resetTurnstileWidget();
+      return;
     }
 
+    setSubmittedDev(result.dev === true);
     setSubmitted("done");
-
-    if (href.length < 1800) {
-      setTimeout(() => {
-        window.location.href = href;
-      }, 200);
-    }
   };
 
   const reset = () => {
     setValues(initial);
     setErrors({});
     setSubmitted("idle");
-    setCopyOk(false);
+    setSubmittedDev(false);
+    setSubmitError("");
+    setTurnstileToken("");
+    setWebsite("");
+    resetTurnstileWidget();
   };
 
   const toggleTaller = (id: string) => {
@@ -254,52 +267,29 @@ export function SolicitudEsferaForm({
       >
         <CheckCircle2 className="mx-auto h-14 w-14 text-na-kefer" />
         <h2 className="mt-4 text-xl font-black text-na-heketDark">
-          Solicitud lista para enviar
+          {submittedDev ? "Solicitud recibida (modo prueba)" : "Correo enviado"}
         </h2>
         <p className="mt-2 text-sm text-na-muted">
-          El texto completo{" "}
-          {copyOk
-            ? "se copió al portapapeles."
-            : "puede copiarse con el botón de abajo."}{" "}
-          Si su correo no se abrió automáticamente, envíe el mensaje manualmente
-          a{" "}
-          <a
-            href={`mailto:${VOLUNTARIADO_EMAIL}`}
-            className="font-medium text-na-heket underline-offset-2 hover:underline"
-          >
-            {VOLUNTARIADO_EMAIL}
-          </a>{" "}
-          (copia a {ESFERA_CC_EMAIL}) con el asunto sugerido.
+          {submittedDev ? (
+            <>
+              La solicitud se guardó en el servidor de desarrollo. No se envió
+              correo porque el SMTP aún no está configurado.
+            </>
+          ) : (
+            <>
+              Hemos recibido su solicitud de taller Esfera. Nuestro equipo la
+              revisará y le contactará pronto. También recibirá una copia en{" "}
+              <span className="font-semibold text-na-heketDark">
+                {values.email.trim()}
+              </span>
+              .
+            </>
+          )}
         </p>
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <button
-            type="button"
-            onClick={async () => {
-              await navigator.clipboard.writeText(buildBody(values));
-              setCopyOk(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-na-heket/25 px-4 py-2.5 text-sm font-semibold text-na-heketDark hover:bg-na-heket/[0.06]"
-          >
-            <ClipboardCopy className="h-4 w-4" />
-            Copiar de nuevo
-          </button>
-          <a
-            href={
-              buildEsferaMailto(
-                `[Esfera] Solicitud taller — ${values.empresa.trim()}`,
-                buildBody(values),
-              ).href
-            }
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-na-heket px-4 py-2.5 text-sm font-semibold text-white hover:bg-na-kefer"
-          >
-            <Mail className="h-4 w-4" />
-            Abrir correo
-          </a>
-        </div>
         <button
           type="button"
           onClick={reset}
-          className="mt-6 text-sm text-na-muted underline-offset-2 hover:text-na-heketDark hover:underline"
+          className="mt-6 text-sm font-semibold text-na-heket underline-offset-2 hover:underline"
         >
           Enviar otra solicitud
         </button>
@@ -317,19 +307,6 @@ export function SolicitudEsferaForm({
       )}
       noValidate
     >
-      <p className="text-sm text-na-muted">
-        Complete el formulario. Al enviar, se generará un borrador de correo
-        hacia{" "}
-        <span className="font-semibold text-na-heket">{VOLUNTARIADO_EMAIL}</span>{" "}
-        con copia a{" "}
-        <span className="font-semibold text-na-heket">{ESFERA_CC_EMAIL}</span>.
-        El mismo texto se copiará al portapapeles. Grupos de hasta{" "}
-        <strong className="font-semibold text-na-heketDark">
-          {MAX_PERSONAS} personas
-        </strong>
-        .
-      </p>
-
       <div className="mt-8 space-y-5">
         <div>
           <label className={fieldLabel()} htmlFor="esf-empresa">
@@ -647,6 +624,33 @@ export function SolicitudEsferaForm({
         </div>
       </div>
 
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden>
+        <label htmlFor="esf-website">Sitio web</label>
+        <input
+          id="esf-website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <div className="mt-6">
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+        {errors.turnstile && (
+          <p className="mt-2 text-xs text-red-400">{errors.turnstile}</p>
+        )}
+      </div>
+
+      {submitError ? (
+        <p className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {submitError}
+        </p>
+      ) : null}
+
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
         {embedded ? (
           <button
@@ -666,9 +670,10 @@ export function SolicitudEsferaForm({
         )}
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-na-heket px-6 py-3 text-sm font-bold text-white shadow-md shadow-na-heket/20 hover:bg-na-kefer"
+          disabled={submitting}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-na-heket px-6 py-3 text-sm font-bold text-white shadow-md shadow-na-heket/20 hover:bg-na-kefer disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Generar solicitud y abrir correo
+          {submitting ? "Enviando…" : "Enviar solicitud"}
         </button>
       </div>
     </form>

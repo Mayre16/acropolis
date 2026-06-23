@@ -15,78 +15,75 @@
       "activeDate": "Sábado 11 de julio",
       "activeTime": "4:00pm a 6:15pm",
       "activeModality": "Presencial",
-      "bannerDuration": "5 meses",
-      "bannerFee": "RD$ 2,500"
+      "bannerDuration": "5 meses"
     },
     "agenda": [
       {
-        "id": "vol-reforestacion-jun20",
+        "id": "vol-reforestacion-jul12",
         "category": "voluntariado",
         "title": "Jornada de reforestación",
-        "startsAt": "2026-06-20",
-        "date": "Sábado 20 de junio",
-        "time": "10:00 a.m.",
-        "sede": "Centro León · Centro cultural",
+        "startsAt": "2026-07-12",
+        "date": "Sábado 12 de julio",
+        "time": "8:00 a.m.",
+        "sede": "Parque ecológico · Santo Domingo Este",
         "tag": "Ecología",
         "image": "/img/voluntariado/cards/ecologia.webp",
         "imageAlt": "Voluntarios en jornada de reforestación y plantación de árboles",
-        "description": "Salida de voluntariado ambiental en el Centro León (Santiago): plantación, cuidado de espacios verdes y educación ecológica. Ropa cómoda y ganas de servir a la naturaleza.",
-        "inscribeMessage": "Hola, me interesa la Jornada de reforestación — Centro León (Santiago), sábado 20 de junio, 10:00 a.m. ¿Me pueden dar más información?",
-        "showOnHome": false
+        "description": "Salida de voluntariado ambiental: plantación, cuidado de espacios verdes y educación ecológica. Ropa cómoda y ganas de servir a la naturaleza.",
+        "inscribeMessage": "Hola, me interesa la Jornada de reforestación — sábado 12 de julio, 8:00 a.m. ¿Me pueden confirmar punto de encuentro?",
+        "detailHref": "/voluntariado",
+        "detailLabel": "Ver voluntariado",
+        "showOnHome": true
       },
       {
-        "id": "vol-ancianos-jun14",
-        "category": "voluntariado",
-        "title": "Visita al hogar de ancianos",
-        "startsAt": "2026-06-14",
-        "date": "Domingo 14 de junio",
-        "time": "10:00 a.m.",
-        "sede": "Sede Los Prados",
-        "image": "/img/voluntariado/cards/ancianos.webp",
-        "imageAlt": "Voluntarios compartiendo con residentes de un hogar de ancianos",
-        "description": "Visita solidaria a un hogar de ancianos desde la Sede Los Prados. Acompañamiento, conversación y actividades sencillas que devuelven alegría y dignidad.",
-        "inscribeMessage": "Hola, me interesa la Visita al hogar de ancianos — Sede Los Prados, domingo 14 de junio, 10:00 a.m. ¿Me pueden dar más información?",
-        "showOnHome": false
-      },
-      {
-        "id": "vol-ninos-jun13",
+        "id": "vol-ninos-jul26",
         "category": "voluntariado",
         "title": "Actividades con niños",
-        "startsAt": "2026-06-13",
-        "date": "Sábado 13 de junio",
+        "startsAt": "2026-07-26",
+        "date": "Sábado 26 de julio",
         "time": "10:00 a.m.",
         "sede": "Sede Naco",
         "image": "/img/voluntariado/cards/ninos.webp",
         "imageAlt": "Voluntarios en actividad educativa y recreativa con niños",
-        "description": "Jornada de voluntariado con niños en la Sede Naco: juegos, valores, cultura y apoyo educativo en un ambiente alegre y responsable.",
-        "inscribeMessage": "Hola, me interesan las Actividades con niños — Sede Naco, sábado 13 de junio, 10:00 a.m. ¿Me pueden dar más información?",
-        "showOnHome": false
+        "description": "Jornada de voluntariado con niños: juegos, valores, cultura y apoyo educativo en un ambiente alegre y responsable.",
+        "inscribeMessage": "Hola, me interesan las Actividades con niños — Sede Naco, sábado 26 de julio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/voluntariado",
+        "detailLabel": "Ver voluntariado",
+        "showOnHome": true
       },
       {
-        "id": "vol-esfera-jun10",
-        "category": "voluntariado",
-        "title": "Charla: voluntariado y Punto Focal Esfera",
-        "startsAt": "2026-06-10",
-        "date": "Miércoles 10 de junio",
-        "time": "7:00 p.m.",
+        "id": "esfera-manual-ago",
+        "category": "esfera",
+        "title": "Introducción al Manual Esfera",
+        "startsAt": "2026-08-09",
+        "date": "Sábado 9 de agosto",
+        "time": "9:00 a.m. – 1:00 p.m.",
         "sede": "Sede Naco",
-        "image": "/img/eventos/simulacros.webp",
-        "imageAlt": "Charla sobre gestión de emergencias y estándares Esfera",
-        "description": "Charla informativa en la Sede Naco sobre nuestro voluntariado y el Punto Focal Esfera: estándares humanitarios, preparación ante emergencias y cómo sumarse.",
-        "inscribeMessage": "Hola, me interesa la Charla sobre voluntariado y Punto Focal Esfera — Sede Naco, miércoles 10 de junio, 7:00 p.m. ¿Me pueden dar más información?",
-        "showOnHome": false
+        "tag": "Punto Focal Esfera",
+        "image": "/img/esfera/manual-esfera-portada-es-card.webp",
+        "imageAlt": "El Manual Esfera — Carta Humanitaria y normas mínimas para la respuesta humanitaria, edición en español 2018",
+        "description": "Taller de base sobre estándares humanitarios y calidad en emergencias. Abierto a voluntarios e instituciones interesadas en la línea Esfera.",
+        "inscribeMessage": "Hola, me interesa el taller Introducción al Manual Esfera — Sede Naco, sábado 9 de agosto. ¿Me pueden confirmar inscripción?",
+        "detailHref": "/esfera",
+        "detailLabel": "Ver Punto Focal Esfera",
+        "showOnHome": true
       },
       {
-        "id": "voluntariado-mqckwqrm",
-        "category": "voluntariado",
-        "title": "Nueva actividad de voluntariado test",
-        "startsAt": "2026-06-25",
-        "date": "25 de junio de 2026",
-        "time": "9am",
-        "sede": "Naco",
-        "showOnHome": false,
-        "inscribeMessage": "Hola, me interesa una actividad de voluntariado de Nueva Acrópolis. ¿Me pueden dar más información?",
-        "image": "/uploads/acropolis/1781368747022-3vu8s6.png"
+        "id": "esfera-simulacro-sep",
+        "category": "esfera",
+        "title": "Simulacro de gestión de emergencias",
+        "startsAt": "2026-09-13",
+        "date": "Sábado 13 de septiembre",
+        "time": "8:00 a.m. – 12:00 m.",
+        "sede": "Sede Naco",
+        "tag": "Práctica de campo",
+        "image": "/img/esfera/cards/simulacro-indoor.webp",
+        "imageAlt": "Simulacro de gestión de emergencias en espacio cerrado — voluntarios en ejercicio de respuesta humanitaria",
+        "description": "Ejercicio práctico de respuesta coordinada, evaluación de necesidades y trabajo en equipo bajo criterios Esfera.",
+        "inscribeMessage": "Hola, me interesa el Simulacro de gestión de emergencias — sábado 13 de septiembre. ¿Me pueden dar más información?",
+        "detailHref": "/esfera",
+        "detailLabel": "Ver Punto Focal Esfera",
+        "showOnHome": true
       },
       {
         "id": "diplomado-los-prados-jun13",
@@ -116,21 +113,6 @@
         "imageAlt": "Diplomado de Filosofía para la Vida — pirámides, cosmos y exploración del saber",
         "description": "Grupo del Diplomado de Filosofía para la Vida en horario nocturno, Sede Naco. Programa de cinco meses con enfoque práctico: autoconocimiento, convivencia y futuro.",
         "inscribeMessage": "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Sede Naco, martes 9 de junio, 7:00 p.m. ¿Me pueden dar más información?",
-        "detailHref": "/filosofia",
-        "detailLabel": "Ver programa completo"
-      },
-      {
-        "id": "diplomado-leon-jun17",
-        "category": "diplomado",
-        "title": "Diplomado de Filosofía para la Vida",
-        "startsAt": "2026-06-17",
-        "date": "Miércoles 17 de junio",
-        "time": "7:00 p.m.",
-        "sede": "Centro León · Centro cultural",
-        "image": "/img/filosofia/diplomado/diplomado-03.webp",
-        "imageAlt": "Diplomado de Filosofía para la Vida — símbolos de Oriente y tradiciones universales",
-        "description": "Apertura del Diplomado en Santiago de los Caballeros, en el Centro León. Mismo programa introductorio de cinco meses, impartido en un centro cultural aliado.",
-        "inscribeMessage": "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Centro León (Santiago), miércoles 17 de junio, 7:00 p.m. ¿Me pueden dar más información?",
         "detailHref": "/filosofia",
         "detailLabel": "Ver programa completo"
       },
@@ -177,21 +159,6 @@
         "imageAlt": "Coro mixto cantando durante un ensayo",
         "description": "Ensayo del coro mixto de Nueva Acrópolis en Los Prados. Cantamos en grupo, cultivamos la escucha y preparamos presentaciones para veladas y celebraciones culturales.",
         "inscribeMessage": "Hola, me interesa el Ensayo de Coro — Sede Los Prados, sábado 13 de junio, 10:00 a.m. ¿Me pueden dar más información?",
-        "detailHref": "/cultura",
-        "detailLabel": "Ver cultura"
-      },
-      {
-        "id": "cultura-danza-jun16",
-        "category": "cultura",
-        "title": "Taller introductorio de Danza",
-        "startsAt": "2026-06-16",
-        "date": "Martes 16 de junio",
-        "time": "7:00 p.m.",
-        "sede": "Centro León · Centro cultural",
-        "image": "/img/cultura/agenda/danza.webp",
-        "imageAlt": "Clase de danza con trajes típicos dominicanos",
-        "description": "Primera sesión del taller de danza en el Centro León (Santiago). Merengue, danzas típicas y movimiento como lenguaje simbólico — sin experiencia previa.",
-        "inscribeMessage": "Hola, me interesa el Taller introductorio de Danza — Centro León (Santiago), martes 16 de junio, 7:00 p.m. ¿Me pueden dar más información?",
         "detailHref": "/cultura",
         "detailLabel": "Ver cultura"
       },
@@ -259,7 +226,8 @@
           "La jornada inició a las 6:30 de la tarde con ejercicios de respiración guiada y continuó con movimientos suaves y restaurativos enfocados en liberar tensiones y promover calma y equilibrio interior en un ambiente sereno y contemplativo.",
           "Con iniciativas como esta, Nueva Acrópolis Dominicana continúa promoviendo espacios culturales y formativos que integran ciencia, filosofía y bienestar, fomentando una vida más consciente y armónica."
         ],
-        "gallery": []
+        "gallery": [],
+        "published": true
       },
       {
         "slug": "dia-de-la-tierra",
@@ -269,15 +237,15 @@
         "excerpt": "Celebramos el Día de la Tierra uniendo reflexión filosófica y acción concreta por el medio ambiente.",
         "image": {
           "src": "/img/eventos/tierra.webp",
-          "alt": "Actividad por el Día de la Tierra con ciencia y filosofía"
+          "alt": "Voluntarios en jornada de reforestación — Día de la Tierra"
         },
         "body": [
-          "Nueva Acrópolis Dominicana celebró durante el mes de abril una programación especial en conmemoración del Día de la Tierra, integrando ciencia, filosofía y acción ecológica a través de una trilogía de encuentros y una jornada de reforestación.",
-          "Bajo el concepto “De la colmena al cosmos: un viaje de ciencia y filosofía para redescubrir nuestro lugar en la naturaleza”, la organización reunió a decenas de participantes en tres encuentros temáticos sobre la inteligencia de la naturaleza, el equilibrio de los ecosistemas y la relación del ser humano con el universo.",
-          "El ciclo inició el 8 de abril con “El secreto de las abejas”; continuó el 15 de abril con la charla “Bosques: el equilibrio de la Tierra”; y cerró el 22 de abril, Día de la Tierra, con “Astronomía: nuestro lugar en el cosmos”, ampliando la mirada hacia el universo para comprender la profunda interconexión entre la Tierra y el cosmos.",
-          "Como cierre de la celebración se realizó una jornada de reforestación en La Jagua, Yaguate, San Cristóbal, con la participación de 53 voluntarios, quienes sembraron 1,080 plántulas de caoba dominicana y guázara, reafirmando el compromiso con la educación ambiental y la acción consciente en favor del planeta."
+          "En el marco del Día Internacional de la Madre Tierra, Nueva Acrópolis Dominicana llevó a cabo una trilogía de encuentros sobre la naturaleza —abejas, bosques y cosmos— y cerró con una jornada de reforestación en La Jagua, Yaguate (San Cristóbal).",
+          "Cincuenta y tres voluntarios sembraron 1.080 plántulas de caoba dominicana y guázara, uniendo reflexión filosófica y acción ecológica en favor de nuestro entorno.",
+          "La programación integró charlas abiertas y trabajo de campo, reafirmando el compromiso de la escuela con el servicio a la comunidad y el cuidado del planeta."
         ],
-        "gallery": []
+        "gallery": [],
+        "published": true
       },
       {
         "slug": "valor-de-las-abejas",
@@ -295,7 +263,8 @@
           "A continuación, Sally Polanco Bloise desarrolló una exposición sobre el simbolismo de las abejas en diversas culturas: desde el antiguo Egipto, donde representaban el orden cósmico, hasta la Grecia clásica, donde las “melisas” eran consideradas sacerdotisas guardianas de los misterios sagrados.",
           "La jornada concluyó con una degustación de miel, propiciando un espacio de encuentro y reforzando el mensaje central de la actividad: valorar, proteger y aprender de estas pequeñas pero esenciales guardianas de la vida."
         ],
-        "gallery": []
+        "gallery": [],
+        "published": true
       },
       {
         "slug": "feria-de-la-salud",
@@ -305,64 +274,15 @@
         "excerpt": "Estuvimos presentes en la 13ª Feria de la Salud, acercando filosofía práctica y bienestar a la comunidad.",
         "image": {
           "src": "/img/eventos/feria-salud.webp",
-          "alt": "Voluntarios de Nueva Acrópolis en la Feria de la Salud Ferries del Caribe"
+          "alt": "Voluntarios de Nueva Acrópolis en la Feria de la Salud"
         },
         "body": [
-          "Nueva Acrópolis Dominicana se hizo presente en la 13ª Feria de la Salud de la Fundación Ferries del Caribe, integrándose a una de las iniciativas solidarias de mayor alcance en el país. La jornada logró brindar más de 9,000 consultas en múltiples especialidades médicas.",
-          "Más de un centenar de voluntarios de Nueva Acrópolis asumieron con compromiso y eficiencia labores clave de orientación, organización y acompañamiento de los pacientes, sosteniendo el orden y el trato humano en cada etapa del proceso.",
-          "Esta experiencia reafirma una convicción central: que el voluntariado consciente no es solo ayuda puntual, sino una forma de acción organizada, disciplinada y profundamente humana, capaz de responder con eficacia a necesidades reales y de fortalecer el tejido social."
+          "Nueva Acrópolis Dominicana participó en la 13ª Feria de la Salud organizada por la Fundación Ferries del Caribe, con un stand de voluntarios que acercó a la comunidad ideas de filosofía práctica, bienestar y servicio.",
+          "Durante la jornada compartimos materiales sobre nuestros programas de voluntariado, actividades abiertas y la Escuela de Filosofía, en un espacio de encuentro orientado al cuidado integral de las personas.",
+          "La presencia en ferias comunitarias forma parte de nuestro compromiso de llevar la cultura y el voluntariado a espacios públicos, dialogando con quienes buscan mejorar su calidad de vida."
         ],
-        "gallery": []
-      },
-      {
-        "slug": "gestion-de-emergencias",
-        "title": "Voluntarios se capacitan en gestión de emergencias",
-        "date": "14 de marzo de 2026",
-        "category": "Esfera",
-        "excerpt": "Simulacros y formación práctica en respuesta a emergencias, en el marco de nuestro Punto Focal Esfera.",
-        "image": {
-          "src": "/img/eventos/simulacros.webp",
-          "alt": "Voluntarios capacitándose en gestión de emergencias"
-        },
-        "body": [
-          "Nueva Acrópolis Dominicana realizó una jornada de simulacros y capacitación orientada a fortalecer la respuesta ante desastres, dirigida a voluntarios y participantes interesados en la preparación comunitaria y el servicio solidario. La actividad recreó distintos escenarios de emergencia para entrenar habilidades prácticas.",
-          "Durante la jornada se desarrollaron ejercicios de Evaluación de Daños y Análisis de Necesidades (EDAN), herramienta clave para identificar el impacto de un evento adverso, y prácticas de Primeros Auxilios Psicológicos, enfocadas en brindar contención emocional a personas en situación de crisis.",
-          "El programa incluyó también formación sobre el Sistema de Comando de Incidentes (ICS) y prácticas vinculadas a los Equipos Comunitarios de Respuesta a Emergencias (CERTS). Con estas iniciativas, Nueva Acrópolis Dominicana reafirma su compromiso con una cultura de resiliencia, solidaridad y servicio."
-        ],
-        "gallery": []
-      },
-      {
-        "slug": "diplomado-filosofia-santiago",
-        "title": "Santiago abraza la filosofía: lanzamiento del Diplomado Filosofía para la Vida",
-        "date": "12 de abril de 2026",
-        "category": "Filosofía",
-        "excerpt": "Con gran acogida lanzamos el nuevo Diplomado de Filosofía para la Vida en Santiago de los Caballeros.",
-        "image": {
-          "src": "/img/eventos/santiago.webp",
-          "alt": "Lanzamiento del Diplomado de Filosofía para la Vida en Santiago"
-        },
-        "body": [
-          "Con una respuesta que ha superado las expectativas y un ambiente cargado de entusiasmo, Nueva Acrópolis Dominicana ha consolidado su presencia en la “Ciudad Corazón”. Tras dos exitosas charlas informativas, el nuevo Diplomado en Filosofía Comparada completó sus primeras sesiones formales con un sólido grupo de 23 inscritos.",
-          "El proceso de apertura ha generado comentarios sumamente positivos entre los participantes, quienes destacan la profundidad de los temas y la calidez del grupo. La transición de las sesiones informativas a las clases del programa académico ha sido fluida, manteniendo un alto nivel de compromiso.",
-          "La llegada a Santiago ha contado con el respaldo constante de los miembros de la sede de Santo Domingo, fortaleciendo el sentido de unidad institucional y permitiendo que la mística y los valores de Nueva Acrópolis se sientan presentes desde el primer día.",
-          "Debido al éxito de este primer grupo, abriremos una nueva promoción. Invitamos a los interesados a inscribirse desde ya en nuestra lista de espera para asegurar su cupo y recibir información prioritaria."
-        ],
-        "gallery": []
-      },
-      {
-        "slug": "solsticio-de-verano",
-        "title": "Solsticio de Verano",
-        "date": "17 de junio 2026",
-        "category": "Cultura",
-        "excerpt": "Nuestra celebración anual de un nuevo año de cosechas",
-        "image": {
-          "src": "/uploads/acropolis/1781366607023-zcc5hf.jpeg",
-          "alt": "Celebración del Solsticio de Verano"
-        },
         "gallery": [],
-        "body": [
-          "Ven con nosotros a celebrar el verano y llévate un montón de sorpresas."
-        ]
+        "published": true
       }
     ],
     "articulos": [
@@ -727,22 +647,17 @@
     "diplomadoInscription": {
       "eyebrow": "Más información",
       "title": "¿Quieres unirte a esta aventura?",
-      "intro": "Para reservar tu cupo, realiza el pago de inscripción.",
-      "feeMain": "RD$2,500",
-      "feeNote": "+ 5 mensualidades de RD$1,500",
-      "paymentNote": "Pago por depósito o transferencia · BHD León",
-      "accountLabel": "Cta. Corriente:",
-      "account": "0255360-001-7",
-      "rncLabel": "RNC:",
-      "rnc": "4-01-50913-1",
-      "email": "nueva.acropolis@codetel.net.do",
-      "footnote": "Tras la inscripción, las cuatro contribuciones mensuales se abonan en los cuatro meses siguientes al inicio del programa.",
-      "inscribeWhatsApp": "Hola, me interesa inscribirme al Diplomado Filosofía para la Vida (Nueva Acrópolis) — sesión del lunes 3 de agosto, 7:00 a 9:15 p.m. ¿Me pueden dar más información?"
+      "intro": "Escríbenos por WhatsApp y te orientamos sobre fechas, sedes disponibles y el proceso de inscripción.",
+      "capacityNote": "Cupo limitado · Requiere inscripción previa",
+      "inscribeWhatsApp": "Hola, me interesa inscribirme al Diplomado Filosofía para la Vida (Nueva Acrópolis). ¿Me pueden dar información sobre fechas, sedes e inscripción?"
     },
     "diplomadoPage": {
       "heroLede": "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
-      "otrasSesionesTitle": "Otras sesiones",
-      "otrasSesionesIntro": "Próximas clases del Diplomado en distintas sedes y horarios. Se comparten con la página de Filosofía — edítalas aquí o allí."
+      "otrasSesionesTitle": "Cupos disponibles",
+      "otrasSesionesIntro": "",
+      "testimonialEyebrow": "Como tú",
+      "testimonialQuote": "«Conócete a ti mismo» — el primer paso para vivir con mayor sentido y claridad.",
+      "testimonialVideoUrl": "https://www.youtube.com/watch?v=4sMY_gaAadE"
     },
     "culturaPage": {
       "proximasTitle": "Próximas actividades",
@@ -750,7 +665,7 @@
       "circuloAmigos": {
         "eyebrow": "Abierto al público",
         "title": "¿Quieres ser amigo de Nueva Acrópolis?",
-        "lede": "Un espacio para quienes aman la filosofía, la cultura y el voluntariado — jóvenes adultos, personas de mediana edad y mayores — y desean seguir vinculados a Nueva Acrópolis sin integrarse al plan de estudios regular. Incluye diálogos semanales sobre filosofía y temas de actualidad, junto al círculo de lectura y otras actividades abiertas a quienes no pueden formar parte del plan de estudios.",
+        "lede": "Un espacio para quienes aman la filosofía, la cultura y el voluntariado — jóvenes adultos, personas de mediana edad y mayores — y desean seguir vinculados a Nueva Acrópolis sin integrarse al plan de estudios regular. Incluye diálogos semanales sobre filosofía y temas de actualidad, y otras actividades abiertas a quienes no pueden formar parte del plan de estudios.",
         "imageSrc": "/img/circulo-amigos/conversacion.webp",
         "imageAlt": "Hombres y mujeres de distintas edades conversando juntos en círculo sobre filosofía y temas de actualidad"
       },
@@ -882,8 +797,8 @@
         },
         {
           "id": "default-3",
-          "src": "/img/cursos/lectura.webp",
-          "alt": "Círculo de lectura"
+          "src": "/img/cursos/astrologia.webp",
+          "alt": "Astrología filosófica"
         }
       ]
     },
@@ -891,40 +806,45 @@
     "venues": [
       {
         "id": "sede-naco",
-        "name": "Sede Naco",
+        "name": "Naco",
         "kind": "sede",
         "city": "Santo Domingo",
         "zone": "Ens. Naco",
         "address": "Calle Cub Scouts No. 6, 3er nivel",
         "reference": "Antes de Av. Tiradentes, detrás de Plaza Merengue",
         "phone": "(849) 352-7054",
-        "email": "info.oinadom@acropolis.org",
-        "mapsQuery": "Calle Cub Scouts 6 Naco Santo Domingo República Dominicana",
-        "note": "Escuela de Filosofía, Diplomado y actividades regulares de sede."
+        "mapsQuery": "Calle Cub Scouts 6 Naco Santo Domingo República Dominicana"
       },
       {
         "id": "sede-los-prados",
-        "name": "Sede Los Prados",
+        "name": "Los Prados",
         "kind": "sede",
         "city": "Santo Domingo",
         "zone": "Los Prados",
         "address": "Eugenio Deschamps No. 81",
         "reference": "Plaza Los Prados",
         "phone": "(849) 352-7054",
-        "email": "info.oinadom@acropolis.org",
-        "mapsQuery": "Eugenio Deschamps 81 Los Prados Santo Domingo República Dominicana",
-        "note": "Clases, talleres y actividades de nuestra sede en Los Prados."
+        "mapsQuery": "Eugenio Deschamps 81 Los Prados Santo Domingo República Dominicana"
       },
       {
         "id": "punto-cultural-roberto-pastoriza",
-        "name": "Punto Cultural Roberto Pastoriza",
+        "name": "Roberto Pastoriza",
         "kind": "centro-cultural",
         "city": "Santo Domingo",
         "zone": "Evaristo Morales",
         "address": "Roberto Pastoriza No. 709",
         "phone": "(849) 352-7054",
-        "mapsQuery": "Roberto Pastoriza 709 Evaristo Morales Santo Domingo",
-        "note": "Punto cultural · eventos, celebraciones y encuentros abiertos."
+        "mapsQuery": "Roberto Pastoriza 709 Evaristo Morales Santo Domingo"
+      },
+      {
+        "id": "sede-santiago",
+        "name": "Santiago",
+        "kind": "sede",
+        "city": "Santiago",
+        "zone": "Santiago de los Caballeros",
+        "address": "Dirección próximamente",
+        "phone": "(849) 352-7054",
+        "mapsQuery": "Nueva Acrópolis Santiago de los Caballeros República Dominicana"
       }
     ],
     "venuesHidden": [],
@@ -976,7 +896,7 @@
           "herradura": 15
         },
         "image": {
-          "src": "/uploads/acropolis/1781457083648-o4304y.webp",
+          "src": "/img/salones/aristoteles-herradura.webp",
           "alt": "Salón Aristóteles en Naco en disposición herradura para facilitación grupal"
         }
       },
@@ -1013,18 +933,69 @@
           "src": "/img/salones/platon-butacas.webp",
           "alt": "Salón Platón en Los Prados con butacas en filas y escenario"
         }
+      },
+      {
+        "id": "apolo",
+        "name": "Apolo",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Salón para charlas, proyecciones y encuentros formativos en nuestra sede de Santiago de los Caballeros.",
+        "featuredLayout": "butacas",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/eventos/santiago.webp",
+          "alt": "Salón Apolo en Sede Santiago — espacio para charlas y formación"
+        }
+      },
+      {
+        "id": "atenea",
+        "name": "Atenea",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Aula versátil para cursos y talleres con trabajo en mesa en Santiago.",
+        "featuredLayout": "mesas",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/salones/hipatia-mesas.webp",
+          "alt": "Salón Atenea en Sede Santiago con mesas tipo escuela"
+        }
+      },
+      {
+        "id": "olimpia",
+        "name": "Olimpia",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Espacio para dinámicas grupales, diálogo y facilitación en disposición herradura.",
+        "featuredLayout": "herradura",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/salones/aristoteles-herradura.webp",
+          "alt": "Salón Olimpia en Sede Santiago en disposición herradura"
+        }
       }
     ],
     "salonesPage": {
       "eyebrow": "Espacios",
       "title": "Alquiler de salones para talleres y cursos",
-      "intro": "Salones sobrios y elegantes en nuestras sedes de Santo Domingo, con distintas disposiciones según el tipo de actividad. Ideal para cursos, charlas, formaciones corporativas y encuentros formativos."
+      "intro": "Salones sobrios y elegantes en nuestras sedes de Santo Domingo y Santiago, con distintas disposiciones según el tipo de actividad. Ideal para cursos, charlas, formaciones corporativas y encuentros formativos."
     },
     "cursosPage": {
       "proximasTitle": "Próximas convocatorias",
       "proximasIntro": "Cursos, talleres y conferencias con fecha próxima. Haz clic para inscribirte o pedir más información.",
       "ofertaEyebrow": "Nuestra oferta",
-      "ofertaCursosIntro": "Una selección de nuestras actividades formativas. Fechas, horarios e inversión se anuncian al inicio de cada temporada; escríbenos para conocer las próximas convocatorias.",
+      "ofertaCursosIntro": "Cursos con horario fijo e inscripción abierta. Consulta fechas y sedes en cada tarjeta y escríbenos para más información.",
       "ofertaConferenciasIntro": "Charlas y conferencias abiertas al público sobre filosofía, cultura y valores. Muchas son gratuitas; consulta fechas y sedes por WhatsApp.",
       "cursosTalleres": [
         {
@@ -1053,17 +1024,18 @@
           "text": "Leer y dialogar en grupo sobre textos que invitan a pensar. Un encuentro para compartir ideas, profundizar en autores y descubrir nuevas miradas sobre la vida.",
           "sede": "Los Prados",
           "tag": "Cultura",
-          "fechaAperturaIso": "2026-07-23",
-          "fechaApertura": "23 de julio"
+          "fechaApertura": "Último jueves de cada mes"
         },
         {
           "id": "curso-tai-chi-y-chi-kung",
           "src": "/img/cursos/chi-kung-salon.webp",
-          "alt": "Grupo visto de espaldas practicando Chi Kung en salón con espejo y piso de madera",
+          "alt": "Grupo practicando Tai Chi y Chi Kung en salón con espejo y piso de madera",
           "title": "Tai Chi y Chi Kung",
-          "text": "Movimientos suaves y naturales combinados con respiración profunda: meditación en movimiento que fortalece cuerpo y mente. Apto para todas las edades y condiciones físicas.",
-          "facilitador": "Mayra Sifres",
-          "tag": "Bienestar"
+          "text": "Curso recurrente de movimientos suaves y respiración profunda: meditación en movimiento que mejora equilibrio, flexibilidad y calma mental. Apto para todas las edades, sin impacto. Inversión: RD$3,000 mensuales.",
+          "facilitador": "Daniel Salinas",
+          "sede": "Sede Los Prados",
+          "tag": "Bienestar",
+          "fechaApertura": "Martes y jueves · 7:00 a.m. – 9:00 a.m."
         },
         {
           "id": "curso-conciencia-y-bienestar",
@@ -1102,11 +1074,23 @@
           "id": "curso-crochet",
           "src": "/img/cursos/crochet.webp",
           "alt": "Manos tejiendo a crochet con ovillos de lana de colores",
-          "title": "Crochet",
-          "text": "Cultiva paciencia, creatividad y atención a través de las manos, creando piezas únicas en un ambiente de encuentro y disfrute.",
-          "sede": "Naco",
+          "title": "Crochet con confianza",
+          "text": "Aprende crochet paso a paso en un ambiente de encuentro y paciencia: mejora la concentración, reduce el estrés y desarrolla motricidad fina mientras creas piezas únicas.",
+          "facilitador": "Jeimy Troncoso",
+          "sede": "Sede Naco",
           "tag": "Arte y oficio",
-          "fechaApertura": "Sábados"
+          "fechaApertura": "Sábados · 10:00 a.m. – 12:00 p.m."
+        },
+        {
+          "id": "curso-circulo-de-amigos",
+          "src": "/img/circulo-amigos/conversacion.webp",
+          "alt": "Personas de distintas edades conversando en círculo — Círculo de Amigos Nueva Acrópolis",
+          "title": "Círculo de Amigos",
+          "text": "Red abierta para quienes comparten los principios de Nueva Acrópolis y desean dialogar sobre filosofía, cultura y voluntariado sin integrarse al plan de estudios regular.",
+          "tag": "Filosofía",
+          "fechaApertura": "Miércoles · encuentro virtual semanal",
+          "inscribeKind": "actividad",
+          "inscribeLabel": "Quiero unirme"
         }
       ]
     }

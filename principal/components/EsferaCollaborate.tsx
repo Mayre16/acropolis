@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Building2, Coins, type LucideIcon } from "lucide-react";
+import { Building2, Coins, HeartHandshake, type LucideIcon } from "lucide-react";
 import {
   CmsEditPencil,
   CmsSectionEditBar,
 } from "@/components/cms/CmsEditPencil";
 import { openCollaborateTabEdit } from "@/components/cms/CollaborateCmsPanels";
-import { EsferaCollaborateInquiry } from "@/components/EsferaCollaborateInquiry";
+import { InquiryMailForm } from "@/components/InquiryMailForm";
 import { SolicitudEsferaDialog } from "@/components/SolicitudEsferaDialog";
+import { VolunteerForm } from "@/components/VolunteerForm";
+import {
+  buildEsferaCollaborateMailto,
+  buildVoluntariadoDonacionMailto,
+} from "@/lib/contact-routing";
 import {
   COLLABORATE_SECTION_ID,
   useCollaborateCmsEdit,
@@ -20,17 +25,25 @@ import { isEsferaSolicitudHref } from "@/lib/esfera-solicitud";
 
 const TAB_ICONS: Record<CmsCollaborateTabId, LucideIcon> = {
   donar: Coins,
-  voluntario: Coins,
+  voluntario: HeartHandshake,
   alianzas: Building2,
 };
 
+type CollaborateInquiry = "donar" | "alianzas";
+
 export function EsferaCollaborate() {
   const [active, setActive] = useState(0);
+  const [inquiry, setInquiry] = useState<CollaborateInquiry | null>(null);
   const block = useCollaborateDisplay();
   const edit = useCollaborateCmsEdit();
-  const tabs = (block.tabs ?? []).filter((tab) => tab.id !== "voluntario");
+  const tabs = block.tabs ?? [];
   const safeActive = Math.min(active, Math.max(0, tabs.length - 1));
   const t = tabs[safeActive];
+
+  useEffect(() => {
+    setInquiry(null);
+  }, [safeActive]);
+
   if (!t) return null;
 
   const Icon = TAB_ICONS[t.id] ?? Coins;
@@ -99,21 +112,61 @@ export function EsferaCollaborate() {
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-na-heket/10 text-na-heket">
               <Icon className="h-6 w-6" strokeWidth={1.75} aria-hidden />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="text-xl font-black text-na-heketDark">{t.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-na-muted">
                 {t.text}
               </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <CollaborateCta tab={t} primaryClass={primaryClass} />
-                {t.secondary?.label ? (
-                  <CollaborateSecondaryCta tab={t} />
-                ) : null}
-              </div>
+              {t.id === "voluntario" ? (
+                <div className="mt-6">
+                  <VolunteerForm
+                    triggerLabel={t.cta || "Quiero ser voluntario/a"}
+                    triggerClassName={primaryClass}
+                  />
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <CollaborateCta
+                    tab={t}
+                    primaryClass={primaryClass}
+                    onOpenInquiry={setInquiry}
+                  />
+                  {t.secondary?.label ? (
+                    <CollaborateSecondaryCta tab={t} />
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <InquiryMailForm
+        hideTrigger
+        open={inquiry === "donar"}
+        onOpenChange={(open) => setInquiry(open ? "donar" : null)}
+        formKey="voluntariado_donacion"
+        triggerLabel="Quiero donar"
+        modalTitle="Quiero donar"
+        modalIntro="Completa tus datos y enviaremos tu consulta al equipo de voluntariado."
+        contextLines={[
+          "Donación para proyectos de ecología, apoyo social y formación humanitaria.",
+        ]}
+        defaultMensaje="Indique monto, forma de aporte o cualquier detalle que debamos conocer (opcional)."
+        buildMailto={buildVoluntariadoDonacionMailto}
+      />
+
+      <InquiryMailForm
+        hideTrigger
+        open={inquiry === "alianzas"}
+        onOpenChange={(open) => setInquiry(open ? "alianzas" : null)}
+        formKey="esfera_alianzas"
+        triggerLabel="Proponer alianza"
+        modalTitle="Proponer alianza"
+        modalIntro="Completa tus datos y enviaremos tu solicitud al equipo de Punto Focal Esfera."
+        contextLines={["Alianza institucional con Punto Focal Esfera."]}
+        buildMailto={(base) => buildEsferaCollaborateMailto("alianzas", base)}
+      />
     </section>
   );
 }
@@ -121,17 +174,21 @@ export function EsferaCollaborate() {
 function CollaborateCta({
   tab,
   primaryClass,
+  onOpenInquiry,
 }: {
   tab: CmsCollaborateTab;
   primaryClass: string;
+  onOpenInquiry: (kind: CollaborateInquiry) => void;
 }) {
   if (tab.id === "donar" || tab.id === "alianzas") {
     return (
-      <EsferaCollaborateInquiry
-        kind={tab.id}
-        triggerLabel={tab.cta}
-        triggerClassName={primaryClass}
-      />
+      <button
+        type="button"
+        className={primaryClass}
+        onClick={() => onOpenInquiry(tab.id)}
+      >
+        {tab.cta}
+      </button>
     );
   }
 
@@ -145,6 +202,14 @@ function CollaborateCta({
       >
         {tab.cta}
       </a>
+    );
+  }
+
+  if (tab.href?.startsWith("#")) {
+    return (
+      <button type="button" className={primaryClass} disabled>
+        {tab.cta}
+      </button>
     );
   }
 

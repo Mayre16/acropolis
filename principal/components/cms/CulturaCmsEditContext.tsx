@@ -34,6 +34,7 @@ import type {
   CmsCulturaCard,
   CmsCulturaPage,
   CmsDocument,
+  CmsEvento,
   CmsViajeCategoriaPage,
   CmsViajesPage,
 } from "@/lib/cms/types";
@@ -58,6 +59,8 @@ import {
 import { AgendaEntryEditFields } from "@/components/cms/AgendaEntryEditFields";
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
+import { promoteAgendaEntryLocally } from "@/lib/agenda-evento";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { CIRCULO_AMIGOS_SELECTED_ID, mergeCirculoAmigos } from "@/lib/cms/circulo-amigos-display";
 
@@ -107,12 +110,14 @@ function buildDoc(
   items: CmsAgendaEntry[],
   culturaPage: CmsCulturaPage,
   viajesPage: CmsViajesPage,
+  eventoDrafts: CmsEvento[] = [],
 ): CmsDocument {
   const withAgenda = mergeCulturaIntoDoc(base, items);
+  const withDrafts = appendEventoDraftsToDoc(withAgenda, eventoDrafts);
   return mergeHeroCarouselsIntoDoc({
-    ...withAgenda,
+    ...withDrafts,
     sections: {
-      ...withAgenda.sections,
+      ...withDrafts.sections,
       culturaPage,
       viajesPage,
     },
@@ -127,6 +132,7 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
     DEFAULT_CULTURA_PAGE,
   );
   const [viajesPage, setViajesPage] = useState<CmsViajesPage>({});
+  const [eventoDrafts, setEventoDrafts] = useState<CmsEvento[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -157,7 +163,7 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
     setStatus("Guardando borrador…");
     try {
       const latest = await fetchCmsDraft("acropolis");
-      const next = buildDoc(latest, items, culturaPage, viajesPage);
+      const next = buildDoc(latest, items, culturaPage, viajesPage, eventoDrafts);
       await saveCmsDraft("acropolis", token, next);
       setDoc(next);
       setDirty(false);
@@ -186,15 +192,13 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
     setStatus("Publicando…");
     try {
       const latest = await fetchCmsDraft("acropolis");
-      const next = buildDoc(latest, items, culturaPage, viajesPage);
+      const next = buildDoc(latest, items, culturaPage, viajesPage, eventoDrafts);
       await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
+      const publishResult = await publishCms("acropolis", token);
       setDoc(next);
       setDirty(false);
-      setStatus("Publicado.");
-      postToEditor({ type: "cms-status", text: "Publicado.", ok: true });
-      postToEditor({ type: "cms-dirty", dirty: false });
-    } catch (e) {
+      setStatus(publishResult.message ?? "Publicado.");
+} catch (e) {
       const text = String(e);
       setStatus(text);
       postToEditor({ type: "cms-status", text, ok: false });
@@ -226,6 +230,25 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, [saveDraft, publish]);
+
+  const promoteToEvento = useCallback(
+    (entry: CmsAgendaEntry) => {
+      const existingSlugs = eventoDrafts.map((e) => e.slug);
+      const { updatedEntry, draft } = promoteAgendaEntryLocally(
+        entry,
+        existingSlugs,
+      );
+      setItems((list) =>
+        list.map((e) => (e.id === entry.id ? updatedEntry : e)),
+      );
+      setEventoDrafts((list) => [...list, draft]);
+      markDirty();
+      window.alert(
+        `Borrador creado: /eventos/${draft.slug}. Edítalo y publícalo en Eventos.`,
+      );
+    },
+    [eventoDrafts, markDirty],
+  );
 
   const patchItem = useCallback(
     (id: string, patch: Partial<CmsAgendaEntry>) => {
@@ -485,67 +508,18 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <div className="space-y-4">
-            <EditField
-              label="Título"
-              value={selected.title}
-              onChange={(v) => patchItem(selected.id, { title: v })}
-            />
-            <EditField
-              label="Etiqueta (ej. Clase, Ensayo)"
-              value={selected.tag ?? ""}
-              onChange={(v) => patchItem(selected.id, { tag: v })}
-            />
-            <EditField
-              label="Fecha legible"
-              value={selected.date}
-              onChange={(v) => patchItem(selected.id, { date: v })}
-            />
-            <EditField
-              label="Fecha ISO (YYYY-MM-DD)"
-              value={selected.startsAt}
-              onChange={(v) => patchItem(selected.id, { startsAt: v })}
-            />
-            <EditField
-              label="Hora"
-              value={selected.time ?? ""}
-              onChange={(v) => patchItem(selected.id, { time: v })}
-            />
-            <EditField
-              label="Sede"
-              value={selected.sede ?? ""}
-              onChange={(v) => patchItem(selected.id, { sede: v })}
-            />
-            <EditField
-              label="Descripción"
-              value={selected.description ?? ""}
-              onChange={(v) => patchItem(selected.id, { description: v })}
-              multiline
-            />
-            <EditField
-              label="Mensaje WhatsApp"
-              value={selected.inscribeMessage ?? ""}
-              onChange={(v) => patchItem(selected.id, { inscribeMessage: v })}
-              multiline
-            />
-            <CulturaAgendaImageField
-              image={selected.image ?? ""}
-              imageAlt={selected.imageAlt ?? ""}
-              token={token}
-              onChange={(patch) => patchItem(selected.id, patch)}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm("¿Eliminar esta actividad?")) {
-                  deleteItem(selected.id);
-                }
-              }}
-              className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
-            >
-              Eliminar actividad
-            </button>
-          </div>
+          <AgendaEntryEditFields
+            entry={selected}
+            token={token}
+            onChange={(patch) => patchItem(selected.id, patch)}
+            onPromoteToEvento={promoteToEvento}
+            showHomeToggle={false}
+            onDelete={() => {
+              if (window.confirm("¿Eliminar esta actividad?")) {
+                deleteItem(selected.id);
+              }
+            }}
+          />
         </EditPanelChrome>
       ) : null}
       {selectedId === "__section__" ? (

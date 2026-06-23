@@ -32,6 +32,10 @@ type BrandLogoProps = {
   priority?: boolean;
   clearSpace?: boolean;
   maxWidthClass?: string;
+  /** Sustituye estilos inline del raster (p. ej. max-height en lugar de height fija). */
+  imageStyle?: CSSProperties;
+  /** Clases extra en la imagen raster. */
+  imageClassName?: string;
   /** `hybrid` = nombre raster + descriptor HTML (legible). `raster` = lockup completo PNG. */
   render?: "auto" | "hybrid" | "raster";
 };
@@ -63,6 +67,8 @@ export function BrandLogo({
   priority = false,
   clearSpace = false,
   maxWidthClass,
+  imageStyle,
+  imageClassName,
   render = "auto",
 }: BrandLogoProps) {
   const hybrid = usesHybrid(lockup, render);
@@ -95,7 +101,8 @@ export function BrandLogo({
   );
 
   const markStyle: CSSProperties =
-    lockup === "na-solo"
+    imageStyle ??
+    (lockup === "na-solo"
       ? { height: "var(--brand-logo-h)", width: "auto" }
       : hybrid
         ? {
@@ -105,7 +112,7 @@ export function BrandLogo({
         : {
             height: "var(--brand-logo-h)",
             width: "auto",
-          };
+          });
 
   const image = (
     <img
@@ -117,9 +124,14 @@ export function BrandLogo({
       fetchPriority={priority ? "high" : undefined}
       className={cn(
         "block max-w-full shrink-0 object-contain",
-        lockup === "na-solo" ? "h-[var(--brand-logo-h)] w-auto" : "h-auto w-auto",
+        lockup === "na-solo" && !imageStyle
+          ? "h-[var(--brand-logo-h)] w-auto"
+          : lockup === "na-solo"
+            ? "h-auto w-auto"
+            : "h-auto w-auto",
         hybrid ? "object-center" : align === "start" ? "object-left" : "object-center",
         maxWidthClass,
+        imageClassName,
       )}
       style={markStyle}
     />
@@ -146,10 +158,7 @@ export function BrandLogo({
               ? "text-white"
               : "text-white/85"
             : "text-[#707070]",
-          lockup === "oina" ||
-            lockup === "oinadom" ||
-            lockup === "trilogo" ||
-            lockup === "escuela"
+          lockup === "trilogo" || lockup === "escuela"
             ? "font-bold"
             : "font-black",
           hybrid ? "text-center" : align === "start" ? "text-left" : "text-center",
@@ -158,16 +167,13 @@ export function BrandLogo({
         )}
         style={{
           ...brandDescriptorStyle(
-            lockup as "oina" | "oinadom" | "escuela" | "trilogo",
+            lockup as "trilogo" | "escuela",
             descriptorProminence,
           ),
           maxWidth: "100%",
           fontFamily: "var(--font-noto-sans), sans-serif",
           fontWeight:
-            lockup === "oina" ||
-            lockup === "trilogo" ||
-            lockup === "escuela" ||
-            (lockup === "oinadom" && descriptorProminence !== "hero")
+            lockup === "trilogo" || lockup === "escuela"
               ? 700
               : 900,
         }}

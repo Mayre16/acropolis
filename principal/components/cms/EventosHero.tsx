@@ -32,7 +32,10 @@ export function EventosHero() {
       brandLockup="trilogo"
       title={display.title}
       lede={display.lede}
-      crumbs={[{ label: "Inicio", href: "/" }, { label: "Eventos" }]}
+      crumbs={[
+        { label: "Contenido", href: "/contenido" },
+        { label: "Eventos" },
+      ]}
       images={images}
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedSlug("__hero__")}

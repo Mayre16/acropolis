@@ -2,7 +2,12 @@
 
 import { mergeSalones, resolveSalonesPage } from "@/lib/cms/salones-edit";
 import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
-import { SALONES, SALONES_BY_SEDE, type Salon } from "@/lib/salones";
+import {
+  SALONES,
+  SALONES_BY_SEDE,
+  SALON_SEDES,
+  type Salon,
+} from "@/lib/salones";
 import type { CmsSalonesPage } from "@/lib/cms/types";
 
 export function useMergedSalones(): Salon[] {
@@ -13,16 +18,10 @@ export function useMergedSalones(): Salon[] {
 
 export function useMergedSalonesBySede() {
   const salones = useMergedSalones();
-  return [
-    {
-      sede: "Naco" as const,
-      salones: salones.filter((s) => s.sede === "Naco"),
-    },
-    {
-      sede: "Los Prados" as const,
-      salones: salones.filter((s) => s.sede === "Los Prados"),
-    },
-  ];
+  return SALON_SEDES.map((sede) => ({
+    sede,
+    salones: salones.filter((s) => s.sede === sede),
+  })).filter((group) => group.salones.length > 0);
 }
 
 export function useCmsSalonesPage(): CmsSalonesPage {

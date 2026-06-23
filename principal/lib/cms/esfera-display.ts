@@ -16,11 +16,11 @@ export function useEsferaPageDisplay(): CmsEsferaPage {
 export function useEsferaBrandLogo() {
   const page = useEsferaPageDisplay();
   return {
-    color: page.esferaLogoSrc ?? "/brand/logo-esfera-red-global.svg",
+    color: page.esferaLogoSrc ?? "/brand/logo-esfera-punto-focal.webp",
     white:
       page.esferaLogoWhiteSrc ??
       page.esferaLogoSrc ??
-      "/brand/logo-esfera-red-global.svg",
-    alt: page.esferaLogoAlt ?? "Estándares Humanitarios Esfera",
+      "/brand/logo-esfera-punto-focal-white.webp",
+    alt: page.esferaLogoAlt ?? "Esfera Punto Focal",
   };
 }

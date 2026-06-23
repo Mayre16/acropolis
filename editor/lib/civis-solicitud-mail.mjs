@@ -1,33 +1,12 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadSmtpConfig } from "./smtp-config.mjs";
 import { sendPlainMail } from "./mail-service.mjs";
+import { verifyTurnstile } from "./turnstile.mjs";
+import { saveDevSubmission, smtpReady } from "./form-mail-utils.mjs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DEV_INBOX = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "data",
-  "forms",
-  "civis-solicitud",
-  "inbox",
-);
 
-function smtpReady(cfg) {
-  return Boolean(cfg.host && cfg.user && cfg.password);
-}
-
-function saveDevSubmission(data) {
-  fs.mkdirSync(DEV_INBOX, { recursive: true });
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const file = path.join(DEV_INBOX, `${stamp}.json`);
-  fs.writeFileSync(
-    file,
-    JSON.stringify({ receivedAt: new Date().toISOString(), ...data }, null, 2),
-    "utf8",
-  );
-  return file;
+function saveDevSubmissionLocal(data) {
+  return saveDevSubmission("civis-solicitud", data);
 }
 
 export function validateCivisSolicitudPayload(body) {
@@ -64,7 +43,14 @@ export function validateCivisSolicitudPayload(body) {
   };
 }
 
-export async function sendCivisSolicitudMail(body) {
+export async function sendCivisSolicitudMail(body, remoteIp) {
+  const bot = await verifyTurnstile(
+    body?.turnstileToken,
+    remoteIp,
+    body?.website,
+  );
+  if (!bot.ok) return bot;
+
   const check = validateCivisSolicitudPayload(body);
   if (!check.ok) return check;
 
@@ -76,7 +62,7 @@ export async function sendCivisSolicitudMail(body) {
       process.env.NODE_ENV !== "production" ||
       process.env.CMS_DEV_SAVE_FORMS === "1";
     if (isDev) {
-      const savedTo = saveDevSubmission(check.data);
+      const savedTo = saveDevSubmissionLocal(check.data);
       console.log(`[civis-solicitud] SMTP sin configurar — guardado en ${savedTo}`);
       return {
         ok: true,

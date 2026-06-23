@@ -42,7 +42,7 @@ export function DiplomadoImpactSection() {
 
       <div className="diplomado-impact-divider my-8" />
 
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-7">
+      <ul className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-3">
         {DIPLOMADO_IMPACT.stats.map((s, index) => (
           <li key={s.label}>
             <CountUpOnView

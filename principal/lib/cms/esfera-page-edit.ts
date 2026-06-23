@@ -147,9 +147,9 @@ export const DEFAULT_ESFERA_PAGE: CmsEsferaPage = {
   quienesTitle: "Punto focal · Estándares humanitarios",
   quienesTabs: DEFAULT_ESFERA_QUIENES_TABS,
   agendaEyebrow: "Agenda",
-  agendaTitle: "Actividades y próximos entrenamientos",
+  agendaTitle: "Próximos talleres",
   agendaIntro:
-    "Líneas habituales de capacitación y práctica; fechas y sedes se confirman con el equipo en República Dominicana.",
+    "Convocatorias abiertas de formación Esfera en República Dominicana. Fechas y cupos se confirman con el equipo Punto Focal.",
   trainings: ESFERA_PROXIMOS_ENTRENAMIENTOS,
   workshopLinesTitle: "Líneas complementarias de formación",
   workshopLinesIntro:
@@ -198,15 +198,15 @@ export const DEFAULT_ESFERA_PAGE: CmsEsferaPage = {
   manualCaption: "El Manual Esfera · Edición 2018",
   manualSubtitle:
     "Carta Humanitaria, Principios de Protección y Norma Humanitaria Esencial.",
-  esferaLogoSrc: "/brand/logo-esfera-red-global.svg",
-  esferaLogoWhiteSrc: "/brand/logo-esfera-red-global.svg",
-  esferaLogoAlt: "Estándares Humanitarios Esfera",
+  esferaLogoSrc: "/brand/logo-esfera-punto-focal.webp",
+  esferaLogoWhiteSrc: "/brand/logo-esfera-punto-focal-white.webp",
+  esferaLogoAlt: "Esfera Punto Focal",
   brochureEyebrow: "Recursos",
   brochureTitle: ESFERA_OINADOM_BROCHURE.title,
   brochureLede: ESFERA_OINADOM_BROCHURE.lede,
   brochureNote: ESFERA_OINADOM_BROCHURE.note,
   brochureHref: ESFERA_OINADOM_BROCHURE.href,
-  brochureButtonLabel: "Descargar brochure (PDF)",
+  brochureButtonLabel: "Descarga nuestro brochure",
 };
 
 export const ESFERA_WORKSHOP_SECTION_ID = "__esfera-workshop-section__";

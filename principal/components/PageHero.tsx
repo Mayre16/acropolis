@@ -4,9 +4,6 @@ import { ChevronRight } from "lucide-react";
 
 import { HeroCarousel } from "@/components/HeroCarousel";
 
-import { BrandLogo } from "@/components/BrandLogo";
-import { brandLogoHeightClass } from "@/lib/brand-clear-space";
-
 import { EsferaLogo } from "@/components/EsferaLogo";
 
 import type { BrandLockupId } from "@/lib/brand-assets";
@@ -38,7 +35,7 @@ export function PageHero({
   crumbs,
   images,
   brandMark = "na",
-  brandLockup,
+  brandLockup: _brandLockup,
   imageObjectPosition,
   layout = "background",
 }: PageHeroProps) {
@@ -47,29 +44,12 @@ export function PageHero({
 
   const brandMarkNode =
     brandMark === "esfera" ? (
-      <EsferaLogo
-        priority
-        tone="white"
-        className="h-14 w-auto sm:h-[4.25rem] md:h-20 lg:h-[5.25rem]"
-      />
-    ) : brandLockup ? (
-      <div className="overflow-visible pb-1">
-        <BrandLogo
-          lockup={brandLockup}
-          variant="white"
-          align="start"
-          className={
-            brandLockup === "trilogo"
-              ? brandLogoHeightClass.pageHeroTrilogo
-              : brandLogoHeightClass.pageHero
-          }
-          maxWidthClass={
-            brandLockup === "trilogo"
-              ? "max-w-[min(92vw,22rem)]"
-              : brandLockup === "escuela"
-                ? "max-w-[min(92vw,14rem)]"
-                : undefined
-          }
+      <div className="max-w-3xl -translate-y-2.5">
+        <EsferaLogo
+          variant="punto-focal"
+          priority
+          tone="white"
+          className="h-auto w-auto max-h-[4.5rem] max-w-[21rem] sm:max-h-20 sm:max-w-[23rem] md:max-h-[5.5rem] md:max-w-[25rem]"
         />
       </div>
     ) : null;
@@ -108,9 +88,9 @@ export function PageHero({
   );
 
   const ledeNode = lede ? (
-    <h3 className="mt-5 max-w-2xl text-balance text-lg font-normal leading-relaxed text-white/90 drop-shadow-sm">
+    <h2 className="mt-5 max-w-2xl text-balance text-lg font-normal leading-relaxed text-white/90 drop-shadow-sm">
       {lede}
-    </h3>
+    </h2>
   ) : null;
 
   if (isSplit) {
@@ -123,7 +103,7 @@ export function PageHero({
         <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_min(36%,20rem)] lg:gap-12">
             <div className="min-w-0">
-              {brandMarkNode ? <div className="mb-6">{brandMarkNode}</div> : null}
+              {brandMarkNode ? <div className="mb-4">{brandMarkNode}</div> : null}
               {crumbsNode}
               {titleNode}
               {ledeNode}
@@ -175,7 +155,7 @@ export function PageHero({
       />
 
       <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-        {brandMarkNode ? <div className="mb-6">{brandMarkNode}</div> : null}
+        {brandMarkNode ? <div className="mb-4">{brandMarkNode}</div> : null}
         {crumbsNode}
         {titleNode}
         {ledeNode}

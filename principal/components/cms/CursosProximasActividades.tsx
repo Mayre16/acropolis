@@ -1,18 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import {
+  ArrowRight,
   Pencil,
   Plus,
 } from "lucide-react";
-import { getUpcomingAgendaItems } from "@/lib/agenda";
+import { getActiveAgendaItems } from "@/lib/agenda";
 import { cmsEntryToAgenda } from "@/lib/cms/agenda-edit";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
   useCmsCursosAgenda,
   useCmsCursosSectionText,
 } from "@/lib/cms/hooks";
-import { isCmsEnabled } from "@/lib/cms/provider";
-import { CURSOS_PROXIMAS_CONVOCATORIAS } from "@/lib/cursos-agenda";
+import { filterCursosAgendaEntries } from "@/lib/cursos-agenda";
 import { UpcomingAgenda } from "@/components/UpcomingAgenda";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
 import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
@@ -25,23 +26,14 @@ export function CursosProximasActividades() {
   const edit = useCursosCmsEdit();
   const cmsItems = useCmsCursosAgenda();
   const sectionText = useCmsCursosSectionText();
-  const fallback = getUpcomingAgendaItems(CURSOS_PROXIMAS_CONVOCATORIAS).map(
-    (e) => ({
-      ...e,
-      image: resolveCmsMediaUrl(e.image) ?? e.image,
-    }),
-  );
-
-  const publicItems = isCmsEnabled()
-    ? cmsItems.map((e) => ({
-        ...e,
-        image: resolveCmsMediaUrl(e.image) ?? e.image,
-      }))
-    : fallback;
+  const publicItems = cmsItems.map((e) => ({
+    ...e,
+    image: resolveCmsMediaUrl(e.image) ?? e.image,
+  }));
 
   if (edit?.ready) {
-    const items = getUpcomingAgendaItems(
-      edit.agendaItems.map(cmsEntryToAgenda),
+    const items = filterCursosAgendaEntries(
+      getActiveAgendaItems(edit.agendaItems.map(cmsEntryToAgenda)),
     ).map((e) => ({
       ...e,
       image: resolveCmsMediaUrl(e.image) ?? e.image,
@@ -131,11 +123,35 @@ export function CursosProximasActividades() {
   if (publicItems.length === 0) return null;
 
   return (
-    <UpcomingAgenda
-      title={sectionText.title}
-      intro={sectionText.intro}
-      items={publicItems}
-      defaultInscribeMessage={DEFAULT_INSCRIBE}
-    />
+    <section
+      id="cursos-proximas"
+      className="scroll-mt-24 border-t border-na-heket/10 py-14 sm:py-16"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
+              Agenda
+            </p>
+            <h2 className="mt-2 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
+              {sectionText.title}
+            </h2>
+            <p className="mt-3 max-w-2xl text-na-muted">{sectionText.intro}</p>
+          </div>
+          <Link
+            href="/agenda"
+            className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer"
+          >
+            Ver agenda completa
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+        <UpcomingAgenda
+          embedded
+          items={publicItems}
+          defaultInscribeMessage={DEFAULT_INSCRIBE}
+        />
+      </div>
+    </section>
   );
 }

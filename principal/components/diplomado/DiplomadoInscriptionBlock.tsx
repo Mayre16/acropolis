@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, Pencil } from "lucide-react";
-import { DiplomadoInscriptionSchedule } from "@/components/diplomado/DiplomadoInscriptionSchedule";
 import { useDiplomadoInscriptionDisplay } from "@/lib/cms/diplomado-display";
 import { useFilosofiaCmsEdit } from "@/components/filosofia/cms/FilosofiaCmsEditContext";
 import { DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
@@ -35,50 +34,18 @@ export function DiplomadoInscriptionBlock() {
       <h2 className="mt-2 text-[2.1rem] font-extrabold leading-[1.08] tracking-tight">
         {ins.title}
       </h2>
-      <p className="mt-3 text-[17px] font-normal leading-relaxed text-[#262d38]">
+      <p className="mt-4 inline-flex rounded-full border border-[var(--dip-teal)]/25 bg-[var(--dip-teal)]/8 px-4 py-2 text-xs font-bold uppercase tracking-wide text-[var(--dip-teal)]">
+        {ins.capacityNote}
+      </p>
+      <p className="mt-4 max-w-2xl text-[17px] font-normal leading-relaxed text-[#262d38]">
         {ins.intro}
       </p>
-
-      <div className="diplomado-inscribe-card mt-8 overflow-hidden rounded-2xl p-5 text-white shadow-xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--dip-gold)]">
-          Inscripción
-        </p>
-        <p className="mt-3 text-[2rem] font-bold text-[var(--dip-gold)]">
-          {ins.feeMain}
-        </p>
-        <div className="my-3 h-px bg-white/15" />
-        <p className="text-sm">{ins.feeNote}</p>
-        <p className="mt-3 text-sm text-white/90">{ins.paymentNote}</p>
-        <p className="mt-4 text-sm text-[#b2d8d1]">
-          {ins.accountLabel}{" "}
-          <span className="text-[#7ec8ff] underline">{ins.account}</span>
-        </p>
-        <p className="mt-1 text-sm text-[#b2d8d1]">
-          {ins.rncLabel}{" "}
-          <span className="text-[#7ec8ff] underline">{ins.rnc}</span>
-        </p>
-        <a
-          href={`mailto:${ins.email}`}
-          className="mt-3 block text-sm text-[#b2d8d1] underline-offset-2 hover:underline"
-        >
-          {ins.email}
-        </a>
-      </div>
-
-      <DiplomadoInscriptionSchedule />
-
-      <div className="mt-5 flex gap-3">
-        <span className="diplomado-quote-line" aria-hidden />
-        <p className="text-xs font-normal leading-relaxed text-[var(--dip-muted)]">
-          {ins.footnote}
-        </p>
-      </div>
 
       <a
         href={inscribeHref}
         target="_blank"
         rel="noopener noreferrer"
-        className="mx-auto mt-6 flex w-full max-w-[300px] items-center justify-center gap-2 rounded-full bg-[var(--dip-gold)] px-6 py-3.5 text-sm font-bold text-[#1a1a18]"
+        className="mx-auto mt-8 flex w-full max-w-[300px] items-center justify-center gap-2 rounded-full bg-[var(--dip-gold)] px-6 py-3.5 text-sm font-bold text-[#1a1a18] transition hover:brightness-105"
       >
         Quiero inscribirme
         <ArrowRight className="h-4 w-4" />
