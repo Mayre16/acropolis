@@ -32,6 +32,8 @@ export type RegaloItem = {
   quote?: string;
   author?: string;
   imageUrl: string;
+  /** Foto ampliada en el modal de detalle (p. ej. lapiceros). */
+  detailImageUrl?: string;
   /** Reverso del artículo (p. ej. la obra de arte del separador); se muestra al pasar el cursor. */
   backImageUrl?: string;
   priceNote?: string;
@@ -69,7 +71,7 @@ export const REGALO_CATEGORIES: {
     id: "camisetas",
     label: "Camisetas",
     description:
-      "Prendas con frases filosóficas y la identidad de la escuela.",
+      "Prendas con frases filosóficas y diseños como Metaphysica.",
   },
 ];
 
@@ -205,6 +207,7 @@ export const REGALOS: RegaloItem[] = [
     description:
       "Set de cuatro lapiceros metálicos grabados con los valores filosóficos: negro Justicia, azul Verdad, rojo Belleza y verde Bondad, con identificador Nueva Acrópolis.",
     imageUrl: "/img/regalos/lapiceros-virtudes.webp",
+    detailImageUrl: "/img/regalos/lapiceros-virtudes-neutro.webp",
     price: 450,
     currency: "DOP",
     priceNote: "Pack de 4 · RD$ 450",
@@ -293,7 +296,7 @@ export const REGALOS: RegaloItem[] = [
     category: "camisetas",
     title: "Camiseta · Metaphysica",
     description:
-      "Camiseta negra estilo póster con los bustos de Platón, Aristóteles, Pitágoras y Sócrates.",
+      "Camiseta negra con póster «Metaphysica»: el título en tipografía al estilo Metallica y los bustos de Platón, Aristóteles, Pitágoras y Sócrates — un guiño entre metal y metafísica.",
     imageUrl: "/img/regalos/camiseta-metaphysica.webp",
     price: 650,
     currency: "DOP",

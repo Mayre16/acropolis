@@ -40,6 +40,9 @@ export const brandLogoHeightClass = {
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
   footer: "[--brand-logo-h:2.65rem] sm:[--brand-logo-h:2.85rem] md:[--brand-logo-h:3rem]",
+  /** Footer — oinadom (misma escala que acropolis.org.do). */
+  footerOinadom:
+    "[--brand-logo-h:4.875rem] sm:[--brand-logo-h:5.25rem] md:[--brand-logo-h:5.625rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:

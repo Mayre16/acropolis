@@ -30,9 +30,9 @@ export const DIPLOMADO_PROXIMAS_SESIONES: AgendaEntry[] = [
     time: "10:00 a.m.",
     sede: "Sede Los Prados",
     tag: "Cupos abiertos",
-    image: "/img/filosofia/diplomado/diplomado-01.webp",
+    image: "/img/filosofia/diplomado/diplomado-03.webp",
     imageAlt:
-      "Diplomado de Filosofía para la Vida — Parthenon, libros y pensamiento clásico",
+      "Diplomado de Filosofía para la Vida — estudio clásico y reflexión en grupo",
     description:
       "Primera sesión del Diplomado de Filosofía para la Vida en la Sede Los Prados. Curso introductorio de filosofía comparada de Oriente y Occidente: cinco meses, una sesión semanal, sin requisitos previos.",
     inscribeMessage:
@@ -66,9 +66,9 @@ export const DIPLOMADO_PROXIMAS_SESIONES: AgendaEntry[] = [
     date: "Sábado 20 de junio",
     time: "10:00 a.m.",
     sede: "Sede Naco",
-    image: "/img/filosofia/diplomado/diplomado-04.webp",
+    image: "/img/filosofia/temario/temario-02.webp",
     imageAlt:
-      "Diplomado de Filosofía para la Vida — manuscritos, ciencia y filosofía comparada",
+      "Diplomado de Filosofía para la Vida — temas de historia y pensamiento comparado",
     description:
       "Nuevo grupo del Diplomado en horario matutino, Sede Naco. Filosofía para la vida en sesiones participativas con prácticas en clase.",
     inscribeMessage:

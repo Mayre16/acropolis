@@ -59,7 +59,7 @@
   display: flex;
   justify-content: center;
   overflow: visible;
-  padding-block: 0.35rem;
+  padding-block: 0.5rem 0.75rem;
 }
 
 .civis-footer__nav-label {

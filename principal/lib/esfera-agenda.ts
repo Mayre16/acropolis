@@ -23,8 +23,8 @@ export const ESFERA_PROXIMOS_ENTRENAMIENTOS: CmsEsferaTrainingItem[] = [
     sede: "Sede Naco",
     blurb:
       "Ejercicio práctico de respuesta coordinada, evaluación de necesidades y trabajo en equipo bajo criterios Esfera.",
-    imageSrc: "/img/esfera/cards/simulacro-indoor.webp",
+    imageSrc: "/img/agenda/esfera-simulacro-campo.webp",
     imageAlt:
-      "Simulacro de gestión de emergencias en espacio cerrado — voluntarios en ejercicio de respuesta humanitaria",
+      "Voluntarios en simulacro de gestión de emergencias — línea Punto Focal Esfera",
   },
 ];

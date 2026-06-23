@@ -303,6 +303,13 @@ function mergeRegaloItem(
     author: cms.author ?? fb?.author,
     imageUrl,
     backImageUrl,
+    detailImageUrl: cms.detailImageUrl
+      ? preferWebpAssetUrl(
+          resolveCmsMediaUrl(cms.detailImageUrl) ?? cms.detailImageUrl,
+        )
+      : fb?.detailImageUrl
+        ? preferWebpAssetUrl(fb.detailImageUrl)
+        : undefined,
     price: cms.price ?? fb?.price,
     currency: cms.currency ?? fb?.currency,
     priceNote: cms.priceNote ?? fb?.priceNote,

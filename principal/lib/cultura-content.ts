@@ -26,6 +26,13 @@ export const CULTURA_TALLERES_DEFAULTS: CmsCulturaCard[] = [
     text: "Expresión, memoria y carácter sobre el escenario; montajes con sentido formativo y humano, para todas las edades.",
   },
   {
+    id: "cineforum",
+    src: "/img/actividades/cineforum.webp",
+    alt: "Cineforum filosófico con proyección y debate en sala",
+    title: "Cineforum",
+    text: "Cine y filosofía: proyección seguida de diálogo sobre la obra, sus ideas y lo que nos mueve como personas.",
+  },
+  {
     id: "danza",
     src: "/img/cultura/talleres/danza.webp",
     alt: "Clase de merengue con trajes típicos dominicanos",

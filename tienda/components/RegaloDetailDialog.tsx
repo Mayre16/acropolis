@@ -32,9 +32,9 @@ function detailImageLayout(item: RegaloItem) {
   }
   if (item.id === "lapiceros-virtudes") {
     return {
-      box: "relative mx-auto aspect-[16/10] w-full max-w-md shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:max-w-lg md:max-w-xl",
-      imageClass: "object-contain p-4",
-      sizes: "(max-width: 640px) 90vw, 512px",
+      box: "relative aspect-[16/10] w-[min(100%,32rem)] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg",
+      imageClass: "object-contain p-3 sm:p-4",
+      sizes: "(max-width: 640px) 100vw, 512px",
     };
   }
   if (item.category === "libretas" || item.category === "camisetas") {
@@ -79,8 +79,10 @@ export function RegaloDetailDialog({
   if (!open) return null;
 
   const isSeparador = item.category === "separadores";
+  const primaryImage =
+    item.detailImageUrl && !showBack ? item.detailImageUrl : item.imageUrl;
   const imageSrc = resolveImage(
-    showBack && item.backImageUrl ? item.backImageUrl : item.imageUrl,
+    showBack && item.backImageUrl ? item.backImageUrl : primaryImage,
   );
   const imageAlt =
     showBack && item.backImageUrl
@@ -121,10 +123,13 @@ export function RegaloDetailDialog({
             }`}
           >
             <div
-              className={`flex flex-col items-center ${
-                isSeparador ? "sm:shrink-0 sm:items-start" : "sm:items-start"
+              className={`flex shrink-0 flex-col items-center sm:items-start ${
+                item.id === "lapiceros-virtudes"
+                  ? "w-full sm:w-[min(100%,32rem)]"
+                  : ""
               }`}
             >
+              {imageSrc ? (
               <div className={layout.box}>
                 {item.sample ? (
                   <span className="absolute left-3 top-3 z-10 rounded-full bg-na-editorial/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
@@ -141,6 +146,7 @@ export function RegaloDetailDialog({
                   priority
                 />
               </div>
+              ) : null}
               {item.backImageUrl ? (
                 <div className="mt-4 flex justify-center gap-2 sm:justify-start">
                   <button

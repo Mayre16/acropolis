@@ -1,5 +1,6 @@
 /**
- * Actualiza separadores: lockup OINADOM blanco completo, sin recorte (fit por altura).
+ * Frente del separador (cara del mensaje): lockup NA apilado blanco, sin país.
+ * El reverso con país (OINADOM) se compone en build-separadores-art.mjs.
  *
  * Uso: npm run separadores:rebrand
  */
@@ -10,7 +11,8 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const IMG = path.join(ROOT, "public/img/regalos");
-const LOCKUP = path.join(ROOT, "public/brand/logo-oinadom-white.webp");
+/** NA apilado blanco — sin descriptor de país (solo frente con cita). */
+const LOCKUP = path.join(ROOT, "public/brand/logo-nueva-acropolis-stacked-white.webp");
 
 const FRONTS = [
   "sep-suntzu-resultados-msg.svg",
@@ -22,8 +24,8 @@ const FRONTS = [
 ];
 
 const CARD_W = 220;
-/** Altura del lockup OINADOM blanco en la cabecera (legible en impresión y pantalla). */
-const LOCKUP_H = 72;
+/** Ancho del lockup en el frente (= proporción del OINADOM en reverso: 220/440 del lienzo). */
+const LOCKUP_W = 110;
 
 if (!fs.existsSync(LOCKUP)) {
   console.error("Falta lockup:", LOCKUP);
@@ -32,7 +34,7 @@ if (!fs.existsSync(LOCKUP)) {
 
 const lockupMeta = await sharp(LOCKUP).metadata();
 const aspect = (lockupMeta.width ?? 2429) / (lockupMeta.height ?? 1574);
-const lockupW = Math.min(CARD_W - 16, Math.round(LOCKUP_H * aspect));
+const lockupW = LOCKUP_W;
 const lockupH = Math.round(lockupW / aspect);
 const lockupLeft = Math.round((CARD_W - lockupW) / 2);
 const LOCKUP_TOP = 38;
@@ -64,5 +66,5 @@ for (const name of FRONTS) {
   }
 
   fs.writeFileSync(file, svg, "utf8");
-  console.log("Marca OINADOM (fit):", name, `${lockupW}x${lockupH}`);
+  console.log("Marca NA (frente, sin país):", name, `${lockupW}x${lockupH}`);
 }

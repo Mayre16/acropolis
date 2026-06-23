@@ -18,6 +18,8 @@ const SPIRAL_X_RATIO = 0.15;
 /** Canvas uniforme (referencia: libreta-escribir). */
 const REF_W = 779;
 const REF_H = 922;
+/** Altura visible objetivo del cuerpo de la libreta tras recorte (todas iguales en catálogo). */
+const NOTEBOOK_BODY_H = 860;
 
 const ITEMS = [
   {
@@ -143,21 +145,49 @@ function floodBgMask(data, width, height, channels) {
   return bg;
 }
 
-function stripAttachedShadow(data, width, height, channels, bg) {
+function getForegroundBounds(bg, width, height) {
   let minX = width;
   let minY = height;
   let maxX = 0;
   let maxY = 0;
+  let found = false;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       if (bg[y * width + x]) continue;
+      found = true;
       if (x < minX) minX = x;
       if (y < minY) minY = y;
       if (x > maxX) maxX = x;
       if (y > maxY) maxY = y;
     }
   }
+
+  return found ? { minX, minY, maxX, maxY } : null;
+}
+
+/** Borde derecho de la portada sin sombras laterales del mockup. */
+function getCoverRightEdge(bg, width, bounds) {
+  const { minX, minY, maxX, maxY } = bounds;
+  const bodyH = maxY - minY + 1;
+  const yCutoff = maxY - Math.max(16, Math.round(bodyH * 0.07));
+  let coverMaxX = minX;
+
+  for (let y = minY; y <= yCutoff; y++) {
+    for (let x = maxX; x >= minX; x--) {
+      if (bg[y * width + x]) continue;
+      if (x > coverMaxX) coverMaxX = x;
+      break;
+    }
+  }
+
+  return coverMaxX;
+}
+
+function stripAttachedShadow(data, width, height, channels, bg) {
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const { minX, minY, maxX, maxY } = bounds;
 
   for (let y = maxY; y >= minY; y--) {
     let neutral = 0;
@@ -209,26 +239,14 @@ function stripAttachedShadow(data, width, height, channels, bg) {
 
 /** Mancha/sombra gris o negra en esquina inferior derecha del mockup. */
 function stripBottomRightSmudge(data, width, height, channels, bg) {
-  let minX = width;
-  let minY = height;
-  let maxX = 0;
-  let maxY = 0;
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const { minX, maxY } = bounds;
+  const coverMaxX = getCoverRightEdge(bg, width, bounds);
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (bg[y * width + x]) continue;
-      if (x < minX) minX = x;
-      if (y < minY) minY = y;
-      if (x > maxX) maxX = x;
-      if (y > maxY) maxY = y;
-    }
-  }
-
-  if (maxY <= minY) return;
-
-  const bodyW = maxX - minX + 1;
-  const bodyH = maxY - minY + 1;
-  const zoneLeft = maxX - Math.max(28, Math.round(bodyW * 0.18));
+  const bodyW = coverMaxX - minX + 1;
+  const bodyH = maxY - bounds.minY + 1;
+  const zoneLeft = coverMaxX - Math.max(28, Math.round(bodyW * 0.18));
   const zoneTop = maxY - Math.max(24, Math.round(bodyH * 0.1));
   const spiralX = spiralMaxX(width);
 
@@ -236,40 +254,168 @@ function stripBottomRightSmudge(data, width, height, channels, bg) {
     for (let x = zoneLeft; x < width; x++) {
       const idx = y * width + x;
       if (bg[idx]) continue;
+      if (x <= spiralX + 8) continue;
       const i = idx * channels;
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
       const lum = (r + g + b) / 3;
       const sat = Math.max(r, g, b) - Math.min(r, g, b);
-      const inCorner = x >= maxX - Math.round(bodyW * 0.12) && y >= maxY - Math.round(bodyH * 0.06);
-      if (!inCorner && y <= maxY + 8) continue;
-      if (x <= spiralX + 8) continue;
-      if ((lum < 178 && sat < 45) || lum < 92) bg[idx] = 1;
+      const detached = y > maxY || x > coverMaxX;
+      if (detached) {
+        if (lum < 205 && sat < 50) bg[idx] = 1;
+        continue;
+      }
+      const inCorner =
+        x >= coverMaxX - Math.round(bodyW * 0.12) &&
+        y >= maxY - Math.round(bodyH * 0.06);
+      if (!inCorner) continue;
+      if (isNeutralFill(r, g, b) || isBgPixel(r, g, b) || lum < 85) bg[idx] = 1;
     }
   }
 }
 
-function stripDarkShadow(data, width, height, channels, bg) {
+/** Manchas negras o grises en la esquina inferior derecha (restos del mockup). */
+function stripCornerBlackBits(data, width, height, channels, bg) {
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const coverMaxX = getCoverRightEdge(bg, width, bounds);
+  const { minX, maxY } = bounds;
+
+  const bodyW = coverMaxX - minX + 1;
+  const bodyH = maxY - bounds.minY + 1;
+  const zoneLeft = coverMaxX - Math.max(36, Math.round(bodyW * 0.16));
+  const zoneTop = maxY - Math.max(28, Math.round(bodyH * 0.07));
+  const spiralX = spiralMaxX(width);
+
+  for (let y = zoneTop; y < height; y++) {
+    for (let x = zoneLeft; x < width; x++) {
+      const idx = y * width + x;
+      if (bg[idx]) continue;
+      if (x <= spiralX + 8) continue;
+      const i = idx * channels;
+      const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const sat =
+        Math.max(data[i], data[i + 1], data[i + 2]) -
+        Math.min(data[i], data[i + 1], data[i + 2]);
+      if (lum < 88 && sat < 38) bg[idx] = 1;
+    }
+  }
+}
+
+/** Bordes inferiores con gris neutro o manchas del recorte del mockup. */
+function stripBottomEdgeSmudge(data, width, height, channels, bg) {
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const { minX, maxX, maxY } = bounds;
+  const coverMaxX = getCoverRightEdge(bg, width, bounds);
+  const spiralX = spiralMaxX(width);
+  const xStart = minX + Math.round((coverMaxX - minX + 1) * 0.18);
+  const yStart = maxY - 5;
+
+  for (let y = yStart; y <= maxY + 6 && y < height; y++) {
+    for (let x = xStart; x < width; x++) {
+      const idx = y * width + x;
+      if (bg[idx]) continue;
+      if (x <= spiralX + 8) continue;
+      const detached = y > maxY || x > coverMaxX;
+      if (!detached) continue;
+      const i = idx * channels;
+      const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const sat =
+        Math.max(data[i], data[i + 1], data[i + 2]) -
+        Math.min(data[i], data[i + 1], data[i + 2]);
+      if (lum < 135 && sat < 38) bg[idx] = 1;
+    }
+  }
+}
+
+function pickFootSampleRgb(data, width, channels, minX, maxX, maxY) {
+  for (let y = maxY - 14; y <= maxY - 4; y++) {
+    if (y < 0) continue;
+    for (let x = maxX - 48; x <= maxX; x++) {
+      if (x < minX) continue;
+      const i = (y * width + x) * channels;
+      if (data[i + 3] < 16) continue;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const lum = (r + g + b) / 3;
+      const sat = Math.max(r, g, b) - Math.min(r, g, b);
+      if (b > r + 8 && lum >= 70 && lum <= 145) return [r, g, b];
+      if (sat >= 22 && lum >= 45 && lum <= 170) return [r, g, b];
+    }
+  }
+  return null;
+}
+
+async function fillBottomCornerGaps(pngBuf, { trimAfter = true } = {}) {
+  const { data, info } = await sharp(pngBuf)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const { width, height, channels } = info;
   let minX = width;
-  let minY = height;
   let maxX = 0;
   let maxY = 0;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if (bg[y * width + x]) continue;
+      const idx = y * width + x;
+      if (data[idx * channels + 3] < 16) continue;
       if (x < minX) minX = x;
-      if (y < minY) minY = y;
       if (x > maxX) maxX = x;
       if (y > maxY) maxY = y;
     }
   }
 
-  if (maxY <= minY) return;
+  if (maxY <= 0) return pngBuf;
 
-  const padX = Math.max(32, Math.round((maxX - minX + 1) * 0.1));
-  const shadowDepth = Math.max(40, Math.round((maxY - minY + 1) * 0.14));
+  const xStart = minX + Math.round((maxX - minX + 1) * 0.5);
+  const sample = pickFootSampleRgb(data, width, channels, minX, maxX, maxY);
+  const sr = sample?.[0] ?? data[(Math.max(0, maxY - 12) * width + Math.max(xStart, maxX - 10)) * channels];
+  const sg = sample?.[1] ?? data[(Math.max(0, maxY - 12) * width + Math.max(xStart, maxX - 10)) * channels + 1];
+  const sb = sample?.[2] ?? data[(Math.max(0, maxY - 12) * width + Math.max(xStart, maxX - 10)) * channels + 2];
+
+  for (let y = maxY - 4; y <= maxY && y < height; y++) {
+    for (let x = xStart; x <= maxX + 1 && x < width; x++) {
+      const idx = y * width + x;
+      const i = idx * channels;
+      if (data[i + 3] >= 16) continue;
+      for (let sy = y - 1; sy >= y - 28; sy--) {
+        if (sy < 0) break;
+        const sj = (sy * width + x) * channels;
+        if (data[sj + 3] < 16) continue;
+        data[i] = data[sj];
+        data[i + 1] = data[sj + 1];
+        data[i + 2] = data[sj + 2];
+        data[i + 3] = 255;
+        break;
+      }
+      if (data[i + 3] < 16) {
+        data[i] = sr;
+        data[i + 1] = sg;
+        data[i + 2] = sb;
+        data[i + 3] = 255;
+      }
+    }
+  }
+
+  let pipeline = sharp(Buffer.from(data), {
+    raw: { width, height, channels },
+  });
+  if (trimAfter) pipeline = pipeline.trim();
+  return pipeline.png().toBuffer();
+}
+
+function stripDarkShadow(data, width, height, channels, bg) {
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const { minX, minY, maxX, maxY } = bounds;
+  const coverMaxX = getCoverRightEdge(bg, width, bounds);
+
+  const padX = Math.max(40, Math.round((coverMaxX - minX + 1) * 0.12));
+  const shadowDepth = Math.max(52, Math.round((maxY - minY + 1) * 0.16));
 
   for (let y = maxY + 1; y < height; y++) {
     for (let x = 0; x < width; x++) bg[y * width + x] = 1;
@@ -277,9 +423,10 @@ function stripDarkShadow(data, width, height, channels, bg) {
 
   for (let y = maxY; y < Math.min(height, maxY + shadowDepth); y++) {
     const t = (y - maxY) / shadowDepth;
-    const lumMax = 210 - t * 95;
-    for (let x = minX - padX; x <= maxX + padX + 24; x++) {
-      if (x < 0 || x >= width) continue;
+    const lumMax = 215 - t * 100;
+    const xEnd = y <= maxY ? coverMaxX + padX + 12 : width;
+    for (let x = minX - padX; x < xEnd; x++) {
+      if (x < 0) continue;
       const idx = y * width + x;
       if (bg[idx]) continue;
       const i = idx * channels;
@@ -288,9 +435,100 @@ function stripDarkShadow(data, width, height, channels, bg) {
       const b = data[i + 2];
       const lum = (r + g + b) / 3;
       const sat = Math.max(r, g, b) - Math.min(r, g, b);
-      if (lum <= lumMax && sat < 42) bg[idx] = 1;
+      if (lum <= lumMax && sat < 45) bg[idx] = 1;
     }
   }
+}
+
+/** Sombras desprendidas a la derecha o bajo la libreta (restos del recorte IA). */
+function stripDetachedShadows(data, width, height, channels, bg) {
+  const bounds = getForegroundBounds(bg, width, height);
+  if (!bounds) return;
+  const { maxY } = bounds;
+  const coverMaxX = getCoverRightEdge(bg, width, bounds);
+
+  const bodyH = maxY - bounds.minY + 1;
+  const yStart = maxY - Math.max(28, Math.round(bodyH * 0.1));
+  const spiralX = spiralMaxX(width);
+
+  for (let y = yStart; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      if (bg[idx]) continue;
+      const detached = y > maxY + 1 || x > coverMaxX + 1;
+      if (!detached) continue;
+      if (x <= spiralX + 8) continue;
+      const i = idx * channels;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const lum = (r + g + b) / 3;
+      const sat = Math.max(r, g, b) - Math.min(r, g, b);
+      if (lum < 205 && sat < 52) bg[idx] = 1;
+    }
+  }
+}
+
+async function repairEscribirFootEdge(pngBuf) {
+  const { data, info } = await sharp(pngBuf)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const { width, height, channels } = info;
+  let minX = width;
+  let maxX = 0;
+  let maxY = 0;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      if (data[idx * channels + 3] < 16) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+  }
+
+  const sample = pickFootSampleRgb(data, width, channels, minX, maxX, maxY);
+  if (!sample) return pngBuf;
+  const [sr, sg, sb] = sample;
+
+  for (let y = maxY - 2; y <= maxY; y++) {
+    if (y < 0) continue;
+    for (let x = minX + 80; x <= maxX; x++) {
+      const idx = y * width + x;
+      const i = idx * channels;
+      if (data[i + 3] < 16) continue;
+      const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const sat =
+        Math.max(data[i], data[i + 1], data[i + 2]) -
+        Math.min(data[i], data[i + 1], data[i + 2]);
+      if ((lum > 112 && lum < 162 && sat < 18) || (lum < 115 && sat < 55)) {
+        data[i] = sr;
+        data[i + 1] = sg;
+        data[i + 2] = sb;
+        data[i + 3] = 255;
+      }
+    }
+  }
+
+  return sharp(Buffer.from(data), {
+    raw: { width, height, channels },
+  })
+    .png()
+    .toBuffer();
+}
+
+async function trimEscribirFoot(pngBuf) {
+  const meta = await sharp(pngBuf).metadata();
+  const w = meta.width ?? 1536;
+  const h = meta.height ?? 1024;
+  const trimPx = 22;
+  return sharp(pngBuf)
+    .extract({ left: 0, top: 0, width: w, height: h - trimPx })
+    .extend({ bottom: trimPx, extendWith: "copy" })
+    .png()
+    .toBuffer();
 }
 
 async function polishNotebookEdges(pngBuf) {
@@ -331,9 +569,11 @@ async function polishNotebookEdges(pngBuf) {
       const sat = Math.max(data[i], data[i + 1], data[i + 2]) - Math.min(data[i], data[i + 1], data[i + 2]);
       if (
         isNeutralFill(data[i], data[i + 1], data[i + 2]) ||
-        isBgPixel(data[i], data[i + 1], data[i + 2]) ||
-        (lum < 175 && sat < 48)
+        isBgPixel(data[i], data[i + 1], data[i + 2])
       ) {
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
         data[i + 3] = 0;
       }
     }
@@ -357,10 +597,18 @@ async function extractNotebook(composedBuf) {
   stripAttachedShadow(data, width, height, channels, bg);
   stripDarkShadow(data, width, height, channels, bg);
   stripBottomRightSmudge(data, width, height, channels, bg);
+  stripDetachedShadows(data, width, height, channels, bg);
+  stripCornerBlackBits(data, width, height, channels, bg);
+  stripBottomEdgeSmudge(data, width, height, channels, bg);
 
   const out = Buffer.from(data);
   for (let idx = 0; idx < width * height; idx++) {
-    if (bg[idx]) out[idx * channels + 3] = 0;
+    if (!bg[idx]) continue;
+    const i = idx * channels;
+    out[i] = 0;
+    out[i + 1] = 0;
+    out[i + 2] = 0;
+    out[i + 3] = 0;
   }
 
   const trimmed = await sharp(out, {
@@ -371,7 +619,6 @@ async function extractNotebook(composedBuf) {
     .toBuffer();
 
   const polished = await polishNotebookEdges(trimmed);
-  const meta = await sharp(polished).metadata();
   const fitted = await fitNotebookCanvas(polished, REF_W, REF_H);
   const fittedMeta = await sharp(fitted).metadata();
   return {
@@ -382,17 +629,32 @@ async function extractNotebook(composedBuf) {
 }
 
 async function fitNotebookCanvas(pngBuf, targetW, targetH) {
-  const meta = await sharp(pngBuf).metadata();
-  const srcW = meta.width ?? targetW;
-  const srcH = meta.height ?? targetH;
-  const scale = Math.min(targetW / srcW, targetH / srcH);
-  const newW = Math.max(1, Math.round(srcW * scale));
-  const newH = Math.max(1, Math.round(srcH * scale));
-  const left = Math.round((targetW - newW) / 2);
-  const top = Math.round((targetH - newH) / 2);
-  const resized = await sharp(pngBuf)
-    .resize(newW, newH, { kernel: sharp.kernel.lanczos3 })
-    .toBuffer();
+  const trimmed = await sharp(pngBuf).ensureAlpha().trim().png().toBuffer();
+  const tMeta = await sharp(trimmed).metadata();
+  const srcW = tMeta.width ?? targetW;
+  const srcH = tMeta.height ?? targetH;
+
+  const scale = NOTEBOOK_BODY_H / srcH;
+  let newW = Math.max(1, Math.round(srcW * scale));
+  const newH = NOTEBOOK_BODY_H;
+
+  let pipeline = sharp(trimmed).resize(newW, newH, {
+    kernel: sharp.kernel.lanczos3,
+  });
+  if (newW > targetW) {
+    pipeline = pipeline.extract({
+      left: Math.round((newW - targetW) / 2),
+      top: 0,
+      width: targetW,
+      height: newH,
+    });
+    newW = targetW;
+  }
+
+  const resized = await pipeline.toBuffer();
+  const rMeta = await sharp(resized).metadata();
+  const left = Math.round((targetW - (rMeta.width ?? newW)) / 2);
+  const top = Math.round((targetH - (rMeta.height ?? newH)) / 2);
 
   return sharp({
     create: {
@@ -522,13 +784,21 @@ async function buildBack(item, width, height) {
 async function build() {
   for (const item of ITEMS) {
     const base = path.join(SRC, `libreta-base-${item.key}.png`);
-    const composed = await sharp(base)
+    let baseBuf = await sharp(base).png().toBuffer();
+    if (item.key === "escribir") {
+      baseBuf = await trimEscribirFoot(baseBuf);
+    }
+    const composed = await sharp(baseBuf)
       .composite([{ input: textSvg(item), top: 0, left: 0 }])
       .png()
       .toBuffer();
 
     const { buffer, width, height } = await extractNotebook(composed);
-    await sharp(buffer).png().toFile(path.join(OUT, `${item.out}.png`));
+    const finalBuf =
+      item.key === "escribir"
+        ? await repairEscribirFootEdge(buffer)
+        : buffer;
+    await sharp(finalBuf).png().toFile(path.join(OUT, `${item.out}.png`));
     await buildBack(item, width, height);
 
     console.log("Libreta:", `${item.out}.png`, `${width}x${height}`);

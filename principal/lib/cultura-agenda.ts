@@ -12,7 +12,7 @@ export const CULTURA_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     sede: "Sede Naco",
     tag: "Clase",
     image: "/img/cultura/agenda/teatro.webp",
-    imageAlt: "Grupo de teatro ensayando en escena",
+    imageAlt: "Grupo de teatro ensayando en escena — expresión escénica",
     description:
       "Taller de expresión escénica en la Sede Naco: voz, cuerpo y presencia en escena. Espacio para todas las edades, con montajes que combinan formación y disfrute del arte dramático.",
     inscribeMessage:
@@ -45,8 +45,8 @@ export const CULTURA_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     date: "Sábado 20 de junio",
     time: "10:00 a.m.",
     sede: "Sede Naco",
-    image: "/img/cultura/agenda/jovenes.webp",
-    imageAlt: "Jóvenes en actividad cultural al aire libre",
+    image: "/img/agenda/jovenes-encuentro.webp",
+    imageAlt: "Jóvenes en encuentro cultural y dinámicas de liderazgo",
     description:
       "Encuentro para jóvenes en la Sede Naco: arte, dinámicas en equipo, naturaleza y reflexión. Un espacio para compartir, crear y conocer propuestas culturales de la escuela.",
     inscribeMessage:
@@ -55,20 +55,20 @@ export const CULTURA_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     detailLabel: "Ver cultura",
   },
   {
-    id: "cultura-teatro-jul8",
+    id: "cultura-cineforum-jul8",
     category: "cultura",
-    title: "Taller de Teatro",
+    title: "Cineforum",
     startsAt: "2026-07-08",
     date: "Martes 8 de julio",
     time: "7:00 p.m.",
     sede: "Sede Naco",
-    tag: "Clase",
-    image: "/img/cultura/agenda/teatro.webp",
-    imageAlt: "Grupo de teatro ensayando en escena",
+    tag: "Cineforum",
+    image: "/img/agenda/cine-foro.webp",
+    imageAlt: "Cineforum filosófico con proyección y debate en sala",
     description:
-      "Nueva convocatoria del taller de expresión escénica: voz, cuerpo y presencia en escena. Espacio para todas las edades.",
+      "Proyección y diálogo abierto sobre una película con enfoque filosófico: compartimos ideas, preguntas y reflexiones que la obra nos inspira. Espacio para todas las edades.",
     inscribeMessage:
-      "Hola, me interesa el Taller de Teatro — Sede Naco, martes 8 de julio, 7:00 p.m. ¿Me pueden dar más información?",
+      "Hola, me interesa el Cineforum — Sede Naco, martes 8 de julio, 7:00 p.m. ¿Me pueden dar más información?",
     detailHref: "/cultura",
     detailLabel: "Ver cultura",
     showOnHome: true,

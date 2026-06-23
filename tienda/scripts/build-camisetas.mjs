@@ -5,6 +5,7 @@
  * Uso: npm run camisetas:build
  */
 import path from "node:path";
+import fs from "node:fs";
 import sharp from "sharp";
 import { fileURLToPath } from "node:url";
 
@@ -21,6 +22,11 @@ const FONTS = {
   impact: "Impact, 'Arial Narrow', 'Arial Black', sans-serif",
   sans: "Arial, sans-serif",
 };
+
+const FUERZAS = path.join(SRC, "fuerzas-vivas");
+
+/** Pecho izquierdo (vista frontal plana) — tamaño bolsillo. */
+const EMBLEM_POCKET = { left: 395, top: 305, width: 128 };
 
 const ITEMS = [
   {
@@ -44,13 +50,32 @@ const ITEMS = [
   {
     key: "metaphysica",
     out: "camiseta-metaphysica",
-    texts: [
-      { t: "METAPHYSICA", x: 745, y: 218, s: 66, font: "impact", weight: 400, fill: "#f2f2f2", spacing: 4 },
-      { t: "PLATÓN", x: 648, y: 556, s: 21, font: "sans", weight: 700, fill: "#ededed", spacing: 1.5 },
-      { t: "ARISTÓTELES", x: 852, y: 556, s: 19, font: "sans", weight: 700, fill: "#ededed", spacing: 1.2 },
-      { t: "PITÁGORAS", x: 648, y: 828, s: 21, font: "sans", weight: 700, fill: "#ededed", spacing: 1.5 },
-      { t: "SÓCRATES", x: 852, y: 828, s: 21, font: "sans", weight: 700, fill: "#ededed", spacing: 1.5 },
-    ],
+    /** Mockup final — «METAPHYSICA» tipografía estilo Metallica (no overlay SVG). */
+    catalogSrc: "tee-metaphysica-catalog.png",
+    catalogBg: "#ededed",
+  },
+  {
+    key: "fuerza-cisne",
+    out: "camiseta-fuerza-cisne",
+    base: "socrates",
+    emblem: path.join(FUERZAS, "cisne.svg"),
+    ...EMBLEM_POCKET,
+  },
+  {
+    key: "fuerza-leon",
+    out: "camiseta-fuerza-leon",
+    base: "negra",
+    emblem: path.join(FUERZAS, "leon.svg"),
+    ...EMBLEM_POCKET,
+  },
+  {
+    key: "fuerza-hacha",
+    out: "camiseta-fuerza-hacha",
+    base: "negra",
+    emblem: path.join(FUERZAS, "hacha.svg"),
+    left: 400,
+    top: 298,
+    width: 118,
   },
 ];
 
@@ -65,19 +90,81 @@ function svgFor(item) {
   );
 }
 
+async function writeWebp(pngPath) {
+  const webpPath = pngPath.replace(/\.png$/i, ".webp");
+  await sharp(pngPath).webp({ quality: 86, effort: 4 }).toFile(webpPath);
+}
+
+async function buildEmblemTee(item) {
+  const base = path.join(SRC, `tee-base-${item.base}.png`);
+  if (!fs.existsSync(base)) {
+    console.warn("Falta base:", base);
+    return;
+  }
+  if (!fs.existsSync(item.emblem)) {
+    console.warn("Falta emblema:", item.emblem);
+    return;
+  }
+
+  const emblemBuf = await sharp(item.emblem)
+    .resize({ width: item.width, kernel: sharp.kernel.lanczos3 })
+    .png()
+    .toBuffer();
+
+  const composed = await sharp(base)
+    .composite([{ input: emblemBuf, left: item.left, top: item.top }])
+    .png()
+    .toBuffer();
+
+  const pngOut = path.join(OUT, `${item.out}.png`);
+  const out = await sharp(composed).extract(CROP).png().toFile(pngOut);
+  await writeWebp(pngOut);
+  console.log("Camiseta (emblema):", `${item.out}.png`, `${out.width}x${out.height}`);
+}
+
 async function build() {
   for (const item of ITEMS) {
+    if (item.emblem) {
+      await buildEmblemTee(item);
+      continue;
+    }
+
+    if (item.catalogSrc) {
+      const catalog = path.join(SRC, item.catalogSrc);
+      if (!fs.existsSync(catalog)) {
+        console.warn("Falta catálogo:", item.catalogSrc);
+        continue;
+      }
+      const bg = item.catalogBg ?? "#ededed";
+      const r = parseInt(bg.slice(1, 3), 16);
+      const g = parseInt(bg.slice(3, 5), 16);
+      const b = parseInt(bg.slice(5, 7), 16);
+      const out = await sharp(catalog)
+        .resize(1024, 1024, {
+          fit: "contain",
+          background: { r, g, b, alpha: 1 },
+        })
+        .png()
+        .toFile(path.join(OUT, `${item.out}.png`));
+      const pngOut = path.join(OUT, `${item.out}.png`);
+      await writeWebp(pngOut);
+      console.log("Camiseta (catálogo):", `${item.out}.png`, `${out.width}x${out.height}`);
+      continue;
+    }
+
     const base = path.join(SRC, `tee-base-${item.key}.png`);
     const composed = await sharp(base)
       .composite([{ input: svgFor(item), top: 0, left: 0 }])
       .png()
       .toBuffer();
 
+    const pngOut = path.join(OUT, `${item.out}.png`);
     const out = await sharp(composed)
       .extract(CROP)
       .png()
-      .toFile(path.join(OUT, `${item.out}.png`));
+      .toFile(pngOut);
 
+    await writeWebp(pngOut);
     console.log("Camiseta:", `${item.out}.png`, `${out.width}x${out.height}`);
   }
 }

@@ -30,7 +30,7 @@ import type { ProximaActividad } from "@/lib/talleres-actividades";
 
 
 
-function ActividadScheduleMeta({ act }: { act: ProximaActividad }) {
+export function ActividadScheduleMeta({ act }: { act: ProximaActividad }) {
   return (
     <>
       {act.date ? (
@@ -57,7 +57,7 @@ function ActividadScheduleMeta({ act }: { act: ProximaActividad }) {
 
 
 
-function ActividadModal({
+export function ActividadModal({
 
   act,
 

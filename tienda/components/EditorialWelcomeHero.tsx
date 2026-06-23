@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { ArrowDown, BookOpen, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { EditorialHeroProductCarousel } from "@/components/EditorialHeroProductCarousel";
 import { loadStoreBooksCatalog, resolveStoreBookCover } from "@/lib/bookstore";
 import { useEditorialWelcome } from "@/lib/cms/hooks";
@@ -12,7 +11,6 @@ import {
   mergeHeroProductSlides,
   type HeroProductSlide,
 } from "@/lib/editorial-hero-products";
-import { navigateEditorialHash } from "@/lib/editorial-navigation";
 
 export function EditorialWelcomeHero() {
   const welcome = useEditorialWelcome();
@@ -109,24 +107,6 @@ export function EditorialWelcomeHero() {
                 </li>
               ))}
             </ul>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/conoce-nueva-acropolis"
-                className="inline-flex items-center gap-2 rounded-full bg-na-editorial px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-editorial/25 transition hover:bg-na-editorialDark"
-              >
-                <BookOpen className="h-4 w-4" aria-hidden />
-                Conoce Nueva Acrópolis
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigateEditorialHash("explorar-catalogos")}
-                className="inline-flex items-center gap-2 rounded-full border border-na-editorial/30 bg-white px-5 py-2.5 text-sm font-bold text-na-editorialDark transition hover:border-na-editorial/50 hover:bg-na-editorial/[0.04]"
-              >
-                Explorar catálogos
-                <ArrowDown className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
           </div>
 
           <div className="relative mx-auto w-full max-w-sm lg:max-w-none">

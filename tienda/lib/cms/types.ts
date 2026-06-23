@@ -134,6 +134,7 @@ export type CmsEditorialRegalo = {
   quote?: string;
   author?: string;
   imageUrl?: string;
+  detailImageUrl?: string;
   backImageUrl?: string;
   price?: number | null;
   currency?: string;

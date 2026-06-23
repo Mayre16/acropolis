@@ -273,8 +273,8 @@ export const DEFAULT_HOME_PAGE: CmsCivisHomePage = {
   },
   actividades: {
     eyebrow: "Experiencia",
-    title: "Nuestras actividades recientes",
-    lede: "",
+    title: "Fotos de nuestras actividades",
+    lede: "Talleres corporativos recientes con empresas e instituciones en República Dominicana.",
   },
   entrenadores: {
     eyebrow: "Equipo",

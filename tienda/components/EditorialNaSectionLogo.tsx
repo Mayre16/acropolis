@@ -2,42 +2,52 @@ import {
   NaBrandLockupGroup,
   type NaBrandLockupSize,
 } from "@/components/NaBrandLockupGroup";
+import type { BrandLockupId } from "@/lib/brand-assets";
 
-const SIZE_MAP = {
-  /** Footer — escala submarca (referencia Civis). */
-  footer: "footerSubmarca",
-  /** Quiénes somos — proporción legible sin recortar el anagrama. */
-  section: "contenidoHub",
-  content: "contenidoHub",
-} as const satisfies Record<string, NaBrandLockupSize>;
+const CONFIG = {
+  footer: {
+    lockup: "oinadom" satisfies BrandLockupId,
+    size: "footerOinadom" satisfies NaBrandLockupSize,
+    render: "raster" as const,
+    maxWidthClass: "max-w-[min(92vw,13.375rem)]",
+  },
+  section: {
+    lockup: "na" satisfies BrandLockupId,
+    size: "quienesSomos" satisfies NaBrandLockupSize,
+    render: "raster" as const,
+    maxWidthClass: "max-w-[min(92vw,10.5rem)]",
+  },
+  content: {
+    lockup: "na" satisfies BrandLockupId,
+    size: "quienesSomos" satisfies NaBrandLockupSize,
+    render: "raster" as const,
+    maxWidthClass: "max-w-[min(92vw,10.5rem)]",
+  },
+} as const;
 
 type EditorialNaSectionLogoProps = {
-  size?: keyof typeof SIZE_MAP;
+  /** footer → oinadom con país · section/content → na verde sin descriptor. */
+  size?: keyof typeof CONFIG;
   variant?: "color" | "white";
   align?: "left" | "center";
-  render?: "auto" | "hybrid" | "raster";
 };
 
-/** Lockup OINA agrupado para Editorial. */
+/** Lockup NA en Editorial — raster aprobado (descriptor integrado en la imagen). */
 export function EditorialNaSectionLogo({
   size = "section",
   variant = "color",
   align = "center",
-  render,
 }: EditorialNaSectionLogoProps) {
-  const maxWidthClass =
-    size === "footer"
-      ? "max-w-[min(92vw,13.5rem)]"
-      : "max-w-[min(92vw,10.5rem)]";
+  const config = CONFIG[size];
 
   return (
     <NaBrandLockupGroup
-      lockup="oina"
-      size={SIZE_MAP[size]}
+      lockup={config.lockup}
+      size={config.size}
       variant={variant}
       align={align === "center" ? "center" : "start"}
-      render={render}
-      maxWidthClass={maxWidthClass}
+      render={config.render}
+      maxWidthClass={config.maxWidthClass}
     />
   );
 }

@@ -26,6 +26,7 @@ import {
 } from "@/lib/civis-content";
 import { CivisFormCta } from "@/components/CivisFormCta";
 import { CivisEntrenadoresList } from "@/components/CivisEntrenadoresList";
+import { CivisClientesLogoGrid } from "@/components/CivisClientesLogoGrid";
 import { CivisQuienesTabsBar } from "@/components/CivisQuienesTabsBar";
 import { CivisMediaImage } from "@/components/cms/CivisMediaImage";
 import { CivisEditPencil } from "@/components/cms/CmsEditFields";
@@ -337,8 +338,6 @@ function CivisConsultingPanel({
 
       <MetodologiaCadena />
 
-      <ClientesPanel />
-
       <div id="entrenadores" className="relative mt-16 scroll-mt-28 border-t border-na-civis/10 pt-14">
         <CivisTabEntrenadoresTeaser />
       </div>
@@ -371,43 +370,12 @@ function ClientesPanel() {
         {section.lede ??
           "Hemos acompañado a empresas, instituciones y organizaciones que buscan fortalecer a sus equipos con formación en convivencia, liderazgo y ética aplicada."}
       </h3>
-      <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {clientes.map((cliente) => (
-          <li
-            key={cliente.id}
-            className="relative flex flex-col items-center justify-between gap-4 rounded-2xl border border-na-civis/12 bg-na-civis/[0.04] p-5 text-center shadow-na-soft"
-          >
-            {edit?.ready ? (
-              <CivisEditPencil
-                label={`Editar ${cliente.name}`}
-                onClick={() => edit.setSelectedId(`cliente:${cliente.id}`)}
-              />
-            ) : null}
-            <div
-              className={`flex min-h-[72px] w-full flex-1 items-center justify-center rounded-xl px-3 py-4 ${
-                cliente.logoOnDark
-                  ? "bg-na-civisDark"
-                  : "bg-white/90 shadow-na-soft"
-              }`}
-            >
-              {cliente.logo ? (
-                <CivisMediaImage
-                  src={cliente.logo}
-                  alt={cliente.logoAlt}
-                  width={180}
-                  height={72}
-                  className="max-h-16 w-auto max-w-full object-contain"
-                />
-              ) : (
-                <span className="text-xs text-na-muted">Sin logo</span>
-              )}
-            </div>
-            <p className="text-xs font-bold leading-snug text-na-civisDark">
-              {cliente.name}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <CivisClientesLogoGrid
+        clientes={clientes}
+        onEditCliente={
+          edit?.ready ? (id) => edit.setSelectedId(`cliente:${id}`) : undefined
+        }
+      />
     </div>
   );
 }

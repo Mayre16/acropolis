@@ -16,6 +16,8 @@ export const NA_BRAND_LOCKUP_SIZES = {
 
   footer: brandLogoHeightClass.footer,
 
+  footerOinadom: brandLogoHeightClass.footerOinadom,
+
   footerSubmarca: brandLogoHeightClass.footerSubmarca,
 
   footerInstitutional: brandLogoHeightClass.footerInstitutional,

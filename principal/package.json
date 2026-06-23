@@ -11,6 +11,7 @@
     "pack:esfera": "node scripts/pack-esfera-cpanel.mjs",
     "pack:footer": "node scripts/pack-footer-cpanel.mjs",
     "images:webp": "node scripts/convert-to-webp.mjs",
+    "agenda:images": "node scripts/build-agenda-images.mjs",
     "brand:lockups": "node scripts/generate-brand-lockups.mjs",
     "images:localize": "node scripts/fetch-instagram-posts.mjs && node scripts/fetch_mundo_feed.mjs",
     "fetch:instagram": "node scripts/fetch-instagram-posts.mjs",

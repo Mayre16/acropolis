@@ -13,11 +13,6 @@ import {
 import type { EditorialNavItem } from "@/lib/editorial-content";
 import { navItemIsActive } from "@/lib/editorial-navigation";
 import { footerNavGridColumns } from "@/lib/footer-nav-grid";
-import {
-  BIBLIOTECA_URL,
-  CIVIS_URL,
-  PRINCIPAL_SITE_URL,
-} from "@/lib/site-config";
 import { setCartOpen } from "@/lib/cart-store";
 import "./EditorialFooter.css";
 
@@ -56,7 +51,6 @@ export function EditorialFooter() {
   const headerNav = useEditorialHeaderNav();
   const tagline = useEditorialFooterTagline();
   const siteNav = headerNav.filter((item) => item.id !== "sesion");
-  const institutionalNavCount = 3;
 
   return (
     <footer className="editorial-footer">
@@ -94,55 +88,6 @@ export function EditorialFooter() {
                       <FooterNavLink item={item} pathname={pathname} />
                     </li>
                   ))}
-              </ul>
-            </nav>
-
-            <nav aria-label="Enlaces institucionales">
-              <p className="editorial-footer__nav-label">Nueva Acrópolis</p>
-              <ul
-                className="editorial-footer__nav-list"
-                style={
-                  {
-                    "--footer-nav-cols":
-                      footerNavGridColumns(institutionalNavCount),
-                  } as CSSProperties
-                }
-              >
-                <li>
-                  <a
-                    href={PRINCIPAL_SITE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Sitio principal
-                    <ExternalLink
-                      className="h-3.5 w-3.5 opacity-70"
-                      aria-hidden
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={BIBLIOTECA_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Biblioteca Sophia
-                    <ExternalLink
-                      className="h-3.5 w-3.5 opacity-70"
-                      aria-hidden
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href={CIVIS_URL} target="_blank" rel="noopener noreferrer">
-                    Civis Consulting
-                    <ExternalLink
-                      className="h-3.5 w-3.5 opacity-70"
-                      aria-hidden
-                    />
-                  </a>
-                </li>
               </ul>
             </nav>
           </div>

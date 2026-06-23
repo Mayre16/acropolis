@@ -79,5 +79,5 @@ export const LOCKUP_DESCRIPTOR_LABELS: Record<
 
 export const BRAND_TOP_MARK = BRAND_LOCKUPS.na;
 
-/** Lockup filial RD — descriptor integrado (no duplicar texto). */
-export const BRAND_NA_SECTION_MARK = BRAND_LOCKUPS.oina;
+/** Lockup filial — logo NA verde sin descriptor de país (Quiénes somos Civis). */
+export const BRAND_NA_SECTION_MARK = BRAND_LOCKUPS.na;

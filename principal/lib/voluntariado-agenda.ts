@@ -11,8 +11,8 @@ export const VOLUNTARIADO_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     time: "8:00 a.m.",
     sede: "Parque ecológico · Santo Domingo Este",
     tag: "Ecología",
-    image: "/img/voluntariado/cards/ecologia.webp",
-    imageAlt: "Voluntarios en jornada de reforestación y plantación de árboles",
+    image: "/img/agenda/vol-reforestacion.webp",
+    imageAlt: "Voluntarios plantando árboles en jornada de reforestación",
     description:
       "Salida de voluntariado ambiental: plantación, cuidado de espacios verdes y educación ecológica. Ropa cómoda y ganas de servir a la naturaleza.",
     inscribeMessage:
@@ -29,8 +29,8 @@ export const VOLUNTARIADO_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     date: "Sábado 26 de julio",
     time: "10:00 a.m.",
     sede: "Sede Naco",
-    image: "/img/voluntariado/cards/ninos.webp",
-    imageAlt: "Voluntarios en actividad educativa y recreativa con niños",
+    image: "/img/agenda/vol-ninos-juegos.webp",
+    imageAlt: "Encuentro cultural y recreativo con niños — voluntariado Nueva Acrópolis",
     description:
       "Jornada de voluntariado con niños: juegos, valores, cultura y apoyo educativo en un ambiente alegre y responsable.",
     inscribeMessage:
@@ -47,7 +47,7 @@ export const VOLUNTARIADO_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
     date: "Sábado 23 de agosto",
     time: "10:00 a.m.",
     sede: "Sede Los Prados",
-    image: "/img/voluntariado/cards/ancianos.webp",
+    image: "/img/agenda/vol-ancianos-visita.webp",
     imageAlt: "Voluntarios compartiendo con residentes de un hogar de ancianos",
     description:
       "Visita solidaria: acompañamiento, conversación y actividades sencillas que devuelven alegría y dignidad a personas mayores.",

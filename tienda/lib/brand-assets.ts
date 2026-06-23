@@ -86,4 +86,5 @@ export const LOCKUP_DESCRIPTOR_LABELS: Record<
 export const BRAND_TOP_MARK = BRAND_LOCKUPS.na;
 
 /** Lockup OINA para secciones institucionales. */
-export const BRAND_NA_SECTION_MARK = BRAND_LOCKUPS.oina;
+/** Lockup filial — logo NA verde sin descriptor (Quiénes somos Editorial). */
+export const BRAND_NA_SECTION_MARK = BRAND_LOCKUPS.na;

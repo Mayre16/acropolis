@@ -1,7 +1,7 @@
 /**
  * Compone el reverso (cara de arte) de cada separador como PNG:
- *   imagen temática (arriba) + banda de pergamino con monograma Nueva Acrópolis
- *   y descriptor «Escuela de Filosofía» + epígrafe (tema · autor).
+ *   imagen temática (arriba) + lockup OINADOM verde con país (República Dominicana)
+ *   + epígrafe (tema · autor).
  *
  * Fuente de imágenes: scripts/separadores-src/<key>.png
  * Salida: public/img/regalos/<out>.png
@@ -22,6 +22,8 @@ const W = 440;
 const H = 1200;
 const IMG_H = 760; // alto del área de imagen
 const RADIUS = 24;
+/** Ancho del lockup OINADOM en reverso (= proporción del frente: 160/220 del lienzo × 2). */
+const LOCKUP_W = 320;
 
 const TEAL = "#1f5a4e";
 const MUTED = "#6a5c45";
@@ -60,7 +62,7 @@ async function build() {
   }
 
   const lockupResized = await sharp(LOCKUP)
-    .resize({ width: 220, kernel: sharp.kernel.lanczos3 })
+    .resize({ width: LOCKUP_W, kernel: sharp.kernel.lanczos3 })
     .png()
     .toBuffer();
   const lockupMeta = await sharp(lockupResized).metadata();

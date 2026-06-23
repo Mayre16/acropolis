@@ -1,8 +1,11 @@
 import { CivisHeroCms } from "@/components/CivisHeroCms";
 import { CivisHomePrincipios } from "@/components/CivisHomePrincipios";
 import { CivisOfertaResumen } from "@/components/CivisOfertaResumen";
-import { ActividadesRecientesCarousel } from "@/components/ActividadesRecientesCarousel";
+import { CivisProximasAgendaHome } from "@/components/CivisProximasAgendaHome";
+import { CivisActividadesRecientesFotos } from "@/components/CivisActividadesRecientesFotos";
+import { CivisClientesHomeSection } from "@/components/CivisClientesHomeSection";
 import { CivisEntrenadoresHome } from "@/components/CivisEntrenadoresHome";
+import { CivisSalonesHomeSection } from "@/components/CivisSalonesHomeSection";
 import { CivisFooter } from "@/components/CivisFooter";
 
 export default function HomePage() {
@@ -17,8 +20,11 @@ export default function HomePage() {
 
       <CivisHomePrincipios />
       <CivisOfertaResumen />
-      <ActividadesRecientesCarousel />
+      <CivisProximasAgendaHome />
+      <CivisClientesHomeSection />
       <CivisEntrenadoresHome />
+      <CivisActividadesRecientesFotos />
+      <CivisSalonesHomeSection />
       <CivisFooter />
     </>
   );
