@@ -9,6 +9,8 @@
     "build:principal": "npm run build --prefix principal",
     "build:civis": "npm run build --prefix civis",
     "build:tienda": "npm run build --prefix tienda",
-    "build:all": "npm run build:principal && npm run build:civis && npm run build:tienda"
+    "build:all": "npm run build:principal && npm run build:civis && npm run build:tienda",
+    "cms:deploy": "node editor/scripts/trigger-cms-deploy.mjs",
+    "cms:deploy:both": "node editor/scripts/trigger-cms-deploy.mjs both"
   }
 }
