@@ -13,6 +13,8 @@ import {
 import type { EditorialNavItem } from "@/lib/editorial-content";
 import { navItemIsActive } from "@/lib/editorial-navigation";
 import { footerNavGridColumns } from "@/lib/footer-nav-grid";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import { setCartOpen } from "@/lib/cart-store";
 import "./EditorialFooter.css";
 
@@ -50,10 +52,18 @@ export function EditorialFooter() {
   const pathname = usePathname();
   const headerNav = useEditorialHeaderNav();
   const tagline = useEditorialFooterTagline();
+  const edit = useEditorialCmsEdit();
   const siteNav = headerNav.filter((item) => item.id !== "sesion");
 
   return (
-    <footer className="editorial-footer">
+    <footer className="editorial-footer relative">
+      {edit?.ready ? (
+        <EditorialEditPencil
+          label="Editar pie de página"
+          onClick={() => edit.setSelectedId("footer")}
+          className="right-4 top-4"
+        />
+      ) : null}
       <div className="editorial-footer__inner">
         <div className="editorial-footer__grid">
           <div className="editorial-footer__brand-col">

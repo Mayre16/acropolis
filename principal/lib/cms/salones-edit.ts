@@ -27,33 +27,63 @@ export function cmsToSalon(s: CmsSalon): Salon {
   };
 }
 
+import type { SalonSede } from "@/lib/salones";
+
+export type AddSalonOptions = {
+  /** Inserta justo después de este salón (misma sede). */
+  afterId?: string;
+  /** Inserta al inicio de la sede (primer salón de esa sede). */
+  atStartOfSede?: SalonSede;
+  /** Sede por defecto si se añade al final sin referencia. */
+  sede?: SalonSede;
+};
+
+export function newSalonId() {
+  return `salon-${Date.now().toString(36)}`;
+}
+
 export function getSalonesForEdit(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
-): CmsSalon[] {
-  const cmsById = new Map(
-    (doc?.sections.salones ?? []).map((s) => [s.id, s]),
-  );
-  return fallback.map((s) => cmsById.get(s.id) ?? salonToCms(s));
+): { items: CmsSalon[]; hidden: string[] } {
+  const hidden = [...(doc?.sections.salonesHidden ?? [])];
+  const hiddenSet = new Set(hidden);
+  const cmsById = new Map((doc?.sections.salones ?? []).map((s) => [s.id, s]));
+  const items: CmsSalon[] = [];
+  const seen = new Set<string>();
+
+  for (const s of fallback) {
+    if (hiddenSet.has(s.id)) continue;
+    items.push(cmsById.get(s.id) ?? salonToCms(s));
+    seen.add(s.id);
+  }
+  for (const s of doc?.sections.salones ?? []) {
+    if (!seen.has(s.id) && !hiddenSet.has(s.id)) {
+      items.push(s);
+    }
+  }
+  return { items, hidden };
 }
 
 export function mergeSalones(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
 ): Salon[] {
-  return getSalonesForEdit(doc, fallback).map(cmsToSalon);
+  return getSalonesForEdit(doc, fallback).items.map(cmsToSalon);
 }
 
 export function buildDocWithSalones(
   base: CmsDocument,
   items: CmsSalon[],
   page?: CmsSalonesPage,
+  hidden?: string[],
 ): CmsDocument {
   return {
     ...base,
     sections: {
       ...base.sections,
       salones: items,
+      salonesHidden: hidden ?? base.sections.salonesHidden ?? [],
       ...(page !== undefined ? { salonesPage: page } : {}),
     },
   };

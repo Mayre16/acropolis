@@ -10,6 +10,7 @@ import { CmsTabNav } from "@/components/CmsTabNav";
 import { DashboardSiteJumpNav } from "@/components/DashboardSiteJumpNav";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 import { SmtpSettingsPanel } from "@/components/SmtpSettingsPanel";
+import { UsersAdminPanel } from "@/components/UsersAdminPanel";
 import { SITE_LABELS, type SiteId } from "@/lib/content-types";
 import {
   DASHBOARD_SITES,
@@ -19,8 +20,11 @@ import {
 import { defaultTabForRole, type EditorRole } from "@/lib/editor-roles";
 
 function sitesForRole(role: EditorRole): SiteId[] {
-  if (role === "admin" || role === "editorial") {
-    return ["acropolis", "civis"];
+  if (role === "admin") {
+    return ["acropolis", "civis", "editorial"];
+  }
+  if (role === "editorial") {
+    return ["editorial"];
   }
   return ["acropolis"];
 }
@@ -148,7 +152,12 @@ export default function DashboardPage() {
       </div>
 
       <TwoFactorSetup enabled={totpEnabled} />
-      {role === "admin" ? <SmtpSettingsPanel /> : null}
+      {role === "admin" ? (
+        <>
+          <UsersAdminPanel />
+          <SmtpSettingsPanel />
+        </>
+      ) : null}
     </div>
   );
 }

@@ -42,6 +42,7 @@ import type {
 } from "@/lib/cms/types";
 import { EditField, EditPanelChrome } from "@/components/cms/CmsEditFields";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
+import { EsferaLogoEditFields } from "@/components/cms/EsferaLogoEditFields";
 import { EsferaHomeEditFields } from "@/components/cms/EsferaHomeEditFields";
 import { BrochurePdfField } from "@/components/cms/PageMediaCmsPanels";
 
@@ -167,8 +168,14 @@ export function EsferaExtraCmsPanels({
         >
           <EsferaHomeEditFields
             value={pickEsferaHomePromo(merged)}
+            logo={{
+              esferaLogoSrc: merged.esferaLogoSrc,
+              esferaLogoWhiteSrc: merged.esferaLogoWhiteSrc,
+              esferaLogoAlt: merged.esferaLogoAlt,
+            }}
             token={token}
             onChange={(patch) => patchPage(patch)}
+            onLogoChange={(patch) => patchPage(patch)}
           />
         </EditPanelChrome>
       ) : null}
@@ -309,13 +316,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar esta tarjeta?")) {
+                if (window.confirm("¿Ocultar esta tarjeta del sitio público?")) {
                   deletePrincipio(principio.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar tarjeta
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -402,38 +409,10 @@ export function EsferaExtraCmsPanels({
           onSave={onSave}
         >
           <div className="space-y-4">
-            <p className="text-xs text-slate-600">
-              El logo se actualiza también en el encabezado de la página Esfera,
-              en Voluntariado y en otras secciones que usan el logo Esfera.
-            </p>
-            <AgendaEntryImageField
-              label="Logo Esfera (color)"
-              site="acropolis"
-              image={merged.esferaLogoSrc ?? ""}
-              imageAlt={merged.esferaLogoAlt ?? ""}
+            <EsferaLogoEditFields
+              page={merged}
               token={token}
-              onChange={(patch) =>
-                patchPage({
-                  ...(patch.image !== undefined ? { esferaLogoSrc: patch.image } : {}),
-                  ...(patch.imageAlt !== undefined
-                    ? { esferaLogoAlt: patch.imageAlt }
-                    : {}),
-                })
-              }
-            />
-            <AgendaEntryImageField
-              label="Logo Esfera (blanco, para hero)"
-              site="acropolis"
-              image={merged.esferaLogoWhiteSrc ?? ""}
-              imageAlt={merged.esferaLogoAlt ?? ""}
-              token={token}
-              onChange={(patch) =>
-                patchPage({
-                  ...(patch.image !== undefined
-                    ? { esferaLogoWhiteSrc: patch.image }
-                    : {}),
-                })
-              }
+              onChange={patchPage}
             />
             <AgendaEntryImageField
               label="Portada del manual"
@@ -565,13 +544,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar este taller?")) {
+                if (window.confirm("¿Ocultar este taller del sitio público?")) {
                   deleteModalidad(modalidad.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar taller
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -639,13 +618,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar esta línea formativa?")) {
+                if (window.confirm("¿Ocultar esta línea del sitio público?")) {
                   deleteWorkshopLine(workshop.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar línea
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -725,13 +704,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar esta alianza?")) {
+                if (window.confirm("¿Ocultar esta alianza del sitio público?")) {
                   deleteAlianza(alianza.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar alianza
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -797,13 +776,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar esta tarjeta?")) {
+                if (window.confirm("¿Ocultar esta tarjeta del sitio público?")) {
                   deleteBeneficio(beneficio.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar tarjeta
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -885,13 +864,13 @@ export function EsferaExtraCmsPanels({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar este perfil?")) {
+                if (window.confirm("¿Ocultar este perfil del sitio público?")) {
                   deleteAudiencia(audiencia.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar perfil
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>

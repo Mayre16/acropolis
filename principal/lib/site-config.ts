@@ -34,12 +34,12 @@ export const INFO_EMAIL =
 export const CURSOS_EMAIL =
   process.env.NEXT_PUBLIC_CURSOS_EMAIL?.trim() || "cursos.oinadom@acropolis.org";
 
-/** Voluntariado humanitario y Punto Focal Esfera. */
+/** Voluntariado humanitario (donaciones y formulario de voluntariado). */
 export const VOLUNTARIADO_EMAIL =
   process.env.NEXT_PUBLIC_VOLUNTARIADO_EMAIL?.trim() ||
-  "voluntariado.humanitario-RD@acropolis.org";
+  "voluntariadord@acropolis.org";
 
-/** Nombre visible del buzón (Contáctenos Esfera / voluntariado). */
+/** Nombre visible del buzón de voluntariado. */
 export const VOLUNTARIADO_EMAIL_NAME = "Voluntariado Humanitario";
 
 /** Etiqueta legible: "Voluntariado Humanitario" <correo> */
@@ -52,9 +52,10 @@ export const LEGAL_DOMICILE =
 /** Línea de áreas de actuación bajo el logo en footers del sitio principal. */
 export const BRAND_FOOTER_TAGLINE = "Filosofía · Cultura · Voluntariado";
 
-/** Correo que recibe solicitudes de taller Esfera (formulario web). */
+/** Correo de Punto Focal Esfera (info, consultas y formularios web). */
 export const ESFERA_SOLICITUD_EMAIL =
-  process.env.NEXT_PUBLIC_ESFERA_SOLICITUD_EMAIL?.trim() || VOLUNTARIADO_EMAIL;
+  process.env.NEXT_PUBLIC_ESFERA_SOLICITUD_EMAIL?.trim() ||
+  "esferard@acropolis.org";
 
 /** Copia en correos Esfera (donaciones, alianzas, talleres, contacto). */
 export const ESFERA_CC_EMAIL =

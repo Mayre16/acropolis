@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { useEditorialDigitalBooks } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import {
   type DigitalBook,
   matchCoverFromCatalog,
@@ -31,15 +33,20 @@ function DigitalBookPlaceholder({ title }: { title: string }) {
 function DigitalBookCard({
   book,
   cover,
+  onEdit,
 }: {
   book: DigitalBook;
   cover?: string;
+  onEdit?: () => void;
 }) {
   const [imgFailed, setImgFailed] = useState(false);
   const showCover = Boolean(cover) && !imgFailed;
 
   return (
-    <article className="overflow-hidden rounded-xl border border-na-editorial/10 bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card">
+    <article className="relative overflow-hidden rounded-xl border border-na-editorial/10 bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card">
+      {onEdit ? (
+        <EditorialEditPencil label={`Editar ${book.title}`} onClick={onEdit} />
+      ) : null}
       <div className="flex justify-center bg-neutral-50 px-3 pt-3">
         <div className="relative aspect-[3/4] w-full max-w-[108px] bg-white shadow-sm">
           {showCover ? (
@@ -84,6 +91,7 @@ function DigitalBookCard({
 
 export function DigitalBooksSection() {
   const digitalBookGroups = useEditorialDigitalBooks();
+  const edit = useEditorialCmsEdit();
   const [catalogCovers, setCatalogCovers] = useState<Map<string, string>>(
     new Map(),
   );
@@ -120,7 +128,14 @@ export function DigitalBooksSection() {
     <section id="digitales" className="scroll-mt-24">
       <div className="space-y-12">
         {booksWithCovers.map((group) => (
-          <div key={group.id}>
+          <div key={group.id} className="relative">
+            {edit?.ready ? (
+              <EditorialEditPencil
+                label={`Editar grupo ${group.label}`}
+                onClick={() => edit.setSelectedId(`digitalGroup:${group.id}`)}
+                className="right-0 top-0"
+              />
+            ) : null}
             <h3 className="text-xl font-bold text-na-ink">{group.label}</h3>
             {group.description ? (
               <p className="mt-1 text-sm text-na-muted">{group.description}</p>
@@ -131,6 +146,14 @@ export function DigitalBooksSection() {
                   key={`${group.id}-${book.title}`}
                   book={book}
                   cover={book.resolvedCover}
+                  onEdit={
+                    edit?.ready
+                      ? () =>
+                          edit.setSelectedId(
+                            `digitalBook:${group.id}:${book.title}`,
+                          )
+                      : undefined
+                  }
                 />
               ))}
             </div>

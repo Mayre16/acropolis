@@ -1,15 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { MapPin, Phone } from "lucide-react";
-import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
+import { MapPin, Pencil, Phone } from "lucide-react";
+import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
+import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditContext";
+import { useMergedSiteFooter } from "@/lib/cms/hooks";
 import {
-  BRAND_FOOTER_TAGLINE,
   FOOTER_NAV_PRIMARY,
   FOOTER_NAV_SECONDARY,
   LEGAL_LINKS,
-  SOCIAL_LINKS,
-  INSTAGRAM_HANDLE,
-  DIPLOMADO_WHATSAPP_URL,
-  LEGAL_DOMICILE,
 } from "@/lib/site-config";
 import type { NavLink } from "@/lib/site-config";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
@@ -69,21 +68,34 @@ function FooterNavList({ items }: { items: NavLink[] }) {
 }
 
 export function Footer() {
+  const footer = useMergedSiteFooter();
+  const edit = useSiteFooterCmsEdit();
+
   return (
-    <footer className="principal-footer">
+    <footer className="principal-footer relative">
+      {edit?.ready ? (
+        <button
+          type="button"
+          onClick={edit.openPanel}
+          className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-400 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950 shadow"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Editar pie
+        </button>
+      ) : null}
       <div className="principal-footer__inner">
         <div className="principal-footer__grid">
           <div className="principal-footer__connect min-w-0">
             <p className="principal-footer__section-label">Conectar</p>
             <div className="principal-footer__social">
               <LeaveSiteLink
-                href={SOCIAL_LINKS.instagram}
-                aria-label={`Instagram @${INSTAGRAM_HANDLE}`}
+                href={footer.socialLinks.instagram}
+                aria-label={`Instagram @${footer.instagramHandle}`}
               >
                 <InstagramIcon className="h-5 w-5" />
               </LeaveSiteLink>
               <a
-                href={SOCIAL_LINKS.youtube}
+                href={footer.socialLinks.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube Nueva Acrópolis"
@@ -91,7 +103,7 @@ export function Footer() {
                 <YoutubeIcon className="h-5 w-5" />
               </a>
               <a
-                href={SOCIAL_LINKS.facebook}
+                href={footer.socialLinks.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook Nueva Acrópolis RD"
@@ -99,7 +111,7 @@ export function Footer() {
                 <FacebookIcon className="h-5 w-5" />
               </a>
               <a
-                href={DIPLOMADO_WHATSAPP_URL}
+                href={footer.whatsappDiplomadoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
@@ -107,13 +119,15 @@ export function Footer() {
                 <Phone className="h-5 w-5" />
               </a>
             </div>
-            <p className="principal-footer__tagline">{BRAND_FOOTER_TAGLINE}</p>
+            <p className="principal-footer__tagline">{footer.tagline}</p>
           </div>
 
           <div className="principal-footer__na-mark">
-            <HeroOinadomLogo
+            <NaBrandLockupGroup
+              lockup="oinadom"
+              size="footer"
+              variant="white"
               align="center"
-              size="footerOinadom"
               maxWidthClass="max-w-[min(92vw,14rem)]"
             />
           </div>
@@ -130,7 +144,7 @@ export function Footer() {
         <div className="principal-footer__meta-row">
           <p className="principal-footer__domicile">
             <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-            <span>Domicilio legal: {LEGAL_DOMICILE}</span>
+            <span>Domicilio legal: {footer.legalDomicile}</span>
           </p>
           <nav aria-label="Enlaces legales">
             <ul className="principal-footer__legal-inline">
@@ -149,7 +163,7 @@ export function Footer() {
           <span>
             © {new Date().getFullYear()} Nueva Acrópolis República Dominicana
           </span>
-          <span>ONG sin fines de lucro</span>
+          <span>{footer.legalNote}</span>
         </div>
       </div>
     </footer>

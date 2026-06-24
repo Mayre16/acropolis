@@ -1,8 +1,20 @@
 import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
   VENUE_LOCATIONS,
   type VenueLocation,
 } from "@/lib/locations";
-import type { CmsDocument, CmsVenue } from "@/lib/cms/types";
+import type { CmsDocument, CmsVenue, CmsVenuesContact } from "@/lib/cms/types";
+
+export const VENUES_CONTACT_PANEL_ID = "__venues_contact__";
+
+export const DEFAULT_VENUES_CONTACT: CmsVenuesContact = {
+  title: "¿Necesitas más información?",
+  body: "Escríbenos por WhatsApp o correo y te indicamos la sede o el punto cultural más cercano según la actividad que te interese.",
+  phone: CONTACT_PHONE,
+  email: CONTACT_EMAIL,
+  ctaLabel: "Escribir por WhatsApp",
+};
 
 export function venueToCms(v: VenueLocation): CmsVenue {
   return {
@@ -65,10 +77,17 @@ export function getVenuesForEdit(
   return { items, hidden };
 }
 
+export function mergeVenuesContact(
+  cms?: CmsDocument | null,
+): CmsVenuesContact {
+  return { ...DEFAULT_VENUES_CONTACT, ...cms?.sections.venuesContact };
+}
+
 export function buildDocWithVenues(
   base: CmsDocument,
   items: CmsVenue[],
   hidden: string[],
+  contact?: CmsVenuesContact,
 ): CmsDocument {
   return {
     ...base,
@@ -76,6 +95,7 @@ export function buildDocWithVenues(
       ...base.sections,
       venues: items,
       venuesHidden: hidden,
+      ...(contact ? { venuesContact: contact } : {}),
     },
   };
 }

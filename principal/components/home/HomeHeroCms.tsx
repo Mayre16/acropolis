@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Images, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
@@ -23,12 +23,6 @@ export function HomeHeroCms() {
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
-  const h2 =
-    (edit?.ready ? draft?.h2 : isCmsEnabled() ? published?.h2 : undefined) ??
-    undefined;
-  const lede =
-    (edit?.ready ? draft?.lede : isCmsEnabled() ? published?.lede : undefined) ??
-    undefined;
 
   const backgroundSrc =
     (edit?.ready
@@ -71,24 +65,14 @@ export function HomeHeroCms() {
       />
 
       {edit?.ready ? (
-        <>
-          <button
-            type="button"
-            onClick={() => edit.setSelected("hero", "__hero__")}
-            className="absolute right-4 top-24 z-20 inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-lg"
-          >
-            <Pencil className="h-4 w-4" />
-            Editar encabezado
-          </button>
-          <button
-            type="button"
-            onClick={() => edit.setSelected("hero", "__hero__")}
-            className="absolute right-4 top-40 z-20 inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-lg"
-          >
-            <Images className="h-4 w-4" />
-            Cambiar foto de fondo
-          </button>
-        </>
+        <button
+          type="button"
+          onClick={() => edit.setSelected("hero", "__hero__")}
+          className="absolute right-4 top-24 z-20 inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-lg"
+        >
+          <Pencil className="h-4 w-4" />
+          Editar encabezado
+        </button>
       ) : null}
 
       <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-12 pt-[150px] text-center md:px-12 md:pb-[50px] md:pt-[100px]">
@@ -99,22 +83,6 @@ export function HomeHeroCms() {
           maxWidthClass="max-w-[min(94vw,32rem)]"
         />
         <h1 className="sr-only">{h1}</h1>
-        {h2 ? (
-          <h2 className="mt-6 max-w-xl text-balance text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-xl">
-            {h2}
-          </h2>
-        ) : null}
-        {lede ? (
-          h2 ? (
-            <p className="mt-3 max-w-lg text-balance text-sm font-normal leading-relaxed text-white/85 drop-shadow sm:text-base">
-              {lede}
-            </p>
-          ) : (
-            <h2 className="mt-6 max-w-xl text-balance text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-xl">
-              {lede}
-            </h2>
-          )
-        ) : null}
         <Link
           href="/quienes-somos"
           className={`${HERO_CTA} pointer-events-auto mt-8 sm:mt-10`}

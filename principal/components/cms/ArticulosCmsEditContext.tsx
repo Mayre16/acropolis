@@ -419,7 +419,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedSlug(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <HeroEditFields value={page} onChange={patchPage} carouselKey="articulos" />
         </EditPanelChrome>
       ) : null}
     </ArticulosCmsEditContext.Provider>

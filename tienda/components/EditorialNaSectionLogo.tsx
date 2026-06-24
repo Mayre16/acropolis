@@ -2,14 +2,11 @@ import {
   NaBrandLockupGroup,
   type NaBrandLockupSize,
 } from "@/components/NaBrandLockupGroup";
-import type { BrandLockupId } from "@/lib/brand-assets";
+import { BRAND_LOCKUPS, type BrandLockupId } from "@/lib/brand-assets";
 
 const CONFIG = {
   footer: {
     lockup: "oinadom" satisfies BrandLockupId,
-    size: "footerOinadom" satisfies NaBrandLockupSize,
-    render: "raster" as const,
-    maxWidthClass: "max-w-[min(92vw,13.375rem)]",
   },
   section: {
     lockup: "na" satisfies BrandLockupId,
@@ -26,7 +23,7 @@ const CONFIG = {
 } as const;
 
 type EditorialNaSectionLogoProps = {
-  /** footer → oinadom con país · section/content → na verde sin descriptor. */
+  /** footer → oinadom raster (logo-oinadom.webp, un solo archivo) · section/content → na. */
   size?: keyof typeof CONFIG;
   variant?: "color" | "white";
   align?: "left" | "center";
@@ -38,6 +35,19 @@ export function EditorialNaSectionLogo({
   variant = "color",
   align = "center",
 }: EditorialNaSectionLogoProps) {
+  if (size === "footer") {
+    const asset = BRAND_LOCKUPS.oinadom;
+    const src = variant === "white" ? asset.webpWhite : asset.webp;
+    return (
+      <img
+        src={src}
+        alt={asset.alt}
+        className="editorial-footer__oinadom-img"
+        decoding="async"
+      />
+    );
+  }
+
   const config = CONFIG[size];
 
   return (
@@ -46,8 +56,8 @@ export function EditorialNaSectionLogo({
       size={config.size}
       variant={variant}
       align={align === "center" ? "center" : "start"}
-      render={config.render}
-      maxWidthClass={config.maxWidthClass}
+      render={"render" in config ? config.render : undefined}
+      maxWidthClass={"maxWidthClass" in config ? config.maxWidthClass : undefined}
     />
   );
 }

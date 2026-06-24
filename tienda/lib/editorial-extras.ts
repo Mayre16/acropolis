@@ -203,11 +203,11 @@ export const REGALOS: RegaloItem[] = [
   {
     id: "lapiceros-virtudes",
     category: "papeleria",
-    title: "Pack lapiceros · Justicia, Verdad, Belleza y Bondad",
+    title: "Pack lapiceros · Prudencia, Fortaleza, Templanza y Justicia",
     description:
-      "Set de cuatro lapiceros metálicos grabados con los valores filosóficos: negro Justicia, azul Verdad, rojo Belleza y verde Bondad, con identificador Nueva Acrópolis.",
+      "Set de cuatro lapiceros metálicos grabados con virtudes cardinales: negro Prudencia, rojo Fortaleza, azul Templanza y verde Justicia, con monograma NA y República Dominicana.",
     imageUrl: "/img/regalos/lapiceros-virtudes.webp",
-    detailImageUrl: "/img/regalos/lapiceros-virtudes-neutro.webp",
+    detailImageUrl: "/img/regalos/lapiceros-virtudes.webp",
     price: 450,
     currency: "DOP",
     priceNote: "Pack de 4 · RD$ 450",
@@ -218,7 +218,7 @@ export const REGALOS: RegaloItem[] = [
     category: "papeleria",
     title: "Resaltador triple · Ilumina las ideas",
     description:
-      "Resaltador 3 en 1 (rosa, amarillo y verde) con el monograma Nueva Acrópolis y el lema «Ilumina las ideas».",
+      "Resaltador 3 en 1 (rosa, amarillo y verde) con identificador Nueva Acrópolis · República Dominicana y el lema «Ilumina las ideas».",
     imageUrl: "/img/regalos/resaltador-ideas.webp",
     priceNote: "Consultar disponibilidad",
     sample: true,

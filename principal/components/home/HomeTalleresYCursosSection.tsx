@@ -124,10 +124,21 @@ export function HomeTalleresYCursosSection() {
           </Link>
         </div>
 
-        <div className="relative mt-5">
+        <div className="mt-5">
+          <div className="flex items-center gap-2 lg:gap-3">
+            {n > 1 ? (
+              <button
+                type="button"
+                onClick={() => setIndex((i) => (i - 1 + n) % n)}
+                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white lg:inline-flex"
+                aria-label="Anterior"
+              >
+                <ChevronLeft className="h-5 w-5" aria-hidden />
+              </button>
+            ) : null}
           <article
             className={cn(
-              "overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
+              "min-w-0 flex-1 overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
               CARD_LG_HEIGHT,
             )}
           >
@@ -217,45 +228,35 @@ export function HomeTalleresYCursosSection() {
               </div>
             </div>
           </article>
+            {n > 1 ? (
+              <button
+                type="button"
+                onClick={() => setIndex((i) => (i + 1) % n)}
+                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white lg:inline-flex"
+                aria-label="Siguiente"
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+            ) : null}
+          </div>
 
           {n > 1 ? (
-            <>
-              <div className="mt-5 flex items-center justify-center gap-2">
-                {items.map((item, i) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setIndex(i)}
-                    className={`h-2.5 rounded-full transition-all ${
-                      i === index
-                        ? "w-8 bg-na-heket"
-                        : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
-                    }`}
-                    aria-label={`Ver: ${item.title}`}
-                    aria-current={i === index ? "true" : undefined}
-                  />
-                ))}
-              </div>
-
-              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden items-center justify-between px-2 lg:flex">
+            <div className="mt-5 flex items-center justify-center gap-2">
+              {items.map((item, i) => (
                 <button
+                  key={item.id}
                   type="button"
-                  onClick={() => setIndex((i) => (i - 1 + n) % n)}
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white"
-                  aria-label="Anterior"
-                >
-                  <ChevronLeft className="h-5 w-5" aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIndex((i) => (i + 1) % n)}
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white"
-                  aria-label="Siguiente"
-                >
-                  <ChevronRight className="h-5 w-5" aria-hidden />
-                </button>
-              </div>
-            </>
+                  onClick={() => setIndex(i)}
+                  className={`h-2.5 rounded-full transition-all ${
+                    i === index
+                      ? "w-8 bg-na-heket"
+                      : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
+                  }`}
+                  aria-label={`Ver: ${item.title}`}
+                  aria-current={i === index ? "true" : undefined}
+                />
+              ))}
+            </div>
           ) : null}
         </div>
       </div>

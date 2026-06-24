@@ -203,23 +203,30 @@ export function BrandLogo({
     <img
       src={src}
       alt={hybrid ? BRAND_LOCKUPS[lockup].alt : asset.alt}
-      width={asset.width}
-      height={asset.height}
+      {...(hybrid
+        ? { width: asset.width, height: asset.height }
+        : {})}
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : undefined}
       className={cn(
         "block shrink-0 object-contain",
         fixedMarkHeightRem === undefined && "max-w-full",
         fixedMarkHeightRem === undefined &&
-          (lockup === "na-solo"
-            ? "h-[var(--brand-logo-h)] w-auto"
+          (lockup === "na-solo" || !hybrid
+            ? "h-[var(--brand-logo-h)] w-auto max-h-[var(--brand-logo-h)]"
             : "h-auto w-auto"),
         hybrid ? "object-center" : align === "start" ? "object-left" : "object-center",
         fixedMarkHeightRem === undefined &&
           !fitDescriptorToWordmark &&
           maxWidthClass,
       )}
-      style={markStyle}
+      style={
+        fixedMarkHeightRem !== undefined || lockupWidthRem !== undefined
+          ? markStyle
+          : hybrid
+            ? markStyle
+            : undefined
+      }
     />
   );
 

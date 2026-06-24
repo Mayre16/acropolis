@@ -17,8 +17,11 @@ const VENUES_STANDALONE_PATHS = ["/donde-estamos", "/esfera"] as const;
 import { VENUE_LOCATIONS } from "@/lib/locations";
 import {
   buildDocWithVenues,
+  DEFAULT_VENUES_CONTACT,
   getVenuesForEdit,
+  mergeVenuesContact,
   newVenueId,
+  VENUES_CONTACT_PANEL_ID,
 } from "@/lib/cms/venues-edit";
 import {
   fetchCmsDraft,
@@ -31,7 +34,7 @@ import {
   type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
-import type { CmsDocument, CmsVenue } from "@/lib/cms/types";
+import type { CmsDocument, CmsVenue, CmsVenuesContact } from "@/lib/cms/types";
 import {
   EditField,
   EditPanelChrome,
@@ -42,9 +45,12 @@ import { VenueEditFields } from "@/components/cms/VenueEditFields";
 type VenuesCmsEditContextValue = {
   ready: boolean;
   items: CmsVenue[];
+  contact: CmsVenuesContact;
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
+  openContactPanel: () => void;
   patchItem: (id: string, patch: Partial<CmsVenue>) => void;
+  patchContact: (patch: Partial<CmsVenuesContact>) => void;
   addItem: (kind: CmsVenue["kind"]) => void;
   hideItem: (id: string) => void;
   saveDraft: () => Promise<void>;
@@ -53,6 +59,8 @@ type VenuesCmsEditContextValue = {
   busy: boolean;
   token: string | null;
 };
+
+export { VENUES_CONTACT_PANEL_ID };
 
 const VenuesCmsEditContext = createContext<VenuesCmsEditContextValue | null>(
   null,
@@ -66,6 +74,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [items, setItems] = useState<CmsVenue[]>([]);
+  const [contact, setContact] = useState<CmsVenuesContact>(DEFAULT_VENUES_CONTACT);
   const [hidden, setHidden] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -87,6 +96,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     );
     setItems(loaded);
     setHidden(h);
+    setContact(mergeVenuesContact(draft));
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
   }, []);
@@ -97,7 +107,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     setStatus("Guardando borrador…");
     try {
       const latest = await fetchCmsDraft("acropolis");
-      const next = buildDocWithVenues(latest, items, hidden);
+      const next = buildDocWithVenues(latest, items, hidden, contact);
       await saveCmsDraft("acropolis", token, next);
       setDoc(next);
       setDirty(false);
@@ -111,7 +121,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, items, hidden]);
+  }, [token, items, hidden, contact]);
 
   const publish = useCallback(async () => {
     if (!token) return;
@@ -126,7 +136,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     setStatus("Publicando…");
     try {
       const latest = await fetchCmsDraft("acropolis");
-      const next = buildDocWithVenues(latest, items, hidden);
+      const next = buildDocWithVenues(latest, items, hidden, contact);
       await saveCmsDraft("acropolis", token, next);
       const publishResult = await publishCms("acropolis", token);
       setDoc(next);
@@ -139,7 +149,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, items, hidden]);
+  }, [token, items, hidden, contact]);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -195,6 +205,18 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const patchContact = useCallback(
+    (patch: Partial<CmsVenuesContact>) => {
+      setContact((prev) => ({ ...prev, ...patch }));
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const openContactPanel = useCallback(() => {
+    setSelectedId(VENUES_CONTACT_PANEL_ID);
+  }, []);
+
   const hideItem = useCallback(
     (id: string) => {
       setItems((list) => list.filter((v) => v.id !== id));
@@ -209,9 +231,12 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     (): VenuesCmsEditContextValue => ({
       ready,
       items,
+      contact,
       selectedId,
       setSelectedId,
+      openContactPanel,
       patchItem,
+      patchContact,
       addItem,
       hideItem,
       saveDraft,
@@ -223,8 +248,11 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     [
       ready,
       items,
+      contact,
       selectedId,
+      openContactPanel,
       patchItem,
+      patchContact,
       addItem,
       hideItem,
       saveDraft,
@@ -235,7 +263,11 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     ],
   );
 
-  const selected = items.find((v) => v.id === selectedId);
+  const selectedVenue =
+    selectedId && selectedId !== VENUES_CONTACT_PANEL_ID
+      ? items.find((v) => v.id === selectedId)
+      : undefined;
+  const contactPanelOpen = selectedId === VENUES_CONTACT_PANEL_ID;
 
   return (
     <VenuesCmsEditContext.Provider value={value}>
@@ -253,7 +285,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
         </div>
       ) : null}
       {children}
-      {selected ? (
+      {selectedVenue ? (
         <EditPanelChrome
           title="Editar sede o punto cultural"
           dirty={dirty}
@@ -263,14 +295,55 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
           onSave={() => void saveDraft()}
         >
           <VenueEditFields
-            venue={selected}
-            onChange={(patch) => patchItem(selected.id, patch)}
+            venue={selectedVenue}
+            onChange={(patch) => patchItem(selectedVenue.id, patch)}
             onHide={() => {
               if (window.confirm("¿Ocultar este espacio del sitio?")) {
-                hideItem(selected.id);
+                hideItem(selectedVenue.id);
               }
             }}
           />
+        </EditPanelChrome>
+      ) : null}
+      {contactPanelOpen ? (
+        <EditPanelChrome
+          title="Bloque — ¿Necesitas más información?"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Título"
+              value={contact.title ?? ""}
+              onChange={(v) => patchContact({ title: v })}
+            />
+            <EditField
+              label="Texto"
+              value={contact.body ?? ""}
+              onChange={(v) => patchContact({ body: v })}
+              multiline
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <EditField
+                label="Teléfono"
+                value={contact.phone ?? ""}
+                onChange={(v) => patchContact({ phone: v })}
+              />
+              <EditField
+                label="Correo"
+                value={contact.email ?? ""}
+                onChange={(v) => patchContact({ email: v })}
+              />
+            </div>
+            <EditField
+              label="Texto del botón WhatsApp"
+              value={contact.ctaLabel ?? ""}
+              onChange={(v) => patchContact({ ctaLabel: v })}
+            />
+          </div>
         </EditPanelChrome>
       ) : null}
     </VenuesCmsEditContext.Provider>

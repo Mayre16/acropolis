@@ -265,3 +265,128 @@ export async function fetchUploadInventory(
 export function publishedJsonUrl(site: SiteId) {
   return `${API_URL}/content/${site}/published`;
 }
+
+export type CmsUser = {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  label: string;
+  totpEnabled: boolean;
+  disabled: boolean;
+  createdAt: string | null;
+};
+
+export async function fetchCmsUsers(token: string): Promise<CmsUser[]> {
+  const res = await fetch(`${API_URL}/auth/users`, {
+    headers: authHeaders(token),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    users?: CmsUser[];
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo cargar usuarios");
+  }
+  return data.users ?? [];
+}
+
+export async function createCmsUser(
+  token: string,
+  body: {
+    email: string;
+    password: string;
+    role: string;
+    label: string;
+  },
+): Promise<CmsUser> {
+  const res = await fetch(`${API_URL}/auth/users`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    user?: CmsUser;
+    error?: string;
+  };
+  if (!res.ok || !data.ok || !data.user) {
+    throw new Error(data.error || "No se pudo crear el usuario");
+  }
+  return data.user;
+}
+
+export async function updateCmsUser(
+  token: string,
+  userId: string,
+  body: { label?: string; role?: string; disabled?: boolean },
+): Promise<CmsUser> {
+  const res = await fetch(`${API_URL}/auth/users/${userId}`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    user?: CmsUser;
+    error?: string;
+  };
+  if (!res.ok || !data.ok || !data.user) {
+    throw new Error(data.error || "No se pudo actualizar el usuario");
+  }
+  return data.user;
+}
+
+export async function resetCmsUserPassword(
+  token: string,
+  userId: string,
+  password: string,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/users/${userId}/reset-password`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ password }),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo cambiar la contraseña");
+  }
+}
+
+export async function clearCmsUserTotp(
+  token: string,
+  userId: string,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/users/${userId}/totp`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo desactivar 2FA");
+  }
+}
+
+export async function deleteCmsUser(
+  token: string,
+  userId: string,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/users/${userId}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo eliminar el usuario");
+  }
+}

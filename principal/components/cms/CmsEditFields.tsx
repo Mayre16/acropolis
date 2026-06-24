@@ -3,11 +3,16 @@
 import { useCmsEditorEmbedded } from "@/hooks/useCmsEditorEmbedded";
 
 import { useState, type ReactNode } from "react";
+import { Images } from "lucide-react";
 import {
   cmsUploadPathExample,
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import {
+  type CmsHeroCarouselKey,
+} from "@/lib/cms/hero-carousel-edit";
 import type { CmsMedia } from "@/lib/cms/types";
 import {
   applySpellReplacement,
@@ -422,6 +427,7 @@ export function EditToolbar({
 export function HeroEditFields({
   value,
   onChange,
+  carouselKey,
 }: {
   value: { heroEyebrow?: string; heroTitle?: string; heroLede?: string };
   onChange: (patch: {
@@ -429,7 +435,10 @@ export function HeroEditFields({
     heroTitle?: string;
     heroLede?: string;
   }) => void;
+  carouselKey?: CmsHeroCarouselKey;
 }) {
+  const carouselEdit = useHeroCarouselCmsEdit();
+
   return (
     <div className="space-y-4">
       <EditField
@@ -448,6 +457,19 @@ export function HeroEditFields({
         onChange={(v) => onChange({ heroLede: v })}
         multiline
       />
+      {carouselKey && carouselEdit?.ready ? (
+        <div className="border-t border-slate-100 pt-4">
+          <p className="text-sm text-slate-600">Fotos del carrusel del encabezado.</p>
+          <button
+            type="button"
+            onClick={() => carouselEdit.openCarousel(carouselKey)}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            <Images className="h-4 w-4 shrink-0" aria-hidden />
+            Editar fotos del carrusel
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

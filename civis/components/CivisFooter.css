@@ -59,7 +59,36 @@
   display: flex;
   justify-content: center;
   overflow: visible;
+  margin-top: 10px;
   padding-block: 0.5rem 0.75rem;
+  max-width: min(100%, 14rem);
+  margin-inline: auto;
+  --brand-logo-h: 3.1875rem;
+  --civis-footer-oinadom-h: 3.1875rem;
+}
+
+.civis-footer__na-mark img {
+  display: block;
+  height: var(--civis-footer-oinadom-h) !important;
+  max-height: var(--civis-footer-oinadom-h) !important;
+  width: auto !important;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (min-width: 640px) {
+  .civis-footer__na-mark {
+    --brand-logo-h: 3.5375rem;
+    --civis-footer-oinadom-h: 3.5375rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .civis-footer__na-mark {
+    --brand-logo-h: 3.7875rem;
+    --civis-footer-oinadom-h: 3.7875rem;
+  }
 }
 
 .civis-footer__nav-label {

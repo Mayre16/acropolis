@@ -16,10 +16,10 @@ function cms_smtp_file(): string
 function cms_load_smtp_config(array $config): array
 {
     $defaults = [
-        'host' => 'mail.acropolis.org.do',
+        'host' => 'mail.acropolis.org',
         'port' => 465,
         'secure' => 'ssl',
-        'user' => 'smtp_user@acropolis.org.do',
+        'user' => 'smtp_user@acropolis.org',
         'password' => '',
         'from_email' => 'no-reply@acropolis.org',
         'from_name' => 'Nueva Acrópolis RD',
@@ -31,8 +31,8 @@ function cms_load_smtp_config(array $config): array
                 'copy_to_sender' => true,
             ],
             'esfera_solicitud' => [
-                'to_email' => 'voluntariado.humanitario-RD@acropolis.org',
-                'to_name' => 'Voluntariado Humanitario',
+                'to_email' => 'esferard@acropolis.org',
+                'to_name' => 'Punto Focal Esfera',
                 'cc_email' => 'Santiago.a@acropolis.org',
                 'subject_prefix' => '[Esfera] Solicitud taller',
                 'copy_to_sender' => true,
@@ -300,8 +300,8 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
 
     $cfg = cms_load_smtp_config($config);
     $form = $cfg['forms']['esfera_solicitud'] ?? [];
-    $toEmail = trim((string) ($form['to_email'] ?? 'voluntariado.humanitario-RD@acropolis.org'));
-    $toName = trim((string) ($form['to_name'] ?? 'Voluntariado Humanitario'));
+    $toEmail = trim((string) ($form['to_email'] ?? 'esferard@acropolis.org'));
+    $toName = trim((string) ($form['to_name'] ?? 'Punto Focal Esfera'));
     $prefix = trim((string) ($form['subject_prefix'] ?? '[Esfera] Solicitud taller'));
     $subject = $prefix . ' — ' . $check['data']['empresa'];
     $copyToSender = ($form['copy_to_sender'] ?? true) !== false;
@@ -451,7 +451,7 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
 
     $cfg = cms_load_smtp_config($config);
     $form = $cfg['forms']['voluntariado_solicitud'] ?? [];
-    $toEmail = trim((string) ($form['to_email'] ?? 'voluntariado.humanitario-RD@acropolis.org'));
+    $toEmail = trim((string) ($form['to_email'] ?? 'voluntariadord@acropolis.org'));
     $toName = trim((string) ($form['to_name'] ?? 'Voluntariado Humanitario'));
     $subject = '[Nueva Acrópolis RD] Solicitud de voluntariado — ' . $contact['data']['nombre'];
 
@@ -491,25 +491,25 @@ function cms_site_inquiry_route(string $formKey): ?array
             'copy_to_sender' => false,
         ],
         'voluntariado_donacion' => [
-            'to_email' => 'voluntariado.humanitario-RD@acropolis.org',
+            'to_email' => 'voluntariadord@acropolis.org',
             'to_name' => 'Voluntariado Humanitario',
             'copy_to_sender' => false,
         ],
         'esfera_donar' => [
-            'to_email' => 'voluntariado.humanitario-RD@acropolis.org',
-            'to_name' => 'Voluntariado Humanitario',
+            'to_email' => 'esferard@acropolis.org',
+            'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => false,
         ],
         'esfera_alianzas' => [
-            'to_email' => 'voluntariado.humanitario-RD@acropolis.org',
-            'to_name' => 'Voluntariado Humanitario',
+            'to_email' => 'esferard@acropolis.org',
+            'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => false,
         ],
         'esfera_info' => [
-            'to_email' => 'voluntariado.humanitario-RD@acropolis.org',
-            'to_name' => 'Voluntariado Humanitario',
+            'to_email' => 'esferard@acropolis.org',
+            'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => false,
         ],

@@ -7,10 +7,10 @@ const SMTP_FILE = path.join(ROOT, "data", "system", "smtp.json");
 const LOCAL_CONFIG = path.join(ROOT, "api", "config.local.php");
 
 const DEFAULTS = {
-  host: "mail.acropolis.org.do",
+  host: "mail.acropolis.org",
   port: 465,
   secure: "ssl",
-  user: "smtp_user@acropolis.org.do",
+  user: "smtp_user@acropolis.org",
   password: "",
   from_email: "no-reply@acropolis.org",
   from_name: "Nueva Acrópolis RD",
@@ -22,11 +22,16 @@ const DEFAULTS = {
       copy_to_sender: true,
     },
     esfera_solicitud: {
-      to_email: "voluntariado.humanitario-RD@acropolis.org",
-      to_name: "Voluntariado Humanitario",
+      to_email: "esferard@acropolis.org",
+      to_name: "Punto Focal Esfera",
       cc_email: "Santiago.a@acropolis.org",
       subject_prefix: "[Esfera] Solicitud taller",
       copy_to_sender: true,
+    },
+    voluntariado_solicitud: {
+      to_email: "voluntariadord@acropolis.org",
+      to_name: "Voluntariado Humanitario",
+      copy_to_sender: false,
     },
   },
 };
@@ -69,6 +74,10 @@ export function loadSmtpConfig() {
       esfera_solicitud: {
         ...DEFAULTS.forms.esfera_solicitud,
         ...(stored.forms?.esfera_solicitud ?? {}),
+      },
+      voluntariado_solicitud: {
+        ...DEFAULTS.forms.voluntariado_solicitud,
+        ...(stored.forms?.voluntariado_solicitud ?? {}),
       },
     },
   };

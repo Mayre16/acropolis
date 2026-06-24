@@ -6,6 +6,8 @@ import { MessageCircle } from "lucide-react";
 import { preferWebpAssetUrl } from "@/lib/media-assets";
 import { type RegaloItem } from "@/lib/editorial-extras";
 import { useEditorialConfig } from "@/lib/editorial-config";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import { regaloToCartItem, formatCartMoney } from "@/lib/cart";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { RegaloDetailDialog } from "@/components/RegaloDetailDialog";
@@ -60,8 +62,9 @@ function RegaloCardImage({
   imagePad: string;
   imageSizes: string;
 }) {
+  const isLibreta = item.category === "libretas";
   return (
-    <div className={`relative ${aspect} bg-white [perspective:1400px]`}>
+    <div className={`relative ${aspect} ${aspect.includes("bg-") ? "" : "bg-white"} [perspective:1400px]`}>
       {item.backImageUrl ? (
         <div className="relative h-full w-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] group-focus-visible:[transform:rotateY(180deg)]">
           <div className="absolute inset-0 [backface-visibility:hidden]">
@@ -112,17 +115,29 @@ function RegaloCardImage({
   );
 }
 
-function RegaloCard({ item }: { item: RegaloItem }) {
+function RegaloCard({
+  item,
+  onEdit,
+}: {
+  item: RegaloItem;
+  onEdit?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [showBack, setShowBack] = useState(false);
   const isSeparador = item.category === "separadores";
   const isLibreta = item.category === "libretas";
   const aspect = isSeparador
     ? "aspect-[5/12] bg-neutral-50"
-    : item.category === "camisetas" || isLibreta
-      ? "aspect-square"
-      : "aspect-[3/4]";
-  const imagePad = isSeparador || isLibreta ? "object-contain p-2" : "object-contain p-3";
+    : isLibreta
+      ? "aspect-[779/922] bg-neutral-50"
+      : item.category === "camisetas"
+        ? "aspect-square"
+        : "aspect-[3/4]";
+  const imagePad = isSeparador
+    ? "object-contain object-center p-2"
+    : isLibreta
+      ? "object-contain object-center p-0.5"
+      : "object-contain p-3";
   const imageSizes = isSeparador
     ? "(max-width: 768px) 45vw, 180px"
     : "(max-width: 768px) 50vw, 25vw";
@@ -138,6 +153,10 @@ function RegaloCard({ item }: { item: RegaloItem }) {
   if (isSeparador) {
     return (
       <>
+        <div className="relative">
+          {onEdit ? (
+            <EditorialEditPencil label={`Editar ${item.title}`} onClick={onEdit} />
+          ) : null}
         <button
           type="button"
           onClick={openDetail}
@@ -170,6 +189,7 @@ function RegaloCard({ item }: { item: RegaloItem }) {
             </p>
           </div>
         </button>
+        </div>
         <RegaloDetailDialog
           item={item}
           open={open}
@@ -183,7 +203,10 @@ function RegaloCard({ item }: { item: RegaloItem }) {
 
   return (
     <>
-      <article className="group overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card">
+      <article className="relative group overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card">
+        {onEdit ? (
+          <EditorialEditPencil label={`Editar ${item.title}`} onClick={onEdit} />
+        ) : null}
         <button
           type="button"
           onClick={openDetail}
@@ -335,6 +358,7 @@ type RegalosSectionProps = {
 
 export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
   const { regaloCategories, regalos } = useEditorialConfig();
+  const edit = useEditorialCmsEdit();
   const [activeFilter, setActiveFilter] = useState(initialFilter);
 
   useEffect(() => {
@@ -413,7 +437,15 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
                 <p className="mt-1 text-sm text-na-muted">{cat.description}</p>
                 <div className={gridClass}>
                   {items.map((item) => (
-                    <RegaloCard key={item.id} item={item} />
+                    <RegaloCard
+                      key={item.id}
+                      item={item}
+                      onEdit={
+                        edit?.ready
+                          ? () => edit.setSelectedId(`regalo:${item.id}`)
+                          : undefined
+                      }
+                    />
                   ))}
                 </div>
               </div>

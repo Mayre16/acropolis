@@ -133,9 +133,7 @@ export function useVoluntariadoQueHacemosDisplay() {
     eyebrow: page.queHacemosEyebrow ?? VOLUNTARIADO_QUE_HACEMOS_SECTION.eyebrow,
     title: page.queHacemosTitle ?? VOLUNTARIADO_QUE_HACEMOS_SECTION.title,
     intro: page.queHacemosIntro ?? VOLUNTARIADO_QUE_HACEMOS_SECTION.intro,
-    cards: (page.queHacemosCards ?? VOLUNTARIADO_QUE_HACEMOS_DEFAULTS).map(
-      resolveQueHacemosCard,
-    ),
+    cards: page.queHacemosCards.map(resolveQueHacemosCard),
   };
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -5,10 +7,11 @@ import {
   brandLogoHeightClass,
   brandLogoSectionGapClass,
 } from "@/lib/brand-clear-space";
-import { WHATSAPP_URL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 /** Cierre de la home: marca de la Organización Internacional + invitación (logo abajo, como la guía). */
 export function InternationalBand() {
+  const whatsapp = useWhatsAppUrls();
   return (
     <section className="mx-auto mb-16 mt-4 max-w-6xl px-4 sm:px-6">
       <div className="rounded-[1.75rem] bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-8 text-center shadow-na-card sm:p-14">
@@ -34,7 +37,7 @@ export function InternationalBand() {
         </p>
         <div className="mt-8 flex flex-col flex-wrap items-center justify-center gap-3 sm:flex-row">
           <a
-            href={WHATSAPP_URL}
+            href={whatsapp.cursos}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-na-helios px-6 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105"

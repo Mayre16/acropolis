@@ -46,10 +46,18 @@ export function useCursosOfertaDisplay() {
     conferenciasIntro:
       page?.ofertaConferenciasIntro ?? DEFAULT_OFERTA_COPY.conferenciasIntro,
     cursosTalleres: resolveCards(
-      mergeCursosCards(CURSOS_TALLERES_DEFAULTS, page?.cursosTalleres),
+      mergeCursosCards(
+        CURSOS_TALLERES_DEFAULTS,
+        page?.cursosTalleres,
+        page?.cursosTalleresHidden,
+      ),
     ),
     conferencias: resolveCards(
-      mergeCursosCards(CONFERENCIAS_DEFAULTS, page?.conferencias),
+      mergeCursosCards(
+        CONFERENCIAS_DEFAULTS,
+        page?.conferencias,
+        page?.conferenciasHidden,
+      ),
     ),
   };
 }

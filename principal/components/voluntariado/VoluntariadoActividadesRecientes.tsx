@@ -68,7 +68,7 @@ function RecienteCard({
           <Pencil className="h-4 w-4" />
         </button>
       ) : null}
-      <div className="relative aspect-[4/3] w-full bg-na-heket/5">
+      <div className="relative aspect-[16/10] w-full bg-na-heket/5">
         {item.src ? (
           <Image
             src={item.src}
@@ -84,16 +84,16 @@ function RecienteCard({
           </div>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col p-3.5 sm:p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-3.5">
         {item.date ? (
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-na-kefer">
             {item.date}
           </p>
         ) : null}
-        <h3 className="mt-0.5 text-sm font-black text-na-heketDark sm:text-base">
+        <h3 className="mt-0.5 line-clamp-2 text-sm font-black text-na-heketDark">
           {item.title}
         </h3>
-        <p className="mt-1.5 flex-1 text-xs leading-relaxed text-na-muted">
+        <p className="mt-1.5 line-clamp-3 flex-1 text-xs leading-relaxed text-na-muted">
           {item.text}
         </p>
         {item.href ? (
@@ -156,7 +156,7 @@ function VoluntariadoRecientesCarousel({
   const pageCount = maxStart + 1;
 
   return (
-    <div className="relative mt-8">
+    <div className="relative mx-auto mt-8 max-w-5xl">
       <div className="overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-in-out"
@@ -270,7 +270,7 @@ export function VoluntariadoActividadesRecientes() {
             onEditItem={(id) => edit?.setSelectedId(voluntariadoRecienteId(id))}
           />
         ) : (
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+          <ul className="mx-auto mt-8 grid max-w-5xl gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {items.map((item, i) => (
               <li key={item.id}>
                 <RecienteCard

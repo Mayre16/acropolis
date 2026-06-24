@@ -1,8 +1,9 @@
 "use client";
 
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { LayoutGrid, MapPin, Pencil, UsersRound } from "lucide-react";
+import { LayoutGrid, MapPin, Pencil, Plus, UsersRound } from "lucide-react";
 import {
   LAYOUT_LABELS,
   SALON_SEDES,
@@ -167,6 +168,28 @@ function SalonCard({
   );
 }
 
+function SalonInsertSlot({
+  onClick,
+  label = "Añadir salón aquí",
+}: {
+  onClick: () => void;
+  label?: string;
+}) {
+  return (
+    <li className="flex justify-center">
+      <button
+        type="button"
+        onClick={onClick}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-amber-300/80 bg-amber-50/60 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-amber-900 transition hover:border-amber-400 hover:bg-amber-100"
+        aria-label={label}
+      >
+        <Plus className="h-4 w-4" aria-hidden />
+        {label}
+      </button>
+    </li>
+  );
+}
+
 export function SalonesAlquiler({
   id = "salones",
   variant = "principal",
@@ -183,7 +206,7 @@ export function SalonesAlquiler({
         salones: edit.items
           .filter((s) => s.sede === sede)
           .map(cmsToSalon),
-      })).filter((group) => group.salones.length > 0)
+      }))
     : staticGroups;
 
   const pageCopy = edit?.ready ? edit.page : staticPageCopy;
@@ -202,14 +225,24 @@ export function SalonesAlquiler({
       {!embedded ? (
         <div className="relative">
           {edit?.ready ? (
-            <button
-              type="button"
-              onClick={() => edit.setSelectedId("__salonesSection__")}
-              className="absolute right-0 top-0 inline-flex items-center gap-1.5 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Editar textos
-            </button>
+            <div className="absolute right-0 top-0 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => edit.setSelectedId("__salonesSection__")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar textos
+              </button>
+              <button
+                type="button"
+                onClick={() => edit.addSalon()}
+                className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow"
+              >
+                <Plus className="h-4 w-4" />
+                Añadir salón
+              </button>
+            </div>
           ) : null}
           <p className={`text-xs font-bold uppercase tracking-[0.32em] ${styles.eyebrow}`}>
             {pageCopy.eyebrow}
@@ -224,14 +257,24 @@ export function SalonesAlquiler({
       ) : (
         <div className="relative">
           {edit?.ready ? (
-            <button
-              type="button"
-              onClick={() => edit.setSelectedId("__salonesSection__")}
-              className="absolute right-0 top-0 inline-flex items-center gap-1.5 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Editar textos
-            </button>
+            <div className="absolute right-0 top-0 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => edit.setSelectedId("__salonesSection__")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar textos
+              </button>
+              <button
+                type="button"
+                onClick={() => edit.addSalon()}
+                className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow"
+              >
+                <Plus className="h-4 w-4" />
+                Añadir salón
+              </button>
+            </div>
           ) : null}
           <h3 className={`text-2xl font-black sm:text-3xl ${styles.title}`}>
             {sectionTitle}
@@ -244,6 +287,7 @@ export function SalonesAlquiler({
 
       {groups.map((group) => {
         const compactCards = group.sede === "Los Prados";
+        const inEdit = Boolean(edit?.ready);
 
         return (
         <div key={group.sede} className={embedded ? "mt-10" : "mt-12"}>
@@ -252,27 +296,44 @@ export function SalonesAlquiler({
             <h3 className="text-lg font-black">Sede {group.sede}</h3>
           </div>
           <ul
-            className={`mt-6 grid gap-5 ${
-              compactCards
-                ? "mx-auto max-w-2xl sm:grid-cols-2 sm:gap-4"
-                : group.salones.length === 2
-                  ? "sm:grid-cols-2"
-                  : "sm:grid-cols-2 lg:grid-cols-3"
+            className={`mt-6 ${
+              inEdit
+                ? "flex flex-col gap-3"
+                : `grid gap-5 ${
+                    compactCards
+                      ? "mx-auto max-w-2xl sm:grid-cols-2 sm:gap-4"
+                      : group.salones.length === 2
+                        ? "sm:grid-cols-2"
+                        : "sm:grid-cols-2 lg:grid-cols-3"
+                  }`
             }`}
           >
+            {inEdit ? (
+              <SalonInsertSlot
+                label={`Añadir salón en ${group.sede} (al inicio)`}
+                onClick={() => edit!.addSalon({ atStartOfSede: group.sede })}
+              />
+            ) : null}
             {group.salones.map((salon) => (
-              <li key={salon.id}>
-                <SalonCard
-                  salon={salon}
-                  styles={styles}
-                  compact={compactCards}
-                  onEdit={
-                    edit?.ready
-                      ? () => edit.setSelectedId(salon.id)
-                      : undefined
-                  }
-                />
-              </li>
+              <Fragment key={salon.id}>
+                <li>
+                  <SalonCard
+                    salon={salon}
+                    styles={styles}
+                    compact={compactCards}
+                    onEdit={
+                      edit?.ready
+                        ? () => edit.setSelectedId(salon.id)
+                        : undefined
+                    }
+                  />
+                </li>
+                {inEdit ? (
+                  <SalonInsertSlot
+                    onClick={() => edit!.addSalon({ afterId: salon.id })}
+                  />
+                ) : null}
+              </Fragment>
             ))}
           </ul>
         </div>

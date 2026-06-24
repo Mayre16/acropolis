@@ -71,6 +71,10 @@ export const SUBMARCA_LOGO = {
 export const LEGAL_DOMICILE =
   "Calle Cub Scouts No. 6, Ens. Naco, Santo Domingo";
 
+/** Contacto general e información (legal, sedes, consultas). */
+export const INFO_EMAIL =
+  process.env.NEXT_PUBLIC_INFO_EMAIL?.trim() || "info.oinadom@acropolis.org";
+
 export const DIPLOMADO_WHATSAPP_NUMBER = "18493527054";
 export const DIPLOMADO_WHATSAPP_URL = `https://wa.me/${DIPLOMADO_WHATSAPP_NUMBER}`;
 

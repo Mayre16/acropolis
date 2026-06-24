@@ -1,7 +1,6 @@
 "use client";
 
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useVoluntariadoCmsEdit } from "@/components/cms/VoluntariadoCmsEditContext";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
@@ -36,8 +35,6 @@ export function VoluntariadoHero() {
       images={images}
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedId("__hero__")}
-    >
-      <HeroCarouselEditButton carouselKey="voluntariado" />
-    </CmsPageHero>
+    />
   );
 }

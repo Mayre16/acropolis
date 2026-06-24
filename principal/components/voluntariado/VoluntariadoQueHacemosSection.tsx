@@ -30,10 +30,10 @@ export function VoluntariadoQueHacemosSection() {
       <h2 className="mt-3 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
         {section.title}
       </h2>
-      <p className="mt-4 max-w-2xl text-na-muted">{section.intro}</p>
+      <p className="mt-4 max-w-3xl text-na-muted">{section.intro}</p>
 
-      <ul className="mt-10 grid gap-6 md:grid-cols-3">
-        {section.cards.map(({ id, src, alt, title, text }, i) => (
+      <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {section.cards.map(({ id, src, alt, area, title, text }, i) => (
           <li
             key={id}
             className={`relative flex flex-col overflow-hidden ${accentCardShell(i)}`}
@@ -56,12 +56,21 @@ export function VoluntariadoQueHacemosSection() {
                 alt={alt}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 unoptimized
               />
             </div>
             <div className="flex flex-1 flex-col p-6">
-              <h3 className="text-lg font-black text-na-heketDark">{title}</h3>
+              {area ? (
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-na-kefer">
+                  {area}
+                </p>
+              ) : null}
+              <h3
+                className={`text-lg font-black text-na-heketDark ${area ? "mt-2" : ""}`}
+              >
+                {title}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-na-muted">{text}</p>
             </div>
           </li>

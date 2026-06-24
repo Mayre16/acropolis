@@ -47,12 +47,12 @@ export const brandLogoHeightClass = {
   /** Header interior — oinadom completo (+20 px vs headerFilial). */
   headerInnerOinadom:
     "[--brand-logo-h:4.225rem] sm:[--brand-logo-h:4.375rem]",
-  /** Footer — oinadom blanco, más grande que header (misma lógica `--brand-logo-h`). */
+  /** @deprecated Usar `footer` (híbrido oinadom en pie de página). */
   footerOinadom:
-    "[--brand-logo-h:5.5rem] sm:[--brand-logo-h:5.875rem] md:[--brand-logo-h:6.25rem]",
+    "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:7.5rem] sm:[--brand-logo-h:8.5rem] md:[--brand-logo-h:9.25rem] lg:[--brand-logo-h:10rem]",
-  footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
+  footer: "[--brand-logo-h:3.8125rem] sm:[--brand-logo-h:4.1625rem] md:[--brand-logo-h:4.4125rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:

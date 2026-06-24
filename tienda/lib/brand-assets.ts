@@ -43,8 +43,8 @@ export const BRAND_LOCKUPS: Record<BrandLockupId, LockupAsset> = {
     webpWhite: "/brand/logo-oinadom-white.webp",
     png: "/brand/logo-oinadom.png",
     alt: "Nueva Acrópolis — República Dominicana",
-    width: 2429,
-    height: 1633,
+    width: 2817,
+    height: 1587,
   },
   escuela: {
     webp: "/brand/logo-escuela.webp",

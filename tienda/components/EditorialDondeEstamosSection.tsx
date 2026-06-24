@@ -17,9 +17,11 @@ import {
   editorialWhatsAppUrl,
 } from "@/lib/editorial-locations";
 import { useEditorialDonde } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
+import { INFO_EMAIL } from "@/lib/site-config";
 
 const CONTACT_PHONE = "(849) 352-7054";
-const CONTACT_EMAIL = "oinadom@nuevaacropolis.org.do";
 
 function LazyMapEmbed({ sede }: { sede: EditorialSede }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -65,9 +67,18 @@ function LazyMapEmbed({ sede }: { sede: EditorialSede }) {
   );
 }
 
-function SedePanel({ sede }: { sede: EditorialSede }) {
+function SedePanel({
+  sede,
+  onEdit,
+}: {
+  sede: EditorialSede;
+  onEdit?: () => void;
+}) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-8">
+    <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-8">
+      {onEdit ? (
+        <EditorialEditPencil label={`Editar ${sede.name}`} onClick={onEdit} />
+      ) : null}
       <div className="rounded-2xl border border-na-heket/10 bg-white p-5 shadow-na-soft sm:p-6">
         <span className="inline-flex rounded-full bg-na-editorial/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-na-editorialDark">
           Sede
@@ -114,10 +125,10 @@ function SedePanel({ sede }: { sede: EditorialSede }) {
           <li className="flex items-center gap-3">
             <Mail className="h-4 w-4 shrink-0 text-na-heket" aria-hidden />
             <a
-              href={`mailto:${CONTACT_EMAIL}`}
+              href={`mailto:${INFO_EMAIL}`}
               className="font-semibold text-na-ink hover:text-na-heket"
             >
-              {CONTACT_EMAIL}
+              {INFO_EMAIL}
             </a>
           </li>
         </ul>
@@ -155,6 +166,7 @@ function SedePanel({ sede }: { sede: EditorialSede }) {
 
 export function EditorialDondeEstamosSection() {
   const { page, sedes } = useEditorialDonde();
+  const edit = useEditorialCmsEdit();
   const [tab, setTab] = useState<EditorialSedeId>(sedes[0]?.id ?? "sede-naco");
   const sede = sedes.find((s) => s.id === tab) ?? sedes[0];
 
@@ -167,6 +179,14 @@ export function EditorialDondeEstamosSection() {
       aria-labelledby="editorial-donde-title"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="relative">
+          {edit?.ready ? (
+            <EditorialEditPencil
+              label="Editar encabezado de la página"
+              onClick={() => edit.setSelectedId("donde:page")}
+              className="right-0 top-0"
+            />
+          ) : null}
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-heket">
           {page.eyebrow}
         </p>
@@ -179,6 +199,7 @@ export function EditorialDondeEstamosSection() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-na-muted sm:text-base">
           {page.lede}
         </p>
+        </div>
 
         <div
           className="mt-8 inline-flex flex-wrap gap-2 rounded-2xl border border-na-heket/10 bg-white p-1.5 shadow-na-soft"
@@ -214,7 +235,14 @@ export function EditorialDondeEstamosSection() {
           aria-labelledby={`editorial-sede-tab-${sede.id}`}
           className="mt-8"
         >
-          <SedePanel sede={sede} />
+          <SedePanel
+            sede={sede}
+            onEdit={
+              edit?.ready
+                ? () => edit.setSelectedId(`donde:sede:${sede.id}`)
+                : undefined
+            }
+          />
         </div>
       </div>
     </section>

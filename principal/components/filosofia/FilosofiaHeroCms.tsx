@@ -1,7 +1,6 @@
 "use client";
 
 import { PageHero } from "@/components/PageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { FILOSOFIA_HERO_IMAGES } from "@/lib/hero-images";
 import type { BrandLockupId } from "@/lib/brand-assets";
 import type { HeroImage } from "@/lib/hero-images";
@@ -57,7 +56,6 @@ export function FilosofiaHeroCms({
         images={carouselImages}
         imageObjectPosition={imageObjectPosition}
       />
-      <HeroCarouselEditButton carouselKey="filosofia" />
       {edit?.ready ? (
         <button
           type="button"

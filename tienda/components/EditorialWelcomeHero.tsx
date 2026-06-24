@@ -6,6 +6,8 @@ import { EditorialHeroProductCarousel } from "@/components/EditorialHeroProductC
 import { loadStoreBooksCatalog, resolveStoreBookCover } from "@/lib/bookstore";
 import { useEditorialWelcome } from "@/lib/cms/hooks";
 import { useEditorialHeroImages } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import {
   buildBookHeroSlide,
   mergeHeroProductSlides,
@@ -15,6 +17,7 @@ import {
 export function EditorialWelcomeHero() {
   const welcome = useEditorialWelcome();
   const heroImages = useEditorialHeroImages();
+  const edit = useEditorialCmsEdit();
   const taglineItems = welcome.tagline
     .split("·")
     .map((item) => item.trim())
@@ -82,7 +85,14 @@ export function EditorialWelcomeHero() {
 
       <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10">
-          <div>
+          <div className="relative">
+            {edit?.ready ? (
+              <EditorialEditPencil
+                label="Editar textos de bienvenida"
+                onClick={() => edit.setSelectedId("welcome")}
+                className="right-0 top-0"
+              />
+            ) : null}
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.32em] text-na-editorial">
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
               Editorial · Librería
@@ -110,6 +120,12 @@ export function EditorialWelcomeHero() {
           </div>
 
           <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
+            {edit?.ready ? (
+              <EditorialEditPencil
+                label="Editar fotos del carrusel"
+                onClick={() => edit.setSelectedId("heroImages")}
+              />
+            ) : null}
             <div className="rounded-[1.75rem] border border-na-editorial/12 bg-white p-5 shadow-[0_20px_50px_rgba(234,118,4,0.08)] sm:p-6">
               <EditorialHeroProductCarousel slides={productSlides} theme="light" />
             </div>

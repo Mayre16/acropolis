@@ -1,7 +1,6 @@
 "use client";
 
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
@@ -41,8 +40,6 @@ export function EsferaHero() {
       imageObjectPosition="50% 25%"
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedId("__hero__")}
-    >
-      <HeroCarouselEditButton carouselKey="esfera" className="right-4 top-36" />
-    </CmsPageHero>
+    />
   );
 }

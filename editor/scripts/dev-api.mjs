@@ -20,6 +20,14 @@ import {
   setupTwoFactor,
   verifyTwoFactor,
 } from "../lib/auth-service.mjs";
+import {
+  adminClearUserTotp,
+  adminCreateUser,
+  adminDeleteUser,
+  adminListUsers,
+  adminResetPassword,
+  adminUpdateUser,
+} from "../lib/auth-users-admin.mjs";
 import { sendCivisSolicitudMail } from "../lib/civis-solicitud-mail.mjs";
 import { sendEsferaSolicitudMail } from "../lib/esfera-solicitud-mail.mjs";
 import { sendVolunteerSolicitudMail } from "../lib/volunteer-solicitud-mail.mjs";
@@ -112,6 +120,14 @@ function getToken(req) {
   const auth = req.headers.authorization || "";
   const m = /^Bearer\s+(.+)$/i.exec(auth);
   return m?.[1] || "";
+}
+
+function clientIp(req) {
+  const fwd = req.headers["x-forwarded-for"];
+  if (typeof fwd === "string" && fwd.trim()) {
+    return fwd.split(",")[0].trim();
+  }
+  return req.socket?.remoteAddress ?? "";
 }
 
 function requireAuth(req, res, origin) {
@@ -342,7 +358,11 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/auth/login" && req.method === "POST") {
       const body = await readBody(req);
-      const result = loginWithPassword(body?.username ?? "", body?.password ?? "");
+      const result = loginWithPassword(
+        body?.username ?? "",
+        body?.password ?? "",
+        clientIp(req),
+      );
       if (!result.ok) {
         json(res, result.status ?? 401, { ok: false, error: result.error }, origin);
         return;
@@ -428,7 +448,64 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const contentMatch = /^\/content\/(acropolis|civis)\/(draft|published)$/.exec(pathname);
+    const usersListMatch =
+      pathname === "/auth/users" && req.method === "GET";
+    if (usersListMatch) {
+      if (!requireAuth(req, res, origin)) return;
+      const result = adminListUsers(getToken(req));
+      json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+      return;
+    }
+
+    if (pathname === "/auth/users" && req.method === "POST") {
+      if (!requireAuth(req, res, origin)) return;
+      const body = await readBody(req);
+      const result = adminCreateUser(getToken(req), body);
+      json(res, result.status ?? (result.ok ? 201 : 400), result, origin);
+      return;
+    }
+
+    const userIdMatch = /^\/auth\/users\/([^/]+)(\/reset-password|\/totp)?$/.exec(
+      pathname,
+    );
+    if (userIdMatch) {
+      if (!requireAuth(req, res, origin)) return;
+      const userId = userIdMatch[1];
+      const action = userIdMatch[2] ?? "";
+      const token = getToken(req);
+
+      if (action === "/reset-password" && req.method === "POST") {
+        const body = await readBody(req);
+        const result = adminResetPassword(
+          token,
+          userId,
+          body?.password ?? "",
+        );
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+
+      if (action === "/totp" && req.method === "DELETE") {
+        const result = adminClearUserTotp(token, userId);
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+
+      if (!action && req.method === "PUT") {
+        const body = await readBody(req);
+        const result = adminUpdateUser(token, userId, body);
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+
+      if (!action && req.method === "DELETE") {
+        const result = adminDeleteUser(token, userId);
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+    }
+
+    const contentMatch = /^\/content\/(acropolis|civis|editorial)\/(draft|published)$/.exec(pathname);
     if (contentMatch) {
       const [, site, kind] = contentMatch;
       ensureSite(site);
@@ -447,7 +524,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    const publishMatch = /^\/content\/(acropolis|civis)\/publish$/.exec(pathname);
+    const publishMatch = /^\/content\/(acropolis|civis|editorial)\/publish$/.exec(pathname);
     if (publishMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = publishMatch[1];
@@ -481,7 +558,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const backupsMatch = /^\/content\/(acropolis|civis)\/backups$/.exec(pathname);
+    const backupsMatch = /^\/content\/(acropolis|civis|editorial)\/backups$/.exec(pathname);
     if (backupsMatch && req.method === "GET") {
       if (!requireAuth(req, res, origin)) return;
       const site = backupsMatch[1];
@@ -495,7 +572,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const rollbackMatch = /^\/content\/(acropolis|civis)\/rollback$/.exec(pathname);
+    const rollbackMatch = /^\/content\/(acropolis|civis|editorial)\/rollback$/.exec(pathname);
     if (rollbackMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = rollbackMatch[1];
@@ -510,7 +587,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const inventoryMatch = /^\/uploads\/(acropolis|civis)\/inventory$/.exec(pathname);
+    const inventoryMatch = /^\/uploads\/(acropolis|civis|editorial)\/inventory$/.exec(pathname);
     if (inventoryMatch && req.method === "GET") {
       if (!requireAuth(req, res, origin)) return;
       const site = inventoryMatch[1];
@@ -520,7 +597,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const uploadMatch = /^\/upload\/(acropolis|civis)$/.exec(pathname);
+    const uploadMatch = /^\/upload\/(acropolis|civis|editorial)$/.exec(pathname);
     if (uploadMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = uploadMatch[1];
@@ -547,7 +624,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const staticUpload = /^\/uploads\/(acropolis|civis)\/(.+)$/.exec(pathname);
+    const staticUpload = /^\/uploads\/(acropolis|civis|editorial)\/(.+)$/.exec(pathname);
     if (staticUpload && req.method === "GET") {
       const [, site, file] = staticUpload;
       const fp = path.join(uploadsDir(site), path.basename(file));

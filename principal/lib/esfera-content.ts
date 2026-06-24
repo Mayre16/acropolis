@@ -1,6 +1,6 @@
 /** Contenido institucional Esfera — alineado con spherestandards.org y rol OINADOM. */
 
-import { VOLUNTARIADO_EMAIL } from "@/lib/site-config";
+import { ESFERA_SOLICITUD_EMAIL } from "@/lib/site-config";
 
 /** Referencias oficiales Sphere (Estándares Humanitarios). */
 export const SPHERE_OFFICIAL = {
@@ -337,5 +337,5 @@ export const ESFERA_ALIANZAS: EsferaAlianza[] = [
 export const ESFERA_CONTACTO = {
   direccion: "Cub Scout No. 6, Naco",
   ciudad: "Santo Domingo, República Dominicana",
-  email: VOLUNTARIADO_EMAIL,
+  email: ESFERA_SOLICITUD_EMAIL,
 };

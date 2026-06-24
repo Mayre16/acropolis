@@ -9,12 +9,13 @@ import {
   MapPin,
   X,
 } from "lucide-react";
-import { whatsAppHref, whatsAppUrlForCategory } from "@/lib/whatsapp-messages";
+import { whatsAppHref, whatsAppUrlForCategory, type WhatsAppUrls } from "@/lib/whatsapp-messages";
 import type { AgendaCategory } from "@/lib/agenda";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import { EsferaInquiryButton } from "@/components/EsferaInquiryButton";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
 import { accentCardShell, accentTokens } from "@/lib/brand-accents";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 export type AgendaItem = {
   id?: string;
@@ -51,12 +52,13 @@ type Props = {
 
 function inscribeUrlFor(
   item: AgendaItem,
-  fallback?: string,
-  whatsappCategory: AgendaCategory = "curso",
+  fallback: string | undefined,
+  whatsappCategory: AgendaCategory,
+  urls?: WhatsAppUrls,
 ) {
   const text = item.inscribeMessage ?? fallback;
   if (!text) return null;
-  return whatsAppHref(text, whatsAppUrlForCategory(whatsappCategory));
+  return whatsAppHref(text, whatsAppUrlForCategory(whatsappCategory, urls));
 }
 
 function itemCategory(item: AgendaItem): AgendaCategory | undefined {
@@ -100,6 +102,7 @@ export function UpcomingAgenda({
   whatsappCategory = "curso",
 }: Props) {
   const [selected, setSelected] = useState<AgendaItem | null>(null);
+  const whatsappUrls = useWhatsAppUrls();
 
   const close = useCallback(() => setSelected(null), []);
 
@@ -124,6 +127,7 @@ export function UpcomingAgenda({
           selected,
           defaultInscribeMessage,
           selectedCategory ?? whatsappCategory,
+          whatsappUrls,
         )
       : null;
 

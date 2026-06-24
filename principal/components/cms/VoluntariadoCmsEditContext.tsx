@@ -477,7 +477,11 @@ function VoluntariadoCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <HeroEditFields
+            value={page}
+            onChange={patchPage}
+            carouselKey="voluntariado"
+          />
         </EditPanelChrome>
       ) : null}
 

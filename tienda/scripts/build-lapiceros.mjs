@@ -1,5 +1,6 @@
 /**
- * Publica lapiceros-virtudes desde la imagen maestra (sin overlay de texto).
+ * Publica lapiceros-virtudes desde la imagen maestra (virtudes cardinales grabadas).
+ * negro Prudencia · rojo Fortaleza · azul Templanza · verde Justicia
  * Uso: npm run lapiceros:build
  */
 import fs from "node:fs";

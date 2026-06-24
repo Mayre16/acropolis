@@ -15,6 +15,13 @@ import type {
   CmsMedia,
   CmsViaje,
 } from "@/lib/cms/types";
+import {
+  eventoCategoryLabel,
+  mergeSeoTags,
+  normalizeCmsEventoCategory,
+  parseLegacyEventoCategory,
+} from "@/lib/agenda-publish-categories";
+import type { AgendaCategory } from "@/lib/agenda";
 import { isEventoPublished } from "@/lib/agenda-evento";
 
 function cmsMedia(m: CmsMedia) {
@@ -41,14 +48,27 @@ export function cmsToArticulo(a: CmsArticulo): Articulo {
 }
 
 export function cmsToEvento(e: CmsEvento): EventoItem {
+  const categoryId = normalizeCmsEventoCategory(e.category);
   return {
     slug: e.slug,
     title: e.title,
     date: e.date,
-    category: e.category,
+    category: eventoCategoryLabel(categoryId),
+    categoryId,
+    seoTags: mergeSeoTags(categoryId, e.seoTags),
     excerpt: e.excerpt,
     image: cmsMedia(e.image),
     body: e.body,
+  };
+}
+
+function enrichStaticEvento(e: EventoItem): EventoItem {
+  const categoryId = e.categoryId ?? parseLegacyEventoCategory(e.category);
+  return {
+    ...e,
+    categoryId,
+    category: eventoCategoryLabel(categoryId),
+    seoTags: mergeSeoTags(categoryId, e.seoTags),
   };
 }
 
@@ -74,7 +94,7 @@ export function mergeEventos(
   const hidden = new Set(cms?.sections.eventosHidden ?? []);
   const map = new Map<string, EventoItem>();
   for (const e of code) {
-    if (!hidden.has(e.slug)) map.set(e.slug, e);
+    if (!hidden.has(e.slug)) map.set(e.slug, enrichStaticEvento(e));
   }
   for (const e of cms?.sections.eventos ?? []) {
     if (!isEventoPublished(e)) continue;

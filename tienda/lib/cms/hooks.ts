@@ -35,11 +35,20 @@ import {
 } from "@/lib/cms/merge-content";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { useCmsHydrated } from "@/lib/cms/hydration";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
+import { editorialStateAsDoc } from "@/lib/cms/editorial-display";
 
 export { useCmsHydrated } from "@/lib/cms/hydration";
 
-export function useEditorialHeaderNav() {
+function useEditOrPublishedCms() {
   const cms = useCmsDocument();
+  const edit = useEditorialCmsEdit();
+  if (edit?.ready) return editorialStateAsDoc(edit.state);
+  return cms;
+}
+
+export function useEditorialHeaderNav() {
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return EDITORIAL_HEADER_NAV;
   if (!isCmsEnabled()) return EDITORIAL_HEADER_NAV;
@@ -47,7 +56,7 @@ export function useEditorialHeaderNav() {
 }
 
 export function useEditorialWelcome() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return { ...EDITORIAL_WELCOME };
   if (!isCmsEnabled()) return { ...EDITORIAL_WELCOME };
@@ -55,7 +64,7 @@ export function useEditorialWelcome() {
 }
 
 export function useEditorialHomeCards() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return EDITORIAL_HOME_CARDS;
   if (!isCmsEnabled()) return EDITORIAL_HOME_CARDS;
@@ -63,7 +72,7 @@ export function useEditorialHomeCards() {
 }
 
 export function useEditorialFooterTagline() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) {
     return mergeEditorialFooterTagline(null);
@@ -73,7 +82,7 @@ export function useEditorialFooterTagline() {
 }
 
 export function useEditorialQuienesSomos() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) {
     return {
@@ -94,7 +103,7 @@ export function useEditorialQuienesSomos() {
 }
 
 export function useEditorialDonde() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) {
     return {
@@ -121,7 +130,7 @@ export function useEditorialDonde() {
 }
 
 export function useEditorialRevistas() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return REVISTAS;
   if (!isCmsEnabled()) return REVISTAS;
@@ -129,7 +138,7 @@ export function useEditorialRevistas() {
 }
 
 export function useEditorialRegalos() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return REGALOS;
   if (!isCmsEnabled()) return REGALOS;
@@ -137,7 +146,7 @@ export function useEditorialRegalos() {
 }
 
 export function useEditorialRegaloCategories() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return REGALO_CATEGORIES;
   if (!isCmsEnabled()) return REGALO_CATEGORIES;
@@ -145,7 +154,7 @@ export function useEditorialRegaloCategories() {
 }
 
 export function useEditorialShopCategories() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return mergeEditorialShopCategories(null);
   if (!isCmsEnabled()) return mergeEditorialShopCategories(null);
@@ -153,7 +162,7 @@ export function useEditorialShopCategories() {
 }
 
 export function useEditorialBookFilters() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return mergeEditorialBookFilters(null);
   if (!isCmsEnabled()) return mergeEditorialBookFilters(null);
@@ -161,7 +170,7 @@ export function useEditorialBookFilters() {
 }
 
 export function useEditorialDigitalBooks() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return DIGITAL_BOOK_GROUPS;
   if (!isCmsEnabled()) return DIGITAL_BOOK_GROUPS;
@@ -169,7 +178,7 @@ export function useEditorialDigitalBooks() {
 }
 
 export function useEditorialHeroImages() {
-  const cms = useCmsDocument();
+  const cms = useEditOrPublishedCms();
   const hydrated = useCmsHydrated();
   if (!hydrated) return EDITORIAL_HERO_IMAGES;
   if (!isCmsEnabled()) return EDITORIAL_HERO_IMAGES;

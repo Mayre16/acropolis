@@ -6,6 +6,8 @@ import { ExternalLink } from "lucide-react";
 import { preferWebpAssetUrl } from "@/lib/media-assets";
 import { LeaveSiteDialog } from "@/components/LeaveSiteDialog";
 import { useEditorialConfig } from "@/lib/editorial-config";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import type { RevistaItem } from "@/lib/editorial-extras";
 import { PRINCIPAL_SITE_URL } from "@/lib/site-config";
 
@@ -38,6 +40,7 @@ function RevistaLinkContent({ item }: { item: RevistaItem }) {
 
 export function RevistasSection() {
   const { revistas } = useEditorialConfig();
+  const edit = useEditorialCmsEdit();
   const [leaveTarget, setLeaveTarget] = useState<RevistaItem | null>(null);
 
   return (
@@ -50,8 +53,14 @@ export function RevistasSection() {
           return (
             <article
               key={item.title}
-              className="flex flex-col overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft"
+              className="relative flex flex-col overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft"
             >
+              {edit?.ready ? (
+                <EditorialEditPencil
+                  label={`Editar ${item.title}`}
+                  onClick={() => edit.setSelectedId(`revista:${item.title}`)}
+                />
+              ) : null}
               {item.imageUrl ? (
                 <div className="relative aspect-[3/2] w-full bg-black/5">
                   <Image

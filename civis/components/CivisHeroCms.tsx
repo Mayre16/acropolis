@@ -1,6 +1,5 @@
 "use client";
 
-import { Images } from "lucide-react";
 import { CivisHero } from "@/components/CivisHero";
 import { CivisEditPencil } from "@/components/cms/CmsEditFields";
 import { useCivisCmsEdit } from "@/components/cms/CivisCmsEditContext";
@@ -43,18 +42,6 @@ export function CivisHeroCms(props: Props) {
         ctaHref={hero.ctaHref ?? props.ctaHref}
         ctaLabel={hero.ctaLabel ?? props.ctaLabel}
         images={images}
-        carouselEditActions={
-          edit?.ready ? (
-            <button
-              type="button"
-              onClick={() => edit.setSelectedId("__heroCarousel__")}
-              className="absolute bottom-3 left-3 right-3 z-20 inline-flex items-center justify-center gap-2 rounded-xl bg-[#ffc90d] px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-[#252e65] shadow-lg transition hover:brightness-105"
-            >
-              <Images className="h-4 w-4" aria-hidden />
-              Editar carrusel ({images.length} fotos)
-            </button>
-          ) : null
-        }
       />
     </div>
   );

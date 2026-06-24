@@ -1,10 +1,11 @@
 import {
   AGENDA_CATEGORY_LABEL,
-  HOME_AGENDA_CATEGORIES,
+  AGENDA_FILTER_CATEGORIES,
   sortAgendaEntries,
   type AgendaCategory,
   type AgendaEntry,
 } from "@/lib/agenda";
+import { categoriesMatchFilter } from "@/lib/agenda-publish-categories";
 
 /** Lugares canónicos para filtrar la agenda. */
 export type AgendaLocationFilter =
@@ -97,7 +98,7 @@ export function agendaLocationLabel(
 export function getAgendaFilterOptions(
   entries: AgendaEntry[],
 ): AgendaFilterOptions {
-  const categories = [...HOME_AGENDA_CATEGORIES];
+  const categories = [...AGENDA_FILTER_CATEGORIES];
   const locations = AGENDA_LOCATION_OPTIONS;
 
   const months = [
@@ -135,7 +136,7 @@ export function filterAgendaEntries(
   filters: AgendaFilterState,
 ): AgendaEntry[] {
   const filtered = entries.filter((entry) => {
-    if (filters.category !== "all" && entry.category !== filters.category) {
+    if (!categoriesMatchFilter(entry.category, filters.category)) {
       return false;
     }
     if (

@@ -2,7 +2,6 @@
 
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
-import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
   DEFAULT_ESFERA_HOME_PROMO,
   ESFERA_HOME_PROMO_SECTION_ID,
@@ -34,11 +33,6 @@ export function useEsferaHomeDisplay() {
     title: promo.homeTitle ?? DEFAULT_ESFERA_HOME_PROMO.homeTitle!,
     intro: promo.homeIntro ?? DEFAULT_ESFERA_HOME_PROMO.homeIntro!,
     detail: promo.homeDetail ?? DEFAULT_ESFERA_HOME_PROMO.homeDetail!,
-    imageSrc:
-      resolveCmsMediaUrl(promo.homeImageSrc) ??
-      promo.homeImageSrc ??
-      DEFAULT_ESFERA_HOME_PROMO.homeImageSrc!,
-    imageAlt: promo.homeImageAlt ?? DEFAULT_ESFERA_HOME_PROMO.homeImageAlt!,
     ctaLabel: promo.homeCtaLabel ?? DEFAULT_ESFERA_HOME_PROMO.homeCtaLabel!,
   };
 }

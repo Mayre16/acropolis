@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { DIPLOMADO_INSCRIBE_WHATSAPP } from "@/lib/diplomado-content";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 import {
   DIPLOMADO_PATH,
-  DIPLOMADO_WHATSAPP_URL,
   INFO_EMAIL,
   NAV_CONTENIDO,
   NAV_INSTITUCIONAL,
@@ -15,7 +15,6 @@ import {
   type NavLink,
 } from "@/lib/site-config";
 
-const INSCRIBE_HREF = `${DIPLOMADO_WHATSAPP_URL}?text=${encodeURIComponent(DIPLOMADO_INSCRIBE_WHATSAPP)}`;
 const CONTACT_HREF = `mailto:${INFO_EMAIL}?subject=${encodeURIComponent("Consulta — Diplomado Nueva Acrópolis")}`;
 
 function DiplomadoInstitucionalNav({ onNavigate }: { onNavigate: () => void }) {
@@ -108,6 +107,8 @@ function NavItemLink({
 
 export function DiplomadoNav() {
   const [open, setOpen] = useState(false);
+  const whatsapp = useWhatsAppUrls();
+  const inscribeHref = `${whatsapp.diplomado}?text=${encodeURIComponent(DIPLOMADO_INSCRIBE_WHATSAPP)}`;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -215,7 +216,7 @@ export function DiplomadoNav() {
             Inscripción
           </a>
           <a
-            href={INSCRIBE_HREF}
+            href={inscribeHref}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 block rounded-full bg-[var(--dip-gold)] px-4 py-3 text-center text-sm font-bold text-[#1a1a18]"

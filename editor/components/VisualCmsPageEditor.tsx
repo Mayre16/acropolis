@@ -13,12 +13,16 @@ const CIVIS_URL =
   process.env.NEXT_PUBLIC_CIVIS_URL?.replace(/\/$/, "") ||
   "http://localhost:3200";
 
+const TIENDA_URL =
+  process.env.NEXT_PUBLIC_TIENDA_URL?.replace(/\/$/, "") ||
+  "http://localhost:3300";
+
 type VisualCmsPageEditorProps = {
   title: string;
   path: string;
   query?: string;
   hint: React.ReactNode;
-  site?: "acropolis" | "civis";
+  site?: "acropolis" | "civis" | "editorial";
   previewOnly?: boolean;
   /** Dentro del panel del editor (con pestañas Guardar/Publicar visibles). */
   embedded?: boolean;
@@ -33,7 +37,12 @@ export function VisualCmsPageEditor({
   previewOnly = false,
   embedded = false,
 }: VisualCmsPageEditorProps) {
-  const siteUrl = site === "civis" ? CIVIS_URL : PRINCIPAL_URL;
+  const siteUrl =
+    site === "civis"
+      ? CIVIS_URL
+      : site === "editorial"
+        ? TIENDA_URL
+        : PRINCIPAL_URL;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState(`Cargando ${title}…`);
   const [ready, setReady] = useState(false);
@@ -311,8 +320,9 @@ export function VisualSedesEditor() {
         <>
           Edita nombres, direcciones y contacto de cada sede o centro cultural en{" "}
           <strong>Dónde estamos</strong>. Usa <strong>Añadir sede</strong> o{" "}
-          <strong>Añadir centro cultural</strong> para espacios nuevos. Los
-          cambios se ven también en Esfera y Voluntariado.
+          <strong>Añadir punto cultural</strong> para espacios nuevos. El bloque{" "}
+          <strong>¿Necesitas más información?</strong> y el <strong>pie de página</strong>{" "}
+          tienen lápiz propio. Los cambios se ven también en Esfera y Voluntariado.
         </>
       }
     />
@@ -499,16 +509,16 @@ export function VisualEsferaEditor() {
       path="/esfera"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero (textos y{" "}
-          <strong>Carrusel de fotos</strong>). El bloque <strong>Esfera en el inicio</strong>{" "}
-          se edita con ✎ en la página <strong>Inicio</strong> (mismos datos aquí en el CMS).
-          En{" "}
+          Botón <strong>✎ Editar encabezado</strong> en el hero: logo Esfera
+          (color y blanco), textos y <strong>carrusel de fotos</strong>. El bloque{" "}
+          <strong>Esfera en el inicio</strong> se edita con ✎ en la página{" "}
+          <strong>Inicio</strong> (mismos datos aquí en el CMS). En{" "}
           <strong>Quiénes somos / Qué hacemos</strong>:{" "}
           <strong>Editar sección</strong> para títulos; ✎ en cada pestaña para
           texto y foto; ✎ en cada tarjeta para título y descripción. En{" "}
           <strong>Estándares Esfera</strong>: <strong>Editar textos</strong> para
-          títulos y párrafos; lápiz en el cuadro lateral para logo (también en el
-          hero), portada del manual y pies de foto. En la sección de{" "}
+          títulos y párrafos; lápiz en el cuadro lateral para portada del manual y
+          pies de foto (el logo también se edita desde el encabezado). En la sección de{" "}
           <strong>estándares</strong>, las tres tarjetas de principios: ✎ en cada
           una para texto y foto; <strong>Añadir tarjeta</strong> para crear nuevas.
           En <strong>Modalidades disponibles</strong>: <strong>Editar sección</strong>{" "}
@@ -530,6 +540,121 @@ export function VisualEsferaEditor() {
           ✎ en cada cifra para cambiar números; <strong>Añadir foto</strong> y ✎ en
           el carrusel de <strong>Momentos de los talleres</strong>.
           En <strong>Contacto</strong>: lápiz para editar sede.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialHomeEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Inicio"
+      path="/"
+      hint={
+        <>
+          ✎ en el <strong>texto de bienvenida</strong>, en cada{" "}
+          <strong>tarjeta del catálogo</strong> y en las{" "}
+          <strong>fotos del carrusel</strong>. Los libros impresos en venta vienen
+          del catálogo en línea; aquí editas textos, imágenes y enlaces de la tienda.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialLibrosEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Libros impresos"
+      path="/libros/"
+      hint={
+        <>
+          ✎ en los <strong>filtros y categorías</strong> de la sección. El listado de
+          libros y precios viene del catálogo; aquí editas etiquetas y textos de la
+          página.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialDigitalesEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Libros digitales"
+      path="/libros/digitales/"
+      hint={
+        <>
+          ✎ en cada <strong>grupo</strong> y en cada <strong>libro digital</strong>{" "}
+          (título, autor, enlace de descarga, portada).
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialRevistasEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Revistas"
+      path="/revistas/"
+      hint={
+        <>
+          ✎ en cada <strong>tarjeta de revista</strong>: título, descripción, imagen,
+          enlace y textos del botón.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialRegalosEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Regalos"
+      path="/regalos/"
+      hint={
+        <>
+          ✎ en cada <strong>regalo</strong>: título, descripción, cita, fotos y
+          precio. También puedes editar las <strong>categorías</strong> de la sección.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialDondeEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Dónde estamos"
+      path="/donde-estamos/"
+      hint={
+        <>
+          ✎ en la banda de <strong>visítanos</strong>, la foto de la librería y cada{" "}
+          <strong>sede</strong> (dirección, horario, nota).
+        </>
+      }
+    />
+  );
+}
+
+export function VisualEditorialQuienesSomosEditor() {
+  return (
+    <VisualCmsPageEditor
+      site="editorial"
+      title="Librería — Quiénes somos"
+      path="/conoce-nueva-acropolis/"
+      hint={
+        <>
+          ✎ en el bloque de <strong>Editorial Logos</strong> y en{" "}
+          <strong>Qué es Nueva Acrópolis</strong> (textos, imagen y botón).
         </>
       }
     />

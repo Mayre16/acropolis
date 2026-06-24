@@ -21,9 +21,14 @@ export async function generateMetadata({
   if (!ev) {
     return { title: "Evento" };
   }
+  const keywords =
+    ev.seoTags && ev.seoTags.length > 0
+      ? ev.seoTags
+      : [ev.category, "Nueva Acrópolis", "eventos"];
   return {
     title: ev.title,
     description: ev.excerpt,
+    keywords,
     alternates: { canonical: `/eventos/${ev.slug}` },
     openGraph: {
       type: "article",

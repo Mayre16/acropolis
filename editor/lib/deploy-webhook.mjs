@@ -64,6 +64,10 @@ export function cmsPublishUserMessage(deploy) {
 
 /** Tras publicar Acropolis, también reconstruye Editorial (sedes/regalos estáticos). */
 export async function triggerDeployAfterPublish(site) {
+  if (site === "editorial") {
+    const tienda = await triggerDeployWebhook("tienda");
+    return { site, primary: tienda, tienda };
+  }
   const primary = await triggerDeployWebhook(site);
   if (site !== "acropolis") {
     return { site, primary };

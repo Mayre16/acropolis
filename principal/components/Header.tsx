@@ -7,11 +7,11 @@ import {
   NAV_LINKS,
   NAV_INSTITUCIONAL,
   NAV_CONTENIDO,
-  DIPLOMADO_WHATSAPP_URL,
   HEADER_BRAND_LOCKUP,
   type NavInstitucionalItem,
   type NavLink,
 } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 import { BrandLogo } from "@/components/BrandLogo";
 import { brandLogoHeightClass } from "@/lib/brand-clear-space";
 
@@ -257,6 +257,7 @@ function MainNavLink({
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const whatsapp = useWhatsAppUrls();
 
   const navLinkClass =
     "rounded-full px-3.5 py-2 text-sm font-semibold tracking-wide text-na-muted transition-colors hover:bg-na-heket/10 hover:text-na-heketDark";
@@ -316,7 +317,7 @@ export function Header() {
           </nav>
 
           <a
-            href={DIPLOMADO_WHATSAPP_URL}
+            href={whatsapp.diplomado}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden rounded-full bg-na-heket px-4 py-2 text-sm font-semibold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer lg:inline-flex"
@@ -367,7 +368,7 @@ export function Header() {
               })}
 
               <a
-                href={DIPLOMADO_WHATSAPP_URL}
+                href={whatsapp.diplomado}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 rounded-full bg-na-heket py-3 text-center text-sm font-semibold text-white"

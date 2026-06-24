@@ -51,6 +51,8 @@ type SalonesCmsEditContextValue = {
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   patchItem: (id: string, patch: Partial<CmsSalon>) => void;
+  addSalon: (options?: import("@/lib/cms/salones-edit").AddSalonOptions) => void;
+  hideSalon: (id: string) => void;
   patchPage: (patch: Partial<CmsSalonesPage>) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
@@ -73,6 +75,8 @@ export function useSalonesCmsEdit() {
       selectedId: cursos.selectedId,
       setSelectedId: cursos.setSelectedId,
       patchItem: cursos.patchSalon,
+      addSalon: cursos.addSalon,
+      hideSalon: cursos.hideSalon,
       patchPage: cursos.patchSalonesPage,
       saveDraft: cursos.saveDraft,
       publish: cursos.publish,

@@ -14,6 +14,8 @@ import {
   type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
 import { HeroCarouselCmsEditProvider } from "@/components/cms/HeroCarouselCmsEditContext";
+import { SiteFooterCmsEditProvider } from "@/components/cms/SiteFooterCmsEditContext";
+import { PlatformNavCmsEditProvider } from "@/components/cms/PlatformNavCmsEditContext";
 import type { CmsDocument } from "@/lib/cms/types";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "");
@@ -52,7 +54,11 @@ export function CmsProvider({ children }: { children: ReactNode }) {
   return (
     <CmsContext.Provider value={doc}>
       <Suspense fallback={null}>
-        <HeroCarouselCmsEditProvider>{children}</HeroCarouselCmsEditProvider>
+        <HeroCarouselCmsEditProvider>
+          <SiteFooterCmsEditProvider>
+            <PlatformNavCmsEditProvider>{children}</PlatformNavCmsEditProvider>
+          </SiteFooterCmsEditProvider>
+        </HeroCarouselCmsEditProvider>
       </Suspense>
     </CmsContext.Provider>
   );

@@ -9,7 +9,7 @@ const CONFIG = {
     lockup: "oinadom" satisfies BrandLockupId,
     size: "footerOinadom" satisfies NaBrandLockupSize,
     render: "raster" as const,
-    maxWidthClass: "max-w-[min(92vw,13.375rem)]",
+    maxWidthClass: "max-w-[min(92vw,14rem)]",
   },
   quienesSomos: {
     lockup: "na" satisfies BrandLockupId,
@@ -26,7 +26,6 @@ type CivisNaSectionLogoProps = {
   align?: "left" | "center";
 };
 
-/** Lockup NA en Civis — raster desde `Logos OINADOM/` (descriptor integrado en la imagen). */
 export function CivisNaSectionLogo({
   context,
   variant = "color",
@@ -40,7 +39,7 @@ export function CivisNaSectionLogo({
       size={config.size}
       variant={variant}
       align={align === "center" ? "center" : "start"}
-      render={config.render}
+      render={"render" in config ? config.render : undefined}
       maxWidthClass={"maxWidthClass" in config ? config.maxWidthClass : undefined}
       markHeightRem={"markHeightRem" in config ? config.markHeightRem : undefined}
     />

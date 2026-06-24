@@ -10,15 +10,14 @@ import {
   Phone,
   Plus,
 } from "lucide-react";
-import { DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 import {
-  CONTACT_EMAIL,
-  CONTACT_PHONE,
   mapsUrl,
   type VenueLocation,
   type VenueKind,
 } from "@/lib/locations";
-import { useMergedVenues } from "@/lib/cms/hooks";
+import { useMergedVenues, useMergedVenuesContact } from "@/lib/cms/hooks";
+import type { CmsVenuesContact } from "@/lib/cms/types";
 import { getMapPinsFromVenues, cmsToVenue } from "@/lib/cms/venues-edit";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
 import { VenueNameLockup } from "@/components/VenueNameLockup";
@@ -227,13 +226,18 @@ function VenueGroup({
 
 function EncuentranosPanel({
   venues,
+  contact,
   onEditVenue,
   onAdd,
+  onEditContact,
 }: {
   venues: VenueLocation[];
+  contact: CmsVenuesContact;
   onEditVenue?: (id: string) => void;
   onAdd?: (kind: VenueKind) => void;
+  onEditContact?: () => void;
 }) {
+  const whatsapp = useWhatsAppUrls();
   const sedes = venues.filter((v) => v.kind === "sede");
   const centros = venues.filter((v) => v.kind === "centro-cultural");
 
@@ -274,29 +278,36 @@ function EncuentranosPanel({
         onEditVenue={onEditVenue}
       />
 
-      <div className="rounded-2xl border border-na-heket/10 bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-6 text-white shadow-na-card sm:p-8">
-        <h3 className="text-lg font-black">¿Necesitas más información?</h3>
-        <p className="mt-2 max-w-2xl text-sm text-white/85">
-          Escríbenos por WhatsApp o correo y te indicamos la sede o el punto
-          cultural más cercano según la actividad que te interese.
-        </p>
+      <div className="relative rounded-2xl border border-na-heket/10 bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer p-6 text-white shadow-na-card sm:p-8">
+        {onEditContact ? (
+          <button
+            type="button"
+            onClick={onEditContact}
+            className="absolute right-4 top-4 rounded-full bg-na-helios p-2 text-na-ink shadow"
+            aria-label="Editar bloque de contacto"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+        ) : null}
+        <h3 className="text-lg font-black">{contact.title}</h3>
+        <p className="mt-2 max-w-2xl text-sm text-white/85">{contact.body}</p>
         <ul className="mt-4 space-y-2 text-sm text-white/90">
           <li className="flex items-center gap-2">
             <Phone className="h-4 w-4 shrink-0 text-na-helios" aria-hidden />
-            {CONTACT_PHONE}
+            {contact.phone}
           </li>
           <li className="flex items-center gap-2">
             <Mail className="h-4 w-4 shrink-0 text-na-helios" aria-hidden />
-            {CONTACT_EMAIL}
+            {contact.email}
           </li>
         </ul>
         <a
-          href={DIPLOMADO_WHATSAPP_URL}
+          href={whatsapp.diplomado}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-5 inline-flex items-center justify-center rounded-full bg-na-helios px-6 py-3 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/25 transition hover:brightness-105"
         >
-          Escribir por WhatsApp
+          {contact.ctaLabel}
         </a>
       </div>
     </div>
@@ -305,11 +316,14 @@ function EncuentranosPanel({
 
 export function WhereWeAre() {
   const merged = useMergedVenues();
+  const mergedContact = useMergedVenuesContact();
   const edit = useVenuesCmsEdit();
 
   const venues: VenueLocation[] = edit?.ready
     ? edit.items.map(cmsToVenue)
     : merged;
+
+  const contact = edit?.ready ? edit.contact : mergedContact;
 
   const onEditVenue = edit?.ready
     ? (id: string) => edit.setSelectedId(id)
@@ -318,6 +332,8 @@ export function WhereWeAre() {
   const onAdd = edit?.ready
     ? (kind: VenueKind) => edit.addItem(kind)
     : undefined;
+
+  const onEditContact = edit?.ready ? edit.openContactPanel : undefined;
 
   return (
     <section
@@ -353,8 +369,10 @@ export function WhereWeAre() {
           <div className="mt-10">
             <EncuentranosPanel
               venues={venues}
+              contact={contact}
               onEditVenue={onEditVenue}
               onAdd={onAdd}
+              onEditContact={onEditContact}
             />
           </div>
         </div>

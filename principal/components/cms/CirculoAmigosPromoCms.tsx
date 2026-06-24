@@ -7,7 +7,8 @@ import {
   CIRCULO_AMIGOS_WHATSAPP_MESSAGE,
 } from "@/lib/circulo-amigos-content";
 import { buildCirculoAmigosMailto } from "@/lib/contact-routing";
-import { DIPLOMADO_WHATSAPP_URL, INFO_EMAIL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { INFO_EMAIL } from "@/lib/site-config";
 import {
   CIRCULO_AMIGOS_SELECTED_ID,
   useCirculoAmigosCmsEdit,
@@ -22,7 +23,8 @@ type Props = {
 export function CirculoAmigosPromoCms({ variant = "home" }: Props) {
   const edit = useCirculoAmigosCmsEdit();
   const promo = useCirculoAmigosDisplay();
-  const whatsappHref = `${DIPLOMADO_WHATSAPP_URL}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
+  const whatsapp = useWhatsAppUrls();
+  const whatsappHref = `${whatsapp.diplomado}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
   const mailtoHref = buildCirculoAmigosMailto().href;
 
   const editButton = edit?.ready ? (

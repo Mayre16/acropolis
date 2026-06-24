@@ -1,7 +1,6 @@
 "use client";
 
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useQuienesSomosCmsEdit } from "@/components/cms/InstitutionalPageCmsEditContext";
 import { mergeQuienesSomosPage } from "@/lib/cms/institutional-page-edit";
 import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
@@ -43,9 +42,7 @@ export function QuienesSomosHero() {
       images={images}
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedId("__hero__")}
-    >
-      <HeroCarouselEditButton carouselKey="quienesSomos" />
-    </CmsPageHero>
+    />
   );
 }
 

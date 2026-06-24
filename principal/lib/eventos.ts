@@ -1,13 +1,19 @@
 // Eventos y actividades de Nueva Acrópolis RD (contenido real de acropolis.org.do).
 // Cada evento abre su propia página en /eventos/<slug>.
 
+import type { AgendaCategory } from "@/lib/agenda";
+
 export type EventoItem = {
   slug: string;
   title: string;
   date: string;
   /** ISO YYYY-MM-DD para ordenar crónicas. */
   sortAt?: string;
+  /** Etiqueta visible en tarjetas. */
   category: string;
+  /** Id de categoría para filtros y SEO. */
+  categoryId?: AgendaCategory;
+  seoTags?: string[];
   excerpt: string;
   image: { src: string; alt: string };
   body: string[];

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { INFO_EMAIL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Aviso legal",
@@ -24,10 +25,10 @@ export default function AvisoLegalPage() {
         <p>
           Para consultas legales o de uso del sitio, contacte{" "}
           <a
-            href="mailto:oinadom@nuevaacropolis.org.do"
+            href={`mailto:${INFO_EMAIL}`}
             className="font-semibold text-na-kefer hover:underline"
           >
-            oinadom@nuevaacropolis.org.do
+            {INFO_EMAIL}
           </a>
           .
         </p>

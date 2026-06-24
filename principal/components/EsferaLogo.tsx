@@ -16,14 +16,6 @@ type EsferaLogoProps = {
   tone?: "color" | "white";
 };
 
-const PUNTO_FOCAL_LOGO = {
-  color: "/brand/logo-esfera-punto-focal.webp",
-  white: "/brand/logo-esfera-punto-focal-white.webp",
-  alt: "Esfera Punto Focal",
-  width: 752,
-  height: 320,
-} as const;
-
 function resolveLogoSrc(path: string): string {
   const cms = resolveCmsMediaUrl(path) ?? path;
   if (cms.startsWith("http://") || cms.startsWith("https://")) return cms;
@@ -40,16 +32,14 @@ export function EsferaLogo({
   tone = "color",
 }: EsferaLogoProps) {
   const brand = useEsferaBrandLogo();
-  const logo =
-    variant === "punto-focal"
-      ? PUNTO_FOCAL_LOGO
-      : {
-          color: resolveCmsMediaUrl(brand.color) ?? brand.color,
-          white: resolveCmsMediaUrl(brand.white) ?? brand.white,
-          alt: brand.alt,
-          width: 320,
-          height: 72,
-        };
+  const isPuntoFocal = variant === "punto-focal";
+  const logo = {
+    color: brand.color,
+    white: brand.white,
+    alt: brand.alt,
+    width: isPuntoFocal ? 752 : 320,
+    height: isPuntoFocal ? 320 : 72,
+  };
 
   const src = resolveLogoSrc(tone === "white" ? logo.white : logo.color);
   const useWhiteFilter =

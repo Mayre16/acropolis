@@ -7,9 +7,12 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
-import { AGENDA_CATEGORY_LABEL, type AgendaCategory } from "@/lib/agenda";
 import { isAgendaEntryPromotable } from "@/lib/agenda-evento";
 import type { CmsAgendaEntry } from "@/lib/cms/types";
+import {
+  PublishCategorySelect,
+  SeoTagsField,
+} from "@/components/cms/PublishCategoryFields";
 
 export function AgendaEntryImageField({
   image,
@@ -98,11 +101,6 @@ export function AgendaEntryImageField({
   );
 }
 
-const AGENDA_CATEGORY_OPTIONS = Object.entries(AGENDA_CATEGORY_LABEL) as [
-  AgendaCategory,
-  string,
-][];
-
 export function AgendaEntryEditFields({
   entry,
   token,
@@ -126,24 +124,10 @@ export function AgendaEntryEditFields({
   return (
     <div className="space-y-4">
       {showCategorySelect ? (
-        <label className="block text-sm">
-          <span className="mb-1 block font-semibold text-slate-700">
-            Categoría (página y carrusel)
-          </span>
-          <select
-            value={entry.category}
-            onChange={(e) =>
-              onChange({ category: e.target.value as CmsAgendaEntry["category"] })
-            }
-            className="w-full rounded-lg border border-slate-300 px-3 py-2"
-          >
-            {AGENDA_CATEGORY_OPTIONS.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <PublishCategorySelect
+          value={entry.category}
+          onChange={(category) => onChange({ category })}
+        />
       ) : null}
       <EditField
         label="Título"
@@ -151,9 +135,14 @@ export function AgendaEntryEditFields({
         onChange={(v) => onChange({ title: v })}
       />
       <EditField
-        label="Etiqueta visible en tarjeta"
+        label="Etiqueta visible en tarjeta (ej. Cupos abiertos)"
         value={entry.tag ?? ""}
         onChange={(v) => onChange({ tag: v })}
+      />
+      <SeoTagsField
+        category={entry.category}
+        value={entry.seoTags}
+        onChange={(seoTags) => onChange({ seoTags })}
       />
       <div className="grid gap-2 sm:grid-cols-2">
         <EditField

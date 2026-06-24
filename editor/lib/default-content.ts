@@ -13,9 +13,6 @@ export function createDefaultContent(site: SiteId): CmsDocument {
     base.sections = {
       homeHero: {
         h1: "Filosofía, Cultura y Voluntariado",
-        h2: "Escuela de filosofía a la manera clásica",
-        lede:
-          "Organización Internacional Nueva Acrópolis en República Dominicana.",
         background: {
           src: "/img/home/hero-voluntarios-chalecos.webp",
           alt: "Voluntarios de Nueva Acrópolis en unidad, con chalecos verdes y azules",

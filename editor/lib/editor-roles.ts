@@ -70,9 +70,9 @@ export const EDITOR_ROLE_META: Record<EditorRole, EditorRoleMeta> = {
 
     role: "editorial",
 
-    label: "Cursos, Civis, Cultura y Contenido",
+    label: "Librería Editorial Logos",
 
-    description: "Cursos, Civis, cultura, artículos, medios y eventos",
+    description: "Tienda editorial — libros, revistas, regalos y textos",
 
   },
 
@@ -142,6 +142,20 @@ export const VISUAL_TAB_IDS = new Set([
 
   "esfera",
 
+  "editorialHome",
+
+  "editorialLibros",
+
+  "editorialDigitales",
+
+  "editorialRevistas",
+
+  "editorialRegalos",
+
+  "editorialDonde",
+
+  "editorialQuienesSomos",
+
 ]);
 
 
@@ -198,6 +212,20 @@ export const TAB_LABELS: Record<string, string> = {
 
   esfera: "Esfera",
 
+  editorialHome: "Inicio — tienda",
+
+  editorialLibros: "Libros impresos",
+
+  editorialDigitales: "Libros digitales",
+
+  editorialRevistas: "Revistas",
+
+  editorialRegalos: "Regalos",
+
+  editorialDonde: "Dónde estamos",
+
+  editorialQuienesSomos: "Quiénes somos",
+
 };
 
 
@@ -248,7 +276,7 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
   voluntariado: ["voluntariado", "agenda"],
 
-  editorial: ["cursos", "articulos", "medios", "cultura", "eventos", "agenda"],
+  editorial: [],
 
   filosofia: ["diplomado", "filosofia", "eventos", "diplomadoHero", "agenda"],
 
@@ -278,19 +306,7 @@ const CIVIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
   voluntariado: [],
 
-  editorial: [
-
-    "civisHome",
-
-    "civisTalleres",
-
-    "civisQuienesSomos",
-
-    "civisSalones",
-
-    "archivos",
-
-  ],
+  editorial: [],
 
   filosofia: [],
 
@@ -302,8 +318,67 @@ const CIVIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
 
 
+const EDITORIAL_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
+
+  admin: [
+
+    "editorialHome",
+
+    "editorialLibros",
+
+    "editorialDigitales",
+
+    "editorialRevistas",
+
+    "editorialRegalos",
+
+    "editorialDonde",
+
+    "editorialQuienesSomos",
+
+    "archivos",
+
+  ],
+
+  voluntariado: [],
+
+  editorial: [
+
+    "editorialHome",
+
+    "editorialLibros",
+
+    "editorialDigitales",
+
+    "editorialRevistas",
+
+    "editorialRegalos",
+
+    "editorialDonde",
+
+    "editorialQuienesSomos",
+
+    "archivos",
+
+  ],
+
+  filosofia: [],
+
+  viajes: [],
+
+  esfera: [],
+
+};
+
+
+
 export function tabsForRole(site: SiteId, role: EditorRole): EditorTabId[] {
-  const map = site === "acropolis" ? ACROPOLIS_BY_ROLE : CIVIS_BY_ROLE;
+  const map =
+    site === "acropolis"
+      ? ACROPOLIS_BY_ROLE
+      : site === "civis"
+        ? CIVIS_BY_ROLE
+        : EDITORIAL_BY_ROLE;
   return map[role] ?? map.admin;
 }
 
@@ -311,6 +386,7 @@ export function tabsForRole(site: SiteId, role: EditorRole): EditorTabId[] {
 
 export function defaultTabForRole(site: SiteId, role: EditorRole): EditorTabId {
   const tabs = tabsForRole(site, role);
+  if (site === "editorial") return tabs[0] ?? "editorialHome";
   return tabs[0] ?? (site === "acropolis" ? "agenda" : "civisHome");
 }
 

@@ -50,9 +50,7 @@ const ITEMS = [
   {
     key: "metaphysica",
     out: "camiseta-metaphysica",
-    /** Mockup final — «METAPHYSICA» tipografía estilo Metallica (no overlay SVG). */
-    catalogSrc: "tee-metaphysica-catalog.png",
-    catalogBg: "#ededed",
+    metaphysicaTitle: true,
   },
   {
     key: "fuerza-cisne",
@@ -95,6 +93,72 @@ async function writeWebp(pngPath) {
   await sharp(pngPath).webp({ quality: 86, effort: 4 }).toFile(webpPath);
 }
 
+/** Quita el fondo oscuro del arte de catálogo (PNG con negro ~#111). */
+async function darkBgToAlpha(buffer, { threshold = 38 } = {}) {
+  const { data, info } = await sharp(buffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 4) {
+    const lum = Math.max(data[i], data[i + 1], data[i + 2]);
+    if (lum <= threshold) data[i + 3] = 0;
+  }
+  return sharp(data, { raw: info }).png().toBuffer();
+}
+
+/** Título del catálogo → blanco nítido sobre camiseta negra. */
+async function titleInkToWhite(buffer) {
+  const { data, info } = await sharp(buffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] === 0) continue;
+    data[i] = 255;
+    data[i + 1] = 255;
+    data[i + 2] = 255;
+  }
+  return sharp(data, { raw: info }).png().toBuffer();
+}
+
+/** Metaphysica: mockup + título METAPHYSICA estilo Metallica del arte de catálogo. */
+async function buildMetaphysicaTee(item) {
+  const basePath = path.join(SRC, `tee-base-${item.key}.png`);
+  const catalogPath = path.join(SRC, "tee-metaphysica-catalog.png");
+  if (!fs.existsSync(basePath)) {
+    console.warn("Falta base:", basePath);
+    return;
+  }
+  if (!fs.existsSync(catalogPath)) {
+    console.warn("Falta arte catálogo:", catalogPath);
+    return;
+  }
+
+  const titleWidth = 560;
+  const titleLeft = 768 - Math.round(titleWidth / 2);
+  const titleTop = 158;
+
+  const titleLayer = await titleInkToWhite(
+    await darkBgToAlpha(
+      await sharp(catalogPath)
+        .extract({ left: 0, top: 0, width: 1024, height: 298 })
+        .resize({ width: titleWidth, kernel: sharp.kernel.lanczos3 })
+        .png()
+        .toBuffer(),
+    ),
+  );
+
+  const composed = await sharp(basePath)
+    .composite([{ input: titleLayer, left: titleLeft, top: titleTop }])
+    .png()
+    .toBuffer();
+
+  const pngOut = path.join(OUT, `${item.out}.png`);
+  const out = await sharp(composed).extract(CROP).png().toFile(pngOut);
+  await writeWebp(pngOut);
+  console.log("Camiseta (metaphysica):", `${item.out}.png`, `${out.width}x${out.height}`);
+}
+
 async function buildEmblemTee(item) {
   const base = path.join(SRC, `tee-base-${item.base}.png`);
   if (!fs.existsSync(base)) {
@@ -129,6 +193,11 @@ async function build() {
       continue;
     }
 
+    if (item.metaphysicaTitle) {
+      await buildMetaphysicaTee(item);
+      continue;
+    }
+
     if (item.catalogSrc) {
       const catalog = path.join(SRC, item.catalogSrc);
       if (!fs.existsSync(catalog)) {
@@ -153,6 +222,19 @@ async function build() {
     }
 
     const base = path.join(SRC, `tee-base-${item.key}.png`);
+    if (!fs.existsSync(base)) {
+      console.warn("Falta base:", base);
+      continue;
+    }
+
+    if (!item.texts?.length) {
+      const pngOut = path.join(OUT, `${item.out}.png`);
+      const out = await sharp(base).extract(CROP).png().toFile(pngOut);
+      await writeWebp(pngOut);
+      console.log("Camiseta (base):", `${item.out}.png`, `${out.width}x${out.height}`);
+      continue;
+    }
+
     const composed = await sharp(base)
       .composite([{ input: svgFor(item), top: 0, left: 0 }])
       .png()

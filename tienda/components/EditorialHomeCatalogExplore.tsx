@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { ArrowRight, BookMarked } from "lucide-react";
 import { useEditorialHomeCards } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import { EDITORIAL_HOME_SECONDARY_LINKS } from "@/lib/editorial-home-cards";
 import { sectionToPath } from "@/lib/editorial-navigation";
 import { BIBLIOTECA_URL } from "@/lib/site-config";
 
 export function EditorialHomeCatalogExplore() {
   const homeCards = useEditorialHomeCards();
+  const edit = useEditorialCmsEdit();
 
   return (
     <section
@@ -35,7 +38,13 @@ export function EditorialHomeCatalogExplore() {
           {homeCards.map((card) => {
             const Icon = card.icon;
             return (
-              <li key={card.id}>
+              <li key={card.id} className="relative">
+                {edit?.ready ? (
+                  <EditorialEditPencil
+                    label={`Editar ${card.title}`}
+                    onClick={() => edit.setSelectedId(`homeCard:${card.id}`)}
+                  />
+                ) : null}
                 <Link
                   href={sectionToPath(card.hash)}
                   className={`group flex h-full w-full flex-col rounded-2xl border p-5 text-left shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card ${card.accent}`}

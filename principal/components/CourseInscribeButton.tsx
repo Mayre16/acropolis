@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { accentTokens } from "@/lib/brand-accents";
 import { inscribeWhatsAppHref } from "@/lib/whatsapp-messages";
 import type { InscribeActivity } from "@/lib/whatsapp-messages";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 type Props = InscribeActivity & {
   accentIndex?: number;
@@ -22,7 +23,8 @@ export function CourseInscribeButton({
   className = "",
 }: Props) {
   const a = accentTokens(accentIndex);
-  const href = inscribeWhatsAppHref({ title, kind, sede, facilitador });
+  const whatsapp = useWhatsAppUrls();
+  const href = inscribeWhatsAppHref({ title, kind, sede, facilitador }, whatsapp.cursos);
 
   return (
     <a

@@ -26,7 +26,18 @@ import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
 import {
   formatCentrosSummary,
   formatSedesSummary,
+  mergeVenuesContact,
 } from "@/lib/cms/venues-edit";
+import {
+  mergeSiteFooter,
+  mergeSiteFooterFields,
+} from "@/lib/cms/site-footer-edit";
+import {
+  mergePlatformNav,
+  mergePlatformNavItems,
+} from "@/lib/cms/platform-nav-edit";
+import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditContext";
+import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditContext";
 import {
   DIPLOMADO_INFO_BANNER,
   DIPLOMADO_INSCRIPTION,
@@ -236,6 +247,33 @@ export function useMergedViajes(categoria?: ViajeCategoriaSlug) {
 export function useMergedVenues() {
   const cms = useCmsDocument();
   return mergeVenues(VENUE_LOCATIONS, cms);
+}
+
+export function useMergedVenuesContact() {
+  const cms = useCmsDocument();
+  return mergeVenuesContact(cms);
+}
+
+export function useMergedSiteFooter() {
+  const cms = useCmsDocument();
+  const edit = useSiteFooterCmsEdit();
+  if (edit?.ready) return mergeSiteFooterFields(edit.footer);
+  return mergeSiteFooter(cms);
+}
+
+export function useMergedPlatformNavItems() {
+  const cms = useCmsDocument();
+  const edit = usePlatformNavCmsEdit();
+  if (edit?.ready) return mergePlatformNavItems(edit.platformNav);
+  return mergePlatformNav(cms);
+}
+
+export function useWhatsAppUrls() {
+  const footer = useMergedSiteFooter();
+  return {
+    cursos: footer.whatsappCursosUrl,
+    diplomado: footer.whatsappDiplomadoUrl,
+  };
 }
 
 export function useVenuesSummary() {

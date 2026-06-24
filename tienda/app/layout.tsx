@@ -9,6 +9,7 @@ import { EditorialFooter } from "@/components/EditorialFooter";
 import { EditorialCartProvider } from "@/components/cart/EditorialCartProvider";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { CmsProvider } from "@/lib/cms/provider";
+import { EditorialCmsEditProvider } from "@/components/cms/EditorialCmsEditContext";
 import { SITE_URL } from "@/lib/site-config";
 
 const notoSans = Noto_Sans({
@@ -41,13 +42,17 @@ export default function RootLayout({
           <CmsEditModeBootstrap />
         </Suspense>
         <CmsProvider>
-          <EditorialCartProvider>
-            <EditorialNavigationProvider>
-              <EditorialSiteHeader />
-              <main className="flex-1 bg-white">{children}</main>
-              <EditorialFooter />
-            </EditorialNavigationProvider>
-          </EditorialCartProvider>
+          <Suspense fallback={null}>
+            <EditorialCmsEditProvider>
+              <EditorialCartProvider>
+                <EditorialNavigationProvider>
+                  <EditorialSiteHeader />
+                  <main className="flex-1 bg-white">{children}</main>
+                  <EditorialFooter />
+                </EditorialNavigationProvider>
+              </EditorialCartProvider>
+            </EditorialCmsEditProvider>
+          </Suspense>
         </CmsProvider>
       </body>
     </html>

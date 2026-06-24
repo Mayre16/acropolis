@@ -2,9 +2,10 @@ import { mergeEventos } from "@/lib/cms/merge-content";
 import type { CmsDocument } from "@/lib/cms/types";
 import type { CmsVoluntariadoReciente } from "@/lib/cms/types";
 import { EVENTOS, type EventoItem } from "@/lib/eventos";
-
-/** Categorías de /eventos que mostramos en «Actividades recientes» de voluntariado. */
-const RECIENTES_CATEGORIES = new Set(["Voluntariado", "Esfera", "Comunidad"]);
+import {
+  agendaFilterCategory,
+  normalizeCmsEventoCategory,
+} from "@/lib/agenda-publish-categories";
 
 const MAX_RECIENTES = 4;
 
@@ -47,6 +48,13 @@ function eventoToReciente(evento: EventoItem): CmsVoluntariadoReciente {
   };
 }
 
+function matchesVoluntariadoRecientes(evento: EventoItem): boolean {
+  const id =
+    evento.categoryId ?? normalizeCmsEventoCategory(evento.category);
+  if (id === "esfera") return true;
+  return agendaFilterCategory(id) === "voluntariado";
+}
+
 /** Últimas crónicas de voluntariado / Esfera / comunidad (desde /eventos). */
 export function getVoluntariadoRecientesFromEventos(
   cms: CmsDocument | null | undefined,
@@ -54,7 +62,7 @@ export function getVoluntariadoRecientesFromEventos(
 ): CmsVoluntariadoReciente[] {
   const merged = mergeEventos(EVENTOS, cms ?? null);
   return merged
-    .filter((e) => RECIENTES_CATEGORIES.has(e.category))
+    .filter(matchesVoluntariadoRecientes)
     .sort((a, b) => eventSortKey(b).localeCompare(eventSortKey(a)))
     .slice(0, limit)
     .map(eventoToReciente);

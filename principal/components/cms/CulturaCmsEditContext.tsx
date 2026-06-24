@@ -555,7 +555,11 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={culturaPage} onChange={patchCulturaPage} />
+          <HeroEditFields
+            value={culturaPage}
+            onChange={patchCulturaPage}
+            carouselKey="cultura"
+          />
         </EditPanelChrome>
       ) : null}
       {selectedId === "__talleres-section__" ? (

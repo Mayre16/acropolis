@@ -3,12 +3,13 @@
 import { ArrowRight, Pencil } from "lucide-react";
 import { useDiplomadoInscriptionDisplay } from "@/lib/cms/diplomado-display";
 import { useFilosofiaCmsEdit } from "@/components/filosofia/cms/FilosofiaCmsEditContext";
-import { DIPLOMADO_WHATSAPP_URL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 export function DiplomadoInscriptionBlock() {
   const edit = useFilosofiaCmsEdit();
   const ins = useDiplomadoInscriptionDisplay();
-  const inscribeHref = `${DIPLOMADO_WHATSAPP_URL}?text=${encodeURIComponent(
+  const whatsapp = useWhatsAppUrls();
+  const inscribeHref = `${whatsapp.diplomado}?text=${encodeURIComponent(
     ins.inscribeWhatsApp ?? "",
   )}`;
 

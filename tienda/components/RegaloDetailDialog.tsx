@@ -25,9 +25,9 @@ function detailImageLayout(item: RegaloItem) {
   }
   if (item.id === "memorion") {
     return {
-      box: "relative mx-auto aspect-[3/4] w-full max-w-xs shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:max-w-sm md:max-w-md",
+      box: "relative mx-auto aspect-[3/4] w-[14rem] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:w-[16rem] md:w-[18rem]",
       imageClass: "object-contain p-4",
-      sizes: "(max-width: 640px) 288px, 384px",
+      sizes: "(max-width: 640px) 224px, 288px",
     };
   }
   if (item.id === "lapiceros-virtudes") {
@@ -37,18 +37,30 @@ function detailImageLayout(item: RegaloItem) {
       sizes: "(max-width: 640px) 100vw, 512px",
     };
   }
-  if (item.category === "libretas" || item.category === "camisetas") {
+  if (item.category === "libretas") {
     return {
-      box: "relative mx-auto aspect-square w-full max-w-xs shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:max-w-sm md:max-w-md",
-      imageClass: "object-contain p-3",
-      sizes: "(max-width: 640px) 288px, 384px",
+      box: "relative mx-auto aspect-[779/922] w-[14rem] shrink-0 overflow-hidden rounded-xl bg-neutral-50 shadow-lg sm:w-[16rem] md:w-[17rem]",
+      imageClass: "object-contain object-center p-0.5",
+      sizes: "(max-width: 640px) 224px, 272px",
+    };
+  }
+  if (item.category === "camisetas") {
+    return {
+      box: "relative mx-auto aspect-square w-[16rem] shrink-0 overflow-hidden rounded-xl bg-neutral-50 shadow-lg sm:w-[20rem] md:w-[24rem]",
+      imageClass: "object-contain object-center p-2",
+      sizes: "(max-width: 640px) 256px, 384px",
     };
   }
   return {
-    box: "relative mx-auto aspect-[3/4] w-full max-w-xs shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:max-w-sm md:w-72 lg:w-80",
+    box: "relative mx-auto aspect-[3/4] w-[14rem] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:w-72 lg:w-80",
     imageClass: "object-contain p-3",
-    sizes: "(max-width: 640px) 288px, 320px",
+    sizes: "(max-width: 640px) 224px, 320px",
   };
+}
+
+function pickDetailImage(item: RegaloItem, showBack: boolean): string {
+  if (showBack && item.backImageUrl?.trim()) return item.backImageUrl.trim();
+  return item.detailImageUrl?.trim() || item.imageUrl?.trim() || "";
 }
 
 export function RegaloDetailDialog({
@@ -59,11 +71,13 @@ export function RegaloDetailDialog({
   whatsAppHref,
 }: RegaloDetailDialogProps) {
   const [showBack, setShowBack] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const layout = detailImageLayout(item);
 
   useEffect(() => {
     if (!open) return;
     setShowBack(false);
+    setImageFailed(false);
     function onKey(ev: KeyboardEvent) {
       if (ev.key === "Escape") onClose();
     }
@@ -79,10 +93,12 @@ export function RegaloDetailDialog({
   if (!open) return null;
 
   const isSeparador = item.category === "separadores";
-  const primaryImage =
-    item.detailImageUrl && !showBack ? item.detailImageUrl : item.imageUrl;
+  const preferredImage = pickDetailImage(item, showBack);
+  const fallbackImage = item.imageUrl?.trim() || "";
   const imageSrc = resolveImage(
-    showBack && item.backImageUrl ? item.backImageUrl : primaryImage,
+    imageFailed && preferredImage !== fallbackImage
+      ? fallbackImage
+      : preferredImage,
   );
   const imageAlt =
     showBack && item.backImageUrl
@@ -123,9 +139,9 @@ export function RegaloDetailDialog({
             }`}
           >
             <div
-              className={`flex shrink-0 flex-col items-center sm:items-start ${
+              className={`flex w-full shrink-0 flex-col items-center sm:w-auto sm:items-start ${
                 item.id === "lapiceros-virtudes"
-                  ? "w-full sm:w-[min(100%,32rem)]"
+                  ? "sm:w-[min(100%,32rem)]"
                   : ""
               }`}
             >
@@ -144,6 +160,11 @@ export function RegaloDetailDialog({
                   sizes={layout.sizes}
                   unoptimized
                   priority
+                  onError={() => {
+                    if (!imageFailed && fallbackImage && preferredImage !== fallbackImage) {
+                      setImageFailed(true);
+                    }
+                  }}
                 />
               </div>
               ) : null}

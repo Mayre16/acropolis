@@ -1,6 +1,6 @@
 /** Contenido inicial del CMS (ESM — usable desde dev-api.mjs). */
 
-/** @param {"acropolis"|"civis"} site */
+/** @param {"acropolis"|"civis"|"editorial"} site */
 export function createDefaultContent(site) {
   const base = {
     version: 1,
@@ -8,6 +8,10 @@ export function createDefaultContent(site) {
     updatedAt: new Date().toISOString(),
     sections: {},
   };
+
+  if (site === "editorial") {
+    return base;
+  }
 
   if (site === "acropolis") {
     base.sections = {

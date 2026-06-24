@@ -280,19 +280,33 @@ export function mergeEditorialRegaloCategories(
   });
 }
 
+function mergeRegaloAssetUrl(
+  cmsUrl: string | undefined,
+  fallbackUrl: string | undefined,
+): string {
+  const raw = cmsUrl?.trim() || fallbackUrl?.trim() || "";
+  if (!raw) return "";
+  return preferWebpAssetUrl(resolveCmsMediaUrl(raw) ?? raw);
+}
+
 function mergeRegaloItem(
   fb: RegaloItem | undefined,
   cms: CmsEditorialRegalo,
 ): RegaloItem {
-  const imageUrl = preferWebpAssetUrl(
-    resolveCmsMediaUrl(cms.imageUrl) ?? cms.imageUrl ?? fb?.imageUrl ?? "",
-  );
-  const backImageUrl = cms.backImageUrl
+  const imageUrl = mergeRegaloAssetUrl(cms.imageUrl, fb?.imageUrl);
+  const backImageUrl = cms.backImageUrl?.trim()
     ? preferWebpAssetUrl(
         resolveCmsMediaUrl(cms.backImageUrl) ?? cms.backImageUrl,
       )
     : fb?.backImageUrl
       ? preferWebpAssetUrl(fb.backImageUrl)
+      : undefined;
+  const detailImageUrl = cms.detailImageUrl?.trim()
+    ? preferWebpAssetUrl(
+        resolveCmsMediaUrl(cms.detailImageUrl) ?? cms.detailImageUrl,
+      )
+    : fb?.detailImageUrl
+      ? preferWebpAssetUrl(fb.detailImageUrl)
       : undefined;
   return {
     id: cms.id,
@@ -303,13 +317,7 @@ function mergeRegaloItem(
     author: cms.author ?? fb?.author,
     imageUrl,
     backImageUrl,
-    detailImageUrl: cms.detailImageUrl
-      ? preferWebpAssetUrl(
-          resolveCmsMediaUrl(cms.detailImageUrl) ?? cms.detailImageUrl,
-        )
-      : fb?.detailImageUrl
-        ? preferWebpAssetUrl(fb.detailImageUrl)
-        : undefined,
+    detailImageUrl,
     price: cms.price ?? fb?.price,
     currency: cms.currency ?? fb?.currency,
     priceNote: cms.priceNote ?? fb?.priceNote,

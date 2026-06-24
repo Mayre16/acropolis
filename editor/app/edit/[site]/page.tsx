@@ -47,6 +47,13 @@ import {
   VisualCivisTalleresEditor,
   VisualCivisQuienesSomosEditor,
   VisualCivisSalonesEditor,
+  VisualEditorialHomeEditor,
+  VisualEditorialLibrosEditor,
+  VisualEditorialDigitalesEditor,
+  VisualEditorialRevistasEditor,
+  VisualEditorialRegalosEditor,
+  VisualEditorialDondeEditor,
+  VisualEditorialQuienesSomosEditor,
   VisualQuienesSomosEditor,
   VisualRelacionesEditor,
   VisualEsferaEditor,
@@ -81,6 +88,13 @@ const VISUAL_TABS = new Set([
   "civisTalleres",
   "civisQuienesSomos",
   "civisSalones",
+  "editorialHome",
+  "editorialLibros",
+  "editorialDigitales",
+  "editorialRevistas",
+  "editorialRegalos",
+  "editorialDonde",
+  "editorialQuienesSomos",
   "quienesSomos",
   "relaciones",
   "esfera",
@@ -126,6 +140,27 @@ function VisualEditors({
       )}
       {tab === "civisSalones" && site === "civis" && (
         <VisualCivisSalonesEditor />
+      )}
+      {tab === "editorialHome" && site === "editorial" && (
+        <VisualEditorialHomeEditor />
+      )}
+      {tab === "editorialLibros" && site === "editorial" && (
+        <VisualEditorialLibrosEditor />
+      )}
+      {tab === "editorialDigitales" && site === "editorial" && (
+        <VisualEditorialDigitalesEditor />
+      )}
+      {tab === "editorialRevistas" && site === "editorial" && (
+        <VisualEditorialRevistasEditor />
+      )}
+      {tab === "editorialRegalos" && site === "editorial" && (
+        <VisualEditorialRegalosEditor />
+      )}
+      {tab === "editorialDonde" && site === "editorial" && (
+        <VisualEditorialDondeEditor />
+      )}
+      {tab === "editorialQuienesSomos" && site === "editorial" && (
+        <VisualEditorialQuienesSomosEditor />
       )}
       {tab === "quienesSomos" && site === "acropolis" && (
         <VisualQuienesSomosEditor />
@@ -455,33 +490,44 @@ function EditSitePageInner() {
                 })
               }
             />
-            <Field
-              label="H2 — subtítulo"
-              value={doc.sections.homeHero?.h2 ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    homeHero: { ...doc.sections.homeHero, h2: v },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Texto introductorio (h3)"
-              multiline
-              value={doc.sections.homeHero?.lede ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    homeHero: { ...doc.sections.homeHero, lede: v },
-                  },
-                })
-              }
-            />
+            {site === "acropolis" ? (
+              <p className="text-sm leading-relaxed text-slate-600">
+                El subtítulo fijo «Escuela de filosofía…» no se muestra en el hero.
+                El hero muestra solo el logo y el botón «Qué es Nueva Acrópolis»; los
+                párrafos introductorios se editan en el bloque «Qué es Nueva Acrópolis»
+                del inicio.
+              </p>
+            ) : (
+              <>
+                <Field
+                  label="H2 — subtítulo"
+                  value={doc.sections.homeHero?.h2 ?? ""}
+                  onChange={(v) =>
+                    setDoc({
+                      ...doc,
+                      sections: {
+                        ...doc.sections,
+                        homeHero: { ...doc.sections.homeHero, h2: v },
+                      },
+                    })
+                  }
+                />
+                <Field
+                  label="Texto introductorio (h3)"
+                  multiline
+                  value={doc.sections.homeHero?.lede ?? ""}
+                  onChange={(v) =>
+                    setDoc({
+                      ...doc,
+                      sections: {
+                        ...doc.sections,
+                        homeHero: { ...doc.sections.homeHero, lede: v },
+                      },
+                    })
+                  }
+                />
+              </>
+            )}
             {site === "acropolis" ? (
               <MediaField
                 label="Foto de fondo del landing"

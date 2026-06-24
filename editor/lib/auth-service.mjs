@@ -9,6 +9,11 @@ import {
   updateUserTotpSecret,
 } from "./auth-store.mjs";
 import { totpGenerateSecret, totpUri, totpVerify } from "./totp.mjs";
+import {
+  clearLoginFailures,
+  isLoginBlocked,
+  recordLoginFailure,
+} from "./login-rate-limit.mjs";
 
 export const LOGIN_ERROR =
   "No se pudo iniciar sesión. Verifica tus datos e inténtalo de nuevo.";
@@ -109,12 +114,26 @@ export function destroySession(token) {
   if (sessions.delete(token)) persistSessions();
 }
 
-export function loginWithPassword(username, password) {
-  const user = findUserByUsername(username);
-  const passwordOk = user && verifyPassword(password, user.passwordHash);
-  if (!passwordOk) {
+export function loginWithPassword(username, password, clientIp = "") {
+  const normalized = String(username ?? "").trim().toLowerCase();
+  if (isLoginBlocked(clientIp, normalized)) {
+    return {
+      ok: false,
+      error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.",
+      status: 429,
+    };
+  }
+  const user = findUserByUsername(normalized);
+  if (user?.disabled) {
+    recordLoginFailure(clientIp, normalized);
     return { ok: false, error: LOGIN_ERROR, status: 401 };
   }
+  const passwordOk = user && verifyPassword(password, user.passwordHash);
+  if (!passwordOk) {
+    recordLoginFailure(clientIp, normalized);
+    return { ok: false, error: LOGIN_ERROR, status: 401 };
+  }
+  clearLoginFailures(clientIp, normalized);
   // 2FA opcional: sin TOTP configurado, entrar directo
   if (!user.totpSecret) {
     return createSession(user);

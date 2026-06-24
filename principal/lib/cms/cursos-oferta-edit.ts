@@ -46,14 +46,21 @@ export const CONFERENCIAS_DEFAULTS: CmsCursosCard[] =
 export function mergeCursosCards(
   defaults: CmsCursosCard[],
   overrides?: CmsCursosCard[],
+  hidden?: string[],
 ): CmsCursosCard[] {
-  if (!overrides?.length) return defaults;
+  const hiddenSet = new Set(hidden ?? []);
+  if (!overrides?.length) {
+    return defaults.filter((d) => !hiddenSet.has(d.id));
+  }
   const byId = new Map(overrides.map((c) => [c.id, c]));
-  const merged = defaults.map((d) => {
+  const merged: CmsCursosCard[] = [];
+  for (const d of defaults) {
+    if (hiddenSet.has(d.id)) continue;
     const o = byId.get(d.id);
-    return o ? { ...d, ...o } : d;
-  });
+    merged.push(o ? { ...d, ...o } : d);
+  }
   for (const o of overrides) {
+    if (hiddenSet.has(o.id)) continue;
     if (!defaults.some((d) => d.id === o.id)) merged.push(o);
   }
   return merged;

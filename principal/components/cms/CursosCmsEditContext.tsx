@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { CURSOS_PROXIMAS_CONVOCATORIAS } from "@/lib/cursos-agenda";
-import { SALONES } from "@/lib/salones";
+import { SALONES, type SalonSede } from "@/lib/salones";
 import {
   getCursosAgendaEntries,
   mergeCursosAgendaIntoDoc,
@@ -41,6 +41,8 @@ import {
   buildDocWithSalones,
   DEFAULT_SALONES_PAGE,
   getSalonesForEdit,
+  newSalonId,
+  type AddSalonOptions,
 } from "@/lib/cms/salones-edit";
 import {
   CIRCULO_AMIGOS_SELECTED_ID,
@@ -102,7 +104,10 @@ type CursosCmsEditContextValue = {
     patch: Partial<CmsCursosCard>,
   ) => void;
   addOfertaCard: (kind: "cursos" | "conf") => void;
+  deleteOfertaCard: (kind: "cursos" | "conf", id: string) => void;
   patchSalon: (id: string, patch: Partial<CmsSalon>) => void;
+  addSalon: (options?: AddSalonOptions) => void;
+  hideSalon: (id: string) => void;
   patchSalonesPage: (patch: Partial<CmsSalonesPage>) => void;
   patchCirculoAmigos: (patch: Partial<CmsCirculoAmigosPromo>) => void;
   getOfertaCards: (kind: "cursos" | "conf") => CmsCursosCard[];
@@ -127,10 +132,16 @@ function buildDoc(
   agendaItems: CmsAgendaEntry[],
   salonesItems: CmsSalon[],
   salonesPage: CmsSalonesPage,
+  salonesHidden: string[],
   circuloAmigos: CmsCirculoAmigosPromo,
 ): CmsDocument {
   const withAgenda = mergeCursosAgendaIntoDoc(base, agendaItems);
-  const withSalones = buildDocWithSalones(withAgenda, salonesItems, salonesPage);
+  const withSalones = buildDocWithSalones(
+    withAgenda,
+    salonesItems,
+    salonesPage,
+    salonesHidden,
+  );
   return mergeHeroCarouselsIntoDoc({
     ...withSalones,
     sections: {
@@ -149,6 +160,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<CmsCursosPage>(DEFAULT_PAGE);
   const [agendaItems, setAgendaItems] = useState<CmsAgendaEntry[]>([]);
   const [salonesItems, setSalonesItems] = useState<CmsSalon[]>([]);
+  const [salonesHidden, setSalonesHidden] = useState<string[]>([]);
   const [salonesPage, setSalonesPage] =
     useState<CmsSalonesPage>(DEFAULT_SALONES_PAGE);
   const [circuloAmigos, setCirculoAmigos] = useState<CmsCirculoAmigosPromo>(
@@ -170,7 +182,9 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     setAgendaItems(
       getCursosAgendaEntries(draft, CURSOS_PROXIMAS_CONVOCATORIAS),
     );
-    setSalonesItems(getSalonesForEdit(draft, SALONES));
+    const salonesLoaded = getSalonesForEdit(draft, SALONES);
+    setSalonesItems(salonesLoaded.items);
+    setSalonesHidden(salonesLoaded.hidden);
     setSalonesPage({ ...DEFAULT_SALONES_PAGE, ...draft.sections.salonesPage });
     setCirculoAmigos(
       mergeCirculoAmigos(draft.sections.culturaPage?.circuloAmigos),
@@ -191,6 +205,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
         agendaItems,
         salonesItems,
         salonesPage,
+        salonesHidden,
         circuloAmigos,
       );
       await saveCmsDraft("acropolis", token, next);
@@ -204,7 +219,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, page, agendaItems, salonesItems, salonesPage, circuloAmigos]);
+  }, [token, page, agendaItems, salonesItems, salonesPage, salonesHidden, circuloAmigos]);
 
   const publish = useCallback(async () => {
     if (!token) return;
@@ -225,6 +240,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
         agendaItems,
         salonesItems,
         salonesPage,
+        salonesHidden,
         circuloAmigos,
       );
       await saveCmsDraft("acropolis", token, next);
@@ -237,7 +253,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, page, agendaItems, salonesItems, salonesPage, circuloAmigos]);
+  }, [token, page, agendaItems, salonesItems, salonesPage, salonesHidden, circuloAmigos]);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -314,22 +330,42 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
         kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
       const overrides =
         kind === "cursos" ? page.cursosTalleres : page.conferencias;
-      return mergeCursosCards(defaults, overrides);
+      const hidden =
+        kind === "cursos"
+          ? page.cursosTalleresHidden
+          : page.conferenciasHidden;
+      return mergeCursosCards(defaults, overrides, hidden);
     },
-    [page.cursosTalleres, page.conferencias],
+    [
+      page.cursosTalleres,
+      page.conferencias,
+      page.cursosTalleresHidden,
+      page.conferenciasHidden,
+    ],
   );
+
+  const ofertaKeys = (kind: "cursos" | "conf") =>
+    kind === "cursos"
+      ? {
+          cards: "cursosTalleres" as const,
+          hidden: "cursosTalleresHidden" as const,
+        }
+      : {
+          cards: "conferencias" as const,
+          hidden: "conferenciasHidden" as const,
+        };
 
   const patchOfertaCard = useCallback(
     (kind: "cursos" | "conf", id: string, patch: Partial<CmsCursosCard>) => {
-      const key = kind === "cursos" ? "cursosTalleres" : "conferencias";
+      const { cards, hidden } = ofertaKeys(kind);
       const defaults =
         kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
       setPage((p) => {
-        const merged = mergeCursosCards(defaults, p[key]);
+        const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
         const next = merged.map((c) =>
           c.id === id ? { ...c, ...patch } : c,
         );
-        return { ...p, [key]: next };
+        return { ...p, [cards]: next };
       });
       markDirty();
     },
@@ -346,14 +382,33 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
         text: "",
         inscribeKind: kind === "cursos" ? "curso" : "conferencia",
       };
-      const key = kind === "cursos" ? "cursosTalleres" : "conferencias";
+      const { cards, hidden } = ofertaKeys(kind);
       const defaults =
         kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
       setPage((p) => {
-        const merged = mergeCursosCards(defaults, p[key]);
-        return { ...p, [key]: [...merged, card] };
+        const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
+        return { ...p, [cards]: [...merged, card] };
       });
       setSelectedId(ofertaSelectedId(kind, card.id));
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const deleteOfertaCard = useCallback(
+    (kind: "cursos" | "conf", id: string) => {
+      const { cards, hidden } = ofertaKeys(kind);
+      const defaults =
+        kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
+      setPage((p) => {
+        if (defaults.some((d) => d.id === id)) {
+          const nextHidden = [...new Set([...(p[hidden] ?? []), id])];
+          return { ...p, [hidden]: nextHidden };
+        }
+        const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
+        return { ...p, [cards]: merged.filter((c) => c.id !== id) };
+      });
+      setSelectedId(null);
       markDirty();
     },
     [markDirty],
@@ -364,6 +419,73 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       setSalonesItems((list) =>
         list.map((s) => (s.id === id ? { ...s, ...patch } : s)),
       );
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const addSalon = useCallback((options?: AddSalonOptions) => {
+    const id = newSalonId();
+    const defaultSede: SalonSede = options?.sede ?? options?.atStartOfSede ?? "Naco";
+
+    setSalonesItems((list) => {
+      let sede: SalonSede = defaultSede;
+      let city: CmsSalon["city"] =
+        sede === "Santiago" ? "Santiago" : "Santo Domingo";
+
+      if (options?.afterId) {
+        const after = list.find((s) => s.id === options.afterId);
+        if (after) {
+          sede = after.sede;
+          city = after.city;
+        }
+      }
+
+      const entry: CmsSalon = {
+        id,
+        name: "Nuevo salón",
+        sede,
+        city,
+        summary: "",
+        featuredLayout: "butacas",
+        capacities: { butacas: 0, mesas: 0, herradura: 0 },
+        image: { src: "", alt: "" },
+      };
+
+      if (options?.afterId) {
+        const idx = list.findIndex((s) => s.id === options.afterId);
+        if (idx >= 0) {
+          const next = [...list];
+          next.splice(idx + 1, 0, entry);
+          return next;
+        }
+      }
+
+      if (options?.atStartOfSede) {
+        const idx = list.findIndex((s) => s.sede === options.atStartOfSede);
+        const next = [...list];
+        if (idx >= 0) {
+          next.splice(idx, 0, entry);
+        } else {
+          next.push(entry);
+        }
+        return next;
+      }
+
+      return [...list, entry];
+    });
+
+    setSelectedId(id);
+    markDirty();
+  }, [markDirty]);
+
+  const hideSalon = useCallback(
+    (id: string) => {
+      setSalonesItems((list) => list.filter((s) => s.id !== id));
+      if (SALONES.some((s) => s.id === id)) {
+        setSalonesHidden((h) => (h.includes(id) ? h : [...h, id]));
+      }
+      setSelectedId(null);
       markDirty();
     },
     [markDirty],
@@ -401,7 +523,10 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       deleteAgendaItem,
       patchOfertaCard,
       addOfertaCard,
+      deleteOfertaCard,
       patchSalon,
+      addSalon,
+      hideSalon,
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
@@ -425,7 +550,10 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       deleteAgendaItem,
       patchOfertaCard,
       addOfertaCard,
+      deleteOfertaCard,
       patchSalon,
+      addSalon,
+      hideSalon,
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
@@ -470,7 +598,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <HeroEditFields value={page} onChange={patchPage} carouselKey="cursos" />
         </EditPanelChrome>
       ) : null}
 
@@ -567,6 +695,15 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
             onChange={(patch) =>
               patchOfertaCard(ofertaSel.kind, selectedOferta.id, patch)
             }
+            onDelete={() => {
+              if (
+                window.confirm(
+                  `¿Ocultar la tarjeta «${selectedOferta.title}»? No se verá en el sitio público.`,
+                )
+              ) {
+                deleteOfertaCard(ofertaSel.kind, selectedOferta.id);
+              }
+            }}
           />
         </EditPanelChrome>
       ) : null}
@@ -685,6 +822,21 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
               token={token}
               onChange={(image) => patchSalon(selectedSalon.id, { image })}
             />
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `¿Ocultar «${selectedSalon.name}»? No se verá en el sitio público.`,
+                  )
+                ) {
+                  hideSalon(selectedSalon.id);
+                }
+              }}
+              className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
+            >
+              Ocultar del sitio
+            </button>
           </div>
         </EditPanelChrome>
       ) : null}
@@ -713,10 +865,12 @@ function CursosCardEditFields({
   card,
   token,
   onChange,
+  onDelete,
 }: {
   card: CmsCursosCard;
   token: string | null;
   onChange: (patch: Partial<CmsCursosCard>) => void;
+  onDelete?: () => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const previewSrc = resolveCmsMediaUrl(card.src);
@@ -822,6 +976,15 @@ function CursosCardEditFields({
           onChange={(v) => onChange({ alt: v })}
         />
       </fieldset>
+      {onDelete ? (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
+        >
+          Ocultar del sitio
+        </button>
+      ) : null}
     </div>
   );
 }

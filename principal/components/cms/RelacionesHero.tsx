@@ -3,7 +3,6 @@
 import { ArrowRight, HeartHandshake } from "lucide-react";
 import { EsferaLogo } from "@/components/EsferaLogo";
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useRelacionesCmsEdit } from "@/components/cms/InstitutionalPageCmsEditContext";
 import { CmsSectionEditBar } from "@/components/cms/CmsEditPencil";
 import { mergeRelacionesPage } from "@/lib/cms/institutional-page-edit";
@@ -11,7 +10,7 @@ import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
 import { RELACIONES_HERO_IMAGES } from "@/lib/hero-images";
-import { WHATSAPP_URL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 import {
   Globe2,
   HeartHandshake as HeartHandshakeIcon,
@@ -61,15 +60,14 @@ export function RelacionesHero() {
       images={images}
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedId("__hero__")}
-    >
-      <HeroCarouselEditButton carouselKey="relaciones" />
-    </CmsPageHero>
+    />
   );
 }
 
 export function RelacionesPageBody() {
   const cms = useCmsDocument();
   const edit = useRelacionesCmsEdit();
+  const whatsapp = useWhatsAppUrls();
   const page = edit?.ready
     ? mergeRelacionesPage(edit.page)
     : mergeRelacionesPage(
@@ -226,7 +224,7 @@ export function RelacionesPageBody() {
               </h3>
               <p className="mx-auto mt-3 max-w-sm text-white/85">{page.ctaText}</p>
               <a
-                href={`${WHATSAPP_URL}?text=${encodeURIComponent(
+                href={`${whatsapp.cursos}?text=${encodeURIComponent(
                   "Hola, represento a una institución y me gustaría explorar una alianza con Nueva Acrópolis RD.",
                 )}`}
                 target="_blank"

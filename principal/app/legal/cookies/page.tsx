@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { INFO_EMAIL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Política de cookies",
@@ -23,10 +24,10 @@ export default function CookiesPage() {
         <p>
           Si tiene preguntas sobre el uso de cookies, escríbanos a{" "}
           <a
-            href="mailto:oinadom@nuevaacropolis.org.do"
+            href={`mailto:${INFO_EMAIL}`}
             className="font-semibold text-na-kefer hover:underline"
           >
-            oinadom@nuevaacropolis.org.do
+            {INFO_EMAIL}
           </a>
           .
         </p>

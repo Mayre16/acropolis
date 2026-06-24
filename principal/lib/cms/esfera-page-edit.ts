@@ -7,6 +7,7 @@ import type {
   CmsEsferaAudiencia,
   CmsEsferaBeneficio,
   CmsEsferaGallerySlide,
+  CmsEsferaHidden,
   CmsEsferaHomePromo,
   CmsEsferaImpactStat,
   CmsEsferaModalidad,
@@ -15,6 +16,7 @@ import type {
   CmsEsferaQuienesTab,
   CmsEsferaTrainingItem,
   CmsEsferaWorkshopLine,
+  EsferaListKey,
 } from "@/lib/cms/types";
 
 export const DEFAULT_ESFERA_WORKSHOP_LINES: CmsEsferaWorkshopLine[] = [
@@ -369,6 +371,29 @@ export function newEsferaPrincipioId() {
   return `esfera-principio-${Date.now().toString(36)}`;
 }
 
+function esferaListDefaults(key: EsferaListKey) {
+  return (DEFAULT_ESFERA_PAGE[key] ?? []) as { id: string }[];
+}
+
+/** Oculta una tarjeta del sitio público (las del sistema) o la quita si fue creada en el CMS. */
+export function hideEsferaListItem(
+  page: CmsEsferaPage,
+  listKey: EsferaListKey,
+  id: string,
+): CmsEsferaPage {
+  const merged = mergeEsferaPage(page);
+  const isDefault = esferaListDefaults(listKey).some((d) => d.id === id);
+  if (isDefault) {
+    const hidden: CmsEsferaHidden = {
+      ...merged.hidden,
+      [listKey]: [...new Set([...(merged.hidden?.[listKey] ?? []), id])],
+    };
+    return { ...merged, hidden };
+  }
+  const list = (merged[listKey] as { id: string }[] | undefined) ?? [];
+  return { ...merged, [listKey]: list.filter((item) => item.id !== id) };
+}
+
 export function cmsImpactStatToDisplay(stat: CmsEsferaImpactStat): EsferaImpactStat {
   if (stat.kind === "display") {
     return { label: stat.label, display: stat.display ?? "" };
@@ -383,14 +408,21 @@ export function cmsImpactStatToDisplay(stat: CmsEsferaImpactStat): EsferaImpactS
 function mergeById<T extends { id: string }>(
   defaults: T[],
   overrides?: T[],
+  hidden?: string[],
 ): T[] {
-  if (!overrides?.length) return defaults;
+  const hiddenSet = new Set(hidden ?? []);
+  if (!overrides?.length) {
+    return defaults.filter((d) => !hiddenSet.has(d.id));
+  }
   const byId = new Map(overrides.map((item) => [item.id, item]));
-  const merged = defaults.map((d) => {
+  const merged: T[] = [];
+  for (const d of defaults) {
+    if (hiddenSet.has(d.id)) continue;
     const o = byId.get(d.id);
-    return o ? { ...d, ...o } : d;
-  });
+    merged.push(o ? { ...d, ...o } : d);
+  }
   for (const item of overrides) {
+    if (hiddenSet.has(item.id)) continue;
     if (!defaults.some((d) => d.id === item.id)) merged.push(item);
   }
   return merged;
@@ -415,38 +447,51 @@ export function mergeEsferaPage(
   overrides?: CmsEsferaPage | null,
 ): CmsEsferaPage {
   if (!overrides) return DEFAULT_ESFERA_PAGE;
+  const hidden = overrides.hidden;
   return {
     ...DEFAULT_ESFERA_PAGE,
     ...overrides,
+    hidden,
     trainings: mergeById(
       DEFAULT_ESFERA_PAGE.trainings ?? [],
       overrides.trainings,
+      hidden?.trainings,
     ),
     workshopLines: mergeById(
       DEFAULT_ESFERA_PAGE.workshopLines ?? [],
       overrides.workshopLines,
+      hidden?.workshopLines,
     ),
-    alianzas: mergeById(DEFAULT_ESFERA_PAGE.alianzas ?? [], overrides.alianzas),
+    alianzas: mergeById(
+      DEFAULT_ESFERA_PAGE.alianzas ?? [],
+      overrides.alianzas,
+      hidden?.alianzas,
+    ),
     impactStats: mergeById(
       DEFAULT_ESFERA_PAGE.impactStats ?? [],
       overrides.impactStats,
+      hidden?.impactStats,
     ),
     impactGallery: overrides.impactGallery ?? DEFAULT_ESFERA_PAGE.impactGallery,
     beneficios: mergeById(
       DEFAULT_ESFERA_PAGE.beneficios ?? [],
       overrides.beneficios,
+      hidden?.beneficios,
     ),
     audiencias: mergeById(
       DEFAULT_ESFERA_PAGE.audiencias ?? [],
       overrides.audiencias,
+      hidden?.audiencias,
     ),
     modalidades: mergeById(
       DEFAULT_ESFERA_PAGE.modalidades ?? [],
       overrides.modalidades,
+      hidden?.modalidades,
     ),
     principios: mergeById(
       DEFAULT_ESFERA_PAGE.principios ?? [],
       overrides.principios,
+      hidden?.principios,
     ),
     quienesTabs: mergeQuienesTabs(
       DEFAULT_ESFERA_PAGE.quienesTabs ?? [],

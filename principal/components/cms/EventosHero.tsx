@@ -1,7 +1,6 @@
 "use client";
 
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { HeroCarouselEditButton } from "@/components/cms/HeroCarouselCmsEditContext";
 import { useEventosCmsEdit } from "@/components/cms/EventosCmsEditContext";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
@@ -39,8 +38,6 @@ export function EventosHero() {
       images={images}
       editReady={edit?.ready}
       onEdit={() => edit?.setSelectedSlug("__hero__")}
-    >
-      <HeroCarouselEditButton carouselKey="eventos" />
-    </CmsPageHero>
+    />
   );
 }

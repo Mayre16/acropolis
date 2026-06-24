@@ -5,6 +5,8 @@ import Image from "next/image";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { EditorialNaSectionLogo } from "@/components/EditorialNaSectionLogo";
 import { useEditorialQuienesSomos } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 
 type QuienesTabId = "editorial" | "nueva-acropolis";
 
@@ -31,12 +33,17 @@ function renderParagraph(text: string) {
 function EditorialPanel({
   onShowNa,
   content,
+  onEdit,
 }: {
   onShowNa: () => void;
   content: ReturnType<typeof useEditorialQuienesSomos>["libreria"];
+  onEdit?: () => void;
 }) {
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12">
+    <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12">
+      {onEdit ? (
+        <EditorialEditPencil label="Editar Editorial Logos" onClick={onEdit} />
+      ) : null}
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-editorial">
           {content.eyebrow}
@@ -85,11 +92,16 @@ function EditorialPanel({
 
 function NuevaAcropolisPanel({
   content,
+  onEdit,
 }: {
   content: ReturnType<typeof useEditorialQuienesSomos>["nuevaAcropolis"];
+  onEdit?: () => void;
 }) {
   return (
-    <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+    <div className="relative grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+      {onEdit ? (
+        <EditorialEditPencil label="Editar Nueva Acrópolis" onClick={onEdit} />
+      ) : null}
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-na-heket/15 bg-na-heket/5 shadow-na-soft">
         <Image
           src={content.heroImage.src}
@@ -135,6 +147,7 @@ function NuevaAcropolisPanel({
 export function EditorialQuienesSomosSection() {
   const [tab, setTab] = useState<QuienesTabId>("editorial");
   const { libreria, nuevaAcropolis } = useEditorialQuienesSomos();
+  const edit = useEditorialCmsEdit();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -184,9 +197,17 @@ export function EditorialQuienesSomosSection() {
           <EditorialPanel
             content={libreria}
             onShowNa={() => setTab("nueva-acropolis")}
+            onEdit={
+              edit?.ready ? () => edit.setSelectedId("quienes:libreria") : undefined
+            }
           />
         ) : (
-          <NuevaAcropolisPanel content={nuevaAcropolis} />
+          <NuevaAcropolisPanel
+            content={nuevaAcropolis}
+            onEdit={
+              edit?.ready ? () => edit.setSelectedId("quienes:na") : undefined
+            }
+          />
         )}
       </div>
     </section>

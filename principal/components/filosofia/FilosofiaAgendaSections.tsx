@@ -1,9 +1,11 @@
 "use client";
 
+import { Fragment } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { getActiveAgendaItems, type AgendaEntry } from "@/lib/agenda";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { cmsEntryToAgenda } from "@/lib/cms/agenda-edit";
+import type { AddAgendaEntryOptions } from "@/lib/cms/agenda-edit";
 import type { CmsAgendaEntry } from "@/lib/cms/types";
 import { useCmsFilosofiaPageAgenda } from "@/lib/cms/hooks";
 import { UpcomingAgenda } from "@/components/UpcomingAgenda";
@@ -22,46 +24,93 @@ function toDisplay(entries: CmsAgendaEntry[]): AgendaEntry[] {
   }));
 }
 
+function AgendaInsertSlot({
+  onClick,
+  label = "Añadir aquí",
+}: {
+  onClick: () => void;
+  label?: string;
+}) {
+  return (
+    <li className="flex justify-center sm:col-span-2">
+      <button
+        type="button"
+        onClick={onClick}
+        className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl border-2 border-dashed border-amber-300/80 bg-amber-50/60 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-amber-900 transition hover:border-amber-400 hover:bg-amber-100"
+        aria-label={label}
+      >
+        <Plus className="h-4 w-4" aria-hidden />
+        {label}
+      </button>
+    </li>
+  );
+}
+
 function AgendaCardGrid({
   items,
   list,
   onEdit,
+  onInsert,
+  onOpenSection,
+  insertLabel = "Añadir sesión aquí",
 }: {
   items: AgendaEntry[];
   list: CmsAgendaEntry[];
   onEdit: (id: string) => void;
+  onInsert?: (options?: AddAgendaEntryOptions) => void;
+  onOpenSection?: () => void;
+  insertLabel?: string;
 }) {
+  const openAndInsert = (options?: AddAgendaEntryOptions) => {
+    onOpenSection?.();
+    onInsert?.(options);
+  };
+
   return (
     <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+      {onInsert ? (
+        <AgendaInsertSlot
+          label={`${insertLabel} (al inicio)`}
+          onClick={() => openAndInsert({ atStart: true })}
+        />
+      ) : null}
       {items.map((it, i) => {
         const a = accentTokens(i);
         const cmsItem = list.find((d) => d.id === it.id);
         return (
-          <li key={it.id} className="flex">
-            <button
-              type="button"
-              onClick={() => it.id && onEdit(it.id)}
-              className={`group relative flex h-full w-full items-stretch gap-4 overflow-hidden p-5 text-left transition ${accentCardShell(i)} hover:ring-2 hover:ring-amber-400/70 hover:ring-offset-1`}
-            >
-              <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow">
-                <Pencil className="h-4 w-4" aria-hidden />
-              </span>
-              <AgendaCardThumbnail
-                src={it.image}
-                alt={it.imageAlt ?? it.title}
+          <Fragment key={it.id}>
+            <li className="flex">
+              <button
+                type="button"
+                onClick={() => it.id && onEdit(it.id)}
+                className={`group relative flex h-full w-full items-stretch gap-4 overflow-hidden p-5 text-left transition ${accentCardShell(i)} hover:ring-2 hover:ring-amber-400/70 hover:ring-offset-1`}
+              >
+                <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow">
+                  <Pencil className="h-4 w-4" aria-hidden />
+                </span>
+                <AgendaCardThumbnail
+                  src={it.image}
+                  alt={it.imageAlt ?? it.title}
+                />
+                <AgendaCardBody
+                  className="pr-8"
+                  tag={it.tag}
+                  title={it.title}
+                  date={it.date || cmsItem?.startsAt}
+                  time={it.time}
+                  sede={it.sede}
+                  iconClass={a.icon}
+                  iconWrapClass={a.iconWrap}
+                />
+              </button>
+            </li>
+            {onInsert && it.id ? (
+              <AgendaInsertSlot
+                label={insertLabel}
+                onClick={() => openAndInsert({ afterId: it.id })}
               />
-              <AgendaCardBody
-                className="pr-8"
-                tag={it.tag}
-                title={it.title}
-                date={it.date || cmsItem?.startsAt}
-                time={it.time}
-                sede={it.sede}
-                iconClass={a.icon}
-                iconWrapClass={a.iconWrap}
-              />
-            </button>
-          </li>
+            ) : null}
+          </Fragment>
         );
       })}
     </ul>
@@ -134,6 +183,8 @@ export function FilosofiaAgendaEditZones() {
               edit.setSelectedAgendaId(id);
               edit.setActiveSection("sesiones");
             }}
+            onInsert={(options) => edit.addAgendaEntry("diplomado", options)}
+            onOpenSection={() => edit.setActiveSection("sesiones")}
           />
         </div>
       </section>
@@ -170,6 +221,9 @@ export function FilosofiaAgendaEditZones() {
               edit.setSelectedAgendaId(id);
               edit.setActiveSection("otras");
             }}
+            onInsert={(options) => edit.addAgendaEntry("conferencia", options)}
+            onOpenSection={() => edit.setActiveSection("otras")}
+            insertLabel="Añadir actividad aquí"
           />
         </div>
       </section>

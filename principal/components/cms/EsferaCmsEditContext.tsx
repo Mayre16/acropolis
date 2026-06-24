@@ -12,6 +12,7 @@ import {
 import {
   DEFAULT_ESFERA_PAGE,
   mergeEsferaPage,
+  hideEsferaListItem,
   newEsferaAlianzaId,
   newEsferaAudienciaId,
   newEsferaBeneficioId,
@@ -54,6 +55,7 @@ import type {
   CmsEsferaQuienesTab,
   CmsEsferaTrainingItem,
   CmsEsferaWorkshopLine,
+  EsferaListKey,
 } from "@/lib/cms/types";
 import {
   EditField,
@@ -62,6 +64,7 @@ import {
   HeroEditFields,
 } from "@/components/cms/CmsEditFields";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
+import { EsferaLogoEditFields } from "@/components/cms/EsferaLogoEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 
@@ -291,19 +294,18 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
     markDirty();
   }, [markDirty]);
 
-  const deleteTraining = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          trainings: (merged.trainings ?? []).filter((t) => t.id !== id),
-        };
-      });
+  const hideEsferaItem = useCallback(
+    (listKey: EsferaListKey, id: string) => {
+      setPage((p) => hideEsferaListItem(p, listKey, id));
       setSelectedId(null);
       markDirty();
     },
     [markDirty],
+  );
+
+  const deleteTraining = useCallback(
+    (id: string) => hideEsferaItem("trainings", id),
+    [hideEsferaItem],
   );
 
   const patchWorkshopLine = useCallback(
@@ -376,33 +378,13 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
   }, [markDirty]);
 
   const deleteWorkshopLine = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          workshopLines: (merged.workshopLines ?? []).filter((w) => w.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("workshopLines", id),
+    [hideEsferaItem],
   );
 
   const deleteAlianza = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          alianzas: (merged.alianzas ?? []).filter((a) => a.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("alianzas", id),
+    [hideEsferaItem],
   );
 
   const patchImpactStat = useCallback(
@@ -504,18 +486,8 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
   }, [markDirty]);
 
   const deleteBeneficio = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          beneficios: (merged.beneficios ?? []).filter((b) => b.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("beneficios", id),
+    [hideEsferaItem],
   );
 
   const patchAudiencia = useCallback(
@@ -554,18 +526,8 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
   }, [markDirty]);
 
   const deleteAudiencia = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          audiencias: (merged.audiencias ?? []).filter((a) => a.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("audiencias", id),
+    [hideEsferaItem],
   );
 
   const patchModalidad = useCallback(
@@ -607,18 +569,8 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
   }, [markDirty]);
 
   const deleteModalidad = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          modalidades: (merged.modalidades ?? []).filter((m) => m.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("modalidades", id),
+    [hideEsferaItem],
   );
 
   const patchPrincipio = useCallback(
@@ -700,18 +652,8 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
   }, [markDirty]);
 
   const deletePrincipio = useCallback(
-    (id: string) => {
-      setPage((p) => {
-        const merged = mergeEsferaPage(p);
-        return {
-          ...merged,
-          principios: (merged.principios ?? []).filter((item) => item.id !== id),
-        };
-      });
-      setSelectedId(null);
-      markDirty();
-    },
-    [markDirty],
+    (id: string) => hideEsferaItem("principios", id),
+    [hideEsferaItem],
   );
 
   const value = useMemo(
@@ -914,13 +856,13 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Quitar este entrenamiento?")) {
+                if (window.confirm("¿Ocultar este entrenamiento del sitio público?")) {
                   deleteTraining(selected.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Quitar entrenamiento
+              Ocultar del sitio
             </button>
           </div>
         </EditPanelChrome>
@@ -935,7 +877,18 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <div className="space-y-4">
+            <EsferaLogoEditFields
+              page={page}
+              token={token}
+              onChange={patchPage}
+            />
+            <HeroEditFields
+              value={page}
+              onChange={patchPage}
+              carouselKey="esfera"
+            />
+          </div>
         </EditPanelChrome>
       ) : null}
 

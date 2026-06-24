@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Clock, User, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Clock, User, CheckCircle2 } from "lucide-react";
 
 import { CursosHero } from "@/components/cms/CursosHero";
 import { CursosPageShell } from "@/components/cms/CursosPageShell";
@@ -12,7 +12,7 @@ import { CursosEventosRecientes } from "@/components/cursos/CursosEventosRecient
 
 import { SalonesAlquiler } from "@/components/SalonesAlquiler";
 
-import { WHATSAPP_URL } from "@/lib/site-config";
+import { CursosInscribeCta } from "@/components/cursos/CursosInscribeCta";
 
 import {
   accentCardClass,
@@ -90,17 +90,7 @@ export default function CursosPage() {
                 Escríbenos para conocer las próximas convocatorias, horarios e
                 inscripción de nuestros cursos y talleres.
               </p>
-              <a
-                href={`${WHATSAPP_URL}?text=${encodeURIComponent(
-                  "Hola, me interesan los cursos y talleres de Nueva Acrópolis. ¿Me dan información de las próximas convocatorias?",
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105"
-              >
-                Quiero más información
-                <ArrowRight className="h-4 w-4" />
-              </a>
+              <CursosInscribeCta />
             </div>
           </div>
         </section>

@@ -22,9 +22,37 @@
   display: flex;
   justify-content: center;
   overflow: visible;
+  margin-top: 10px;
   padding-block: 0.5rem 0.75rem;
-  max-width: min(100%, 13.375rem);
+  max-width: min(100%, 15rem);
   margin-inline: auto;
+  --brand-logo-h: 3.5rem;
+  --editorial-footer-oinadom-h: 3.5rem;
+}
+
+.editorial-footer__na-mark img,
+.editorial-footer__oinadom-img {
+  display: block;
+  height: var(--editorial-footer-oinadom-h) !important;
+  max-height: var(--editorial-footer-oinadom-h) !important;
+  width: auto !important;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (min-width: 640px) {
+  .editorial-footer__na-mark {
+    --brand-logo-h: 3.85rem;
+    --editorial-footer-oinadom-h: 3.85rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .editorial-footer__na-mark {
+    --brand-logo-h: 4.1rem;
+    --editorial-footer-oinadom-h: 4.1rem;
+  }
 }
 
 .editorial-footer__grid {

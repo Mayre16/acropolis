@@ -3,12 +3,12 @@
 import { Mail, MapPin, Pencil } from "lucide-react";
 import { usePrimarySedeContact } from "@/lib/cms/hooks";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
-import { VOLUNTARIADO_EMAIL } from "@/lib/site-config";
+import { ESFERA_SOLICITUD_EMAIL } from "@/lib/site-config";
 
 export function EsferaContactInfo() {
   const contacto = usePrimarySedeContact();
   const edit = useVenuesCmsEdit();
-  const mailtoHref = `mailto:${VOLUNTARIADO_EMAIL}`;
+  const mailtoHref = `mailto:${ESFERA_SOLICITUD_EMAIL}`;
 
   const openEdit = () => {
     const naco = edit?.items.find((v) => v.id === "sede-naco");
@@ -39,7 +39,7 @@ export function EsferaContactInfo() {
             className="inline-flex items-center justify-center gap-2 font-medium text-na-heket transition hover:text-na-kefer"
           >
             <Mail className="h-4 w-4 shrink-0" aria-hidden />
-            {VOLUNTARIADO_EMAIL}
+            {ESFERA_SOLICITUD_EMAIL}
           </a>
         </p>
       </div>

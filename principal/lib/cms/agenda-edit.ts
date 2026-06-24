@@ -1,7 +1,16 @@
+import { VOLUNTARIADO_PAGE_CATEGORIES } from "@/lib/agenda-publish-categories";
 import type { AgendaEntry } from "@/lib/agenda";
 import { HOME_AGENDA_CATEGORIES } from "@/lib/agenda";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import type { CmsAgendaEntry, CmsDocument } from "@/lib/cms/types";
+
+export type AddAgendaEntryOptions = {
+  /** Inserta justo después de esta entrada. */
+  afterId?: string;
+  /** Inserta al inicio de la lista. */
+  atStart?: boolean;
+};
+
 export function agendaEntryToCms(e: AgendaEntry): CmsAgendaEntry {
   return {
     id: e.id,
@@ -20,6 +29,7 @@ export function agendaEntryToCms(e: AgendaEntry): CmsAgendaEntry {
     detailLabel: e.detailLabel,
     showOnHome: e.showOnHome,
     eventoSlug: e.eventoSlug,
+    seoTags: e.seoTags,
   };
 }
 
@@ -41,6 +51,7 @@ export function cmsEntryToAgenda(e: CmsAgendaEntry): AgendaEntry {
     detailLabel: e.detailLabel,
     showOnHome: e.showOnHome,
     eventoSlug: e.eventoSlug,
+    seoTags: e.seoTags,
   };
 }
 
@@ -84,7 +95,9 @@ export function getVoluntariadoPageAgendaEntries(
   doc: CmsDocument,
   fallback: AgendaEntry[],
 ): CmsAgendaEntry[] {
-  const categories = new Set<AgendaEntry["category"]>(["voluntariado", "esfera"]);
+  const categories = new Set<AgendaEntry["category"]>(
+    VOLUNTARIADO_PAGE_CATEGORIES as unknown as AgendaEntry["category"][],
+  );
   const hidden = new Set(doc.sections.agendaHidden ?? []);
   const cmsById = new Map(
     (doc.sections.agenda ?? [])

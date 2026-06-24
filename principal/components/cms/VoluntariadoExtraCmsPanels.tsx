@@ -450,6 +450,11 @@ function VoluntariadoImageCardFields({
   return (
     <div className="space-y-4">
       <EditField
+        label="Área"
+        value={card.area ?? ""}
+        onChange={(v) => onChange({ area: v })}
+      />
+      <EditField
         label="Título"
         value={card.title}
         onChange={(v) => onChange({ title: v })}

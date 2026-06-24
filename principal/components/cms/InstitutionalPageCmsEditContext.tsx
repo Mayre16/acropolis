@@ -310,7 +310,11 @@ function InstitutionalPageCmsEditInner({
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <HeroEditFields
+            value={page}
+            onChange={patchPage}
+            carouselKey={pageKey}
+          />
         </EditPanelChrome>
       ) : null}
 

@@ -24,6 +24,7 @@ import {
   mergeCirculoAmigos,
 } from "@/lib/cms/circulo-amigos-display";
 import {
+  DEFAULT_ESFERA_PAGE,
   ESFERA_HOME_PROMO_SECTION_ID,
   mergeEsferaHomePromo,
   mergeEsferaPage,
@@ -57,7 +58,7 @@ import {
 } from "@/components/cms/CmsEditFields";
 import { AgendaEntryEditFields, AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
-import { EsferaHomeEditFields } from "@/components/cms/EsferaHomeEditFields";
+import { EsferaHomeEditFields, type EsferaHomeLogoFields } from "@/components/cms/EsferaHomeEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
@@ -83,6 +84,7 @@ type HomeCmsEditContextValue = {
   homePage: CmsHomePage;
   circuloAmigos: CmsCirculoAmigosPromo;
   esferaHomePromo: CmsEsferaHomePromo;
+  esferaLogo: EsferaHomeLogoFields;
   homeHero: {
     h1?: string;
     h2?: string;
@@ -98,6 +100,7 @@ type HomeCmsEditContextValue = {
   patchPillar: (id: string, patch: Partial<CmsHomePillar>) => void;
   patchCirculoAmigos: (patch: Partial<CmsCirculoAmigosPromo>) => void;
   patchEsferaHomePromo: (patch: Partial<CmsEsferaHomePromo>) => void;
+  patchEsferaLogo: (patch: Partial<EsferaHomeLogoFields>) => void;
   patchHomeHero: (patch: {
     h1?: string;
     h2?: string;
@@ -139,6 +142,11 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const [esferaHomePromo, setEsferaHomePromo] = useState<CmsEsferaHomePromo>(
     mergeEsferaHomePromo(),
   );
+  const [esferaLogo, setEsferaLogo] = useState<EsferaHomeLogoFields>({
+    esferaLogoSrc: DEFAULT_ESFERA_PAGE.esferaLogoSrc,
+    esferaLogoWhiteSrc: DEFAULT_ESFERA_PAGE.esferaLogoWhiteSrc,
+    esferaLogoAlt: DEFAULT_ESFERA_PAGE.esferaLogoAlt,
+  });
   const [hidden, setHidden] = useState<string[]>([]);
   const [eventoDrafts, setEventoDrafts] = useState<CmsEvento[]>([]);
   const [selectedKind, setSelectedKind] = useState<HomeSelectedKind>(null);
@@ -173,6 +181,12 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     setEsferaHomePromo(
       pickEsferaHomePromo(mergeEsferaPage(draft.sections.esferaPage)),
     );
+    const mergedEsfera = mergeEsferaPage(draft.sections.esferaPage);
+    setEsferaLogo({
+      esferaLogoSrc: mergedEsfera.esferaLogoSrc,
+      esferaLogoWhiteSrc: mergedEsfera.esferaLogoWhiteSrc,
+      esferaLogoAlt: mergedEsfera.esferaLogoAlt,
+    });
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
   }, []);
@@ -195,11 +209,12 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
           esferaPage: {
             ...merged.sections.esferaPage,
             ...esferaHomePromo,
+            ...esferaLogo,
           },
         },
       });
     },
-    [carousel, photos, hidden, eventoDrafts, homeHero, homePage, circuloAmigos, esferaHomePromo],
+    [carousel, photos, hidden, eventoDrafts, homeHero, homePage, circuloAmigos, esferaHomePromo, esferaLogo],
   );
 
   const saveDraft = useCallback(async () => {
@@ -321,6 +336,14 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const patchEsferaLogo = useCallback(
+    (patch: Partial<EsferaHomeLogoFields>) => {
+      setEsferaLogo((p) => ({ ...p, ...patch }));
+      markDirty();
+    },
+    [markDirty],
+  );
+
   const value = useMemo(
     (): HomeCmsEditContextValue => ({
       ready,
@@ -329,6 +352,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       homePage,
       circuloAmigos,
       esferaHomePromo,
+      esferaLogo,
       homeHero,
       selectedKind,
       selectedId,
@@ -337,6 +361,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       patchPillar,
       patchCirculoAmigos,
       patchEsferaHomePromo,
+      patchEsferaLogo,
       patchHomeHero,
       patchCarousel: (id, patch) => {
         setCarousel((list) =>
@@ -413,6 +438,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       homePage,
       circuloAmigos,
       esferaHomePromo,
+      esferaLogo,
       homeHero,
       selectedKind,
       selectedId,
@@ -421,6 +447,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       patchPillar,
       patchCirculoAmigos,
       patchEsferaHomePromo,
+      patchEsferaLogo,
       patchHomeHero,
       saveDraft,
       publish,
@@ -537,17 +564,6 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
               label="Título principal (h1)"
               value={homeHero.h1 ?? ""}
               onChange={(v) => patchHomeHero({ h1: v })}
-            />
-            <EditField
-              label="Subtítulo (h2)"
-              value={homeHero.h2 ?? ""}
-              onChange={(v) => patchHomeHero({ h2: v })}
-            />
-            <EditField
-              label="Texto introductorio (h3)"
-              value={homeHero.lede ?? ""}
-              onChange={(v) => patchHomeHero({ lede: v })}
-              multiline
             />
           </div>
         </EditPanelChrome>
@@ -752,8 +768,10 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         >
           <EsferaHomeEditFields
             value={esferaHomePromo}
+            logo={esferaLogo}
             token={token}
             onChange={patchEsferaHomePromo}
+            onLogoChange={patchEsferaLogo}
           />
         </EditPanelChrome>
       ) : null}

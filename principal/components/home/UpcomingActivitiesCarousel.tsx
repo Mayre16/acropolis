@@ -20,7 +20,8 @@ import {
   AGENDA_CATEGORY_LABEL,
   type AgendaEntry,
 } from "@/lib/agenda";
-import { agendaInscribeHref } from "@/lib/whatsapp-messages";
+import { agendaInscribeHref, type WhatsAppUrls } from "@/lib/whatsapp-messages";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 type CarouselVariant = "primary" | "cultura" | "agenda";
 
@@ -75,8 +76,8 @@ type Props = {
   };
 };
 
-function inscribeHref(item: AgendaEntry) {
-  return agendaInscribeHref(item);
+function inscribeHref(item: AgendaEntry, urls?: WhatsAppUrls) {
+  return agendaInscribeHref(item, urls);
 }
 
 function defaultDetail(item: AgendaEntry) {
@@ -182,6 +183,7 @@ export function UpcomingActivitiesCarousel({
 }: Props) {
   const copy = VARIANT_COPY[variant];
   const cardHeight = CARD_LG_HEIGHT[variant];
+  const whatsappUrls = useWhatsAppUrls();
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const n = items.length;
@@ -206,7 +208,7 @@ export function UpcomingActivitiesCarousel({
 
   if (!current && !editMode) return null;
 
-  const whatsapp = current ? inscribeHref(current) : null;
+  const whatsapp = current ? inscribeHref(current, whatsappUrls) : null;
   const detail = current ? defaultDetail(current) : null;
   const categoryLabel = current ? AGENDA_CATEGORY_LABEL[current.category] : "";
 
@@ -248,10 +250,21 @@ export function UpcomingActivitiesCarousel({
         </div>
 
         {current ? (
-        <div className="relative mt-5">
+        <div className="mt-5">
+          <div className="flex items-center gap-2 lg:gap-3">
+            {n > 1 ? (
+              <button
+                type="button"
+                onClick={() => setIndex((i) => (i - 1 + n) % n)}
+                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white lg:inline-flex"
+                aria-label="Actividad anterior"
+              >
+                <ChevronLeft className="h-5 w-5" aria-hidden />
+              </button>
+            ) : null}
           <article
             className={cn(
-              "overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
+              "relative min-w-0 flex-1 overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
               cardHeight,
             )}
           >
@@ -362,49 +375,39 @@ export function UpcomingActivitiesCarousel({
               </div>
             </div>
           </article>
+            {n > 1 ? (
+              <button
+                type="button"
+                onClick={() => setIndex((i) => (i + 1) % n)}
+                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white lg:inline-flex"
+                aria-label="Siguiente actividad"
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+            ) : null}
+          </div>
 
           {n > 1 ? (
-            <>
-              <div className="mt-5 flex items-center justify-center gap-2">
-                {items.map((item, i) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setIndex(i)}
-                    className={`h-2.5 rounded-full transition-all ${
-                      i === index
-                        ? "w-8 bg-na-heket"
-                        : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
-                    }`}
-                    aria-label={
-                      item.date
-                        ? `Ver: ${item.title}, ${item.date}`
-                        : `Ver: ${item.title}`
-                    }
-                    aria-current={i === index ? "true" : undefined}
-                  />
-                ))}
-              </div>
-
-              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden items-center justify-between px-2 lg:flex">
+            <div className="mt-5 flex items-center justify-center gap-2">
+              {items.map((item, i) => (
                 <button
+                  key={item.id}
                   type="button"
-                  onClick={() => setIndex((i) => (i - 1 + n) % n)}
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white"
-                  aria-label="Actividad anterior"
-                >
-                  <ChevronLeft className="h-5 w-5" aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIndex((i) => (i + 1) % n)}
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-na-heket/15 bg-white/95 text-na-heket shadow-na-soft transition hover:bg-white"
-                  aria-label="Siguiente actividad"
-                >
-                  <ChevronRight className="h-5 w-5" aria-hidden />
-                </button>
-              </div>
-            </>
+                  onClick={() => setIndex(i)}
+                  className={`h-2.5 rounded-full transition-all ${
+                    i === index
+                      ? "w-8 bg-na-heket"
+                      : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
+                  }`}
+                  aria-label={
+                    item.date
+                      ? `Ver: ${item.title}, ${item.date}`
+                      : `Ver: ${item.title}`
+                  }
+                  aria-current={i === index ? "true" : undefined}
+                />
+              ))}
+            </div>
           ) : null}
         </div>
         ) : editMode ? (

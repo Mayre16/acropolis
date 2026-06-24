@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { ArrowRight, MessageCircle, Users } from "lucide-react";
 import {
@@ -7,7 +9,8 @@ import {
   CIRCULO_AMIGOS_WHATSAPP_MESSAGE,
 } from "@/lib/circulo-amigos-content";
 import { buildCirculoAmigosMailto } from "@/lib/contact-routing";
-import { DIPLOMADO_WHATSAPP_URL, INFO_EMAIL } from "@/lib/site-config";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { INFO_EMAIL } from "@/lib/site-config";
 
 type CirculoAmigosPromoProps = {
   /** `home` = sección completa; `compact` = banda en cursos/cultura. */
@@ -15,7 +18,8 @@ type CirculoAmigosPromoProps = {
 };
 
 export function CirculoAmigosPromo({ variant = "home" }: CirculoAmigosPromoProps) {
-  const whatsappHref = `${DIPLOMADO_WHATSAPP_URL}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
+  const whatsapp = useWhatsAppUrls();
+  const whatsappHref = `${whatsapp.diplomado}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
   const mailtoHref = buildCirculoAmigosMailto().href;
 
   if (variant === "compact") {

@@ -37,13 +37,12 @@ export const brandLogoHeightClass = {
   headerFilial: "[--brand-logo-h:2.35rem] sm:[--brand-logo-h:2.5rem]",
   header: "[--brand-logo-h:2.25rem] sm:[--brand-logo-h:2.4rem]",
   hero: "[--brand-logo-h:6.25rem] sm:[--brand-logo-h:7.25rem] md:[--brand-logo-h:8rem] lg:[--brand-logo-h:8.75rem]",
-  footer: "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
-  /** Footer — oinadom (misma escala que acropolis.org.do). */
   footerOinadom:
-    "[--brand-logo-h:4.875rem] sm:[--brand-logo-h:5.25rem] md:[--brand-logo-h:5.625rem]",
-  /** @deprecated Usar `footerOinadom`. */
+    "[--brand-logo-h:3.1875rem] sm:[--brand-logo-h:3.5375rem] md:[--brand-logo-h:3.7875rem]",
+  footer: "[--brand-logo-h:3.1875rem] sm:[--brand-logo-h:3.5375rem] md:[--brand-logo-h:3.7875rem]",
+  /** @deprecated Usar `footer`. */
   civisFooterOinadom:
-    "[--brand-logo-h:4.875rem] sm:[--brand-logo-h:5.25rem] md:[--brand-logo-h:5.625rem]",
+    "[--brand-logo-h:3.5rem] sm:[--brand-logo-h:3.85rem] md:[--brand-logo-h:4.1rem]",
   footerSubmarca:
     "[--brand-logo-h:1.4rem] sm:[--brand-logo-h:1.6rem] md:[--brand-logo-h:1.75rem]",
   footerInstitutional:

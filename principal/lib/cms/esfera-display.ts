@@ -1,14 +1,26 @@
 "use client";
 
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { mergeEsferaPage } from "@/lib/cms/esfera-page-edit";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import type { CmsEsferaPage } from "@/lib/cms/types";
 
 export function useEsferaPageDisplay(): CmsEsferaPage {
-  const edit = useEsferaCmsEdit();
+  const esferaEdit = useEsferaCmsEdit();
+  const homeEdit = useHomeCmsEdit();
   const cms = useCmsDocument();
-  if (edit?.ready) return mergeEsferaPage(edit.page);
+
+  if (esferaEdit?.ready) return mergeEsferaPage(esferaEdit.page);
+
+  if (homeEdit?.ready) {
+    return mergeEsferaPage({
+      ...mergeEsferaPage(cms?.sections.esferaPage),
+      ...homeEdit.esferaHomePromo,
+      ...homeEdit.esferaLogo,
+    });
+  }
+
   if (isCmsEnabled()) return mergeEsferaPage(cms?.sections.esferaPage);
   return mergeEsferaPage(null);
 }

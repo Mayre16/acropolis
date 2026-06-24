@@ -11,7 +11,7 @@ import { VoluntariadoSostenibilidadSection } from "@/components/voluntariado/Vol
 export const metadata: Metadata = {
   title: "Voluntariado",
   description:
-    "Voluntariado de Nueva Acrópolis RD: reforestación y ecología, acompañamiento a personas mayores, actividades con niños y el Punto Focal Esfera para emergencias. Inscríbete.",
+    "Voluntariado de Nueva Acrópolis RD: medio ambiente, acción social, educación y niñez, ayuda humanitaria, salud comunitaria y formación en valores. Inscríbete.",
   alternates: { canonical: "/voluntariado" },
 };
 

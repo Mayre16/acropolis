@@ -2,7 +2,7 @@
 
 Regenera lapiceros-virtudes.png — frase por color:
 
-negro Justicia · azul Verdad · rojo Belleza · verde Bondad
+negro Prudencia · rojo Fortaleza · azul Templanza · verde Justicia
 
 """
 
@@ -34,13 +34,13 @@ COVER_HEIGHT = 92
 
 PENS = [
 
-    {"word": "JUSTICIA", "yCenter": 248, "size": 44},
+    {"word": "PRUDENCIA", "yCenter": 248, "size": 40},
 
-    {"word": "VERDAD", "yCenter": 434, "size": 46},
+    {"word": "FORTALEZA", "yCenter": 434, "size": 38},
 
-    {"word": "BELLEZA", "yCenter": 622, "size": 44},
+    {"word": "TEMPLANZA", "yCenter": 622, "size": 40},
 
-    {"word": "BONDAD", "yCenter": 806, "size": 46},
+    {"word": "JUSTICIA", "yCenter": 806, "size": 44},
 
 ]
 

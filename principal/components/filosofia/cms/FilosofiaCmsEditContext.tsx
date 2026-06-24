@@ -17,6 +17,7 @@ import { DIPLOMADO_PROXIMAS_SESIONES } from "@/lib/diplomado-sessions";
 import {
   getDiplomadoEntries,
   mergeDiplomadoIntoDoc,
+  type AddAgendaEntryOptions,
 } from "@/lib/cms/agenda-edit";
 import {
   fetchCmsDraft,
@@ -55,6 +56,8 @@ import {
   FILOSOFIA_TEMARIO_DEFAULTS,
 } from "@/lib/filosofia-content";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import { Images } from "lucide-react";
 import {
   FilosofiaAvanzadosPanel,
   FilosofiaCtaPanel,
@@ -107,7 +110,10 @@ type FilosofiaCmsEditContextValue = {
   diplomadoAgenda: CmsAgendaEntry[];
   otrasAgenda: CmsAgendaEntry[];
   patchAgendaEntry: (id: string, patch: Partial<CmsAgendaEntry>) => void;
-  addAgendaEntry: (category: CmsAgendaEntry["category"]) => void;
+  addAgendaEntry: (
+    category: CmsAgendaEntry["category"],
+    options?: AddAgendaEntryOptions,
+  ) => void;
   deleteAgendaEntry: (id: string) => void;
   selectedAgendaId: string | null;
   setSelectedAgendaId: (id: string | null) => void;
@@ -430,7 +436,10 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
   );
 
   const addAgendaEntry = useCallback(
-    (category: CmsAgendaEntry["category"]) => {
+    (
+      category: CmsAgendaEntry["category"],
+      options?: AddAgendaEntryOptions,
+    ) => {
       const entry: CmsAgendaEntry = {
         id: `agenda-${Date.now().toString(36)}`,
         category,
@@ -464,10 +473,26 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
         image: undefined,
         imageAlt: "",
       };
+
+      const insert = (list: CmsAgendaEntry[]) => {
+        if (options?.afterId) {
+          const idx = list.findIndex((e) => e.id === options.afterId);
+          if (idx >= 0) {
+            const next = [...list];
+            next.splice(idx + 1, 0, entry);
+            return next;
+          }
+        }
+        if (options?.atStart) {
+          return [entry, ...list];
+        }
+        return [...list, entry];
+      };
+
       if (category === "diplomado") {
-        setDiplomadoAgenda((list) => [...list, entry]);
+        setDiplomadoAgenda(insert);
       } else {
-        setOtrasAgenda((list) => [...list, entry]);
+        setOtrasAgenda(insert);
       }
       setSelectedAgendaId(entry.id);
       markDirty();
@@ -759,6 +784,7 @@ function PanelFooter({ onClose }: { onClose: () => void }) {
 
 function HeroPanel() {
   const ctx = useFilosofiaCmsEditRequired();
+  const carouselEdit = useHeroCarouselCmsEdit();
   const p = ctx.filosofiaPage;
   return (
     <div className="space-y-4">
@@ -778,6 +804,19 @@ function HeroPanel() {
         onChange={(v) => ctx.patchFilosofiaPage({ heroLede: v })}
         multiline
       />
+      {carouselEdit?.ready ? (
+        <div className="border-t border-slate-100 pt-4">
+          <p className="text-sm text-slate-600">Fotos del carrusel del encabezado.</p>
+          <button
+            type="button"
+            onClick={() => carouselEdit.openCarousel("filosofia")}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            <Images className="h-4 w-4 shrink-0" aria-hidden />
+            Editar fotos del carrusel
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

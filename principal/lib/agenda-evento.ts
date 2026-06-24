@@ -1,3 +1,7 @@
+import {
+  eventoCategoryLabel,
+  publishCategoryDef,
+} from "@/lib/agenda-publish-categories";
 import type { AgendaCategory } from "@/lib/agenda";
 import {
   isAgendaActive,
@@ -11,17 +15,7 @@ export { isAgendaClosed } from "@/lib/agenda";
 export function eventoCategoryLabelFromAgenda(
   category: AgendaCategory,
 ): string {
-  const labels: Record<AgendaCategory, string> = {
-    diplomado: "Diplomado",
-    filosofia: "Filosofía",
-    curso: "Curso",
-    taller: "Taller",
-    conferencia: "Conferencia",
-    cultura: "Cultura",
-    voluntariado: "Voluntariado",
-    esfera: "Esfera",
-  };
-  return labels[category];
+  return eventoCategoryLabel(category);
 }
 
 /** Los grupos del Diplomado no se convierten en crónica de /eventos. */
@@ -72,6 +66,7 @@ export function draftEventoFromAgendaEntry(
     ],
     published: false,
     sourceAgendaId: entry.id,
+    seoTags: entry.seoTags,
   };
 }
 
@@ -134,8 +129,15 @@ export const AGENDA_PAGE_BY_CATEGORY: Record<AgendaCategory, string> = {
   conferencia: "/cursos",
   cultura: "/cultura",
   voluntariado: "/voluntariado",
+  "voluntariado-comunidad": "/voluntariado",
+  "voluntariado-ninos": "/voluntariado",
+  "voluntariado-ambiente": "/voluntariado",
   esfera: "/esfera",
 };
+
+export function publishPagesForCategory(category: AgendaCategory) {
+  return publishCategoryDef(category).pages;
+}
 
 export function isAgendaEntryPromotable(
   entry: CmsAgendaEntry,

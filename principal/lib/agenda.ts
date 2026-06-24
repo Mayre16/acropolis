@@ -8,6 +8,9 @@ export type AgendaCategory =
   | "conferencia"
   | "cultura"
   | "voluntariado"
+  | "voluntariado-comunidad"
+  | "voluntariado-ninos"
+  | "voluntariado-ambiente"
   | "esfera";
 
 /** Entrada de agenda con metadatos para filtrado en home y páginas. */
@@ -27,6 +30,7 @@ export type AgendaEntry = AgendaItem & {
   detailLabel?: string;
   /** Slug de crónica en /eventos si se promovió desde agenda. */
   eventoSlug?: string;
+  seoTags?: string[];
 };
 
 export const AGENDA_CATEGORY_LABEL: Record<AgendaCategory, string> = {
@@ -37,8 +41,23 @@ export const AGENDA_CATEGORY_LABEL: Record<AgendaCategory, string> = {
   conferencia: "Conferencia",
   cultura: "Cultura",
   voluntariado: "Voluntariado",
+  "voluntariado-comunidad": "Voluntariado — Comunidad",
+  "voluntariado-ninos": "Voluntariado — Niños",
+  "voluntariado-ambiente": "Voluntariado — Medio ambiente",
   esfera: "Punto Focal Esfera",
 };
+
+/** Categorías visibles en el filtro de /agenda (sin subtipos de voluntariado). */
+export const AGENDA_FILTER_CATEGORIES: readonly AgendaCategory[] = [
+  "diplomado",
+  "filosofia",
+  "curso",
+  "taller",
+  "conferencia",
+  "cultura",
+  "voluntariado",
+  "esfera",
+];
 
 /** Unión de categorías que rotan en el carrusel de agenda del home. */
 export const HOME_AGENDA_CATEGORIES: readonly AgendaCategory[] = [
@@ -49,6 +68,9 @@ export const HOME_AGENDA_CATEGORIES: readonly AgendaCategory[] = [
   "conferencia",
   "cultura",
   "voluntariado",
+  "voluntariado-comunidad",
+  "voluntariado-ninos",
+  "voluntariado-ambiente",
   "esfera",
 ];
 

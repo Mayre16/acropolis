@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { ArrowRight, Pencil, Plus } from "lucide-react";
 import { DiplomadoSessionsCarousel } from "@/components/diplomado/DiplomadoSessionsCarousel";
@@ -117,24 +118,52 @@ export function DiplomadoOtherSessions() {
 
       {edit?.ready ? (
         <ul className="mt-8 space-y-2">
+          <li>
+            <button
+              type="button"
+              onClick={() => {
+                edit.addAgendaEntry("diplomado", { atStart: true });
+                edit.setActiveSection("sesiones");
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-amber-300/80 bg-amber-50/60 px-4 py-2.5 text-xs font-bold uppercase text-amber-900 transition hover:border-amber-400 hover:bg-amber-100"
+            >
+              <Plus className="h-4 w-4" />
+              Añadir sesión al inicio
+            </button>
+          </li>
           {edit.diplomadoAgenda.map((e) => (
-            <li key={e.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  edit.setSelectedAgendaId(e.id);
-                  edit.setActiveSection("sesiones");
-                }}
-                className="flex w-full items-center justify-between rounded-xl border border-amber-200 bg-white px-4 py-3 text-left text-sm hover:ring-2 hover:ring-amber-400/60"
-              >
-                <span>
-                  <strong>{e.sede || "Sin sede"}</strong>
-                  <span className="mx-2 text-[var(--dip-muted)]">·</span>
-                  {e.date || e.startsAt}
-                </span>
-                <Pencil className="h-4 w-4 shrink-0 text-amber-600" />
-              </button>
-            </li>
+            <Fragment key={e.id}>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    edit.setSelectedAgendaId(e.id);
+                    edit.setActiveSection("sesiones");
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl border border-amber-200 bg-white px-4 py-3 text-left text-sm hover:ring-2 hover:ring-amber-400/60"
+                >
+                  <span>
+                    <strong>{e.sede || "Sin sede"}</strong>
+                    <span className="mx-2 text-[var(--dip-muted)]">·</span>
+                    {e.date || e.startsAt}
+                  </span>
+                  <Pencil className="h-4 w-4 shrink-0 text-amber-600" />
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    edit.addAgendaEntry("diplomado", { afterId: e.id });
+                    edit.setActiveSection("sesiones");
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-amber-300/80 bg-amber-50/60 px-4 py-2 text-[11px] font-bold uppercase text-amber-900 transition hover:border-amber-400 hover:bg-amber-100"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Añadir aquí
+                </button>
+              </li>
+            </Fragment>
           ))}
         </ul>
       ) : null}

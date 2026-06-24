@@ -7,7 +7,7 @@ export const DEFAULT_COLLABORATE_TABS: CmsCollaborateTab[] = [
     id: "voluntario",
     label: "Voluntariado",
     title: "Quiero ser voluntario/a",
-    text: "Cuéntanos si te interesa el voluntariado humanitario, actividades con niños, ancianos, ecología o la línea Punto Focal Esfera. Te contactaremos para las próximas convocatorias.",
+    text: "Cuéntanos qué línea de voluntariado te interesa: medio ambiente, acción social, educación y niñez, ayuda humanitaria, salud comunitaria o formación en valores. Te contactaremos para las próximas convocatorias.",
     cta: "Enviar solicitud",
     href: "#voluntario",
   },

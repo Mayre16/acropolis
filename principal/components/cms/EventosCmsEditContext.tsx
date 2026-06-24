@@ -40,6 +40,12 @@ import {
   HeroEditFields,
   ImageField,
 } from "@/components/cms/CmsEditFields";
+import {
+  PublishCategorySelect,
+  SeoTagsField,
+} from "@/components/cms/PublishCategoryFields";
+import { normalizeCmsEventoCategory } from "@/lib/agenda-publish-categories";
+import type { AgendaCategory } from "@/lib/agenda";
 
 type EventosCmsEditContextValue = {
   ready: boolean;
@@ -199,12 +205,13 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
         slug,
         title,
         date: "",
-        category: "Cultura",
+        category: "cultura",
         excerpt: "",
         image: { src: "", alt: "" },
         gallery: [],
         body: [""],
         published: false,
+        seoTags: [],
       };
       setSelectedSlug(slug);
       return [...list, entry];
@@ -278,6 +285,10 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
       ? items.find((e) => e.slug === selectedSlug)
       : undefined;
 
+  const selectedCategoryId: AgendaCategory | null = selected
+    ? normalizeCmsEventoCategory(selected.category)
+    : null;
+
   return (
     <EventosCmsEditContext.Provider value={value}>
       <EditToolbar
@@ -344,12 +355,24 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
                 value={selected.date}
                 onChange={(v) => patchItem(selected.slug, { date: v })}
               />
-              <EditField
-                label="Categoría"
-                value={selected.category}
-                onChange={(v) => patchItem(selected.slug, { category: v })}
-              />
             </div>
+            {selectedCategoryId ? (
+              <PublishCategorySelect
+                value={selectedCategoryId}
+                onChange={(category) =>
+                  patchItem(selected.slug, { category })
+                }
+              />
+            ) : null}
+            {selectedCategoryId ? (
+              <SeoTagsField
+                category={selectedCategoryId}
+                value={selected.seoTags}
+                onChange={(seoTags) =>
+                  patchItem(selected.slug, { seoTags })
+                }
+              />
+            ) : null}
             <EditField
               label="Extracto (tarjeta)"
               value={selected.excerpt}
@@ -420,7 +443,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
           onClose={() => setSelectedSlug(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} />
+          <HeroEditFields value={page} onChange={patchPage} carouselKey="eventos" />
         </EditPanelChrome>
       ) : null}
     </EventosCmsEditContext.Provider>

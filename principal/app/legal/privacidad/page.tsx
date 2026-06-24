@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { INFO_EMAIL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Política de privacidad",
@@ -22,10 +23,10 @@ export default function PrivacidadPage() {
           o consentimiento expreso. Puede solicitar acceso, rectificación o
           eliminación de sus datos escribiendo a{" "}
           <a
-            href="mailto:oinadom@nuevaacropolis.org.do"
+            href={`mailto:${INFO_EMAIL}`}
             className="font-semibold text-na-kefer hover:underline"
           >
-            oinadom@nuevaacropolis.org.do
+            {INFO_EMAIL}
           </a>
           .
         </p>

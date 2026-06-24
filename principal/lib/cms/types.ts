@@ -16,6 +16,9 @@ export type CmsAgendaEntry = {
     | "conferencia"
     | "cultura"
     | "voluntariado"
+    | "voluntariado-comunidad"
+    | "voluntariado-ninos"
+    | "voluntariado-ambiente"
     | "esfera";
   title: string;
   startsAt: string;
@@ -23,6 +26,8 @@ export type CmsAgendaEntry = {
   time?: string;
   sede?: string;
   tag?: string;
+  /** Etiquetas para búsqueda (Google, filtros internos). Separadas por comas en el CMS. */
+  seoTags?: string[];
   image?: string;
   imageAlt?: string;
   description?: string;
@@ -52,11 +57,14 @@ export type CmsEvento = {
   slug: string;
   title: string;
   date: string;
+  /** Id de categoría (misma lista que agenda) o etiqueta legada. */
   category: string;
   excerpt: string;
   image: CmsMedia;
   gallery?: CmsMedia[];
   body: string[];
+  /** Etiquetas para búsqueda y SEO. */
+  seoTags?: string[];
   /** `false` = borrador oculto en /eventos hasta publicar. */
   published?: boolean;
   /** Actividad de agenda que originó este borrador. */
@@ -332,6 +340,8 @@ export type CmsVoluntariadoCard = {
   id: string;
   src: string;
   alt: string;
+  /** Etiqueta corta del área (p. ej. Medio Ambiente). */
+  area?: string;
   title: string;
   text: string;
 };
@@ -526,6 +536,18 @@ export type CmsEsferaHomePromo = {
   homeCtaLabel?: string;
 };
 
+export type EsferaListKey =
+  | "workshopLines"
+  | "alianzas"
+  | "beneficios"
+  | "audiencias"
+  | "modalidades"
+  | "principios"
+  | "trainings"
+  | "impactStats";
+
+export type CmsEsferaHidden = Partial<Record<EsferaListKey, string[]>>;
+
 export type CmsEsferaPage = CmsPageHeroText & CmsEsferaHomePromo & {
   agendaEyebrow?: string;
   agendaTitle?: string;
@@ -560,6 +582,7 @@ export type CmsEsferaPage = CmsPageHeroText & CmsEsferaHomePromo & {
   modalidadesNota?: string;
   modalidades?: CmsEsferaModalidad[];
   principios?: CmsEsferaPrincipio[];
+  hidden?: CmsEsferaHidden;
   estandaresEyebrow?: string;
   estandaresTitle?: string;
   estandaresPuntoFocal?: string;
@@ -613,6 +636,8 @@ export type CmsCursosPage = CmsPageHeroText & {
   ofertaConferenciasIntro?: string;
   cursosTalleres?: CmsCursosCard[];
   conferencias?: CmsCursosCard[];
+  cursosTalleresHidden?: string[];
+  conferenciasHidden?: string[];
 };
 
 export type CmsEventosPage = CmsPageHeroText;
@@ -677,6 +702,31 @@ export type CmsVenue = {
   mapY?: number;
 };
 
+export type CmsVenuesContact = {
+  title?: string;
+  body?: string;
+  phone?: string;
+  email?: string;
+  ctaLabel?: string;
+};
+
+export type CmsSiteFooter = {
+  tagline?: string;
+  legalDomicile?: string;
+  legalNote?: string;
+  instagramUrl?: string;
+  instagramHandle?: string;
+  youtubeUrl?: string;
+  facebookUrl?: string;
+  whatsappCursosNumber?: string;
+  whatsappDiplomadoNumber?: string;
+};
+
+/** Bandeja verde superior — visibilidad de enlaces a otras plataformas. */
+export type CmsPlatformNav = {
+  hidden?: ("biblioteca" | "civis" | "tienda")[];
+};
+
 export type CmsSalonLayout = "butacas" | "mesas" | "herradura";
 
 export type CmsSalon = {
@@ -734,7 +784,11 @@ export type CmsDocument = {
     viajesHidden?: string[];
     venues?: CmsVenue[];
     venuesHidden?: string[];
+    venuesContact?: CmsVenuesContact;
+    siteFooter?: CmsSiteFooter;
+    platformNav?: CmsPlatformNav;
     salones?: CmsSalon[];
+    salonesHidden?: string[];
     salonesPage?: CmsSalonesPage;
     quienesSomosPage?: CmsQuienesSomosPage;
     relacionesPage?: CmsRelacionesPage;

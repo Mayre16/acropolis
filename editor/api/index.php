@@ -45,7 +45,7 @@ function jsonOut(int $code, array $body): void
 
 function sitePath(string $root, string $site): string
 {
-    if (!preg_match('/^(acropolis|civis)$/', $site)) {
+    if (!preg_match('/^(acropolis|civis|editorial)$/', $site)) {
         jsonOut(400, ['error' => 'Sitio inválido']);
     }
     return $root . DIRECTORY_SEPARATOR . $site;
@@ -92,7 +92,7 @@ if ($uri === '/auth/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(200, ['ok' => true]);
 }
 
-if (preg_match('#^/content/(acropolis|civis)/(draft|published)$#', $uri, $m)) {
+if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $uri, $m)) {
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
     $file = $siteDir . DIRECTORY_SEPARATOR . $m[2] . '.json';
@@ -166,7 +166,7 @@ if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
-if (preg_match('#^/content/(acropolis|civis)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);

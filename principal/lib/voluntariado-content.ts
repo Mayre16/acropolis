@@ -8,32 +8,59 @@ import type {
 
 export const VOLUNTARIADO_QUE_HACEMOS_SECTION = {
   eyebrow: "Líneas de acción",
-  title: "Qué hacemos",
+  title: "¿Qué hacemos?",
   intro:
-    "Nuestras actividades de voluntariado se desarrollan durante todo el año en colaboración con la comunidad.",
+    "Nuestras actividades de voluntariado se desarrollan durante todo el año en colaboración con la comunidad, promoviendo valores, solidaridad y responsabilidad social a través de acciones concretas que buscan mejorar la vida de las personas y contribuir al cuidado del entorno.",
 } as const;
 
 export const VOLUNTARIADO_QUE_HACEMOS_DEFAULTS: CmsVoluntariadoCard[] = [
   {
-    id: "ecologia",
+    id: "medio-ambiente",
     src: "/img/voluntariado/cards/ecologia.webp",
     alt: "Voluntarios de Nueva Acrópolis en una jornada de reforestación al aire libre",
-    title: "Ecología y plantación",
-    text: "Jornadas de reforestación, limpieza de espacios y educación ambiental: cuidar la naturaleza como un acto de servicio.",
+    area: "Medio Ambiente",
+    title: "Voluntariado Ambiental",
+    text: "Realizamos jornadas de reforestación, limpieza de playas, parques y espacios públicos, así como actividades de educación ambiental que fomentan el respeto y la protección de la naturaleza.",
   },
   {
-    id: "ancianos",
+    id: "accion-social",
     src: "/img/voluntariado/cards/ancianos.webp",
     alt: "Voluntarios de Nueva Acrópolis compartiendo con residentes de un hogar de ancianos",
-    title: "Hogar de ancianos",
-    text: "Acompañamiento a personas mayores: visitas, actividades y compañía que devuelven dignidad y alegría.",
+    area: "Acción Social",
+    title: "Acción Social y Comunitaria",
+    text: "Desarrollamos actividades destinadas a fortalecer el tejido social mediante visitas a hogares de ancianos, centros comunitarios y otras instituciones, promoviendo la compañía, la integración y el apoyo a quienes más lo necesitan.",
   },
   {
-    id: "ninos",
+    id: "educacion-ninez",
     src: "/img/voluntariado/cards/ninos.webp",
     alt: "Voluntarios realizando una actividad educativa con niños",
-    title: "Actividades con niños",
-    text: "Programas educativos y recreativos que transmiten valores, juego y cultura a los más pequeños.",
+    area: "Educación y Niñez",
+    title: "Apoyo a la Niñez y la Educación",
+    text: "Organizamos campañas de recolección y entrega de útiles escolares, actividades recreativas, talleres educativos y espacios de formación en valores para contribuir al desarrollo integral de niños y jóvenes.",
+  },
+  {
+    id: "ayuda-humanitaria",
+    src: "/img/actividades/voluntariado-santa-rosa.webp",
+    alt: "Voluntarios entregando donaciones en una acción solidaria comunitaria",
+    area: "Ayuda Humanitaria",
+    title: "Ayuda Humanitaria y Solidaridad",
+    text: "Impulsamos campañas de donación y recolección de alimentos, ropa, juguetes y otros recursos para apoyar a comunidades e instituciones en situación de vulnerabilidad.",
+  },
+  {
+    id: "salud-comunitaria",
+    src: "/img/actividades/feria-salud.webp",
+    alt: "Voluntarios apoyando una feria de salud comunitaria",
+    area: "Salud Comunitaria",
+    title: "Salud y Bienestar Comunitario",
+    text: "Participamos en ferias de salud y jornadas preventivas, brindando apoyo logístico, orientación a los asistentes y colaboración en iniciativas que promueven el bienestar físico y social de la comunidad.",
+  },
+  {
+    id: "formacion-valores",
+    src: "/img/actividades/unibe.webp",
+    alt: "Voluntarios de Nueva Acrópolis en la Feria de Voluntariado de UNIBE",
+    area: "Formación y Valores",
+    title: "Formación en Valores y Ciudadanía",
+    text: "Promovemos actividades culturales, educativas y de desarrollo humano que fortalecen la responsabilidad, la convivencia, la solidaridad y el compromiso con una sociedad mejor.",
   },
 ];
 
@@ -76,7 +103,7 @@ export const VOLUNTARIADO_SOSTENIBILIDAD_DEFAULTS: CmsVoluntariadoInfoCard[] = [
     id: "donacion",
     icon: "heart",
     title: "Tu aporte transforma",
-    text: "Cada donación ayuda a sostener proyectos de ecología, apoyo social y formación humanitaria. Puedes colaborar puntualmente o de forma recurrente.",
+    text: "Cada donación ayuda a sostener proyectos de medio ambiente, acción social, salud comunitaria y formación en valores. Puedes colaborar puntualmente o de forma recurrente.",
     cta: "Quiero donar",
     ctaHref: "",
   },
@@ -86,7 +113,7 @@ export const VOLUNTARIADO_PARTICIPACION_SECTION = {
   eyebrow: "Súmate",
   title: "Quiero ser voluntario/a",
   intro:
-    "Pulsa el botón y cuéntanos si te interesa el voluntariado humanitario o la línea Punto Focal Esfera. Envía tu solicitud por correo y te contactaremos para las próximas convocatorias.",
+    "Pulsa el botón y cuéntanos qué línea de voluntariado te interesa. Envía tu solicitud por correo y te contactaremos para las próximas convocatorias.",
 } as const;
 
 export const VOLUNTARIADO_RECIENTES_SECTION = {

@@ -55,7 +55,7 @@ async function knockOutWhite(pngBuf) {
 
 const DEFAULT_OINADOM = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../../../principal/public/brand/logo-oinadom.png",
+  "../../public/brand/logo-oinadom.webp",
 );
 
 /**
@@ -67,6 +67,10 @@ const DEFAULT_OINADOM = path.join(
 export async function buildStackedLockupBuffer(opts = {}) {
   const { oinadomPath = DEFAULT_OINADOM, width = 300 } = opts;
   const resized = await sharp(oinadomPath).resize({ width }).png().toBuffer();
+  // WebP importado (kit OINADOM) ya trae α; knockOutWhite daña el wordmark gris.
+  if (/\.webp$/i.test(oinadomPath)) {
+    return resized;
+  }
   return knockOutWhite(resized);
 }
 

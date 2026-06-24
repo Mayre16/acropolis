@@ -33,7 +33,7 @@ const SECTIONS: Section[] = [
   {
     icon: HeartHandshake,
     title: "Voluntariado",
-    text: "Ecología, acompañamiento a mayores y actividades con niños. Todos somos voluntarios.",
+    text: "Medio ambiente, acción social, educación, ayuda humanitaria, salud comunitaria y formación en valores. Todos somos voluntarios.",
     href: "/voluntariado",
   },
   {

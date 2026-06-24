@@ -545,6 +545,13 @@ function EditPanel({
           <EditField label="Texto introductorio (h3)" value={edit.homeHero.lede ?? ""} onChange={(v) => edit.patchHomeHero({ lede: v })} multiline />
           <EditField label="Enlace del botón" value={edit.homeHero.ctaHref ?? ""} onChange={(v) => edit.patchHomeHero({ ctaHref: v })} />
           <EditField label="Texto del botón" value={edit.homeHero.ctaLabel ?? ""} onChange={(v) => edit.patchHomeHero({ ctaLabel: v })} />
+          <div className="border-t border-slate-100 pt-4">
+            <p className="mb-3 text-sm font-semibold text-slate-700">Fotos del carrusel</p>
+            <CivisHeroCarouselList
+              edit={edit}
+              onSelectSlide={(id) => edit.setSelectedId(`heroCarousel:${id}`)}
+            />
+          </div>
         </div>
       </EditPanelChrome>
     );

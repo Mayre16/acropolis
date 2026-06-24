@@ -1,6 +1,7 @@
 import {
   CURSOS_EMAIL,
   ESFERA_CC_EMAIL,
+  ESFERA_SOLICITUD_EMAIL,
   INFO_EMAIL,
   VOLUNTARIADO_EMAIL,
 } from "@/lib/site-config";
@@ -153,13 +154,13 @@ function buildMailtoLink(
   return { href, recipients, cc, body };
 }
 
-/** Correo Esfera → voluntariado humanitario + copia a coordinación. */
+/** Correo Esfera → buzón Esfera + copia a coordinación. */
 export function buildEsferaMailto(
   subject: string,
   body: string,
 ): MailtoResult {
   return buildMailtoLink(
-    [VOLUNTARIADO_EMAIL],
+    [ESFERA_SOLICITUD_EMAIL],
     subject,
     body,
     [ESFERA_CC_EMAIL],

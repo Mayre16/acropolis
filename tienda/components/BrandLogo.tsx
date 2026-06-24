@@ -171,8 +171,9 @@ export function BrandLogo({
     <img
       src={src}
       alt={hybrid ? BRAND_LOCKUPS[lockup].alt : asset.alt}
-      width={asset.width}
-      height={asset.height}
+      {...(hybrid
+        ? { width: asset.width, height: asset.height }
+        : {})}
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : undefined}
       className={cn(
@@ -180,7 +181,9 @@ export function BrandLogo({
         hybrid && wordmarkBandFit
           ? "col-span-full w-full max-w-full"
           : "max-w-full",
-        lockup === "na-solo" ? "h-[var(--brand-logo-h)] w-auto" : "h-auto w-auto",
+        lockup === "na-solo" || !hybrid
+          ? "h-[var(--brand-logo-h)] w-auto max-h-[var(--brand-logo-h)]"
+          : "h-auto w-auto",
         hybrid && !wordmarkBandFit
           ? "object-center"
           : !hybrid && align === "start"
@@ -191,7 +194,9 @@ export function BrandLogo({
       style={
         hybrid && wordmarkBandFit
           ? { height: "var(--brand-logo-h)", width: "100%" }
-          : markStyle
+          : hybrid
+            ? markStyle
+            : undefined
       }
     />
   );
