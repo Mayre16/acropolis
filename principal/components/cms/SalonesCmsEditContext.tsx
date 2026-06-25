@@ -16,7 +16,10 @@ import {
   buildDocWithSalones,
   getSalonesForEdit,
   DEFAULT_SALONES_PAGE,
+  newSalonId,
+  type AddSalonOptions,
 } from "@/lib/cms/salones-edit";
+import type { SalonSede } from "@/lib/salones";
 import {
   fetchCmsDraft,
   publishCms,
@@ -92,6 +95,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [items, setItems] = useState<CmsSalon[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
   const [page, setPage] = useState<CmsSalonesPage>(DEFAULT_SALONES_PAGE);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -107,7 +111,9 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
 
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
     setDoc(draft);
-    setItems(getSalonesForEdit(draft, SALONES));
+    const salonesLoaded = getSalonesForEdit(draft, SALONES);
+    setItems(salonesLoaded.items);
+    setHidden(salonesLoaded.hidden);
     setPage({ ...DEFAULT_SALONES_PAGE, ...draft.sections.salonesPage });
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
@@ -120,7 +126,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     try {
       const latest = await fetchCmsDraft("acropolis");
       const next = mergeHeroCarouselsIntoDoc(
-        buildDocWithSalones(latest, items, page),
+        buildDocWithSalones(latest, items, page, hidden),
       );
       await saveCmsDraft("acropolis", token, next);
       setDoc(next);
@@ -135,7 +141,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, items, page]);
+  }, [token, items, page, hidden]);
 
   const publish = useCallback(async () => {
     if (!token) return;
@@ -151,7 +157,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     try {
       const latest = await fetchCmsDraft("acropolis");
       const next = mergeHeroCarouselsIntoDoc(
-        buildDocWithSalones(latest, items, page),
+        buildDocWithSalones(latest, items, page, hidden),
       );
       await saveCmsDraft("acropolis", token, next);
       const publishResult = await publishCms("acropolis", token);
@@ -165,7 +171,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, items, page]);
+  }, [token, items, page, hidden]);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -209,6 +215,77 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const addSalon = useCallback(
+    (options?: AddSalonOptions) => {
+      const id = newSalonId();
+      const defaultSede: SalonSede =
+        options?.sede ?? options?.atStartOfSede ?? "Naco";
+
+      setItems((list) => {
+        let sede: SalonSede = defaultSede;
+        let city: CmsSalon["city"] =
+          sede === "Santiago" ? "Santiago" : "Santo Domingo";
+
+        if (options?.afterId) {
+          const after = list.find((s) => s.id === options.afterId);
+          if (after) {
+            sede = after.sede;
+            city = after.city;
+          }
+        }
+
+        const entry: CmsSalon = {
+          id,
+          name: "Nuevo salón",
+          sede,
+          city,
+          summary: "",
+          featuredLayout: "butacas",
+          capacities: { butacas: 0, mesas: 0, herradura: 0 },
+          image: { src: "", alt: "" },
+        };
+
+        if (options?.afterId) {
+          const idx = list.findIndex((s) => s.id === options.afterId);
+          if (idx >= 0) {
+            const next = [...list];
+            next.splice(idx + 1, 0, entry);
+            return next;
+          }
+        }
+
+        if (options?.atStartOfSede) {
+          const idx = list.findIndex((s) => s.sede === options.atStartOfSede);
+          const next = [...list];
+          if (idx >= 0) {
+            next.splice(idx, 0, entry);
+          } else {
+            next.push(entry);
+          }
+          return next;
+        }
+
+        return [...list, entry];
+      });
+
+      setSelectedId(id);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const hideSalon = useCallback(
+    (id: string) => {
+      setItems((list) => list.filter((s) => s.id !== id));
+      if (SALONES.some((s) => s.id === id)) {
+        setHidden((h) => (h.includes(id) ? h : [...h, id]));
+      }
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
   const selected = items.find((s) => s.id === selectedId) ?? null;
 
   const value = useMemo(
@@ -219,6 +296,8 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
       selectedId,
       setSelectedId,
       patchItem,
+      addSalon,
+      hideSalon,
       patchPage,
       saveDraft,
       publish,
@@ -232,6 +311,8 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
       page,
       selectedId,
       patchItem,
+      addSalon,
+      hideSalon,
       patchPage,
       saveDraft,
       publish,
