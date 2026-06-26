@@ -10,13 +10,14 @@
 import {
   cpSync,
   existsSync,
+  mkdirSync,
   readFileSync,
   readdirSync,
   renameSync,
   statSync,
   writeFileSync,
 } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -86,8 +87,25 @@ if (!existsSync(API_SRC)) {
   process.exit(1);
 }
 
-cpSync(API_SRC, API_DST, { recursive: true });
-console.log("Copiado: api/ → out/api/");
+cpSync(API_SRC, API_DST, {
+  recursive: true,
+  filter: (src) => {
+    const name = basename(src);
+    if (name.endsWith(".example")) return false;
+    if (name === "config.local.php") return false;
+    if (name === "config.php") return false;
+    return true;
+  },
+});
+console.log("Copiado: api/ → out/api/ (sin config ni plantillas .example)");
+
+const dataHtaccessSrc = join(ROOT, "data", ".htaccess");
+const dataHtaccessDst = join(OUT, "data", ".htaccess");
+if (existsSync(dataHtaccessSrc)) {
+  mkdirSync(join(OUT, "data"), { recursive: true });
+  cpSync(dataHtaccessSrc, dataHtaccessDst);
+  console.log("Copiado: data/.htaccess (bloqueo HTTP; no sobrescribe JSON en servidor)");
+}
 
 const htaccess = join(OUT, ".htaccess");
 if (existsSync(htaccess)) {

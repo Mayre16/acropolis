@@ -55,6 +55,19 @@ Guardar el token; no va en git.
 
 Si FTP no está configurado, el workflow igual hace build y deja un **artifact** descargable en Actions.
 
+## Seguridad en cPanel (revisar tras cada deploy)
+
+| Riesgo | Mitigación en el repo |
+|--------|------------------------|
+| `data/` (JSON, SMTP, usuarios, backups) accesible por URL | `editor/data/.htaccess` → `Require all denied`; raíz del editor bloquea `/data/` |
+| Plantillas con secretos (`config.php.example`) en el servidor | El build **no** copia `.example` ni `config.php`; FTP los excluye |
+| PHP auxiliar ejecutable por HTTP (`mail.php`, etc.) | `editor/api/.htaccess` solo permite `index.php` |
+| Borrador CMS legible sin login | `GET …/content/{site}/draft` exige autenticación |
+| Imágenes CMS sin exponer `data/` | `/uploads/{site}/…` se sirve vía `api/index.php` |
+| Sitios públicos con carpetas CMS sueltas | `.htaccess` bloquea `data/acropolis`, `auth`, `system` si existieran en `public_html` |
+
+**Una vez en cPanel:** confirma que `editor/data/.htaccess` existe y que `api/config.php` **no** es descargable (debe dar 403). `published.json` sigue siendo público vía API (los sitios lo necesitan).
+
 ## 3. config.php del editor (cPanel)
 
 Copiar `editor/api/config.php.example` → `config.php`:

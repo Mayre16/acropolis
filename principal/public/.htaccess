@@ -26,6 +26,8 @@ Options -Indexes
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # Carpetas que no deben estar en public_html
+  # CMS / auth (no confundir con public/data/mundo-feed.json en principal)
+  RewriteRule ^data/(acropolis|civis|editorial|auth|system)(/|$) - [F,L]
   RewriteRule ^(vendor|node_modules|\.git|scripts|\.vscode|\.idea)/ - [F,L]
 
   # Assets Next.js (build: na-assets/; alias _next/ por compatibilidad)

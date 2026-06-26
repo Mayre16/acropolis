@@ -193,6 +193,8 @@ jobs:
           dangerous-clean-slate: false
           exclude: |
             **/api/config.php
+            **/api/config.local.php
+            **/api/*.example
             **/data/**
 
       - name: Upload build artifact (si FTP no configurado)

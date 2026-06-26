@@ -1,0 +1,26 @@
+# API CMS — solo index.php como entrada HTTP
+Options -Indexes
+
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(example|local|md|txt|sample|bak|sql|log|ini|env)$">
+  Require all denied
+</FilesMatch>
+
+# config.php nunca por HTTP (solo include interno)
+<Files "config.php">
+  Require all denied
+</Files>
+
+# Módulos PHP internos (solo require desde index.php)
+<FilesMatch "^(mail|deploy-webhook|bookstore-sync|auth-helper)\.php$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

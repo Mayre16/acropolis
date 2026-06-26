@@ -10,11 +10,12 @@ header('Content-Type: application/json; charset=utf-8');
 $configFile = __DIR__ . '/config.php';
 if (!is_file($configFile)) {
     http_response_code(503);
-    echo json_encode(['error' => 'Falta config.php — copia config.php.example']);
+    echo json_encode(['error' => 'Servicio no configurado']);
     exit;
 }
 
 $config = require $configFile;
+require __DIR__ . '/auth-helper.php';
 require __DIR__ . '/mail.php';
 require __DIR__ . '/deploy-webhook.php';
 require __DIR__ . '/bookstore-sync.php';
@@ -35,6 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
 session_start();
 
 function jsonOut(int $code, array $body): void
@@ -67,7 +78,8 @@ function ensureSite(string $dir): void
 
 function requireAuth(): void
 {
-    if (empty($_SESSION['cms_auth'])) {
+    global $dataRoot;
+    if (!cms_session_valid($dataRoot)) {
         jsonOut(401, ['error' => 'No autorizado']);
     }
 }
@@ -98,6 +110,9 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $ur
     ensureSite($siteDir);
     $file = $siteDir . DIRECTORY_SEPARATOR . $m[2] . '.json';
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($m[2] === 'draft') {
+            requireAuth();
+        }
         if (!is_file($file)) {
             jsonOut(404, ['error' => 'Sin contenido']);
         }
@@ -214,6 +229,31 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && 
         'bookstoreSync' => $bookstoreSync,
         'message' => $message,
     ]);
+}
+
+if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $siteDir = sitePath($dataRoot, $m[1]);
+    $safe = basename($m[2]);
+    if ($safe === '' || $safe === '.' || $safe === '..') {
+        jsonOut(400, ['error' => 'Archivo inválido']);
+    }
+    $path = $siteDir . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $safe;
+    if (!is_file($path)) {
+        jsonOut(404, ['error' => 'No encontrado']);
+    }
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $types = [
+        'webp' => 'image/webp',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'pdf' => 'application/pdf',
+    ];
+    header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
+    header('X-Content-Type-Options: nosniff');
+    readfile($path);
+    exit;
 }
 
 jsonOut(404, ['error' => 'Not found']);
