@@ -2,45 +2,73 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { assetUrl } from "@/lib/asset-url";
+import {
+  isInEditorIframe,
+  parseCmsEditParam,
+  readStoredCmsEditMode,
+} from "@/lib/cms/edit-mode";
+
+/** Detecta modo edición del inicio antes de que React resuelva useSearchParams. */
+function isHomeCmsEditActive(): boolean {
+  if (typeof window === "undefined") return false;
+  const fromUrl = parseCmsEditParam(
+    new URLSearchParams(window.location.search).get("cmsEdit"),
+  );
+  if (fromUrl === "1") return true;
+  return isInEditorIframe() && readStoredCmsEditMode() === "1";
+}
 
 const HERO_OVERLAY = "bg-na-heket/[0.78]";
 const HERO_CTA =
   "inline-flex items-center justify-center rounded-2xl border-2 border-white bg-na-heket/50 px-10 py-4 text-xs font-bold uppercase tracking-[0.22em] text-white transition hover:bg-na-heket/65 sm:rounded-3xl sm:px-12 sm:py-[1.125rem] sm:text-sm";
 
 export function HomeHeroCms() {
+  const cmsEditMode = useCmsEditMode();
+  const [homeEditActive] = useState(isHomeCmsEditActive);
   const cms = useCmsDocument();
   const edit = useHomeCmsEdit();
   const published = cms?.sections.homeHero;
   const draft = edit?.homeHero;
 
+  const inHomeEdit = cmsEditMode === "1" || homeEditActive;
+  /** En el iframe nunca mostrar published/default hasta tener el borrador. */
+  const awaitingDraft = inHomeEdit && !edit?.ready;
+
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
 
-  const backgroundSrc =
-    (
-      (edit?.ready
-        ? draft?.background?.src
-        : isCmsEnabled()
-          ? published?.background?.src
-          : undefined) ?? HOME_HERO_BACKGROUND.src
-    ).trim() || HOME_HERO_BACKGROUND.src;
+  let backgroundSrc: string | null = null;
+  if (awaitingDraft) {
+    backgroundSrc = null;
+  } else if (inHomeEdit && edit?.ready) {
+    const draftSrc = draft?.background?.src?.trim();
+    backgroundSrc = draftSrc || HOME_HERO_BACKGROUND.src;
+  } else {
+    backgroundSrc =
+      (
+        (isCmsEnabled() ? published?.background?.src : undefined) ??
+        HOME_HERO_BACKGROUND.src
+      ).trim() || HOME_HERO_BACKGROUND.src;
+  }
+
   const backgroundAlt =
-    (edit?.ready
-      ? draft?.background?.alt
-      : isCmsEnabled()
-        ? published?.background?.alt
-        : undefined) ?? HOME_HERO_BACKGROUND.alt;
-  const resolvedBackgroundSrc = assetUrl(
-    resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc,
-  );
+    inHomeEdit && edit?.ready
+      ? draft?.background?.alt ?? HOME_HERO_BACKGROUND.alt
+      : (isCmsEnabled() ? published?.background?.alt : undefined) ??
+        HOME_HERO_BACKGROUND.alt;
+  const resolvedBackgroundSrc = backgroundSrc
+    ? assetUrl(resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc)
+    : null;
 
   return (
     <section
@@ -48,15 +76,23 @@ export function HomeHeroCms() {
       className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24"
     >
       {/* Imagen con <Image> en todos los breakpoints: md:bg-fixed falla en iframe del editor. */}
-      <Image
-        src={resolvedBackgroundSrc}
-        alt={backgroundAlt}
-        fill
-        priority
-        unoptimized
-        className="object-cover object-center"
-        sizes="100vw"
-      />
+      {resolvedBackgroundSrc ? (
+        <Image
+          src={resolvedBackgroundSrc}
+          alt={backgroundAlt}
+          fill
+          priority
+          unoptimized
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-na-heket/15"
+          aria-hidden
+          aria-label="Cargando foto del encabezado…"
+        />
+      )}
       <div
         className={`pointer-events-none absolute inset-0 ${HERO_OVERLAY}`}
         aria-hidden

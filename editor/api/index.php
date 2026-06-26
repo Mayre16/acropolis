@@ -288,6 +288,60 @@ if (preg_match('#^/upload/(acropolis|civis|editorial)$#', $uri, $m) && $_SERVER[
     ]);
 }
 
+if ($uri === '/spellcheck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $body = json_decode((string) file_get_contents('php://input'), true) ?? [];
+    $text = trim((string) ($body['text'] ?? ''));
+    if ($text === '') {
+        jsonOut(200, ['issues' => []]);
+    }
+    $text = mb_substr($text, 0, 8000);
+    $params = http_build_query(['language' => 'es', 'text' => $text]);
+    $ch = curl_init('https://api.languagetool.org/v2/check');
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $params,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/x-www-form-urlencoded',
+            'Accept: application/json',
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 15,
+    ]);
+    $raw = curl_exec($ch);
+    curl_close($ch);
+    if ($raw === false) {
+        jsonOut(200, ['issues' => []]);
+    }
+    $data = json_decode($raw, true);
+    if (!is_array($data)) {
+        jsonOut(200, ['issues' => []]);
+    }
+    $issues = [];
+    foreach ($data['matches'] ?? [] as $m) {
+        $ctx = is_array($m['context'] ?? null) ? $m['context'] : [];
+        $ctxText = (string) ($ctx['text'] ?? $text);
+        $ctxOffset = (int) ($ctx['offset'] ?? $m['offset'] ?? 0);
+        $length = (int) ($m['length'] ?? 0);
+        $start = max(0, $ctxOffset - 12);
+        $end = min(mb_strlen($ctxText), $ctxOffset + $length + 12);
+        $replacements = [];
+        foreach (array_slice($m['replacements'] ?? [], 0, 5) as $r) {
+            $val = (string) ($r['value'] ?? '');
+            if ($val !== '') {
+                $replacements[] = $val;
+            }
+        }
+        $issues[] = [
+            'message' => (string) ($m['message'] ?? 'Posible error'),
+            'offset' => (int) ($m['offset'] ?? 0),
+            'length' => $length,
+            'replacements' => $replacements,
+            'excerpt' => trim(mb_substr($ctxText, $start, $end - $start)) ?: mb_substr($text, 0, 40),
+        ];
+    }
+    jsonOut(200, ['issues' => $issues]);
+}
+
 if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $siteDir = sitePath($dataRoot, $m[1]);
     $safe = basename($m[2]);

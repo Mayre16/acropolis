@@ -56,6 +56,7 @@ import { AgendaEntryEditFields, AgendaEntryImageField } from "@/components/cms/A
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
 import { EsferaHomeEditFields, type EsferaHomeLogoFields } from "@/components/cms/EsferaHomeEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { isInEditorIframe, readStoredCmsEditMode } from "@/lib/cms/edit-mode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
@@ -151,7 +152,8 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
-  const ready = !!token;
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const ready = !!token && draftLoaded;
 
   const markDirty = useCallback(() => {
     setDirty(true);
@@ -239,9 +241,11 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
       setToken(initToken);
+      setDraftLoaded(false);
       fetchCmsDraft("acropolis")
         .then((draft) => {
           applyLoadedDoc(draft);
+          setDraftLoaded(true);
           postToEditor({ type: "cms-ready" });
         })
         .catch(() => setStatus("No se pudo cargar el borrador."));
@@ -792,7 +796,12 @@ function HomePhotoEditFields({
 
 export function HomeCmsEditProvider({ children }: { children: ReactNode }) {
   const editMode = useCmsEditMode();
-  if (editMode !== "1") return <>{children}</>;
+  const activeEdit =
+    editMode === "1" ||
+    (typeof window !== "undefined" &&
+      isInEditorIframe() &&
+      readStoredCmsEditMode() === "1");
+  if (!activeEdit) return <>{children}</>;
   return <HomeCmsEditInner>{children}</HomeCmsEditInner>;
 }
 

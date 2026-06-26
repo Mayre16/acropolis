@@ -48,17 +48,23 @@ export function VisualCmsPageEditor({
   const [ready, setReady] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
   const iframeSrc = `${siteUrl}${path}?${query}`;
+
+  useEffect(() => {
+    setIframeLoaded(false);
+    setReady(false);
+  }, [iframeSrc]);
 
   const sendInit = useCallback(() => {
     const token = getToken();
     const win = iframeRef.current?.contentWindow;
-    if (!token || !win) return;
+    if (!token || !win || win === window || !iframeLoaded) return;
     win.postMessage(
       { type: "cms-edit-init", token, site } satisfies CmsEditMessage,
       previewOrigin,
     );
-  }, [site, previewOrigin]);
+  }, [site, previewOrigin, iframeLoaded]);
 
   useEffect(() => {
     function onMessage(ev: MessageEvent<CmsEditMessage>) {
@@ -78,15 +84,18 @@ export function VisualCmsPageEditor({
   }, [sendInit, previewOrigin]);
 
   useEffect(() => {
+    if (!iframeLoaded) return;
     sendInit();
-    const timers = [250, 750, 1500, 3000, 5000].map((ms) =>
+    const timers = [250, 750, 1500, 3000].map((ms) =>
       window.setTimeout(() => sendInit(), ms),
     );
     return () => timers.forEach((id) => window.clearTimeout(id));
-  }, [sendInit, iframeSrc]);
+  }, [sendInit, iframeLoaded, iframeSrc]);
 
   function postToIframe(message: CmsEditMessage) {
-    iframeRef.current?.contentWindow?.postMessage(message, previewOrigin);
+    const win = iframeRef.current?.contentWindow;
+    if (!win || win === window || !iframeLoaded) return;
+    win.postMessage(message, previewOrigin);
   }
 
   return (
@@ -167,7 +176,7 @@ export function VisualCmsPageEditor({
         title={`${title} — edición visual`}
         src={iframeSrc}
         className="min-h-0 flex-1 w-full border-0"
-        onLoad={sendInit}
+        onLoad={() => setIframeLoaded(true)}
       />
     </div>
   );
