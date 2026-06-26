@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
-import { HOME_HERO_BACKGROUND } from "@/lib/hero-images";
+import { pickHomeHeroBackground } from "@/lib/cms/home-hero-display";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { assetUrl } from "@/lib/asset-url";
@@ -43,34 +43,24 @@ export function HomeHeroCms() {
     cmsEditMode === "1" ||
     (typeof window !== "undefined" && isHomeCmsEditActive());
 
-  /** En el iframe nunca mostrar published/default hasta tener el borrador. */
   const awaitingDraft = inHomeEdit && !edit?.ready;
 
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
 
-  let backgroundSrc: string | null = null;
-  if (awaitingDraft) {
-    backgroundSrc = null;
-  } else if (inHomeEdit && edit?.ready) {
-    const draftSrc = draft?.background?.src?.trim();
-    backgroundSrc = draftSrc || HOME_HERO_BACKGROUND.src;
-  } else {
-    backgroundSrc =
-      (
-        (isCmsEnabled() ? published?.background?.src : undefined) ??
-        HOME_HERO_BACKGROUND.src
-      ).trim() || HOME_HERO_BACKGROUND.src;
-  }
+  const heroBackground = awaitingDraft
+    ? null
+    : inHomeEdit && edit?.ready
+      ? pickHomeHeroBackground(draft?.background)
+      : pickHomeHeroBackground(
+          isCmsEnabled() ? published?.background : undefined,
+        );
 
-  const backgroundAlt =
-    inHomeEdit && edit?.ready
-      ? draft?.background?.alt ?? HOME_HERO_BACKGROUND.alt
-      : (isCmsEnabled() ? published?.background?.alt : undefined) ??
-        HOME_HERO_BACKGROUND.alt;
-  const resolvedBackgroundSrc = backgroundSrc
-    ? assetUrl(resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc)
+  const resolvedBackgroundSrc = heroBackground
+    ? assetUrl(
+        resolveCmsMediaUrl(heroBackground.src) ?? heroBackground.src,
+      )
     : null;
 
   useLayoutEffect(() => {
@@ -94,8 +84,9 @@ export function HomeHeroCms() {
       <div className="absolute inset-0" data-hero-bg aria-hidden>
         {resolvedBackgroundSrc ? (
           <Image
+            key={resolvedBackgroundSrc}
             src={resolvedBackgroundSrc}
-            alt={backgroundAlt}
+            alt={heroBackground?.alt ?? ""}
             fill
             priority
             unoptimized

@@ -13,10 +13,6 @@ export function createDefaultContent(site: SiteId): CmsDocument {
     base.sections = {
       homeHero: {
         h1: "Filosofía, Cultura y Voluntariado",
-        background: {
-          src: "/img/home/hero-voluntarios-chalecos.webp",
-          alt: "Voluntarios de Nueva Acrópolis en unidad, con chalecos verdes y azules",
-        },
       },
       diplomadoHero: {
         badgeWeekday: "Lunes",

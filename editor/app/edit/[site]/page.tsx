@@ -519,25 +519,44 @@ function EditSitePageInner() {
               </>
             )}
             {site === "acropolis" ? (
-              <MediaField
-                label="Foto de fondo del landing"
-                media={
-                  doc.sections.homeHero?.background ?? {
-                    src: "/img/home/hero-voluntarios-chalecos.webp",
-                    alt: "Voluntarios de Nueva Acrópolis en unidad, con chalecos verdes y azules",
+              <>
+                <MediaField
+                  label="Foto de fondo del landing"
+                  media={
+                    doc.sections.homeHero?.background ?? {
+                      src: "",
+                      alt: "Voluntarios de Nueva Acrópolis en unidad, con chalecos verdes y azules",
+                    }
                   }
-                }
-                onChange={(background) =>
-                  setDoc({
-                    ...doc,
-                    sections: {
-                      ...doc.sections,
-                      homeHero: { ...doc.sections.homeHero, background },
-                    },
-                  })
-                }
-                onUpload={(file, onUrl) => handleUpload(file, onUrl)}
-              />
+                  onChange={(background) =>
+                    setDoc({
+                      ...doc,
+                      sections: {
+                        ...doc.sections,
+                        homeHero: {
+                          ...doc.sections.homeHero,
+                          background:
+                            background.src.trim() === "" &&
+                            !background.alt.trim()
+                              ? undefined
+                              : {
+                                  ...background,
+                                  src: background.src.trim(),
+                                },
+                        },
+                      },
+                    })
+                  }
+                  onUpload={(file, onUrl) => handleUpload(file, onUrl)}
+                />
+                <p className="text-xs leading-relaxed text-slate-600">
+                  Deja la URL vacía para usar la foto por defecto del sitio (
+                  <code className="rounded bg-slate-100 px-1">
+                    /img/home/hero-voluntarios-chalecos.webp
+                  </code>
+                  ). Al subir un archivo se sustituye la ruta anterior.
+                </p>
+              </>
             ) : null}
           </section>
         )}

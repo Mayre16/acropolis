@@ -36,6 +36,10 @@ import {
   resolveCmsMediaUrl,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
+import {
+  normalizeHomeHeroSection,
+  patchHomeHeroBackground,
+} from "@/lib/cms/home-hero-display";
 import { postToEditor } from "@/lib/cms/edit-bridge";
 import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import type {
@@ -173,7 +177,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
           })),
     );
     setHidden(draft.sections.agendaHidden ?? []);
-    setHomeHero(draft.sections.homeHero ?? {});
+    setHomeHero(normalizeHomeHeroSection(draft.sections.homeHero ?? {}));
     setHomePage(mergeHomePage(draft.sections.homePage));
     setCirculoAmigos(
       mergeCirculoAmigos(draft.sections.culturaPage?.circuloAmigos),
@@ -200,7 +204,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         sections: {
           ...withDrafts.sections,
           activityPhotos: photos,
-          homeHero,
+          homeHero: normalizeHomeHeroSection(homeHero),
           homePage,
           culturaPage: {
             ...merged.sections.culturaPage,
@@ -296,8 +300,16 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       h2?: string;
       lede?: string;
       background?: { src: string; alt: string };
+      clearBackground?: boolean;
     }) => {
-      setHomeHero((h) => ({ ...h, ...patch }));
+      setHomeHero((h) => {
+        if (patch.clearBackground) {
+          const { background: _removed, ...rest } = h;
+          const { clearBackground: _flag, ...fields } = patch;
+          return { ...rest, ...fields };
+        }
+        return { ...h, ...patch };
+      });
       markDirty();
     },
     [markDirty],
@@ -534,14 +546,22 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
                 "Voluntarios de Nueva Acrópolis en unidad, con chalecos verdes y azules"
               }
               token={token}
-              onChange={(patch) =>
-                patchHomeHero({
-                  background: {
-                    src: patch.image ?? homeHero.background?.src ?? "",
-                    alt: patch.imageAlt ?? homeHero.background?.alt ?? "",
-                  },
-                })
-              }
+              onChange={(patch) => {
+                const background = patchHomeHeroBackground(
+                  homeHero.background,
+                  patch,
+                );
+                if (background) {
+                  patchHomeHero({
+                    background: {
+                      src: background.src ?? "",
+                      alt: background.alt ?? "",
+                    },
+                  });
+                } else {
+                  patchHomeHero({ clearBackground: true });
+                }
+              }}
             />
             <EditField
               label="Título principal (h1)"
