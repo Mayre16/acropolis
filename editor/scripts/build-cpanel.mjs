@@ -24,17 +24,24 @@ const cmsApiUrl =
   process.env.NEXT_PUBLIC_CMS_API_URL?.trim() ||
   `${editorUrl.replace(/\/$/, "")}/api`;
 
+const githubPagesPreview =
+  process.env.EDITOR_PREVIEW_GITHUB_PAGES === "1" ||
+  process.env.EDITOR_PREVIEW_GITHUB_PAGES === "true";
+const ghUser = process.env.GITHUB_PAGES_USER?.trim() || "mayre16";
+const ghRepo = process.env.GITHUB_PAGES_REPO?.trim() || "acropolis";
+const ghBase = `https://${ghUser}.github.io/${ghRepo}`;
+
 const principalUrl =
   process.env.NEXT_PUBLIC_PRINCIPAL_URL?.trim() ||
-  "https://acropolis.adesa.com.do";
+  (githubPagesPreview ? `${ghBase}/principal` : "https://acropolis.adesa.com.do");
 
 const civisUrl =
   process.env.NEXT_PUBLIC_CIVIS_URL?.trim() ||
-  "https://civis.acropolis.adesa.com.do";
+  (githubPagesPreview ? `${ghBase}/civis` : "https://civis.acropolis.adesa.com.do");
 
 const tiendaUrl =
   process.env.NEXT_PUBLIC_TIENDA_URL?.trim() ||
-  "https://tienda.acropolis.adesa.com.do";
+  (githubPagesPreview ? `${ghBase}/tienda` : "https://tienda.acropolis.adesa.com.do");
 
 const env = {
   ...process.env,
