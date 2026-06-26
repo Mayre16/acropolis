@@ -131,6 +131,208 @@ function cms_verify_password(string $password, string $stored): bool
     return false;
 }
 
+function cms_hash_password(string $password): string
+{
+    if (in_array('scrypt', hash_algos(), true)) {
+        $salt = random_bytes(16);
+        $hash = hash('scrypt', $password, true, [
+            'salt' => $salt,
+            'memory_cost' => 16384,
+            'time_cost' => 8,
+            'threads' => 1,
+        ]);
+        if ($hash !== false && strlen($hash) === 64) {
+            return 'scrypt:' . base64_encode($salt) . ':' . base64_encode($hash);
+        }
+    }
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+function cms_validate_password(string $password): array
+{
+    $errors = [];
+    if (strlen($password) < 12) {
+        $errors[] = 'Mínimo 12 caracteres';
+    }
+    if (!preg_match('/[a-z]/', $password)) {
+        $errors[] = 'Al menos una minúscula';
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        $errors[] = 'Al menos una mayúscula';
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        $errors[] = 'Al menos un número';
+    }
+    if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+        $errors[] = 'Al menos un símbolo (!@#$…)';
+    }
+    return ['ok' => count($errors) === 0, 'errors' => $errors];
+}
+
+function cms_auth_normalize_login(string $value): string
+{
+    return strtolower(trim($value));
+}
+
+function cms_auth_is_valid_email(string $value): bool
+{
+    return filter_var(cms_auth_normalize_login($value), FILTER_VALIDATE_EMAIL) !== false;
+}
+
+function cms_auth_count_admins(string $dataRoot): int
+{
+    $n = 0;
+    foreach (cms_auth_users($dataRoot) as $user) {
+        if (($user['role'] ?? '') === 'admin' && empty($user['disabled'])) {
+            $n += 1;
+        }
+    }
+    return $n;
+}
+
+function cms_auth_save_users(string $dataRoot, array $users): void
+{
+    cms_auth_write_json(cms_auth_json_file($dataRoot, 'users.json'), ['users' => $users]);
+}
+
+function cms_auth_append_user(string $dataRoot, array $user): array
+{
+    $users = cms_auth_users($dataRoot);
+    $users[] = $user;
+    cms_auth_save_users($dataRoot, $users);
+    return $user;
+}
+
+function cms_auth_admin_create_user(string $dataRoot, array $body): array
+{
+    $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
+    $role = trim((string) ($body['role'] ?? ''));
+    $label = trim((string) ($body['label'] ?? ''));
+    $password = (string) ($body['password'] ?? '');
+
+    if ($email === '' || !cms_auth_is_valid_email($email)) {
+        return ['ok' => false, 'error' => 'Correo electrónico inválido', 'status' => 400];
+    }
+    if ($role === '') {
+        return ['ok' => false, 'error' => 'Rol requerido', 'status' => 400];
+    }
+    if ($label === '') {
+        return ['ok' => false, 'error' => 'Nombre visible requerido', 'status' => 400];
+    }
+    if (cms_auth_find_user($dataRoot, $email) !== null) {
+        return ['ok' => false, 'error' => 'Ya existe un usuario con ese correo', 'status' => 409];
+    }
+
+    $policy = cms_validate_password($password);
+    if (!$policy['ok']) {
+        return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
+    }
+
+    $user = cms_auth_append_user($dataRoot, [
+        'id' => bin2hex(random_bytes(16)),
+        'username' => $email,
+        'email' => $email,
+        'passwordHash' => cms_hash_password($password),
+        'role' => $role,
+        'label' => $label,
+        'totpSecret' => null,
+        'disabled' => false,
+        'createdAt' => gmdate('c'),
+    ]);
+
+    return ['ok' => true, 'user' => cms_auth_public_user($user)];
+}
+
+function cms_auth_admin_update_user(string $dataRoot, string $userId, array $body, array $session): array
+{
+    $user = cms_auth_find_user_by_id($dataRoot, $userId);
+    if ($user === null) {
+        return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
+    }
+
+    $patch = [];
+    if (array_key_exists('label', $body)) {
+        $label = trim((string) $body['label']);
+        if ($label === '') {
+            return ['ok' => false, 'error' => 'Nombre visible requerido', 'status' => 400];
+        }
+        $patch['label'] = $label;
+    }
+    if (array_key_exists('role', $body)) {
+        $role = trim((string) $body['role']);
+        if ($role === '') {
+            return ['ok' => false, 'error' => 'Rol requerido', 'status' => 400];
+        }
+        if (($user['role'] ?? '') === 'admin' && $role !== 'admin' && cms_auth_count_admins($dataRoot) <= 1) {
+            return ['ok' => false, 'error' => 'Debe quedar al menos un administrador', 'status' => 400];
+        }
+        $patch['role'] = $role;
+    }
+    if (array_key_exists('disabled', $body)) {
+        $disabled = !empty($body['disabled']);
+        if (($user['username'] ?? '') === ($session['username'] ?? '') && $disabled) {
+            return ['ok' => false, 'error' => 'No puedes desactivar tu propia cuenta', 'status' => 400];
+        }
+        if (($user['role'] ?? '') === 'admin' && $disabled && cms_auth_count_admins($dataRoot) <= 1) {
+            return ['ok' => false, 'error' => 'Debe quedar al menos un administrador activo', 'status' => 400];
+        }
+        $patch['disabled'] = $disabled;
+    }
+
+    if ($patch === []) {
+        return ['ok' => true, 'user' => cms_auth_public_user($user)];
+    }
+
+    cms_auth_update_user($dataRoot, $userId, $patch);
+    $updated = cms_auth_find_user_by_id($dataRoot, $userId);
+    return ['ok' => true, 'user' => cms_auth_public_user($updated ?? $user)];
+}
+
+function cms_auth_admin_reset_password(string $dataRoot, string $userId, string $password): array
+{
+    $user = cms_auth_find_user_by_id($dataRoot, $userId);
+    if ($user === null) {
+        return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
+    }
+    $policy = cms_validate_password($password);
+    if (!$policy['ok']) {
+        return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
+    }
+    cms_auth_update_user($dataRoot, $userId, ['passwordHash' => cms_hash_password($password)]);
+    return ['ok' => true, 'message' => 'Contraseña actualizada'];
+}
+
+function cms_auth_admin_clear_totp(string $dataRoot, string $userId): array
+{
+    $user = cms_auth_find_user_by_id($dataRoot, $userId);
+    if ($user === null) {
+        return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
+    }
+    cms_auth_update_user($dataRoot, $userId, ['totpSecret' => null]);
+    return ['ok' => true, 'message' => 'Verificación en dos pasos desactivada'];
+}
+
+function cms_auth_admin_delete_user(string $dataRoot, string $userId, array $session): array
+{
+    $user = cms_auth_find_user_by_id($dataRoot, $userId);
+    if ($user === null) {
+        return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
+    }
+    if (($user['username'] ?? '') === ($session['username'] ?? '')) {
+        return ['ok' => false, 'error' => 'No puedes eliminar tu propia cuenta', 'status' => 400];
+    }
+    if (($user['role'] ?? '') === 'admin' && cms_auth_count_admins($dataRoot) <= 1) {
+        return ['ok' => false, 'error' => 'Debe quedar al menos un administrador', 'status' => 400];
+    }
+
+    $users = array_values(array_filter(
+        cms_auth_users($dataRoot),
+        static fn ($u) => is_array($u) && ($u['id'] ?? '') !== $userId,
+    ));
+    cms_auth_save_users($dataRoot, $users);
+    return ['ok' => true, 'message' => 'Usuario eliminado'];
+}
+
 function cms_auth_sessions(string $dataRoot): array
 {
     $now = (int) round(microtime(true) * 1000);
@@ -507,6 +709,65 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
         }
         $users = array_map('cms_auth_public_user', cms_auth_users($dataRoot));
         return ['status' => 200, 'body' => ['ok' => true, 'users' => $users]];
+    }
+
+    if ($uri === '/auth/users' && $method === 'POST') {
+        $gate = cms_auth_require_admin($dataRoot, $token);
+        if (!$gate['ok']) {
+            return [
+                'status' => (int) ($gate['status'] ?? 401),
+                'body' => ['ok' => false, 'error' => $gate['error'] ?? 'No autorizado'],
+            ];
+        }
+        $result = cms_auth_admin_create_user($dataRoot, $body);
+        $status = (int) ($result['status'] ?? ($result['ok'] ? 201 : 400));
+        unset($result['status']);
+        return ['status' => $status, 'body' => $result];
+    }
+
+    if (preg_match('#^/auth/users/([^/]+)(/reset-password|/totp)?$#', $uri, $m)) {
+        $gate = cms_auth_require_admin($dataRoot, $token);
+        if (!$gate['ok']) {
+            return [
+                'status' => (int) ($gate['status'] ?? 401),
+                'body' => ['ok' => false, 'error' => $gate['error'] ?? 'No autorizado'],
+            ];
+        }
+        $userId = $m[1];
+        $action = $m[2] ?? '';
+        $session = $gate['session'] ?? [];
+
+        if ($action === '/reset-password' && $method === 'POST') {
+            $result = cms_auth_admin_reset_password(
+                $dataRoot,
+                $userId,
+                (string) ($body['password'] ?? ''),
+            );
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+
+        if ($action === '/totp' && $method === 'DELETE') {
+            $result = cms_auth_admin_clear_totp($dataRoot, $userId);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+
+        if ($action === '' && $method === 'PUT') {
+            $result = cms_auth_admin_update_user($dataRoot, $userId, $body, $session);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+
+        if ($action === '' && $method === 'DELETE') {
+            $result = cms_auth_admin_delete_user($dataRoot, $userId, $session);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
     }
 
     return null;
