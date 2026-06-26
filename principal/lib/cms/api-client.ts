@@ -1,4 +1,7 @@
 import type { CmsDocument } from "@/lib/cms/types";
+import { getCmsEditSession } from "@/lib/cms/edit-session";
+
+const DEFAULT_CMS_API = "https://editor.acropolis.adesa.com.do/api";
 
 export type CmsDeployStatus = {
   queued?: boolean;
@@ -15,10 +18,20 @@ export type CmsPublishResult = {
 };
 
 export function cmsApiBase() {
-  return (
-    process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "") ||
-    "http://localhost:3401"
-  );
+  const fromEnv = process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "http://localhost:3401";
+    }
+  }
+  return DEFAULT_CMS_API;
+}
+
+/** Raíz del editor (sin /api) — las imágenes CMS van en /uploads/… */
+export function cmsEditorOrigin() {
+  return cmsApiBase().replace(/\/api$/i, "");
 }
 
 export function resolveCmsMediaUrl(src?: string): string | undefined {
@@ -26,9 +39,9 @@ export function resolveCmsMediaUrl(src?: string): string | undefined {
   const uploadPath = src.match(
     /(\/uploads\/(?:acropolis|civis)\/[^\s"?#]+)/,
   )?.[1];
-  if (uploadPath) return `${cmsApiBase()}${uploadPath}`;
+  if (uploadPath) return `${cmsEditorOrigin()}${uploadPath}`;
   if (src.startsWith("http://") || src.startsWith("https://")) return src;
-  if (src.startsWith("/uploads/")) return `${cmsApiBase()}${src}`;
+  if (src.startsWith("/uploads/")) return `${cmsEditorOrigin()}${src}`;
   return src;
 }
 
@@ -44,9 +57,17 @@ function authHeaders(token: string): HeadersInit {
   };
 }
 
-export async function fetchCmsDraft(site: "acropolis" | "civis"): Promise<CmsDocument> {
+export async function fetchCmsDraft(
+  site: "acropolis" | "civis",
+  token?: string,
+): Promise<CmsDocument> {
+  const bearer = token ?? getCmsEditSession()?.token;
+  const headers: HeadersInit = bearer
+    ? { Authorization: `Bearer ${bearer}` }
+    : {};
   const res = await fetch(`${cmsApiBase()}/content/${site}/draft`, {
     cache: "no-store",
+    headers,
   });
   if (!res.ok) throw new Error("No se pudo cargar el borrador");
   return res.json() as Promise<CmsDocument>;

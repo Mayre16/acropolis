@@ -264,6 +264,30 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && 
     ]);
 }
 
+if (preg_match('#^/upload/(acropolis|civis|editorial)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireAuth();
+    $siteDir = sitePath($dataRoot, $m[1]);
+    ensureSite($siteDir);
+    if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'] ?? '')) {
+        jsonOut(400, ['error' => 'Archivo requerido']);
+    }
+    $file = $_FILES['file'];
+    $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION)) ?: 'webp';
+    $allowed = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'];
+    if (!in_array($ext, $allowed, true)) {
+        jsonOut(400, ['error' => 'Tipo de archivo no permitido']);
+    }
+    $safe = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+    $dest = $siteDir . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $safe;
+    if (!move_uploaded_file((string) $file['tmp_name'], $dest)) {
+        jsonOut(500, ['error' => 'No se pudo guardar el archivo']);
+    }
+    jsonOut(200, [
+        'url' => '/uploads/' . $m[1] . '/' . $safe,
+        'filename' => $safe,
+    ]);
+}
+
 if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $siteDir = sitePath($dataRoot, $m[1]);
     $safe = basename($m[2]);

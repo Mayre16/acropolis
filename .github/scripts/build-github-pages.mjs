@@ -13,6 +13,8 @@ const GITHUB_USER = process.env.GITHUB_PAGES_USER?.trim() || "mayre16";
 const REPO_NAME = process.env.GITHUB_PAGES_REPO?.trim() || "acropolis";
 const ORIGIN = `https://${GITHUB_USER}.github.io`;
 const PAGES_BASE = `/${REPO_NAME}`;
+const CMS_API =
+  process.env.CMS_API_URL?.trim() || "https://editor.acropolis.adesa.com.do/api";
 
 const sites = [
   {
@@ -22,7 +24,7 @@ const sites = [
       NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_CIVIS_URL: `${ORIGIN}${PAGES_BASE}/civis`,
       NEXT_PUBLIC_TIENDA_URL: `${ORIGIN}${PAGES_BASE}/tienda`,
-      NEXT_PUBLIC_CMS_URL: "",
+      NEXT_PUBLIC_CMS_URL: CMS_API,
     },
   },
   {
@@ -32,7 +34,7 @@ const sites = [
       NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/civis`,
       NEXT_PUBLIC_PRINCIPAL_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_TIENDA_URL: `${ORIGIN}${PAGES_BASE}/tienda`,
-      NEXT_PUBLIC_CMS_URL: "",
+      NEXT_PUBLIC_CMS_URL: CMS_API,
     },
   },
   {
@@ -43,7 +45,7 @@ const sites = [
       NEXT_PUBLIC_PRINCIPAL_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_CIVIS_URL: `${ORIGIN}${PAGES_BASE}/civis`,
       NEXT_PUBLIC_STORE_API_URL: "https://biblioteca-oina.adesa.com.do",
-      NEXT_PUBLIC_CMS_URL: "",
+      NEXT_PUBLIC_CMS_URL: CMS_API,
     },
   },
 ];

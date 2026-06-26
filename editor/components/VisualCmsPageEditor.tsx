@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getToken } from "@/lib/auth-storage";
 import type { CmsEditMessage } from "@/lib/edit-bridge";
 
@@ -43,6 +43,13 @@ export function VisualCmsPageEditor({
       : site === "editorial"
         ? TIENDA_URL
         : PRINCIPAL_URL;
+  const previewOrigin = useMemo(() => {
+    try {
+      return new URL(siteUrl).origin;
+    } catch {
+      return siteUrl;
+    }
+  }, [siteUrl]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState(`Cargando ${title}…`);
   const [ready, setReady] = useState(false);
@@ -56,13 +63,13 @@ export function VisualCmsPageEditor({
     if (!token || !win) return;
     win.postMessage(
       { type: "cms-edit-init", token, site } satisfies CmsEditMessage,
-      siteUrl,
+      previewOrigin,
     );
-  }, [site, siteUrl]);
+  }, [site, previewOrigin]);
 
   useEffect(() => {
     function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (ev.origin !== siteUrl) return;
+      if (ev.origin !== previewOrigin) return;
       const msg = ev.data;
       if (!msg || typeof msg !== "object") return;
       if (msg.type === "cms-ready") {
@@ -75,7 +82,7 @@ export function VisualCmsPageEditor({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [sendInit, siteUrl]);
+  }, [sendInit, previewOrigin]);
 
   useEffect(() => {
     sendInit();
@@ -86,7 +93,7 @@ export function VisualCmsPageEditor({
   }, [sendInit, iframeSrc]);
 
   function postToIframe(message: CmsEditMessage) {
-    iframeRef.current?.contentWindow?.postMessage(message, siteUrl);
+    iframeRef.current?.contentWindow?.postMessage(message, previewOrigin);
   }
 
   return (
