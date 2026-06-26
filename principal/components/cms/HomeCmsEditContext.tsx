@@ -241,7 +241,6 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
       setToken(initToken);
-      setDraftLoaded(false);
       fetchCmsDraft("acropolis")
         .then((draft) => {
           applyLoadedDoc(draft);

@@ -2,6 +2,10 @@
 
 export const CMS_EDIT_STORAGE_KEY = "acropolis-cms-edit";
 
+/** Oculta el hero pre-renderizado hasta cargar el borrador en el iframe del editor. */
+export const CMS_EDIT_HERO_PENDING_CLASS = "cms-edit-pending-hero";
+export const CMS_EDIT_HERO_READY_CLASS = "cms-edit-hero-ready";
+
 export type CmsEditMode = "1" | "medios";
 
 export function readStoredCmsEditMode(): CmsEditMode | null {

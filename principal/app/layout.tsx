@@ -58,6 +58,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var q=location.search;if(/[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q)||(window.parent!==window&&sessionStorage.getItem("acropolis-cms-edit"))){document.documentElement.classList.add("cms-edit-pending-hero")}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${notoSans.variable} flex min-h-screen flex-col font-sans antialiased text-na-ink`}
       >

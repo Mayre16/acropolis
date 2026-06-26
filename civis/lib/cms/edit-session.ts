@@ -13,6 +13,7 @@ let session: CmsEditSession | null = null;
 const listeners = new Set<(value: CmsEditSession) => void>();
 
 export function setCmsEditSession(value: CmsEditSession) {
+  if (session?.token === value.token && session.site === value.site) return;
   session = value;
   for (const listener of listeners) listener(value);
 }
@@ -38,9 +39,6 @@ export function registerCmsEditInit(
     onInit(value.token, value.site);
   }
 
-  const pending = getCmsEditSession();
-  if (pending) apply(pending);
-
   const unsub = subscribeCmsEditSession(apply);
 
   function onMessage(ev: MessageEvent<CmsEditMessage>) {
@@ -48,7 +46,6 @@ export function registerCmsEditInit(
     const msg = ev.data;
     if (!msg || typeof msg !== "object" || msg.type !== "cms-edit-init") return;
     setCmsEditSession({ token: msg.token, site: msg.site });
-    if (msg.site === site) onInit(msg.token, msg.site);
   }
 
   window.addEventListener("message", onMessage);

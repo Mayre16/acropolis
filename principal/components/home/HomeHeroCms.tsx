@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
@@ -12,12 +12,13 @@ import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { assetUrl } from "@/lib/asset-url";
 import {
+  CMS_EDIT_HERO_PENDING_CLASS,
+  CMS_EDIT_HERO_READY_CLASS,
   isInEditorIframe,
   parseCmsEditParam,
   readStoredCmsEditMode,
 } from "@/lib/cms/edit-mode";
 
-/** Detecta modo edición del inicio antes de que React resuelva useSearchParams. */
 function isHomeCmsEditActive(): boolean {
   if (typeof window === "undefined") return false;
   const fromUrl = parseCmsEditParam(
@@ -33,13 +34,16 @@ const HERO_CTA =
 
 export function HomeHeroCms() {
   const cmsEditMode = useCmsEditMode();
-  const [homeEditActive] = useState(isHomeCmsEditActive);
   const cms = useCmsDocument();
   const edit = useHomeCmsEdit();
   const published = cms?.sections.homeHero;
   const draft = edit?.homeHero;
+  const [inHomeEdit, setInHomeEdit] = useState(false);
 
-  const inHomeEdit = cmsEditMode === "1" || homeEditActive;
+  useLayoutEffect(() => {
+    setInHomeEdit(cmsEditMode === "1" || isHomeCmsEditActive());
+  }, [cmsEditMode]);
+
   /** En el iframe nunca mostrar published/default hasta tener el borrador. */
   const awaitingDraft = inHomeEdit && !edit?.ready;
 
@@ -70,29 +74,42 @@ export function HomeHeroCms() {
     ? assetUrl(resolveCmsMediaUrl(backgroundSrc) ?? backgroundSrc)
     : null;
 
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (!inHomeEdit) {
+      root.classList.remove(CMS_EDIT_HERO_PENDING_CLASS, CMS_EDIT_HERO_READY_CLASS);
+      return;
+    }
+    if (edit?.ready && resolvedBackgroundSrc) {
+      root.classList.add(CMS_EDIT_HERO_READY_CLASS);
+    } else {
+      root.classList.remove(CMS_EDIT_HERO_READY_CLASS);
+    }
+  }, [inHomeEdit, edit?.ready, resolvedBackgroundSrc]);
+
   return (
     <section
       id="home-hero"
       className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24"
     >
-      {/* Imagen con <Image> en todos los breakpoints: md:bg-fixed falla en iframe del editor. */}
-      {resolvedBackgroundSrc ? (
-        <Image
-          src={resolvedBackgroundSrc}
-          alt={backgroundAlt}
-          fill
-          priority
-          unoptimized
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-      ) : (
-        <div
-          className="absolute inset-0 bg-na-heket/15"
-          aria-hidden
-          aria-label="Cargando foto del encabezado…"
-        />
-      )}
+      <div className="absolute inset-0" data-hero-bg aria-hidden>
+        {resolvedBackgroundSrc ? (
+          <Image
+            src={resolvedBackgroundSrc}
+            alt={backgroundAlt}
+            fill
+            priority
+            unoptimized
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 bg-na-heket/15"
+            aria-label="Cargando foto del encabezado…"
+          />
+        )}
+      </div>
       <div
         className={`pointer-events-none absolute inset-0 ${HERO_OVERLAY}`}
         aria-hidden
