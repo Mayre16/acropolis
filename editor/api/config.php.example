@@ -33,4 +33,10 @@ return [
     'store_upsert_path' => '/api/bookstore_upsert.php',
     /** Token Bearer — debe coincidir con STORE_SYNC_TOKEN en Biblioteca/Harmonía. */
     'store_sync_token' => '',
+    /**
+     * Cloudflare Turnstile («No soy un robot» en formularios de Acropolis y Civis).
+     * Crear en: Cloudflare → Turnstile → clave secreta (par de la site key del build).
+     * La site key pública va en NEXT_PUBLIC_TURNSTILE_SITE_KEY al construir principal/civis.
+     */
+    'turnstile_secret_key' => '',
 ];

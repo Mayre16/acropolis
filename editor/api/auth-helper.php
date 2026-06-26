@@ -33,24 +33,20 @@ function cms_session_valid(string $dataRoot): bool
         return false;
     }
 
-    $file = rtrim($dataRoot, '/\\') . DIRECTORY_SEPARATOR . 'auth'
-        . DIRECTORY_SEPARATOR . 'sessions.json';
-
-    if (!is_file($file)) {
-        return false;
+    if (!function_exists('cms_auth_get_session')) {
+        $file = rtrim($dataRoot, '/\\') . DIRECTORY_SEPARATOR . 'auth'
+            . DIRECTORY_SEPARATOR . 'sessions.json';
+        if (!is_file($file)) {
+            return false;
+        }
+        $sessions = json_decode((string) file_get_contents($file), true);
+        if (!is_array($sessions) || !isset($sessions[$token])) {
+            return false;
+        }
+        $sess = $sessions[$token];
+        return is_array($sess)
+            && (int) ($sess['expires'] ?? 0) > (int) round(microtime(true) * 1000);
     }
 
-    $sessions = json_decode((string) file_get_contents($file), true);
-    if (!is_array($sessions) || !isset($sessions[$token])) {
-        return false;
-    }
-
-    $sess = $sessions[$token];
-    if (!is_array($sess)) {
-        return false;
-    }
-
-    $expires = (int) ($sess['expires'] ?? 0);
-
-    return $expires > (int) round(microtime(true) * 1000);
+    return cms_auth_get_session($dataRoot, $token) !== null;
 }

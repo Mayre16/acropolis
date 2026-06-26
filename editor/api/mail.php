@@ -215,7 +215,7 @@ function cms_validate_civis_solicitud(array $body): array
 
 function cms_send_civis_solicitud(array $body, array $config, ?string $remoteIp = null): array
 {
-    $bot = cms_verify_turnstile($body, $remoteIp);
+    $bot = cms_verify_turnstile($body, $remoteIp, $config);
     if (!$bot['ok']) {
         return $bot;
     }
@@ -288,7 +288,7 @@ function cms_validate_esfera_solicitud(array $body): array
 
 function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp = null): array
 {
-    $bot = cms_verify_turnstile($body, $remoteIp);
+    $bot = cms_verify_turnstile($body, $remoteIp, $config);
     if (!$bot['ok']) {
         return $bot;
     }
@@ -331,8 +331,12 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
     return ['ok' => true];
 }
 
-function cms_turnstile_secret(): string
+function cms_turnstile_secret(array $config = []): string
 {
+    $fromConfig = trim((string) ($config['turnstile_secret_key'] ?? ''));
+    if ($fromConfig !== '') {
+        return $fromConfig;
+    }
     $fromEnv = getenv('TURNSTILE_SECRET_KEY');
     if (is_string($fromEnv) && trim($fromEnv) !== '') {
         return trim($fromEnv);
@@ -340,7 +344,7 @@ function cms_turnstile_secret(): string
     return '';
 }
 
-function cms_verify_turnstile(array $body, ?string $remoteIp): array
+function cms_verify_turnstile(array $body, ?string $remoteIp, array $config = []): array
 {
     $honeypot = trim((string) ($body['website'] ?? ''));
     if ($honeypot !== '') {
@@ -348,7 +352,7 @@ function cms_verify_turnstile(array $body, ?string $remoteIp): array
     }
 
     $token = trim((string) ($body['turnstileToken'] ?? ''));
-    $secret = cms_turnstile_secret();
+    $secret = cms_turnstile_secret($config);
     if ($secret === '') {
         return [
             'ok' => false,
@@ -411,7 +415,7 @@ function cms_validate_contact_fields(array $body, bool $emailRequired = false): 
 
 function cms_send_voluntariado_solicitud(array $body, array $config, ?string $remoteIp): array
 {
-    $bot = cms_verify_turnstile($body, $remoteIp);
+    $bot = cms_verify_turnstile($body, $remoteIp, $config);
     if (!$bot['ok']) {
         return $bot;
     }
@@ -524,7 +528,7 @@ function cms_site_inquiry_route(string $formKey): ?array
 
 function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): array
 {
-    $bot = cms_verify_turnstile($body, $remoteIp);
+    $bot = cms_verify_turnstile($body, $remoteIp, $config);
     if (!$bot['ok']) {
         return $bot;
     }

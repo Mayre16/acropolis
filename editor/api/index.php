@@ -16,11 +16,12 @@ if (!is_file($configFile)) {
 
 $config = require $configFile;
 require __DIR__ . '/auth-helper.php';
+require __DIR__ . '/auth-totp.php';
+require __DIR__ . '/auth-service.php';
 require __DIR__ . '/mail.php';
 require __DIR__ . '/deploy-webhook.php';
 require __DIR__ . '/bookstore-sync.php';
 $dataRoot = rtrim($config['data_root'] ?? (__DIR__ . '/../data'), '/\\');
-$adminPassword = (string) ($config['admin_password'] ?? '');
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -87,22 +88,14 @@ function requireAuth(): void
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 $uri = preg_replace('#^/api#', '', $uri) ?: '/';
 
-if ($uri === '/auth/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $body = json_decode(file_get_contents('php://input') ?: '{}', true);
-    if (($body['password'] ?? '') !== $adminPassword) {
-        jsonOut(401, ['ok' => false, 'error' => 'No se pudo iniciar sesión. Verifica tus datos e inténtalo de nuevo.']);
-    }
-    $_SESSION['cms_auth'] = true;
-    jsonOut(200, ['ok' => true]);
-}
-
-if ($uri === '/auth/me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    jsonOut(empty($_SESSION['cms_auth']) ? 401 : 200, ['ok' => !empty($_SESSION['cms_auth'])]);
-}
-
-if ($uri === '/auth/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION = [];
-    jsonOut(200, ['ok' => true]);
+$authResponse = cms_auth_handle(
+    $uri,
+    $_SERVER['REQUEST_METHOD'] ?? 'GET',
+    $config,
+    $dataRoot,
+);
+if ($authResponse !== null) {
+    jsonOut($authResponse['status'], $authResponse['body']);
 }
 
 if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $uri, $m)) {
