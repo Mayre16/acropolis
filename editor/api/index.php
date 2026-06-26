@@ -120,6 +120,46 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $ur
     }
 }
 
+if (preg_match('#^/content/(acropolis|civis|editorial)/backups$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    requireAuth();
+    $siteDir = sitePath($dataRoot, $m[1]);
+    ensureSite($siteDir);
+    $backupDir = $siteDir . DIRECTORY_SEPARATOR . 'backups';
+    $files = [];
+    if (is_dir($backupDir)) {
+        foreach (scandir($backupDir) as $f) {
+            if ($f === '.' || $f === '..') {
+                continue;
+            }
+            if (str_ends_with($f, '.json')) {
+                $files[] = $f;
+            }
+        }
+        rsort($files);
+    }
+    jsonOut(200, ['backups' => $files]);
+}
+
+if (preg_match('#^/content/(acropolis|civis|editorial)/rollback$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireAuth();
+    $siteDir = sitePath($dataRoot, $m[1]);
+    ensureSite($siteDir);
+    $body = json_decode(file_get_contents('php://input') ?: '{}', true);
+    if (!is_array($body)) {
+        jsonOut(400, ['error' => 'JSON inválido']);
+    }
+    $filename = basename((string) ($body['filename'] ?? ''));
+    if ($filename === '' || $filename === '.' || $filename === '..') {
+        jsonOut(400, ['error' => 'Archivo inválido']);
+    }
+    $backupFile = $siteDir . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . $filename;
+    if (!is_file($backupFile)) {
+        jsonOut(404, ['error' => 'Backup no encontrado']);
+    }
+    copy($backupFile, $siteDir . DIRECTORY_SEPARATOR . 'draft.json');
+    jsonOut(200, ['ok' => true]);
+}
+
 if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     requireAuth();
     jsonOut(200, cms_public_smtp_config(cms_load_smtp_config($config)));

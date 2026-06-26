@@ -242,44 +242,31 @@ function RegaloCard({
             imageSizes={imageSizes}
           />
         </button>
-        <div className="p-4">
+        <div className="p-3">
           <button
             type="button"
             onClick={openDetail}
             className="w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
           >
-            <h4 className="text-sm font-bold text-na-ink">{titleText}</h4>
+            <h4 className="text-sm font-bold leading-snug text-na-ink">{titleText}</h4>
           </button>
-          <p className="mt-1 text-xs leading-relaxed text-na-muted">
-            {item.description}
-          </p>
-          {item.quote ? (
-            <blockquote className="mt-2 border-l-2 border-na-heket/40 pl-2 text-xs italic leading-relaxed text-na-ink/80">
-              «{item.quote}»
-              {item.author ? (
-                <footer className="mt-1 not-italic text-na-muted">
-                  — {item.author}
-                </footer>
-              ) : null}
-            </blockquote>
-          ) : null}
           {item.price != null && item.price > 0 ? (
-            <p className="mt-2 text-[11px] font-semibold text-na-editorialDark">
+            <p className="mt-1.5 text-[11px] font-semibold text-na-editorialDark">
               {formatCartMoney(item.price, item.currency ?? "DOP")}
             </p>
           ) : item.priceNote ? (
-            <p className="mt-2 text-[11px] font-semibold text-na-editorialDark">
+            <p className="mt-1.5 text-[11px] font-semibold text-na-editorialDark">
               {item.priceNote}
             </p>
           ) : null}
           <button
             type="button"
             onClick={openDetail}
-            className="mt-2 text-[11px] font-semibold text-na-editorial hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
+            className="mt-1.5 text-[11px] font-semibold text-na-editorial hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
           >
             Ver detalle →
           </button>
-          <div className="mt-3 space-y-2">
+          <div className="mt-2.5 space-y-2">
             <AddToCartButton
               item={regaloToCartItem(item)}
               className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-na-editorial px-3 py-2 text-xs font-bold text-white transition hover:bg-na-editorialDark"

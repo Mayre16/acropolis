@@ -52,6 +52,9 @@ Guardar el token; no va en git.
 | `TIENDA_FTP_*` | (igual) | Deploy Editorial |
 | `EDITOR_SITE_URL` | `https://editor.acropolis.adesa.com.do` | Build panel editor |
 | `EDITOR_FTP_*` | (igual) | Deploy panel editor (front + api PHP; no borra `data/` ni `config.php`) |
+| `TURNSTILE_SITE_KEY` | clave **pública** de Cloudflare Turnstile | Build principal + civis (widget «No soy un robot») |
+
+La **clave secreta** de Turnstile va solo en `editor/api/config.php` → `turnstile_secret_key` (no en GitHub del front).
 
 Si FTP no está configurado, el workflow igual hace build y deja un **artifact** descargable en Actions.
 

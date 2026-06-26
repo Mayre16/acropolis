@@ -36,6 +36,11 @@ const env = {
 
 console.log("Build cPanel Civis — NEXT_PUBLIC_SITE_URL =", env.NEXT_PUBLIC_SITE_URL);
 console.log("  CMS:", env.NEXT_PUBLIC_CMS_URL);
+if (env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+  console.log("  Turnstile: site key definida");
+} else {
+  console.warn("  Turnstile: sin NEXT_PUBLIC_TURNSTILE_SITE_KEY — formularios sin captcha en producción");
+}
 
 const build = spawnSync("npm", ["run", "build"], {
   cwd: ROOT,

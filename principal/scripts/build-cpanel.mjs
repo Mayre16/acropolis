@@ -34,6 +34,11 @@ const env = {
 
 console.log("Build cPanel (desde cero) — NEXT_PUBLIC_SITE_URL =", env.NEXT_PUBLIC_SITE_URL);
 console.log("  CMS:", env.NEXT_PUBLIC_CMS_URL);
+if (env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+  console.log("  Turnstile: site key definida");
+} else {
+  console.warn("  Turnstile: sin NEXT_PUBLIC_TURNSTILE_SITE_KEY — formularios sin captcha en producción");
+}
 if (env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
   console.log("  GA4:", env.NEXT_PUBLIC_GA_MEASUREMENT_ID);
 }

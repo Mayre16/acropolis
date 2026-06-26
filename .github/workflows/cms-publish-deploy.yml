@@ -79,6 +79,7 @@ jobs:
           NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
           NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: npm ci && npm run build:cpanel
 
       - name: Check principal FTP
@@ -108,6 +109,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.CIVIS_SITE_URL || 'https://civis.acropolis.adesa.com.do' }}
           NEXT_PUBLIC_PRINCIPAL_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
           NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: npm ci && npm run build:cpanel
 
       - name: Check civis FTP
