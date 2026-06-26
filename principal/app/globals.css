@@ -12,7 +12,8 @@ html {
 }
 
 /* Modo edición CMS: oculta el hero pre-renderizado hasta que el borrador esté listo. */
-html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero [data-hero-bg] {
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero [data-hero-bg],
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero > img {
   visibility: hidden;
 }
 

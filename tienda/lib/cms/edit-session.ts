@@ -34,8 +34,12 @@ export function registerCmsEditInit(
   onInit: (token: string, site: "acropolis" | "civis" | "editorial") => void,
   site: "acropolis" | "civis" | "editorial",
 ) {
+  let appliedToken: string | null = null;
+
   function apply(value: CmsEditSession) {
     if (value.site !== site) return;
+    if (appliedToken === value.token) return;
+    appliedToken = value.token;
     onInit(value.token, value.site);
   }
 

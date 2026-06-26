@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -238,8 +239,12 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     await runCoordinatedCmsPublish();
   }, []);
 
+  const draftLoadTokenRef = useRef<string | null>(null);
+
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
+      if (draftLoadTokenRef.current === initToken) return;
+      draftLoadTokenRef.current = initToken;
       setToken(initToken);
       fetchCmsDraft("acropolis")
         .then((draft) => {

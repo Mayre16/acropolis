@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
@@ -38,11 +38,10 @@ export function HomeHeroCms() {
   const edit = useHomeCmsEdit();
   const published = cms?.sections.homeHero;
   const draft = edit?.homeHero;
-  const [inHomeEdit, setInHomeEdit] = useState(false);
 
-  useLayoutEffect(() => {
-    setInHomeEdit(cmsEditMode === "1" || isHomeCmsEditActive());
-  }, [cmsEditMode]);
+  const inHomeEdit =
+    cmsEditMode === "1" ||
+    (typeof window !== "undefined" && isHomeCmsEditActive());
 
   /** En el iframe nunca mostrar published/default hasta tener el borrador. */
   const awaitingDraft = inHomeEdit && !edit?.ready;
