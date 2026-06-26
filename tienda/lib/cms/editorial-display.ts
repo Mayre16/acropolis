@@ -1,4 +1,4 @@
-import { AUTHOR_FILTERS, STORE_THEMES } from "@/lib/bookstore";
+import { AUTHOR_FILTERS, STORE_THEMES, extractCmsSlugFromTags, type StoreBook } from "@/lib/bookstore";
 import type { DigitalBookGroup } from "@/lib/digital-books";
 import type { EditorialNavItem } from "@/lib/editorial-content";
 import type { RegaloItem, RevistaItem } from "@/lib/editorial-extras";
@@ -8,6 +8,7 @@ import type { HeroImage } from "@/lib/hero-images";
 import {
   DIGITAL_BOOK_GROUPS,
   EDITORIAL_DONDE,
+  EDITORIAL_DONDE_CONTACT,
   EDITORIAL_HEADER_NAV,
   EDITORIAL_HOME_CARDS,
   EDITORIAL_LIBRERIA,
@@ -32,6 +33,7 @@ import type {
   CmsEditorialHomeCard,
   CmsEditorialNavItem,
   CmsEditorialQuienesSomos,
+  CmsEditorialPrintedBook,
   CmsEditorialRegalo,
   CmsEditorialRegaloCategory,
   CmsEditorialRevista,
@@ -138,6 +140,50 @@ export function defaultBookFilters(): CmsEditorialBookFilters {
   return {
     themes: [...STORE_THEMES],
     authorFilters: AUTHOR_FILTERS.map((f) => ({ id: f.id, label: f.label })),
+    publishers: ["Editorial Nueva Acrópolis"],
+  };
+}
+
+export const DEFAULT_MEMORION: CmsEditorialRegalo = {
+  id: "memorion",
+  category: "papeleria",
+  title: "Memorion — juego de cartas",
+  description:
+    "Juego educativo de Editorial Nueva Acrópolis para entrenar la memoria. Consulte disponibilidad y precio con nosotros.",
+  imageUrl: "/img/regalos/memorion.webp",
+  priceNote: "Consultar disponibilidad",
+};
+
+export function defaultMemorion(): CmsEditorialRegalo {
+  return { ...DEFAULT_MEMORION };
+}
+
+export function newPrintedBookId() {
+  return `libro-${Date.now().toString(36)}`;
+}
+
+/** Vincula un listing de Biblioteca al CMS editorial (sentido inverso). */
+export function cmsPrintedBookFromStore(
+  book: StoreBook,
+  existingSlug?: string,
+): CmsEditorialPrintedBook {
+  const cmsSlug = existingSlug ?? extractCmsSlugFromTags(book.tags);
+  return {
+    id: cmsSlug ?? newPrintedBookId(),
+    bibliotecaId: book.id,
+    title: book.title,
+    author: book.author,
+    isbn: book.isbn,
+    coverUrl: book.cover_url,
+    summary: book.summary,
+    price: book.price,
+    currency: book.currency ?? "DOP",
+    stock: book.stock,
+    publisher: book.publisher,
+    area_tema: book.area_tema,
+    priceNote: book.edition_note,
+    syncStatus: "synced",
+    lastSyncedAt: new Date().toISOString(),
   };
 }
 
@@ -166,6 +212,7 @@ export function defaultDonde(): CmsEditorialDonde {
   return {
     visit: { ...EDITORIAL_VISIT },
     page: { ...EDITORIAL_DONDE },
+    contact: { ...EDITORIAL_DONDE_CONTACT },
     storePhoto: { ...EDITORIAL_STORE_PHOTO },
     sedes: codeToCmsSedes(EDITORIAL_SEDES),
   };
@@ -179,12 +226,14 @@ export type EditorialEditableState = {
   heroImages: CmsEditorialHeroImage[];
   revistas: CmsEditorialRevista[];
   regalos: CmsEditorialRegalo[];
+  memorion: CmsEditorialRegalo;
   regaloCategories: CmsEditorialRegaloCategory[];
   digitalBooks: CmsEditorialDigitalBookGroup[];
   quienesSomos: CmsEditorialQuienesSomos;
   donde: CmsEditorialDonde;
   shopCategories: CmsEditorialShopCategory[];
   bookFilters: CmsEditorialBookFilters;
+  printedBooks: CmsEditorialPrintedBook[];
 };
 
 export function loadEditableDoc(draft: CmsDocument): EditorialEditableState {
@@ -209,6 +258,7 @@ export function loadEditableDoc(draft: CmsDocument): EditorialEditableState {
     regalos: s.editorialRegalos?.length
       ? s.editorialRegalos
       : codeToCmsRegalos(REGALOS),
+    memorion: { ...defaultMemorion(), ...s.editorialMemorion },
     regaloCategories: s.editorialRegaloCategories?.length
       ? s.editorialRegaloCategories
       : codeToCmsRegaloCategories(),
@@ -245,6 +295,7 @@ export function loadEditableDoc(draft: CmsDocument): EditorialEditableState {
       ...s.editorialDonde,
       visit: { ...defaultDonde().visit, ...s.editorialDonde?.visit },
       page: { ...defaultDonde().page, ...s.editorialDonde?.page },
+      contact: { ...defaultDonde().contact, ...s.editorialDonde?.contact },
       storePhoto: {
         ...defaultDonde().storePhoto,
         ...s.editorialDonde?.storePhoto,
@@ -265,7 +316,11 @@ export function loadEditableDoc(draft: CmsDocument): EditorialEditableState {
       authorFilters: s.editorialBookFilters?.authorFilters?.length
         ? s.editorialBookFilters.authorFilters
         : defaultBookFilters().authorFilters,
+      publishers: s.editorialBookFilters?.publishers?.length
+        ? s.editorialBookFilters.publishers
+        : defaultBookFilters().publishers,
     },
+    printedBooks: s.editorialPrintedBooks ?? [],
   };
 }
 
@@ -285,12 +340,14 @@ export function buildEditorialDoc(
       editorialHeroImages: state.heroImages,
       editorialRevistas: state.revistas,
       editorialRegalos: state.regalos,
+      editorialMemorion: state.memorion,
       editorialRegaloCategories: state.regaloCategories,
       editorialDigitalBooks: state.digitalBooks,
       editorialQuienesSomos: state.quienesSomos,
       editorialDonde: state.donde,
       editorialShopCategories: state.shopCategories,
       editorialBookFilters: state.bookFilters,
+      editorialPrintedBooks: state.printedBooks,
     },
   };
 }
@@ -304,6 +361,16 @@ export function editorialStateAsDoc(state: EditorialEditableState): CmsDocument 
 
 export function newRegaloId() {
   return `regalo-${Date.now().toString(36)}`;
+}
+
+export function newRegaloCategoryId(label = "nueva-categoria") {
+  const slug = label
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || `cat-${Date.now().toString(36)}`;
 }
 
 export function newHeroImageId() {

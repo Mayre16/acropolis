@@ -122,7 +122,6 @@ export function FilosofiaAgendaEditZones() {
   if (!edit?.ready) return null;
 
   const diplomadoItems = toDisplay(edit.diplomadoAgenda);
-  const otrasItems = toDisplay(edit.otrasAgenda);
 
   return (
     <>
@@ -188,45 +187,6 @@ export function FilosofiaAgendaEditZones() {
           />
         </div>
       </section>
-
-      <section
-        id="otras-actividades"
-        className="scroll-mt-24 border-t border-na-heket/10 py-14 sm:py-16"
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
-            Home
-          </p>
-          <h2 className="mt-2 text-2xl font-black text-na-heketDark">
-            Otras actividades (carrusel del inicio)
-          </h2>
-          <p className="mt-2 text-sm text-na-muted">
-            Conferencias, cursos y talleres — no son sesiones del diplomado.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              edit.addAgendaEntry("conferencia");
-              edit.setActiveSection("otras");
-            }}
-            className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 px-4 py-2 text-xs font-bold uppercase text-amber-900"
-          >
-            <Plus className="h-4 w-4" />
-            Añadir actividad
-          </button>
-          <AgendaCardGrid
-            items={otrasItems}
-            list={edit.otrasAgenda}
-            onEdit={(id) => {
-              edit.setSelectedAgendaId(id);
-              edit.setActiveSection("otras");
-            }}
-            onInsert={(options) => edit.addAgendaEntry("conferencia", options)}
-            onOpenSection={() => edit.setActiveSection("otras")}
-            insertLabel="Añadir actividad aquí"
-          />
-        </div>
-      </section>
     </>
   );
 }
@@ -263,6 +223,6 @@ export function FilosofiaAgendaPublic() {
 
 export function FilosofiaProximasSesionesBody() {
   const edit = useFilosofiaCmsEdit();
-  if (edit) return <FilosofiaAgendaEditZones />;
+  if (edit?.ready) return <FilosofiaAgendaEditZones />;
   return <FilosofiaAgendaPublic />;
 }

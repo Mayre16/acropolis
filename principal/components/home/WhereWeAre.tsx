@@ -18,24 +18,23 @@ import {
 } from "@/lib/locations";
 import { useMergedVenues, useMergedVenuesContact } from "@/lib/cms/hooks";
 import type { CmsVenuesContact } from "@/lib/cms/types";
-import { getMapPinsFromVenues, cmsToVenue } from "@/lib/cms/venues-edit";
+import { getMapPinsFromVenues, cmsToVenue, venuesContactWhatsAppHref } from "@/lib/cms/venues-edit";
 import { useVenuesCmsEdit } from "@/components/cms/VenuesCmsEditContext";
 import { VenueNameLockup } from "@/components/VenueNameLockup";
-
-/** Trazado de República Dominicana (Simplemaps, libre uso comercial · proyección Mercator). */
-const DR_PATH =
-  "M107.8 90.9l4.7 1.1 4.5 2.3-1-5.2-4.4-10.2 0.3-2.5 0-2-6.6-0.4-0.9-2.8 2.7-4.1 3.9-4.3 1.1-0.8 1.3-0.2 2.7 0 1.7-0.7 2.7-3.3 1.5-1.3 3-1.2 2.1-0.6 2.2-1 2.8-2.6-1.6-3.3-0.3-2.9 1.3-2.1 3.2-0.8 1.9 0.3 2.9 1.3 1.9 0.3 0.8-0.6 1.8-2.4 0.9-0.6 25.3-1.9 6.5 0.9 6.3 2.3 23.6 12.3 6.9 1.4 6.6-2.6 5 3.7 3.5 1.6 11 0.4 2.9-0.8 0.6-2 0.2-2.7 1.3-2.7 2.9-1.1 2.1 2.4 2.7 6.9 1.9-1.2 1.5-1.3 1-1.4 0.7-1.8-2.1-0.6-0.5-0.4 0-0.6-0.8-1.8 3.9 1.5 3.2-0.2 3.3-0.8 4-0.5 2.5-2 4.6-8.6 3-2 3.8-0.9 8-4 4.3-0.6 4 1 3.8 2.3 2.1 3.3-1.3 4.2 4.8 1.9 1.8 0-1.2-4-0.6-1.5 11.9 1.9 3.5-0.3 7.3-1.8 2.8 0.2 3.1 2 10.8 13.1 0.9 2.5-1.3 2.4 9.3 0.1 3.6 1.7 9.4 8 9 4.6 9.5 3.3 11 1.7 14.9 0.1 1.2-0.7 1.3-1.8 3-2.1 3.4-1.7 2.4-0.8 9.7 3.1 15 16 9.1 9.6 4.1 2.9 4.5 2.3 5 1.5 11.3 1.2 9.1 3.3 16.5 3.3 3.7-0.1 2.5-0.9 2.2-1.9 9-9.7 4.7-2.2 13.7 0.3 6.7-0.7 3 0.4 3.8 2.2 8.4 9 2.6 6.1-0.1 6.6-4 14.4 4.9 2.1 1.9 4.7-0.1 11.9 0.6 5.2 1.6 4.2 16.4 24.7 7.4 7.2 1 0.9 8.4 3.5 5-0.8 9.6-3.7 4.9-0.9 11.2-0.4 4.9-1.1 5-2 7.3-4.9 2.9-0.7 2.5 0.6 5.2 2.6 3.3 0.6 6-1.5 2.6-0.3 1.4 0 1.3 0.4 1 0.8 0.4 1.5 0.8 1.2 1.7-0.4 2.7-1.7 14.3 5.8 4.3 3.1 2.8-5.7 4.5-4.2 11.2-6.2 7.2-2.2 1.7 3-1.9 6.3-3.6 7.4 4.9 1.8 5.6 0 5.4-1.4 4.5-2.4 1.4 5.8-3.2 4.5-4.4 4.1-2.3 4.5-1 4.7-2.9 4.3-4.3 3.1-5.4 1.3-19.4-3.5-21.2 1.6-5-1.4-9.2-4.6-31.5-3.9-3.5 0.9-1.4 3.5-0.8 12.5-1.8 10.6 0.8 4 2.3 1.7 3.1 2.2 13.6-2.1 4.7 1.7 5.9-1.9 11.6 4.6 6.1-0.7-1.5-1.3-2-1.2-2.3-0.9-2.8-0.3 0-1.8 13.2-0.7 3.9 0.7 4.3 3.2 3.4 8 4.2 3.2 4.2 1.1 8.5 1.1 23 6.2 9.5 2.6 3.9-0.3 4.6-2.6-1.5-1.9-3.1-1.9 0-2.5 4.4-1.3 3.8 3.5 5.2 8.5 3.4 2 3.7 1.1 3.2 1.4 1.7 2.8 3-2.4 6-2.8 2.8-2.1-1.9-2.1 0.9-0.5 2.3-0.1 2.1-0.7 2.6-2.7 0.7-1.1 1-0.1 8.9 0.5 5.1 1.1 4.7 1.6 4.1 2.3 0.5 0.7 0 1 0.2 1 1 0.9 5 1.8 0.5-0.1 8.8 1.8 5.5 0.3 2.3 0.8 0.4 0.3 2 1.4 2.3 1.3 4.4 0.3 2.5 1 28.7 26.8 10.6 12.8 14.9 11.4 10.6 7.5 3.1 1.4 1.6 1 11.1 10.8 14.1 8.6 6.8 10.4-1.3 10.3-23.2 35.4-1.7 1.4-1.6 1.8-0.7 2.5 0.4 9-0.4 2.6-2.8 4.4-4.1 2.1-5.1 0.6-5.9 0-4.5-1.5-9.8-6.5-3.5-1.1-4.1 2.8 0.6 4.2 1.3 4.9-2.1 5.1-3 4.1-1.9 4.7-3.8 15.1-1.4 2.7-2.8 1-20.9 1.7-4.2-1.5-0.6-9.6-6-12.5-8.2-12.3-7.3-8.4-7.8-5.4-10.2-4.4-10.4-1.4-11.9 4.9-18 0.8-4.6-0.8-10.9-3.7-4.9-0.8-4.2-1.4-7.2-6.1-5.4-1.4-4.8 1-4.8 1.6-4.9 0.4-5-3-5.1 4.8-32.1 2.5-9.6 3.5-5.1 0.1-13.5-9.3-5.5-3-3.6-0.4-1.5 2.4 0.1 3 0.4 2.9-0.7 2.4-2.2 0.7-3.4 0-3.2-0.6-1.4-0.9-4.2-7.1-1.9-1.9-1.9-0.6-38-4.2-6.9 0.3-1.1 0-4 1.2-7.7 3.8-6.4 4.4-2.4 1.1-6.6 2.2-2.6 1.3-3.1 1.6-5.5 4.9-4.2 6.6-1.6 7.8-1.3 2.1-5.7 3-1.3 1.9-1 2.9-8.3 7.7-6 7-3.4 2.9-1.5-0.7-6 0.1-4.6 0.8-3.1 1.7-4.3-2.7-4.7-0.9-31.6 0.1-5.3 1.7-10.2 5.7-5.7 1.3-17.1 0-4-1.6-0.3-2.3 1.7-1.7 2.4-1.5 1.1-1.6-0.7-2.8-1.7-1.6-1.7-1-1.9-2.5-4.7-3.1-1.1-2.4 0.6-2.6 1.5-1.2 1.6-0.9 1.3-1.8 1.2-5.2 0.1-5.5-0.6-4.8-1.4-3.1-5.4-6.8-3.3-2.4-5.7-2.2-4.9-1.2-6.2-0.4-5.2 1.4-2.3 4.5 0.9 5.5-0.6 2.2-7.4 7.2-2 1.3-2.7 0.8-2.8-0.1-5.2-1.6-2.2-0.2-2 0.7-3.4 2.5-2.3 0.5-3.1-0.4-1.1 0.7-2.5 2.3-0.7 0.9-1.5 3.3-0.3 1.1-0.7 1-3.3 1.1-1.2 0.6-6.6 7.9-3.5 2.1-5.8 0.7-2.4-0.9-1.6-2.1-1.3-2.6-1.6-2.3-2.5-2-2.7-1.1-10.7-2.3-4.9-0.1-3.9 1.5-1.5 4-0.6 2.2-2.2 3.8-0.5 2.9 0.5 3.3 1.2 1.8 1.6 1.7 1.8 2.9 4 14.1 1.3 2.4 0 3.1-4.8 7.3-4.1 10.5-23.3 34.2-2.1 5.9-1 2.1-2.3 1.6-5 2.6-3 2.6-2.2 2.5-1.7 3.1-1.5 4.3-1.8-0.6-0.7-0.4-1-0.9-0.4 1.9-0.4 0.7-0.9 0.8 1.7 0-1 2.2-1.3 1.6-1.6 1.1-1.9 0.4-0.9 1.1-1.7 5.1-0.9 1.9-3 4.4-8.3 24.3-2.6 4.8-10.2 14.3-2.5-1.1-2.1-2.1-0.1-1-2.4-2.1-17-28.1-4.1-4.5-8.4-3.3-19.7 2.7-8.4-2.1 2.4-1.8 7.8-8.2 1.7-3.3-0.3-5.6-1.1-3.9-3.8-7.4-2.7-4.1-0.5-1.5-0.1-3.1 1.6-9.9-1.8-4.5-4.3-5-9-7.5-13.9-5.3 3-7.8 0.9-4.5-0.6-7.6 0.2-4.3-0.6-2.9-2.6-7.4-0.4-2.5 0.7-5.1 1.9-4.9 11-18.9 0.2-0.3 2.9-5-0.6-0.7-2.2-2.1-3.6-2.3-13.2-5-9.4-6.3-2-2.3-3.7-5.5-2.1-1.9-9.6-2.4-3.7-2.1-1.5-4.8 0.9-2.8 1.9-1.1 1.3-1.4-0.6-3.9-1.6-2.5-22.4-23-2.1-4.2 4.2-3.2 9.2-2 18.5 3.4 9.6-3.2 3.2-3.5 5.1-8.7 3.4-3.8 0.6-0.4 1.7-1 6.6-4.1 3.5-2.9 2.9-4.9 1.7-4.4 1.2-4.8 0.4-4.9-2-10.2-0.2-10.6-1.4-4.8-1.8-2.4-5.7-5.2-2.2-2.7-3.5-7.3-2.3-1.9-5.8-0.2-6.1 2.1-4.4 0.7-0.8-4.5 4.3-2.9 12.7-3.4 3.2-2 10.7-11.9 7.4-10.4 3.7-3.4 8.4-6 3.1-4.6 1.3-4.5 1.1-15.6-3.1-1.6-16-7.8-8.2-8.3-1-1.1-4.4-6.2-1.2-5.2 1.6-1.7 6.7-3.8 2.3-1.8 3.1-8 1.4-1.5 2.8-6 0.2-11.7-3-20.5-6.9-16.4-1.1-6 0.4-6.8 0.2-4.2-0.8-4.6-2.2-7.3z m57.5 564.2l-4.1-2.4-0.1-5.6 2.3-6.5 2.8-5.1 3.4 1.9 3.6 2.6 6.3 6.1-3.8 1.2-6.2 6.3-4.2 1.5z m706.4-161.9l12.8-0.4 3.3 1.2 2.5 3.4 2.8 5.1 1.8 4.7-0.4 2-3.8-0.8-7.9-3.7-4.2-0.8-4.4 0.5-7.6 2.5-4.2 0.5-8.7-2.3-6.2-5.6-4-7-2.1-6.4 3.6-1.1 4.4 0.9 4.2 2.1 3.7 2.6 2.9 1.1 11.5 1.5z";
+import { DrMapSvg } from "@/components/DrMapSvg";
 
 function DrMapPin({
   x,
   y,
   label,
   variant = "sede",
+  hideLabel = false,
 }: {
   x: number;
   y: number;
   label: string;
   variant?: "sede" | "centro";
+  hideLabel?: boolean;
 }) {
   const fill = variant === "centro" ? "#009485" : "#f39300";
 
@@ -57,64 +56,52 @@ function DrMapPin({
       </circle>
       <circle r="11" fill={fill} stroke="#ffffff" strokeWidth="3" />
       <circle r="4" fill="#ffffff" />
-      <text
-        x="0"
-        y="-22"
-        textAnchor="middle"
-        className="fill-na-heketDark"
-        style={{ fontSize: 26, fontWeight: 800, paintOrder: "stroke" }}
-        stroke="#ffffff"
-        strokeWidth="5"
-      >
-        {label}
-      </text>
+      {!hideLabel ? (
+        <text
+          x="0"
+          y="-22"
+          textAnchor="middle"
+          className="fill-na-heketDark"
+          style={{ fontSize: 26, fontWeight: 800, paintOrder: "stroke" }}
+          stroke="#ffffff"
+          strokeWidth="5"
+        >
+          {label}
+        </text>
+      ) : null}
     </g>
   );
 }
 
 function MapPanel({ venues }: { venues: VenueLocation[] }) {
   const pins = getMapPinsFromVenues(venues);
+  const hasCentroPins = pins.some((p) => p.variant === "centro");
 
   return (
-    <div className="mx-auto max-w-3xl rounded-2xl border border-na-heket/10 bg-na-surface p-4 shadow-na-soft sm:p-6">
-      <svg
-        viewBox="0 0 1000 686"
-        role="img"
-        aria-label="Mapa de República Dominicana con presencia de Nueva Acrópolis por ciudad"
-        className="h-auto w-full"
-      >
-        <defs>
-          <linearGradient id="drFill" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#0a7264" />
-            <stop offset="100%" stopColor="#009485" />
-          </linearGradient>
-        </defs>
-        <path
-          d={DR_PATH}
-          fill="url(#drFill)"
-          stroke="#ffffff"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-        />
+    <div className="relative mx-auto max-w-3xl rounded-2xl border border-na-heket/10 bg-na-surface p-4 shadow-na-soft sm:p-6">
+      <DrMapSvg ariaLabel="Mapa de República Dominicana con sedes de Nueva Acrópolis por ciudad">
         {pins.map((pin) => (
           <DrMapPin
-            key={pin.city}
+            key={pin.id}
             x={pin.x}
             y={pin.y}
-            label={pin.city}
+            label={pin.label}
             variant={pin.variant}
+            hideLabel={pin.hideLabel}
           />
         ))}
-      </svg>
+      </DrMapSvg>
       <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-na-muted">
         <li className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-na-amon ring-2 ring-na-amon/30" />
           Sedes
         </li>
-        <li className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-na-kefer ring-2 ring-na-kefer/30" />
-          Puntos culturales
-        </li>
+        {hasCentroPins ? (
+          <li className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-na-kefer ring-2 ring-na-kefer/30" />
+            Puntos culturales
+          </li>
+        ) : null}
       </ul>
     </div>
   );
@@ -302,7 +289,7 @@ function EncuentranosPanel({
           </li>
         </ul>
         <a
-          href={whatsapp.diplomado}
+          href={venuesContactWhatsAppHref(contact, whatsapp.diplomado)}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-5 inline-flex items-center justify-center rounded-full bg-na-helios px-6 py-3 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/25 transition hover:brightness-105"
@@ -325,15 +312,14 @@ export function WhereWeAre() {
 
   const contact = edit?.ready ? edit.contact : mergedContact;
 
-  const onEditVenue = edit?.ready
+  const editing = !!edit;
+  const onEditVenue = edit
     ? (id: string) => edit.setSelectedId(id)
     : undefined;
 
-  const onAdd = edit?.ready
-    ? (kind: VenueKind) => edit.addItem(kind)
-    : undefined;
+  const onAdd = edit ? (kind: VenueKind) => edit.addItem(kind) : undefined;
 
-  const onEditContact = edit?.ready ? edit.openContactPanel : undefined;
+  const onEditContact = edit ? edit.openContactPanel : undefined;
 
   return (
     <section

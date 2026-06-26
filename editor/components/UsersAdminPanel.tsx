@@ -164,9 +164,8 @@ export function UsersAdminPanel() {
         <div>
           <h2 className="text-sm font-bold text-slate-800">Usuarios del CMS</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Correo + contraseña segura (hash en{" "}
-            <code className="rounded bg-slate-100 px-1">editor/data/auth/users.json</code>
-            ). Cada editor puede activar 2FA con Google o Microsoft Authenticator.
+            Cada editor entra con correo y contraseña. Puede activar 2FA con
+            Google o Microsoft Authenticator.
           </p>
         </div>
         <button

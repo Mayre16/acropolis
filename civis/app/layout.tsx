@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { assetUrl } from "@/lib/asset-url";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
-import { CivisSiteHeader } from "@/components/CivisSiteHeader";
-import { CivisLegacyHashRedirect } from "@/components/CivisLegacyHashRedirect";
+import { CivisSiteChrome } from "@/components/CivisSiteChrome";
+import { CivisFooter } from "@/components/CivisFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { CivisCmsEditProvider } from "@/components/cms/CivisCmsEditContext";
@@ -59,9 +59,8 @@ export default function RootLayout({
         <CmsProvider>
           <Suspense fallback={null}>
             <CivisCmsEditProvider>
-              <CivisLegacyHashRedirect />
-              <CivisSiteHeader />
-              <main className="flex-1">{children}</main>
+              <CivisSiteChrome>{children}</CivisSiteChrome>
+              <CivisFooter />
             </CivisCmsEditProvider>
           </Suspense>
         </CmsProvider>

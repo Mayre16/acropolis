@@ -49,6 +49,7 @@ const REGALO_HASH_TO_FILTER: Record<string, string> = {
   papeleria: "papeleria",
   libretas: "libretas",
   camisetas: "camisetas",
+  editio: "editio",
   memorion: "memorion",
   accesorios: "papeleria",
   articulos: "papeleria",

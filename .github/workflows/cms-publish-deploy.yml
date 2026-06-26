@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       site:
-        description: "Sitio (all | acropolis | civis | tienda)"
+        description: "Sitio (all | acropolis | civis | tienda | editor)"
         required: true
         default: all
         type: choice
@@ -15,6 +15,7 @@ on:
           - acropolis
           - civis
           - tienda
+          - editor
 
 permissions:
   contents: read
@@ -32,7 +33,7 @@ jobs:
             all|both)
               echo 'sites=["acropolis","civis","tienda"]' >> "$GITHUB_OUTPUT"
               ;;
-            acropolis|civis|tienda)
+            acropolis|civis|tienda|editor)
               echo "sites=[\"$SITE\"]" >> "$GITHUB_OUTPUT"
               ;;
             *)
@@ -160,10 +161,44 @@ jobs:
           server-dir: ${{ secrets.TIENDA_FTP_REMOTE_DIR }}
           dangerous-clean-slate: false
 
+      - name: Build editor (CMS panel)
+        if: matrix.site == 'editor'
+        working-directory: editor
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.EDITOR_SITE_URL || 'https://editor.acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CMS_API_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
+          NEXT_PUBLIC_PRINCIPAL_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CIVIS_URL: ${{ secrets.CIVIS_SITE_URL || 'https://civis.acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_TIENDA_URL: ${{ secrets.TIENDA_SITE_URL || 'https://tienda.acropolis.adesa.com.do' }}
+        run: npm ci && npm run build:cpanel
+
+      - name: Check editor FTP
+        id: editor_ftp
+        if: matrix.site == 'editor'
+        env:
+          FTP_SERVER: ${{ secrets.EDITOR_FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"
+          else echo "ready=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Deploy editor to cPanel (FTP)
+        if: matrix.site == 'editor' && steps.editor_ftp.outputs.ready == '1'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.EDITOR_FTP_SERVER }}
+          username: ${{ secrets.EDITOR_FTP_USERNAME }}
+          password: ${{ secrets.EDITOR_FTP_PASSWORD }}
+          local-dir: editor/out/
+          server-dir: ${{ secrets.EDITOR_FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false
+          exclude: |
+            **/api/config.php
+            **/data/**
+
       - name: Upload build artifact (si FTP no configurado)
         uses: actions/upload-artifact@v4
         with:
           name: cms-${{ matrix.site }}-out
-          path: ${{ matrix.site == 'civis' && 'civis/out/' || matrix.site == 'tienda' && 'tienda/out/' || 'principal/out/' }}
+          path: ${{ matrix.site == 'civis' && 'civis/out/' || matrix.site == 'tienda' && 'tienda/out/' || matrix.site == 'editor' && 'editor/out/' || 'principal/out/' }}
           if-no-files-found: ignore
           retention-days: 7

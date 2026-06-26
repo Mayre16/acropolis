@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CivisClientesAliadosSection } from "@/components/CivisQuienesSomos";
-import { CivisFooter } from "@/components/CivisFooter";
+import { CivisPageShell } from "@/components/cms/CivisPageShell";
 import { CIVIS_CLIENTES_ALIADOS_PATH } from "@/lib/civis-content";
 
 export const metadata: Metadata = {
@@ -10,9 +10,8 @@ export const metadata: Metadata = {
 
 export default function ClientesAliadosPage() {
   return (
-    <>
+    <CivisPageShell pageId="clientes-aliados">
       <CivisClientesAliadosSection />
-      <CivisFooter />
-    </>
+    </CivisPageShell>
   );
 }

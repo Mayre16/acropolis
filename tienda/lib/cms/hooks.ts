@@ -2,8 +2,11 @@
 
 import {
   mergeEditorialBookFilters,
+  mergeEditorialMemorion,
+  mergeEditorialPrintedBooks,
   mergeEditorialDigitalBooks,
   mergeEditorialDondePage,
+  mergeEditorialDondeContact,
   mergeEditorialFooterTagline,
   mergeEditorialHeaderNav,
   mergeEditorialHeroImages,
@@ -20,6 +23,7 @@ import {
   mergeEditorialWelcome,
   DIGITAL_BOOK_GROUPS,
   EDITORIAL_DONDE,
+  EDITORIAL_DONDE_CONTACT,
   EDITORIAL_HEADER_NAV,
   EDITORIAL_HOME_CARDS,
   EDITORIAL_LIBRERIA,
@@ -109,6 +113,7 @@ export function useEditorialDonde() {
     return {
       visit: EDITORIAL_VISIT,
       page: EDITORIAL_DONDE,
+      contact: EDITORIAL_DONDE_CONTACT,
       sedes: EDITORIAL_SEDES,
       storePhoto: EDITORIAL_STORE_PHOTO,
     };
@@ -117,6 +122,7 @@ export function useEditorialDonde() {
     return {
       visit: EDITORIAL_VISIT,
       page: EDITORIAL_DONDE,
+      contact: EDITORIAL_DONDE_CONTACT,
       sedes: EDITORIAL_SEDES,
       storePhoto: EDITORIAL_STORE_PHOTO,
     };
@@ -124,6 +130,7 @@ export function useEditorialDonde() {
   return {
     visit: mergeEditorialVisit(cms),
     page: mergeEditorialDondePage(cms),
+    contact: mergeEditorialDondeContact(cms),
     sedes: mergeEditorialSedes(EDITORIAL_SEDES, cms),
     storePhoto: mergeEditorialStorePhoto(cms),
   };
@@ -167,6 +174,22 @@ export function useEditorialBookFilters() {
   if (!hydrated) return mergeEditorialBookFilters(null);
   if (!isCmsEnabled()) return mergeEditorialBookFilters(null);
   return mergeEditorialBookFilters(cms);
+}
+
+export function useEditorialMemorion() {
+  const cms = useEditOrPublishedCms();
+  const hydrated = useCmsHydrated();
+  if (!hydrated) return mergeEditorialMemorion(null);
+  if (!isCmsEnabled()) return mergeEditorialMemorion(null);
+  return mergeEditorialMemorion(cms);
+}
+
+export function useEditorialPrintedBooks() {
+  const cms = useEditOrPublishedCms();
+  const hydrated = useCmsHydrated();
+  if (!hydrated) return mergeEditorialPrintedBooks(null);
+  if (!isCmsEnabled()) return mergeEditorialPrintedBooks(null);
+  return mergeEditorialPrintedBooks(cms);
 }
 
 export function useEditorialDigitalBooks() {

@@ -17,11 +17,7 @@ export type RevistaItem = {
   leaveLabel?: string;
 };
 
-export type RegaloCategory =
-  | "separadores"
-  | "papeleria"
-  | "libretas"
-  | "camisetas";
+export type RegaloCategory = string;
 
 export type RegaloItem = {
   id: string;
@@ -72,6 +68,12 @@ export const REGALO_CATEGORIES: {
     label: "Camisetas",
     description:
       "Prendas con frases filosóficas y diseños como Metaphysica.",
+  },
+  {
+    id: "editio",
+    label: "Editio",
+    description:
+      "Artículos y ediciones de la línea Editio — Editorial Logos.",
   },
 ];
 
@@ -207,7 +209,7 @@ export const REGALOS: RegaloItem[] = [
     description:
       "Set de cuatro lapiceros metálicos grabados con virtudes cardinales: negro Prudencia, rojo Fortaleza, azul Templanza y verde Justicia, con monograma NA y República Dominicana.",
     imageUrl: "/img/regalos/lapiceros-virtudes.webp",
-    detailImageUrl: "/img/regalos/lapiceros-virtudes.webp",
+    detailImageUrl: "/img/regalos/lapiceros-virtudes.png",
     price: 450,
     currency: "DOP",
     priceNote: "Pack de 4 · RD$ 450",

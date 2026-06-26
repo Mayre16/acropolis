@@ -8,5 +8,6 @@ function resolveSrc(src: ImageProps["src"]): ImageProps["src"] {
 }
 
 export default function Image({ src, ...props }: ImageProps) {
+  if (typeof src === "string" && !src.trim()) return null;
   return <OriginalImage src={resolveSrc(src)} {...props} />;
 }

@@ -9,12 +9,15 @@ import {
   ChevronRight,
   LayoutGrid,
   MapPin,
+  Pencil,
   UsersRound,
 } from "lucide-react";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
 import { SalonInquiryButton } from "@/components/SalonInquiryButton";
 import { cn } from "@/lib/utils/cn";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { useMergedSalones } from "@/lib/cms/salones-hooks";
+import { cmsToSalon } from "@/lib/cms/salones-edit";
 import { HOME_SALONES_CAROUSEL } from "@/lib/home-cursos-carousels";
 import { LAYOUT_LABELS, type Salon } from "@/lib/salones";
 
@@ -49,11 +52,16 @@ function SalonCarouselMeta({ salon }: { salon: Salon }) {
 }
 
 export function HomeSalonesCarousel() {
+  const edit = useCursosCmsEdit();
   const salones = useMergedSalones();
-  const items = useMemo(
-    () => salones.filter((s) => s.image?.src?.trim()),
-    [salones],
-  );
+  const items = useMemo(() => {
+    const list = edit?.ready
+      ? edit.salonesItems
+          .filter((s) => s.image?.src?.trim())
+          .map(cmsToSalon)
+      : salones.filter((s) => s.image?.src?.trim());
+    return list;
+  }, [edit?.ready, edit?.salonesItems, salones]);
 
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -109,10 +117,20 @@ export function HomeSalonesCarousel() {
         <div className="relative mt-5">
           <article
             className={cn(
-              "overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
+              "relative overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
               CARD_LG_HEIGHT,
             )}
           >
+            {edit?.ready ? (
+              <button
+                type="button"
+                onClick={() => edit.setSelectedId(current.id)}
+                className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-na-helios px-3 py-1.5 text-[10px] font-bold uppercase text-na-ink shadow"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar
+              </button>
+            ) : null}
             <div className={cn("grid lg:grid-cols-[1.05fr_1fr]", CARD_LG_HEIGHT)}>
               <div
                 className={cn(

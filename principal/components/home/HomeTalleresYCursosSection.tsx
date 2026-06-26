@@ -9,8 +9,11 @@ import {
   ChevronRight,
   Clock,
   MapPin,
+  Pencil,
   User,
 } from "lucide-react";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { ofertaSelectedId } from "@/lib/cms/cursos-oferta-edit";
 import { CourseInscribeButton } from "@/components/CourseInscribeButton";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import { cn } from "@/lib/utils/cn";
@@ -20,7 +23,8 @@ import {
   HOME_TALLERES_FEATURED_IDS,
 } from "@/lib/home-cursos-carousels";
 import {
-  isCursoPermanente,
+  isCursoActivo,
+  HOME_CURSOS_CAROUSEL_EXCLUDE_IDS,
   splitCursosOferta,
 } from "@/lib/cursos-permanentes";
 import type { CmsCursosCard } from "@/lib/cms/types";
@@ -28,7 +32,7 @@ import type { CmsCursosCard } from "@/lib/cms/types";
 const CARD_LG_HEIGHT = "lg:h-[380px] lg:min-h-[380px]";
 
 function courseBadge(card: CmsCursosCard) {
-  return isCursoPermanente(card.id) ? "Activo" : "Taller personalizado";
+  return isCursoActivo(card) ? "Activo" : "Taller personalizado";
 }
 
 function CourseCarouselMeta({ card }: { card: CmsCursosCard }) {
@@ -62,15 +66,18 @@ function CourseCarouselMeta({ card }: { card: CmsCursosCard }) {
 
 /** Cursos activos + talleres por convocatoria en un solo carrusel del home. */
 export function HomeTalleresYCursosSection() {
+  const edit = useCursosCmsEdit();
   const display = useCursosOfertaDisplay();
   const items = useMemo(() => {
     const { permanentes } = splitCursosOferta(display.cursosTalleres);
+    const activosHome = permanentes.filter(
+      (card) => !HOME_CURSOS_CAROUSEL_EXCLUDE_IDS.has(card.id),
+    );
     const byId = new Map(display.cursosTalleres.map((c) => [c.id, c]));
     const talleres = HOME_TALLERES_FEATURED_IDS.map((id) => byId.get(id)).filter(
-      (card): card is CmsCursosCard =>
-        !!card && !isCursoPermanente(card.id),
+      (card): card is CmsCursosCard => !!card && !isCursoActivo(card),
     );
-    return [...permanentes, ...talleres];
+    return [...activosHome, ...talleres];
   }, [display.cursosTalleres]);
 
   const [index, setIndex] = useState(0);
@@ -138,10 +145,22 @@ export function HomeTalleresYCursosSection() {
             ) : null}
           <article
             className={cn(
-              "min-w-0 flex-1 overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
+              "relative min-w-0 flex-1 overflow-hidden rounded-xl border border-na-heket/12 bg-white shadow-na-card",
               CARD_LG_HEIGHT,
             )}
           >
+            {edit?.ready ? (
+              <button
+                type="button"
+                onClick={() =>
+                  edit.setSelectedId(ofertaSelectedId("cursos", current.id))
+                }
+                className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-na-helios px-3 py-1.5 text-[10px] font-bold uppercase text-na-ink shadow"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar
+              </button>
+            ) : null}
             <div className={cn("grid lg:grid-cols-[1.05fr_1fr]", CARD_LG_HEIGHT)}>
               <div
                 className={cn(
@@ -209,13 +228,15 @@ export function HomeTalleresYCursosSection() {
                   <CourseInscribeButton
                     title={current.title}
                     kind={
-                      isCursoPermanente(current.id)
+                      isCursoActivo(current)
                         ? (current.inscribeKind ?? "curso")
                         : (current.inscribeKind ?? "taller")
                     }
                     sede={current.sede}
                     facilitador={current.facilitador}
-                    label={current.inscribeLabel ?? "Solicitar info"}
+                    label={current.inscribeLabel?.trim() || "Solicitar info"}
+                    whatsappNumber={current.inscribeWhatsappNumber}
+                    whatsappMessage={current.inscribeWhatsappMessage}
                     className="!mt-0 !bg-na-heket !px-5 !py-2.5 !text-sm !text-white shadow-md shadow-na-heket/20 hover:!brightness-110"
                   />
                   <Link

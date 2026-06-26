@@ -33,6 +33,7 @@ export function ofertaToCmsCard(
     accessLabel: c.accessLabel,
     inscribeKind: c.inscribeKind,
     inscribeLabel: c.inscribeLabel,
+    activo: c.recurrent ? true : undefined,
   };
 }
 
@@ -66,6 +67,48 @@ export function mergeCursosCards(
   return merged;
 }
 
+function ofertaDefaults(kind: "cursos" | "conf") {
+  return kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
+}
+
+/** Tarjetas del catálogo base marcadas como ocultas (solo en modo edición). */
+export function getHiddenOfertaCards(
+  kind: "cursos" | "conf",
+  overrides?: CmsCursosCard[],
+  hidden?: string[],
+): CmsCursosCard[] {
+  const defaults = ofertaDefaults(kind);
+  const hiddenSet = new Set(hidden ?? []);
+  if (!hiddenSet.size) return [];
+  const byId = new Map((overrides ?? []).map((c) => [c.id, c]));
+  const result: CmsCursosCard[] = [];
+  for (const id of hiddenSet) {
+    const base = defaults.find((d) => d.id === id);
+    if (base) result.push({ ...base, ...byId.get(id) });
+  }
+  return result;
+}
+
+export function findOfertaCard(
+  kind: "cursos" | "conf",
+  id: string,
+  overrides?: CmsCursosCard[],
+  hidden?: string[],
+): CmsCursosCard | undefined {
+  const visible = mergeCursosCards(ofertaDefaults(kind), overrides, hidden);
+  const found = visible.find((c) => c.id === id);
+  if (found) return found;
+  return getHiddenOfertaCards(kind, overrides, hidden).find((c) => c.id === id);
+}
+
+export function isOfertaCardHidden(
+  kind: "cursos" | "conf",
+  id: string,
+  hidden?: string[],
+): boolean {
+  return (hidden ?? []).includes(id);
+}
+
 export function parseOfertaSelectedId(
   id: string,
 ): { kind: "cursos" | "conf"; cardId: string } | null {
@@ -80,4 +123,14 @@ export function ofertaSelectedId(kind: "cursos" | "conf", cardId: string) {
 
 export function newCursosCardId(kind: "cursos" | "conf") {
   return `${kind}-nuevo-${Date.now().toString(36)}`;
+}
+
+/** Tarjeta definida en el catálogo base (código); no se puede eliminar, solo ocultar. */
+export function isCatalogOfertaCard(
+  id: string,
+  kind: "cursos" | "conf",
+): boolean {
+  const defaults =
+    kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
+  return defaults.some((d) => d.id === id);
 }

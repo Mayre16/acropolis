@@ -1,0 +1,71 @@
+<?php
+/**
+ * PLANTILLA — copiar al repo Biblioteca-OINA como api/bookstore_upsert.php
+ *
+ * Alta/actualización de listings desde el CMS editorial (servidor).
+ * Mismo estilo que checkout_create.php y bookstore_public_list.php.
+ *
+ * Requiere en config.php de Biblioteca:
+ *   'STORE_SYNC_TOKEN' => '…'  (mismo valor que store_sync_token en editor)
+ */
+declare(strict_types=1);
+
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Método no permitido']);
+    exit;
+}
+
+$config = require __DIR__ . '/config.php';
+$expectedToken = trim((string) ($config['STORE_SYNC_TOKEN'] ?? ''));
+$auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+if ($expectedToken === '' || !preg_match('/^Bearer\s+(\S+)$/i', $auth, $m) || !hash_equals($expectedToken, $m[1])) {
+    http_response_code(401);
+    echo json_encode(['ok' => false, 'error' => 'No autorizado']);
+    exit;
+}
+
+$body = json_decode(file_get_contents('php://input') ?: '{}', true);
+if (!is_array($body)) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => 'JSON inválido']);
+    exit;
+}
+
+$title = trim((string) ($body['title'] ?? ''));
+if ($title === '') {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => 'Falta título']);
+    exit;
+}
+
+// TODO: adaptar a tu capa DB (PDO MySQL bookstore_listings)
+// Campos sugeridos: title, author, isbn, price, currency, stock, publisher,
+// area_tema, summary, cover_url, product_type, cms_slug, visible=1
+
+$id = isset($body['id']) ? (int) $body['id'] : 0;
+
+/*
+if ($id > 0) {
+    // UPDATE … WHERE id = :id
+} else {
+    // INSERT … ; $id = (int) $pdo->lastInsertId();
+}
+*/
+
+http_response_code(501);
+echo json_encode([
+    'ok' => false,
+    'error' => 'Implementar INSERT/UPDATE en bookstore_listings (ver comentarios en este archivo)',
+    'received' => ['title' => $title, 'id' => $id],
+]);

@@ -12,17 +12,16 @@ import {
 import { usePathname } from "next/navigation";
 import { Images, Plus } from "lucide-react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import {
   fetchCmsDraft,
-  publishCms,
   resolveCmsMediaUrl,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import {
-  isCmsEditOrigin,
   postToEditor,
-  type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
 import type { CmsDocument } from "@/lib/cms/types";
 import {
@@ -128,31 +127,8 @@ function HeroCarouselCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, buildDoc]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const next = buildDoc(latest);
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, buildDoc]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
     setCarousels(loadHeroCarouselsFromDoc(draft));
@@ -172,17 +148,7 @@ function HeroCarouselCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      // El guardado lo hace el proveedor de la página (mergeHeroCarouselsIntoDoc).
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [publish]);
+  useCmsEditBridge(saveDraft);
 
   useEffect(() => {
     setSelectedKey(null);

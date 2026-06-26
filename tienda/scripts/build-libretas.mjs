@@ -13,8 +13,10 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(ROOT, "scripts/regalos-src");
 const OUT = path.join(ROOT, "public/img/regalos");
 const LOCKUP_WIDTH = 280;
-/** Ancho relativo de la banda de espiral (para centrar el logo). */
+/** Ancho relativo de la banda de espiral en catálogo (para centrar el logo). */
 const SPIRAL_X_RATIO = 0.15;
+/** Margen extra a la izquierda para que se vean los anillos completos del espiral. */
+const SPIRAL_LEFT_PAD = 14;
 /** Canvas uniforme (referencia: libreta-escribir). */
 const REF_W = 779;
 const REF_H = 922;
@@ -131,6 +133,7 @@ function isNeutralFill(r, g, b) {
 function isNotebookCoverPixel(r, g, b) {
   const lum = (r + g + b) / 3;
   const sat = Math.max(r, g, b) - Math.min(r, g, b);
+  if (lum >= 232 && lum <= 252 && sat < 18) return true;
   if (lum < 220 || sat >= 28) return false;
   if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6) return false;
   return true;
@@ -144,7 +147,7 @@ function isDetachedShadowPixel(r, g, b) {
   return lum >= 92 && lum < 198 && sat < 42;
 }
 
-function floodBgMask(data, width, height, channels) {
+function floodBgMask(data, width, height, channels, itemKey = null) {
   const bg = new Uint8Array(width * height);
   const queue = [];
   const key = (x, y) => y * width + x;
@@ -157,7 +160,7 @@ function floodBgMask(data, width, height, channels) {
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
-    if (isSpiralPixel(x, r, g, b, spiralX)) return;
+    if (pickSpiralPixel(x, r, g, b, spiralX, itemKey)) return;
     if (!isRemovableBg(r, g, b)) return;
     bg[idx] = 1;
     queue.push([x, y]);
@@ -187,7 +190,7 @@ function floodBgMask(data, width, height, channels) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      if (isSpiralPixel(nx, r, g, b, spiralX)) continue;
+      if (pickSpiralPixel(nx, r, g, b, spiralX, itemKey)) continue;
       if (!isRemovableBg(r, g, b)) continue;
       bg[idx] = 1;
       queue.push([nx, ny]);
@@ -341,10 +344,43 @@ function getRowRightFromAlpha(data, width, channels, y, minX, maxX) {
   return minX;
 }
 
+/** Primera columna con anillos del espiral (mockup IA). */
+function findSpiralLeftEdge(data, width, height, channels) {
+  const y0 = Math.round(height * 0.14);
+  const y1 = Math.round(height * 0.86);
+  const scanStart = Math.round(width * 0.1);
+  const scanEnd = Math.round(width * 0.4);
+  let spiralMinX = width;
+
+  for (let x = scanStart; x < scanEnd; x++) {
+    let ringRows = 0;
+    for (let y = y0; y < y1; y++) {
+      const i = (y * width + x) * channels;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const lum = (r + g + b) / 3;
+      const sat = Math.max(r, g, b) - Math.min(r, g, b);
+      if (sat >= 3 && lum >= 80 && lum <= 235) ringRows++;
+    }
+    if (ringRows >= 30) {
+      spiralMinX = Math.min(spiralMinX, x);
+    }
+  }
+
+  return spiralMinX < width
+    ? Math.max(0, spiralMinX - SPIRAL_LEFT_PAD)
+    : null;
+}
+
 /** Primera columna con contenido real de la libreta (no fondo del mockup). */
 function findNotebookLeftEdge(data, width, height, channels) {
+  const spiralLeft = findSpiralLeftEdge(data, width, height, channels);
   const minRows = Math.max(12, Math.round(height * 0.08));
-  for (let x = 0; x < width; x++) {
+  const scanStart = Math.round(width * 0.1);
+  let coverLeft = null;
+
+  for (let x = scanStart; x < width; x++) {
     let hits = 0;
     for (let y = 0; y < height; y++) {
       const i = (y * width + x) * channels;
@@ -359,9 +395,16 @@ function findNotebookLeftEdge(data, width, height, channels) {
       if (isRemovableBg(r, g, b) || isDetachedShadowPixel(r, g, b)) continue;
       hits++;
     }
-    if (hits >= minRows) return x;
+    if (hits >= minRows) {
+      coverLeft = Math.max(0, x - SPIRAL_LEFT_PAD);
+      break;
+    }
   }
-  return 0;
+
+  if (spiralLeft != null && coverLeft != null) {
+    return Math.min(spiralLeft, coverLeft);
+  }
+  return spiralLeft ?? coverLeft ?? 0;
 }
 
 /** Recorta el mockup IA: sin fondo gris ni sombra lateral (conserva esquina). */
@@ -1086,7 +1129,7 @@ async function finalizeNotebookImage(pngBuf) {
   return fitNotebookCanvas(trimmed, REF_W, REF_H);
 }
 
-async function extractNotebook(composedBuf) {
+async function extractNotebook(composedBuf, itemKey = null) {
   const cropped = await cropMockupSource(composedBuf);
 
   const { data, info } = await sharp(cropped)
@@ -1094,7 +1137,7 @@ async function extractNotebook(composedBuf) {
     .raw()
     .toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;
-  const bg = floodBgMask(data, width, height, channels);
+  const bg = floodBgMask(data, width, height, channels, itemKey);
   stripAttachedShadow(data, width, height, channels, bg);
   stripDetachedShadows(data, width, height, channels, bg);
 
@@ -1107,7 +1150,7 @@ async function extractNotebook(composedBuf) {
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
-    if (isSpiralPixel(x, r, g, b, spiralX)) continue;
+    if (pickSpiralPixel(x, r, g, b, spiralX, itemKey)) continue;
     if (!bg[idx]) continue;
     out[i] = 0;
     out[i + 1] = 0;
@@ -1122,9 +1165,9 @@ async function extractNotebook(composedBuf) {
     .png()
     .toBuffer();
 
-  const cleaned = await clearRemovableFringe(trimmed);
-  const bounded = await cropNotebookOpaqueBounds(cleaned);
-  let fitted = await fitNotebookCanvas(bounded, REF_W, REF_H);
+  const cleaned = await clearRemovableFringe(trimmed, itemKey);
+  const bounded = await cropNotebookOpaqueBounds(cleaned, itemKey);
+  let fitted = await fitNotebookCanvas(bounded, REF_W, REF_H, itemKey);
   const fittedMeta = await sharp(fitted).metadata();
   return {
     buffer: fitted,
@@ -1133,7 +1176,7 @@ async function extractNotebook(composedBuf) {
   };
 }
 
-async function clearRemovableFringe(pngBuf) {
+async function clearRemovableFringe(pngBuf, itemKey = null) {
   const { data, info } = await sharp(pngBuf)
     .ensureAlpha()
     .raw()
@@ -1149,7 +1192,7 @@ async function clearRemovableFringe(pngBuf) {
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
-    if (isSpiralPixel(x, r, g, b, spiralX)) continue;
+    if (pickSpiralPixel(x, r, g, b, spiralX, itemKey)) continue;
     if (isNotebookCoverPixel(r, g, b)) continue;
     if (!isRemovableBg(r, g, b) && !isFloorPixel(r, g, b)) continue;
     out[i] = 0;
@@ -1164,7 +1207,7 @@ async function clearRemovableFringe(pngBuf) {
     .toBuffer();
 }
 
-async function cropNotebookOpaqueBounds(pngBuf) {
+async function cropNotebookOpaqueBounds(pngBuf, itemKey = null) {
   const { data, info } = await sharp(pngBuf)
     .ensureAlpha()
     .raw()
@@ -1174,6 +1217,7 @@ async function cropNotebookOpaqueBounds(pngBuf) {
   let minY = height;
   let maxX = 0;
   let maxY = 0;
+  const spiralX = spiralMaxX(width) + 18;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -1182,10 +1226,16 @@ async function cropNotebookOpaqueBounds(pngBuf) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      if (isRemovableBg(r, g, b) && !isSpiralPixel(x, r, g, b, spiralMaxX(width) + 18)) {
+      if (
+        isRemovableBg(r, g, b) &&
+        !pickSpiralPixel(x, r, g, b, spiralX, itemKey)
+      ) {
         continue;
       }
-      if (isFloorPixel(r, g, b) && !isSpiralPixel(x, r, g, b, spiralMaxX(width) + 18)) {
+      if (
+        isFloorPixel(r, g, b) &&
+        !pickSpiralPixel(x, r, g, b, spiralX, itemKey)
+      ) {
         continue;
       }
       if (x < minX) minX = x;
@@ -1198,7 +1248,7 @@ async function cropNotebookOpaqueBounds(pngBuf) {
   if (maxX <= minX || maxY <= minY) return pngBuf;
 
   const pad = 2;
-  const left = Math.max(0, minX - pad);
+  const left = Math.max(0, minX - Math.max(pad, SPIRAL_LEFT_PAD));
   const top = Math.max(0, minY - pad);
   const right = Math.min(width - 1, maxX + pad);
   const bottom = Math.min(height - 1, maxY + pad);
@@ -1291,7 +1341,7 @@ async function defringeNotebook(pngBuf) {
     .toBuffer();
 }
 
-async function fitNotebookCanvas(pngBuf, targetW, targetH) {
+async function fitNotebookCanvas(pngBuf, targetW, targetH, itemKey = null) {
   const defringed = await defringeNotebook(pngBuf);
   const trimmed = await sharp(defringed).ensureAlpha().trim().png().toBuffer();
   const { data, info } = await sharp(trimmed)
@@ -1326,7 +1376,7 @@ async function fitNotebookCanvas(pngBuf, targetW, targetH) {
   }
 
   const pad = 1;
-  const left = Math.max(0, bounds.minX - pad);
+  const left = Math.max(0, bounds.minX - Math.max(pad, SPIRAL_LEFT_PAD));
   const top = Math.max(0, bounds.minY - pad);
   const right = Math.min(width - 1, bounds.maxX + pad);
   const bottom = Math.min(height - 1, bounds.maxY + pad);
@@ -1338,7 +1388,11 @@ async function fitNotebookCanvas(pngBuf, targetW, targetH) {
     .png()
     .toBuffer();
 
-  const scale = Math.min(NOTEBOOK_BODY_W / bodyW, NOTEBOOK_BODY_H / bodyH);
+  const spiralInset = itemKey === "escribir" ? 18 : 0;
+  const scale = Math.min(
+    (NOTEBOOK_BODY_W - spiralInset) / bodyW,
+    NOTEBOOK_BODY_H / bodyH,
+  );
   const newW = Math.max(1, Math.round(bodyW * scale));
   const newH = Math.max(1, Math.round(bodyH * scale));
   const resized = await sharp(bodyBuf)
@@ -1346,7 +1400,7 @@ async function fitNotebookCanvas(pngBuf, targetW, targetH) {
     .png()
     .toBuffer();
 
-  const offsetLeft = Math.round((targetW - newW) / 2);
+  const offsetLeft = Math.round((targetW - newW) / 2) + spiralInset;
   const offsetTop = Math.round((targetH - newH) / 2);
 
   return sharp({
@@ -1371,8 +1425,27 @@ function isSpiralPixel(x, r, g, b, spiralX) {
   if (isRemovableBg(r, g, b) || isNotebookCoverPixel(r, g, b)) return false;
   const lum = (r + g + b) / 3;
   const sat = Math.max(r, g, b) - Math.min(r, g, b);
-  if (lum < 95 || lum > 205) return false;
-  return sat < 42;
+  if (lum < 95 && sat < 42) return true;
+  if (lum >= 95 && lum <= 205 && sat < 42) return true;
+  return false;
+}
+
+/** Anillos metálicos claros (portada crema de libreta-escribir). */
+function isEscribirSpiralPixel(x, r, g, b, spiralX) {
+  if (x > spiralX) return false;
+  if (isNotebookCoverPixel(r, g, b)) return false;
+  const lum = (r + g + b) / 3;
+  const sat = Math.max(r, g, b) - Math.min(r, g, b);
+  const ringBand = Math.min(spiralX, Math.round(spiralX * 0.75));
+  if (x <= ringBand && sat >= 2 && lum >= 80 && lum <= 245) return true;
+  return isSpiralPixel(x, r, g, b, spiralX);
+}
+
+function pickSpiralPixel(x, r, g, b, spiralX, itemKey) {
+  if (itemKey === "escribir") {
+    return isEscribirSpiralPixel(x, r, g, b, spiralX);
+  }
+  return isSpiralPixel(x, r, g, b, spiralX);
 }
 
 async function buildCoverReplaceMask(frontBuf, width, height) {
@@ -1484,7 +1557,7 @@ async function build() {
       .png()
       .toBuffer();
 
-    const { buffer, width, height } = await extractNotebook(composed);
+    const { buffer, width, height } = await extractNotebook(composed, item.key);
     let finalBuf = buffer;
     if (item.key === "conocete") {
       finalBuf = await fillBottomRightCorner(finalBuf);

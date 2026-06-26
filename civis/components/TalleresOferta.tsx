@@ -36,7 +36,7 @@ export function TalleresOferta() {
 
   return (
 
-    <section className="relative bg-na-civis/[0.04] py-14 sm:py-16">
+    <section className="relative border-b border-na-civis/10 bg-na-surface py-14 sm:py-16">
 
       {edit?.ready ? (
 

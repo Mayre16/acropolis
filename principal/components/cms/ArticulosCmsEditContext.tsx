@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { ARTICULOS } from "@/lib/articulos";
 import {
@@ -21,14 +22,10 @@ import {
 } from "@/lib/cms/content-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import type { CmsArticulo, CmsArticulosPage, CmsDocument } from "@/lib/cms/types";
 import {
@@ -120,36 +117,8 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, items, hidden, page]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const merged = buildDocWithArticulos(latest, items, hidden);
-      const next = mergeHeroCarouselsIntoDoc({
-        ...merged,
-        sections: { ...merged.sections, articulosPage: page },
-      });
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDoc(next);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, items, hidden, page]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -163,17 +132,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchItem = useCallback(
     (slug: string, patch: Partial<CmsArticulo>) => {

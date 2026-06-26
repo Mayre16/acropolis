@@ -35,7 +35,21 @@ export function CulturaTalleresSection() {
         <p className="mt-4 max-w-2xl text-na-muted">{section.intro}</p>
       </div>
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {section.cards.map(({ id, src, alt, title, text, date, sede }, i) => (
+        {section.cards.map(
+          (
+            {
+              id,
+              src,
+              alt,
+              title,
+              text,
+              date,
+              sede,
+              inscribeWhatsappNumber,
+              inscribeWhatsappMessage,
+            },
+            i,
+          ) => (
           <li
             key={id}
             className={`relative flex flex-col overflow-hidden ${accentCardShell(i)}`}
@@ -94,10 +108,13 @@ export function CulturaTalleresSection() {
                 kind="taller"
                 sede={sede}
                 accentIndex={i}
+                whatsappNumber={inscribeWhatsappNumber}
+                whatsappMessage={inscribeWhatsappMessage}
               />
             </div>
           </li>
-        ))}
+        ),
+        )}
       </ul>
     </section>
   );

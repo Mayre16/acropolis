@@ -9,9 +9,13 @@ import {
   formatPrice,
   resolveStoreBookCover,
 } from "@/lib/bookstore";
-import { useStoreBooksCatalog } from "@/lib/use-store-books";import { bookToCartItem } from "@/lib/cart";
+import { mergeCatalogBooks, findCmsPrintedBook } from "@/lib/bookstore-merge";
+import { useStoreBooksCatalog } from "@/lib/use-store-books";
+import { bookToCartItem } from "@/lib/cart";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { useEditorialBookFilters } from "@/lib/cms/hooks";
+import { useEditorialBookFilters, useEditorialPrintedBooks } from "@/lib/cms/hooks";
+import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
+import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import { STORE_WHATSAPP_NUMBER } from "@/lib/site-config";
 
 function BookDetail({
@@ -108,7 +112,9 @@ export function EditorialCatalog({
   embedded?: boolean;
   initialArea?: string;
 }) {
-  const { themes, authorFilters } = useEditorialBookFilters();
+  const { themes, authorFilters, publishers } = useEditorialBookFilters();
+  const printedBooksCms = useEditorialPrintedBooks();
+  const edit = useEditorialCmsEdit();
   const [q, setQ] = useState("");
   const [searchDraft, setSearchDraft] = useState("");
   const [authorGroup, setAuthorGroup] = useState("");
@@ -120,7 +126,11 @@ export function EditorialCatalog({
     () => ({ q, authorGroup, publisher, area, productType: "impreso" as const }),
     [q, authorGroup, publisher, area],
   );
-  const { items, loading, error } = useStoreBooksCatalog(filters);
+  const { items: apiItems, loading, error } = useStoreBooksCatalog(filters);
+  const items = useMemo(
+    () => mergeCatalogBooks(apiItems, printedBooksCms, filters),
+    [apiItems, printedBooksCms, filters],
+  );
   useEffect(() => {
     if (initialArea) setArea(initialArea);
   }, [initialArea]);
@@ -188,7 +198,14 @@ export function EditorialCatalog({
         </p>
       ) : null}
 
-      <div className="mt-8 flex flex-wrap gap-2">
+      <div className="relative mt-8 flex flex-wrap gap-2">
+        {edit?.ready ? (
+          <EditorialEditPencil
+            label="Editar filtros de autores"
+            onClick={() => edit.setSelectedId("libros:filters")}
+            className="right-0 -top-8"
+          />
+        ) : null}
         {authorFilters.map((f) => (
           <button
             key={f.id || "all"}
@@ -205,7 +222,7 @@ export function EditorialCatalog({
         ))}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="relative mt-4 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => setPublisher("")}
@@ -217,20 +234,30 @@ export function EditorialCatalog({
         >
           Todas las editoriales
         </button>
-        <button
-          type="button"
-          onClick={() => setPublisher("Editorial Nueva Acrópolis")}
-          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-            publisher !== ""
-              ? "bg-na-heket text-white"
-              : "bg-white text-na-muted ring-1 ring-na-heket/15"
-          }`}
-        >
-          Editorial Nueva Acrópolis
-        </button>
+        {publishers.map((pub) => (
+          <button
+            key={pub}
+            type="button"
+            onClick={() => setPublisher(pub)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              publisher === pub
+                ? "bg-na-heket text-white"
+                : "bg-white text-na-muted ring-1 ring-na-heket/15"
+            }`}
+          >
+            {pub}
+          </button>
+        ))}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="relative mt-3 flex flex-wrap gap-2">
+        {edit?.ready ? (
+          <EditorialEditPencil
+            label="Editar filtros de temas"
+            onClick={() => edit.setSelectedId("libros:filters")}
+            className="right-0 -top-8"
+          />
+        ) : null}
         <button
           type="button"
           onClick={() => setArea("")}
@@ -258,7 +285,26 @@ export function EditorialCatalog({
         ))}
       </div>
 
-      {loading && items.length === 0 ? (
+      {edit?.ready ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => edit.setSelectedId("libros:printed")}
+            className="rounded-full border border-dashed border-na-editorial/40 px-4 py-2 text-xs font-bold text-na-editorial"
+          >
+            + Gestionar libros manuales
+          </button>
+          <button
+            type="button"
+            onClick={() => edit.setSelectedId("libros:filters")}
+            className="rounded-full border border-na-editorial/20 px-4 py-2 text-xs font-bold text-na-muted"
+          >
+            Editar filtros del catálogo
+          </button>
+        </div>
+      ) : null}
+
+      {loading && apiItems.length === 0 ? (
         <p className="mt-10 text-center text-sm text-na-muted">
           Cargando catálogo…
         </p>
@@ -279,9 +325,13 @@ export function EditorialCatalog({
       >
         {items.map((book, index) => {
           const cover = resolveStoreBookCover(book);
-          return (            <article
+          const cmsBook = findCmsPrintedBook(printedBooksCms, book);
+          const isManual = cmsBook != null;
+          const manualId = cmsBook?.id ?? null;
+          return (
+            <article
               key={book.id}
-              className={`cursor-pointer overflow-hidden border bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card [content-visibility:auto] [contain-intrinsic-size:auto_420px] ${
+              className={`relative cursor-pointer overflow-hidden border bg-white shadow-na-soft transition hover:-translate-y-0.5 hover:shadow-na-card [content-visibility:auto] [contain-intrinsic-size:auto_420px] ${
                 embedded ? "rounded-xl shadow-sm" : "rounded-2xl"
               } ${
                 detail?.id === book.id
@@ -298,6 +348,19 @@ export function EditorialCatalog({
               role="button"
               tabIndex={0}
             >
+              {edit?.ready ? (
+                <EditorialEditPencil
+                  label={isManual ? "Editar libro manual" : "Ver info del catálogo"}
+                  onClick={() =>
+                    edit.setSelectedId(
+                      isManual && manualId
+                        ? `printedBook:${manualId}`
+                        : `libro-api:${book.id}`,
+                    )
+                  }
+                  className="right-2 top-2 z-10"
+                />
+              ) : null}
               <div className="relative aspect-[3/4] bg-white">
                 {cover ? (
                   <Image
@@ -317,7 +380,17 @@ export function EditorialCatalog({
                     Sin portada
                   </div>
                 )}
-                {book.stock <= 0 ? (
+                {isManual ? (
+                  <span
+                    className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white ${
+                      cmsBook?.bibliotecaId
+                        ? "bg-emerald-700"
+                        : "bg-na-editorial"
+                    }`}
+                  >
+                    {cmsBook?.bibliotecaId ? "Editorial" : "Pendiente"}
+                  </span>
+                ) : book.stock <= 0 ? (
                   <span className="absolute left-2 top-2 rounded-full bg-neutral-600 px-2 py-0.5 text-[10px] font-bold uppercase text-white">
                     Agotado
                   </span>

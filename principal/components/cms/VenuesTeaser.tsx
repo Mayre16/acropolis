@@ -33,7 +33,7 @@ export function VenuesTeaser() {
           </Link>
         </div>
 
-        {edit?.ready ? (
+        {edit ? (
           <div className="mt-6 flex flex-wrap gap-2">
             <button
               type="button"
@@ -60,7 +60,7 @@ export function VenuesTeaser() {
               key={v.id}
               className="relative rounded-2xl border border-na-heket/10 bg-na-surface p-4 shadow-na-soft"
             >
-              {edit?.ready ? (
+              {edit ? (
                 <button
                   type="button"
                   onClick={() => edit.setSelectedId(v.id)}

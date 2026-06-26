@@ -10,15 +10,14 @@ import {
   type ReactNode,
 } from "react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import {
   fetchCmsDraft,
-  publishCms,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import {
-  isCmsEditOrigin,
   postToEditor,
-  type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import {
@@ -100,31 +99,8 @@ function SiteFooterCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, footer]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const next = buildDocWithSiteFooter(latest, footer);
-      await saveCmsDraft("acropolis", token, next);
-      await publishCms("acropolis", token);
-      setDirty(false);
-      setStatus("Publicado.");
-    } catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, footer]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -138,17 +114,7 @@ function SiteFooterCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchFooter = useCallback(
     (patch: Partial<CmsSiteFooter>) => {

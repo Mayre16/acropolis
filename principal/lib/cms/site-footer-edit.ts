@@ -47,6 +47,21 @@ export function buildWhatsAppUrl(number: string): string {
   return `https://wa.me/${digits}`;
 }
 
+/** Enlace wa.me con número y mensaje opcional; si no hay número, usa fallbackUrl (sin query). */
+export function buildWhatsAppHref(
+  number: string | undefined,
+  message: string | undefined,
+  fallbackUrl: string,
+): string {
+  const digits = (number ?? "").replace(/\D/g, "");
+  const base = digits
+    ? buildWhatsAppUrl(digits)
+    : fallbackUrl.replace(/\?.*$/, "");
+  const msg = message?.trim();
+  if (msg) return `${base}?text=${encodeURIComponent(msg)}`;
+  return base;
+}
+
 export function mergeSiteFooterFields(
   partial: CmsSiteFooter = {},
 ): MergedSiteFooter {

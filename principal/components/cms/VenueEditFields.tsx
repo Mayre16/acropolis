@@ -1,16 +1,26 @@
 "use client";
 
 import type { CmsVenue } from "@/lib/cms/types";
+import { venueDisplayName } from "@/lib/locations";
 import { EditField } from "@/components/cms/CmsEditFields";
+import { VenueMapPicker } from "@/components/cms/VenueMapPicker";
+import {
+  latLonToDrMapSvg,
+  looksLikeGpsNotSvg,
+  parseLatLonFromMapsInput,
+} from "@/lib/map-coords";
 
 export function VenueEditFields({
   venue,
   onChange,
   onHide,
+  cityHasSede = false,
 }: {
   venue: CmsVenue;
   onChange: (patch: Partial<CmsVenue>) => void;
   onHide?: () => void;
+  /** Ciudad con al menos una sede (afecta si el punto cultural entra al mapa). */
+  cityHasSede?: boolean;
 }) {
   return (
     <div className="space-y-4">
@@ -85,21 +95,83 @@ export function VenueEditFields({
         onChange={(v) => onChange({ note: v })}
         multiline
       />
-      <div className="grid gap-2 sm:grid-cols-2">
-        <EditField
-          label="Mapa X (opcional)"
-          value={venue.mapX != null ? String(venue.mapX) : ""}
-          onChange={(v) =>
-            onChange({ mapX: v.trim() ? Number(v) : undefined })
-          }
+      <div className="rounded-lg border border-slate-200 p-3 space-y-3">
+        <p className="text-xs font-semibold text-slate-700">Ubicación en el mapa del sitio</p>
+        {venue.kind === "sede" && cityHasSede ? (
+          <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-950">
+            Hay más de una sede en esta ciudad. Cada una necesita su propio pin
+            (clic en el mapa o coordenadas X/Y) para aparecer en el mapa del
+            sitio.
+          </p>
+        ) : venue.kind === "centro-cultural" && cityHasSede ? (
+          <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-950">
+            Esta ciudad ya tiene sede en el mapa. El punto cultural{" "}
+            <strong>no se mostrará</strong> hasta que coloque el pin abajo (clic
+            en el mapa o coordenadas X/Y).
+          </p>
+        ) : venue.kind === "centro-cultural" ? (
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700">
+            Sin pin manual, se usará la ubicación por defecto de la ciudad si
+            existe.
+          </p>
+        ) : null}
+        {looksLikeGpsNotSvg(venue.mapX, venue.mapY) ? (
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-950">
+            X/Y parecen coordenadas de Google (lat/lon), no del dibujo del mapa.
+            Use el botón «Desde Google Maps» o haga clic en el mapa.
+          </p>
+        ) : null}
+        <label className="flex cursor-pointer items-start gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={venue.mapHideLabel === true}
+            onChange={(e) => onChange({ mapHideLabel: e.target.checked })}
+            className="mt-0.5 rounded border-slate-300"
+          />
+          <span>
+            Solo mostrar el punto en el mapa (sin el nombre de la ciudad)
+          </span>
+        </label>
+        <VenueMapPicker
+          mapX={venue.mapX}
+          mapY={venue.mapY}
+          label={venueDisplayName(venue.name, venue.kind)}
+          hideLabel={venue.mapHideLabel}
+          onPick={(x, y) => onChange({ mapX: x, mapY: y })}
         />
-        <EditField
-          label="Mapa Y (opcional)"
-          value={venue.mapY != null ? String(venue.mapY) : ""}
-          onChange={(v) =>
-            onChange({ mapY: v.trim() ? Number(v) : undefined })
-          }
-        />
+        <div className="grid gap-2 sm:grid-cols-2">
+          <EditField
+            label="Mapa X (SVG 0–1000)"
+            value={venue.mapX != null ? String(venue.mapX) : ""}
+            onChange={(v) =>
+              onChange({ mapX: v.trim() ? Number(v) : undefined })
+            }
+          />
+          <EditField
+            label="Mapa Y (SVG 0–686)"
+            value={venue.mapY != null ? String(venue.mapY) : ""}
+            onChange={(v) =>
+              onChange({ mapY: v.trim() ? Number(v) : undefined })
+            }
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            const gps = parseLatLonFromMapsInput(venue.mapsQuery);
+            if (!gps) {
+              window.alert(
+                "No se encontraron coordenadas en el campo de Google Maps. Pegue un enlace con @lat,lon o lat,lon.",
+              );
+              return;
+            }
+            const { x, y } = latLonToDrMapSvg(gps.lat, gps.lon);
+            onChange({ mapX: x, mapY: y });
+          }}
+          className="w-full rounded-lg border border-na-heket/20 py-2 text-sm font-semibold text-na-heketDark"
+        >
+          Calcular pin desde Google Maps
+        </button>
       </div>
       {venue.mapsQuery ? (
         <a

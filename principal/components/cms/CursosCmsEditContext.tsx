@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -19,6 +20,10 @@ import {
 import {
   CONFERENCIAS_DEFAULTS,
   CURSOS_TALLERES_DEFAULTS,
+  findOfertaCard,
+  getHiddenOfertaCards,
+  isCatalogOfertaCard,
+  isOfertaCardHidden,
   mergeCursosCards,
   newCursosCardId,
   ofertaSelectedId,
@@ -26,16 +31,12 @@ import {
 } from "@/lib/cms/cursos-oferta-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   resolveCmsMediaUrl,
   saveCmsDraft,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import {
   buildDocWithSalones,
@@ -67,8 +68,9 @@ import {
 import { AgendaEntryEditFields } from "@/components/cms/AgendaEntryEditFields";
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
-import { DEFAULT_OFERTA_COPY } from "@/lib/cms/cursos-display";
+import { DEFAULT_OFERTA_COPY, CURSOS_INSCRIBE_SECTION_ID } from "@/lib/cms/cursos-display";
 
 const LAYOUT_OPTIONS = [
   { value: "butacas", label: "Butacas en filas" },
@@ -111,6 +113,9 @@ type CursosCmsEditContextValue = {
   patchSalonesPage: (patch: Partial<CmsSalonesPage>) => void;
   patchCirculoAmigos: (patch: Partial<CmsCirculoAmigosPromo>) => void;
   getOfertaCards: (kind: "cursos" | "conf") => CmsCursosCard[];
+  getHiddenOfertaCards: (kind: "cursos" | "conf") => CmsCursosCard[];
+  isOfertaCardHidden: (kind: "cursos" | "conf", id: string) => boolean;
+  restoreOfertaCard: (kind: "cursos" | "conf", id: string) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
   dirty: boolean;
@@ -130,6 +135,7 @@ function buildDoc(
   base: CmsDocument,
   page: CmsCursosPage,
   agendaItems: CmsAgendaEntry[],
+  agendaHidden: string[],
   salonesItems: CmsSalon[],
   salonesPage: CmsSalonesPage,
   salonesHidden: string[],
@@ -146,6 +152,7 @@ function buildDoc(
     ...withSalones,
     sections: {
       ...withSalones.sections,
+      agendaHidden,
       cursosPage: page,
       culturaPage: {
         ...withSalones.sections.culturaPage,
@@ -155,10 +162,17 @@ function buildDoc(
   });
 }
 
-function CursosCmsEditInner({ children }: { children: ReactNode }) {
+function CursosCmsEditInner({
+  children,
+  embedded = false,
+}: {
+  children: ReactNode;
+  embedded?: boolean;
+}) {
   const [token, setToken] = useState<string | null>(null);
   const [page, setPage] = useState<CmsCursosPage>(DEFAULT_PAGE);
   const [agendaItems, setAgendaItems] = useState<CmsAgendaEntry[]>([]);
+  const [agendaHidden, setAgendaHidden] = useState<string[]>([]);
   const [salonesItems, setSalonesItems] = useState<CmsSalon[]>([]);
   const [salonesHidden, setSalonesHidden] = useState<string[]>([]);
   const [salonesPage, setSalonesPage] =
@@ -172,6 +186,36 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState("");
   const ready = !!token;
 
+  const pageRef = useRef(page);
+  const agendaItemsRef = useRef(agendaItems);
+  const agendaHiddenRef = useRef(agendaHidden);
+  const salonesItemsRef = useRef(salonesItems);
+  const salonesPageRef = useRef(salonesPage);
+  const salonesHiddenRef = useRef(salonesHidden);
+  const circuloAmigosRef = useRef(circuloAmigos);
+
+  useEffect(() => {
+    pageRef.current = page;
+  }, [page]);
+  useEffect(() => {
+    agendaItemsRef.current = agendaItems;
+  }, [agendaItems]);
+  useEffect(() => {
+    agendaHiddenRef.current = agendaHidden;
+  }, [agendaHidden]);
+  useEffect(() => {
+    salonesItemsRef.current = salonesItems;
+  }, [salonesItems]);
+  useEffect(() => {
+    salonesPageRef.current = salonesPage;
+  }, [salonesPage]);
+  useEffect(() => {
+    salonesHiddenRef.current = salonesHidden;
+  }, [salonesHidden]);
+  useEffect(() => {
+    circuloAmigosRef.current = circuloAmigos;
+  }, [circuloAmigos]);
+
   const markDirty = useCallback(() => {
     setDirty(true);
     postToEditor({ type: "cms-dirty", dirty: true });
@@ -182,6 +226,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     setAgendaItems(
       getCursosAgendaEntries(draft, CURSOS_PROXIMAS_CONVOCATORIAS),
     );
+    setAgendaHidden([...(draft.sections.agendaHidden ?? [])]);
     const salonesLoaded = getSalonesForEdit(draft, SALONES);
     setSalonesItems(salonesLoaded.items);
     setSalonesHidden(salonesLoaded.hidden);
@@ -201,12 +246,13 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       const latest = await fetchCmsDraft("acropolis");
       const next = buildDoc(
         latest,
-        page,
-        agendaItems,
-        salonesItems,
-        salonesPage,
-        salonesHidden,
-        circuloAmigos,
+        pageRef.current,
+        agendaItemsRef.current,
+        agendaHiddenRef.current,
+        salonesItemsRef.current,
+        salonesPageRef.current,
+        salonesHiddenRef.current,
+        circuloAmigosRef.current,
       );
       await saveCmsDraft("acropolis", token, next);
       setDirty(false);
@@ -219,41 +265,15 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, page, agendaItems, salonesItems, salonesPage, salonesHidden, circuloAmigos]);
+  }, [token]);
+
+  const queueSave = useCallback(() => {
+    window.setTimeout(() => void saveDraft(), 0);
+  }, [saveDraft]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios en la página de cursos y salones.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const next = buildDoc(
-        latest,
-        page,
-        agendaItems,
-        salonesItems,
-        salonesPage,
-        salonesHidden,
-        circuloAmigos,
-      );
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      setStatus(String(e));
-      postToEditor({ type: "cms-status", text: String(e), ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, page, agendaItems, salonesItems, salonesPage, salonesHidden, circuloAmigos]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -267,17 +287,7 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchPage = useCallback(
     (patch: Partial<CmsCursosPage>) => {
@@ -317,11 +327,21 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
 
   const deleteAgendaItem = useCallback(
     (id: string) => {
-      setAgendaItems((list) => list.filter((e) => e.id !== id));
+      setAgendaItems((list) => {
+        const next = list.filter((e) => e.id !== id);
+        agendaItemsRef.current = next;
+        return next;
+      });
+      setAgendaHidden((hidden) => {
+        const next = hidden.includes(id) ? hidden : [...hidden, id];
+        agendaHiddenRef.current = next;
+        return next;
+      });
       setSelectedId(null);
       markDirty();
+      queueSave();
     },
-    [markDirty],
+    [markDirty, queueSave],
   );
 
   const getOfertaCards = useCallback(
@@ -355,12 +375,36 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
           hidden: "conferenciasHidden" as const,
         };
 
+  const getHiddenOfertaCardsCb = useCallback(
+    (kind: "cursos" | "conf") => {
+      const { cards, hidden } = ofertaKeys(kind);
+      return getHiddenOfertaCards(kind, page[cards], page[hidden]);
+    },
+    [page.cursosTalleres, page.conferencias, page.cursosTalleresHidden, page.conferenciasHidden],
+  );
+
+  const isOfertaCardHiddenCb = useCallback(
+    (kind: "cursos" | "conf", id: string) => {
+      const { hidden } = ofertaKeys(kind);
+      return isOfertaCardHidden(kind, id, page[hidden]);
+    },
+    [page.cursosTalleresHidden, page.conferenciasHidden],
+  );
+
   const patchOfertaCard = useCallback(
     (kind: "cursos" | "conf", id: string, patch: Partial<CmsCursosCard>) => {
       const { cards, hidden } = ofertaKeys(kind);
       const defaults =
         kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
       setPage((p) => {
+        if (isOfertaCardHidden(kind, id, p[hidden])) {
+          const byId = new Map((p[cards] ?? []).map((c) => [c.id, c]));
+          const base = defaults.find((d) => d.id === id) ?? byId.get(id);
+          if (!base) return p;
+          const updated = { ...base, ...byId.get(id), ...patch };
+          const rest = (p[cards] ?? []).filter((c) => c.id !== id);
+          return { ...p, [cards]: [...rest, updated] };
+        }
         const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
         const next = merged.map((c) =>
           c.id === id ? { ...c, ...patch } : c,
@@ -401,14 +445,31 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       const defaults =
         kind === "cursos" ? CURSOS_TALLERES_DEFAULTS : CONFERENCIAS_DEFAULTS;
       setPage((p) => {
+        let next: CmsCursosPage;
         if (defaults.some((d) => d.id === id)) {
           const nextHidden = [...new Set([...(p[hidden] ?? []), id])];
-          return { ...p, [hidden]: nextHidden };
+          next = { ...p, [hidden]: nextHidden };
+        } else {
+          const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
+          next = { ...p, [cards]: merged.filter((c) => c.id !== id) };
         }
-        const merged = mergeCursosCards(defaults, p[cards], p[hidden]);
-        return { ...p, [cards]: merged.filter((c) => c.id !== id) };
+        pageRef.current = next;
+        return next;
       });
       setSelectedId(null);
+      markDirty();
+      queueSave();
+    },
+    [markDirty, queueSave],
+  );
+
+  const restoreOfertaCard = useCallback(
+    (kind: "cursos" | "conf", id: string) => {
+      const { hidden } = ofertaKeys(kind);
+      setPage((p) => ({
+        ...p,
+        [hidden]: (p[hidden] ?? []).filter((hid) => hid !== id),
+      }));
       markDirty();
     },
     [markDirty],
@@ -481,14 +542,23 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
 
   const hideSalon = useCallback(
     (id: string) => {
-      setSalonesItems((list) => list.filter((s) => s.id !== id));
+      setSalonesItems((list) => {
+        const next = list.filter((s) => s.id !== id);
+        salonesItemsRef.current = next;
+        return next;
+      });
       if (SALONES.some((s) => s.id === id)) {
-        setSalonesHidden((h) => (h.includes(id) ? h : [...h, id]));
+        setSalonesHidden((h) => {
+          const next = h.includes(id) ? h : [...h, id];
+          salonesHiddenRef.current = next;
+          return next;
+        });
       }
       setSelectedId(null);
       markDirty();
+      queueSave();
     },
-    [markDirty],
+    [markDirty, queueSave],
   );
 
   const patchSalonesPage = useCallback(
@@ -530,6 +600,9 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
+      getHiddenOfertaCards: getHiddenOfertaCardsCb,
+      isOfertaCardHidden: isOfertaCardHiddenCb,
+      restoreOfertaCard,
       saveDraft,
       publish,
       dirty,
@@ -557,6 +630,9 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
+      getHiddenOfertaCardsCb,
+      isOfertaCardHiddenCb,
+      restoreOfertaCard,
       saveDraft,
       publish,
       dirty,
@@ -570,18 +646,27 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
   const ofertaSel = selectedId ? parseOfertaSelectedId(selectedId) : null;
   const selectedOferta =
     ofertaSel &&
-    getOfertaCards(ofertaSel.kind).find((c) => c.id === ofertaSel.cardId);
+    findOfertaCard(
+      ofertaSel.kind,
+      ofertaSel.cardId,
+      ofertaSel.kind === "cursos" ? page.cursosTalleres : page.conferencias,
+      ofertaSel.kind === "cursos"
+        ? page.cursosTalleresHidden
+        : page.conferenciasHidden,
+    );
 
   return (
     <CursosCmsEditContext.Provider value={value}>
-      <EditToolbar
-        label="Cursos y salones"
-        dirty={dirty}
-        busy={busy}
-        status={status}
-        onSave={() => void saveDraft()}
-        onPublish={() => void publish()}
-      />
+      {embedded ? null : (
+        <EditToolbar
+          label="Cursos y salones"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onSave={() => void saveDraft()}
+          onPublish={() => void publish()}
+        />
+      )}
       {!ready ? (
         <div className="bg-amber-50 py-3 text-center text-sm text-na-muted">
           Conectando con el editor…
@@ -641,11 +726,59 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
             token={token}
             onChange={(patch) => patchAgendaItem(selectedAgenda.id, patch)}
             onDelete={() => {
-              if (window.confirm("¿Eliminar esta convocatoria?")) {
+              if (
+                window.confirm(
+                  "¿Eliminar esta convocatoria? Se ocultará de Cursos y de la agenda pública. El borrador se guardará automáticamente.",
+                )
+              ) {
                 deleteAgendaItem(selectedAgenda.id);
               }
             }}
           />
+        </EditPanelChrome>
+      ) : null}
+
+      {selectedId === CURSOS_INSCRIBE_SECTION_ID ? (
+        <EditPanelChrome
+          title="Bloque — Inscripción por WhatsApp"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Título del bloque verde"
+              value={page.inscribeTitle ?? ""}
+              onChange={(v) => patchPage({ inscribeTitle: v })}
+            />
+            <EditField
+              label="Texto"
+              value={page.inscribeText ?? ""}
+              onChange={(v) => patchPage({ inscribeText: v })}
+              multiline
+            />
+            <EditField
+              label="Texto del botón"
+              value={page.inscribeCtaLabel ?? ""}
+              onChange={(v) => patchPage({ inscribeCtaLabel: v })}
+            />
+            <EditField
+              label="Número WhatsApp del botón"
+              value={page.inscribeWhatsappNumber ?? ""}
+              onChange={(v) => patchPage({ inscribeWhatsappNumber: v })}
+            />
+            <p className="-mt-2 text-xs text-slate-500">
+              Vacío = número de WhatsApp cursos del pie de página (CMS global).
+            </p>
+            <EditField
+              label="Mensaje prellenado de WhatsApp"
+              value={page.inscribeWhatsappMessage ?? ""}
+              onChange={(v) => patchPage({ inscribeWhatsappMessage: v })}
+              multiline
+            />
+          </div>
         </EditPanelChrome>
       ) : null}
 
@@ -676,6 +809,64 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
               onChange={(v) => patchPage({ ofertaConferenciasIntro: v })}
               multiline
             />
+            {(page.cursosTalleresHidden?.length ?? 0) > 0 ? (
+              <div className="rounded-lg border border-slate-200 p-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Cursos ocultos
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  También los ves al final de la página, en «Ocultos del catálogo».
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {page.cursosTalleresHidden!.map((id) => {
+                    const card =
+                      CURSOS_TALLERES_DEFAULTS.find((c) => c.id === id);
+                    return (
+                      <li
+                        key={id}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>{card?.title ?? id}</span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                          onClick={() => restoreOfertaCard("cursos", id)}
+                        >
+                          Mostrar de nuevo
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+            {(page.conferenciasHidden?.length ?? 0) > 0 ? (
+              <div className="rounded-lg border border-slate-200 p-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Conferencias ocultas
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {page.conferenciasHidden!.map((id) => {
+                    const card = CONFERENCIAS_DEFAULTS.find((c) => c.id === id);
+                    return (
+                      <li
+                        key={id}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>{card?.title ?? id}</span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                          onClick={() => restoreOfertaCard("conf", id)}
+                        >
+                          Mostrar de nuevo
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </EditPanelChrome>
       ) : null}
@@ -692,18 +883,29 @@ function CursosCmsEditInner({ children }: { children: ReactNode }) {
           <CursosCardEditFields
             card={selectedOferta}
             token={token}
+            ofertaKind={ofertaSel.kind}
+            isHidden={isOfertaCardHiddenCb(ofertaSel.kind, selectedOferta.id)}
             onChange={(patch) =>
               patchOfertaCard(ofertaSel.kind, selectedOferta.id, patch)
             }
+            onRestore={() => restoreOfertaCard(ofertaSel.kind, selectedOferta.id)}
             onDelete={() => {
-              if (
-                window.confirm(
-                  `¿Ocultar la tarjeta «${selectedOferta.title}»? No se verá en el sitio público.`,
-                )
-              ) {
+              const catalog = isCatalogOfertaCard(
+                selectedOferta.id,
+                ofertaSel.kind,
+              );
+              const msg = catalog
+                ? `¿Ocultar «${selectedOferta.title}»? Dejará de mostrarse en la web. El borrador se guardará automáticamente; publica para que los visitantes lo vean.`
+                : `¿Eliminar «${selectedOferta.title}»? Se quitará por completo del CMS.`;
+              if (window.confirm(msg)) {
                 deleteOfertaCard(ofertaSel.kind, selectedOferta.id);
               }
             }}
+            deleteMode={
+              isCatalogOfertaCard(selectedOferta.id, ofertaSel.kind)
+                ? "hide"
+                : "remove"
+            }
           />
         </EditPanelChrome>
       ) : null}
@@ -866,11 +1068,20 @@ function CursosCardEditFields({
   token,
   onChange,
   onDelete,
+  onRestore,
+  deleteMode = "hide",
+  isHidden = false,
+  ofertaKind = "cursos",
 }: {
   card: CmsCursosCard;
   token: string | null;
   onChange: (patch: Partial<CmsCursosCard>) => void;
   onDelete?: () => void;
+  onRestore?: () => void;
+  /** hide = catálogo base (solo ocultar); remove = tarjeta creada en CMS (eliminar). */
+  deleteMode?: "hide" | "remove";
+  isHidden?: boolean;
+  ofertaKind?: "cursos" | "conf";
 }) {
   const [uploading, setUploading] = useState(false);
   const previewSrc = resolveCmsMediaUrl(card.src);
@@ -901,6 +1112,39 @@ function CursosCardEditFields({
         onChange={(v) => onChange({ text: v })}
         multiline
       />
+      {ofertaKind === "cursos" ? (
+        <label className="block text-sm">
+          <span className="font-semibold text-slate-700">
+            Ubicación en la página de cursos
+          </span>
+          <select
+            value={
+              card.activo === true
+                ? "activo"
+                : card.activo === false
+                  ? "otros"
+                  : "auto"
+            }
+            onChange={(e) => {
+              const v = e.target.value;
+              onChange({
+                activo:
+                  v === "activo" ? true : v === "otros" ? false : undefined,
+              });
+            }}
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm spellcheck-field"
+          >
+            <option value="auto">Automático (según catálogo base)</option>
+            <option value="activo">Cursos activos</option>
+            <option value="otros">Otros cursos y talleres</option>
+          </select>
+          <p className="mt-1 text-xs text-slate-500">
+            «Cursos activos» = horario fijo todo el año. «Otros» = por temporada
+            o convocatoria. Si no eliges, se mantiene la ubicación del catálogo
+            original.
+          </p>
+        </label>
+      ) : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <EditField
           label="Fecha de apertura (texto)"
@@ -937,6 +1181,48 @@ function CursosCardEditFields({
         value={card.accessLabel ?? ""}
         onChange={(v) => onChange({ accessLabel: v })}
       />
+      <fieldset className="space-y-3 rounded-lg border border-slate-200 p-3">
+        <legend className="px-1 text-sm font-medium">Botón «Solicitar info»</legend>
+        <p className="text-xs text-slate-500">
+          Si dejas el número vacío, se usa el de cursos del pie de página. Si
+          dejas el mensaje vacío, se genera con el título y la sede.
+        </p>
+        <EditField
+          label="Texto del botón"
+          value={card.inscribeLabel ?? ""}
+          onChange={(v) => onChange({ inscribeLabel: v })}
+        />
+        <label className="block text-sm">
+          <span className="font-semibold text-slate-700">Tipo en WhatsApp</span>
+          <select
+            value={card.inscribeKind ?? "curso"}
+            onChange={(e) =>
+              onChange({
+                inscribeKind: e.target.value as NonNullable<
+                  CmsCursosCard["inscribeKind"]
+                >,
+              })
+            }
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm spellcheck-field"
+          >
+            <option value="curso">Curso</option>
+            <option value="taller">Taller</option>
+            <option value="conferencia">Conferencia</option>
+            <option value="actividad">Actividad</option>
+          </select>
+        </label>
+        <EditField
+          label="Número WhatsApp (opcional)"
+          value={card.inscribeWhatsappNumber ?? ""}
+          onChange={(v) => onChange({ inscribeWhatsappNumber: v })}
+        />
+        <EditField
+          label="Mensaje WhatsApp (opcional)"
+          value={card.inscribeWhatsappMessage ?? ""}
+          onChange={(v) => onChange({ inscribeWhatsappMessage: v })}
+          multiline
+        />
+      </fieldset>
       <fieldset className="space-y-2 rounded-lg border border-slate-200 p-3">
         <legend className="px-1 text-sm font-medium">Foto</legend>
         <EditField
@@ -976,21 +1262,57 @@ function CursosCardEditFields({
           onChange={(v) => onChange({ alt: v })}
         />
       </fieldset>
-      {onDelete ? (
-        <button
-          type="button"
-          onClick={onDelete}
-          className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
-        >
-          Ocultar del sitio
-        </button>
+      {isHidden ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+          <p className="font-semibold">Oculto del sitio público</p>
+          <p className="mt-1 text-xs text-amber-900/80">
+            Los visitantes no ven esta tarjeta. Puedes editarla aquí y volver a
+            publicarla cuando quieras.
+          </p>
+          {onRestore ? (
+            <button
+              type="button"
+              onClick={onRestore}
+              className="mt-3 w-full rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white"
+            >
+              Mostrar de nuevo en el sitio
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {onDelete && !isHidden ? (
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={onDelete}
+            className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
+          >
+            {deleteMode === "remove" ? "Eliminar tarjeta" : "Ocultar del catálogo"}
+          </button>
+          {deleteMode === "hide" ? (
+            <p className="text-xs text-slate-500">
+              Los cursos del catálogo base no se pueden borrar del sistema; solo
+              ocultar en la web. Las tarjetas que añades con «+ Añadir curso» sí
+              se pueden eliminar.
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
 }
 
-export function CursosCmsEditProvider({ children }: { children: ReactNode }) {
+export function CursosCmsEditProvider({
+  children,
+  embedded = false,
+}: {
+  children: ReactNode;
+  /** En home: lápices sin segunda barra de guardado (usa la de Inicio). */
+  embedded?: boolean;
+}) {
   const editMode = useCmsEditMode();
   if (editMode !== "1") return <>{children}</>;
-  return <CursosCmsEditInner>{children}</CursosCmsEditInner>;
+  return (
+    <CursosCmsEditInner embedded={embedded}>{children}</CursosCmsEditInner>
+  );
 }

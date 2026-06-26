@@ -10,18 +10,17 @@ import {
   Phone,
 } from "lucide-react";
 import {
+  type EditorialDondeContact,
   type EditorialSede,
   type EditorialSedeId,
   editorialMapsEmbedUrl,
   editorialMapsUrl,
-  editorialWhatsAppUrl,
+  editorialSedeWhatsAppUrl,
+  editorialTelHref,
 } from "@/lib/editorial-locations";
 import { useEditorialDonde } from "@/lib/cms/hooks";
 import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
 import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
-import { INFO_EMAIL } from "@/lib/site-config";
-
-const CONTACT_PHONE = "(849) 352-7054";
 
 function LazyMapEmbed({ sede }: { sede: EditorialSede }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -69,10 +68,14 @@ function LazyMapEmbed({ sede }: { sede: EditorialSede }) {
 
 function SedePanel({
   sede,
+  contact,
   onEdit,
+  onEditContact,
 }: {
   sede: EditorialSede;
+  contact: EditorialDondeContact;
   onEdit?: () => void;
+  onEditContact?: () => void;
 }) {
   return (
     <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-8">
@@ -93,7 +96,14 @@ function SedePanel({
           </p>
         ) : null}
 
-        <ul className="mt-5 space-y-3 text-sm text-na-muted">
+        <ul className="relative mt-5 space-y-3 text-sm text-na-muted">
+          {onEditContact ? (
+            <EditorialEditPencil
+              label="Editar teléfono, correo y WhatsApp"
+              onClick={onEditContact}
+              className="right-0 top-0"
+            />
+          ) : null}
           <li className="flex gap-3">
             <MapPin
               className="mt-0.5 h-4 w-4 shrink-0 text-na-heket"
@@ -116,19 +126,19 @@ function SedePanel({
           <li className="flex items-center gap-3">
             <Phone className="h-4 w-4 shrink-0 text-na-heket" aria-hidden />
             <a
-              href={`tel:${CONTACT_PHONE.replace(/\D/g, "")}`}
+              href={editorialTelHref(contact.phone)}
               className="font-semibold text-na-ink hover:text-na-heket"
             >
-              {CONTACT_PHONE}
+              {contact.phone}
             </a>
           </li>
           <li className="flex items-center gap-3">
             <Mail className="h-4 w-4 shrink-0 text-na-heket" aria-hidden />
             <a
-              href={`mailto:${INFO_EMAIL}`}
+              href={`mailto:${contact.email}`}
               className="font-semibold text-na-ink hover:text-na-heket"
             >
-              {INFO_EMAIL}
+              {contact.email}
             </a>
           </li>
         </ul>
@@ -146,15 +156,13 @@ function SedePanel({
             <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           </a>
           <a
-            href={editorialWhatsAppUrl(
-              `Hola, me interesa visitar la Librería Editorial Logos en ${sede.name}.`,
-            )}
+            href={editorialSedeWhatsAppUrl(sede.name, contact)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-na-heket px-4 py-2 text-xs font-bold text-white transition hover:opacity-90"
           >
             <MessageCircle className="h-3.5 w-3.5" aria-hidden />
-            Escribir por WhatsApp
+            {contact.whatsappCtaLabel}
           </a>
         </div>
       </div>
@@ -165,7 +173,7 @@ function SedePanel({
 }
 
 export function EditorialDondeEstamosSection() {
-  const { page, sedes } = useEditorialDonde();
+  const { page, contact, sedes } = useEditorialDonde();
   const edit = useEditorialCmsEdit();
   const [tab, setTab] = useState<EditorialSedeId>(sedes[0]?.id ?? "sede-naco");
   const sede = sedes.find((s) => s.id === tab) ?? sedes[0];
@@ -237,10 +245,14 @@ export function EditorialDondeEstamosSection() {
         >
           <SedePanel
             sede={sede}
+            contact={contact}
             onEdit={
               edit?.ready
                 ? () => edit.setSelectedId(`donde:sede:${sede.id}`)
                 : undefined
+            }
+            onEditContact={
+              edit?.ready ? () => edit.setSelectedId("donde:contact") : undefined
             }
           />
         </div>

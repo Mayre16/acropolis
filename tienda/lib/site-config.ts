@@ -49,6 +49,11 @@ export const STORE_CHECKOUT_PATH =
   process.env.NEXT_PUBLIC_STORE_CHECKOUT_PATH?.trim() ||
   "/api/checkout_create.php";
 
+/** Alta/actualización de listings — solo CMS API (servidor). Harmonía: `/api/store/listings/upsert`. */
+export const STORE_UPSERT_PATH =
+  process.env.NEXT_PUBLIC_STORE_UPSERT_PATH?.trim() ||
+  "/api/bookstore_upsert.php";
+
 /** WhatsApp para pedidos de libros (NA RD). */
 export const STORE_WHATSAPP_NUMBER = "18493527054";
 

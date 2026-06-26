@@ -130,7 +130,16 @@ export type CmsDiplomadoInscription = {
   rnc?: string;
   email?: string;
   footnote?: string;
+  /** Vacío = número de WhatsApp diplomado del pie de página (CMS global). */
+  inscribeWhatsappNumber?: string;
   inscribeWhatsApp?: string;
+};
+
+export type CmsDiplomadoImpactStat = {
+  id: string;
+  end: number;
+  suffix: string;
+  label: string;
 };
 
 export type CmsDiplomadoPage = {
@@ -140,6 +149,11 @@ export type CmsDiplomadoPage = {
   testimonialEyebrow?: string;
   testimonialQuote?: string;
   testimonialVideoUrl?: string;
+  impactHeadlineEnd?: number;
+  impactHeadlineSuffix?: string;
+  impactTitle?: string;
+  impactSubtitle?: string;
+  impactStats?: CmsDiplomadoImpactStat[];
 };
 
 export type CmsPageHeroText = {
@@ -209,6 +223,8 @@ export type CmsFilosofiaPage = CmsPageHeroText & {
   esParaTi?: CmsFilosofiaFaqItem[];
   ctaTitle?: string;
   ctaText?: string;
+  /** Vacío = número de WhatsApp diplomado del pie de página (CMS global). */
+  ctaWhatsappNumber?: string;
   ctaWhatsappMessage?: string;
   ctaButtonLabel?: string;
   ctaImageSrc?: string;
@@ -227,6 +243,10 @@ export type CmsCulturaCard = {
   sede?: string;
   /** Enlace interno (ej. crónica en /eventos/…). */
   href?: string;
+  /** Vacío = número de WhatsApp cursos del pie de página. */
+  inscribeWhatsappNumber?: string;
+  /** Vacío = mensaje automático según título y sede. */
+  inscribeWhatsappMessage?: string;
 };
 
 export type CmsCirculoAmigosPromo = {
@@ -292,6 +312,12 @@ export type CmsPersonaBlock = {
   photo?: string;
 };
 
+export type CmsOinaStat = {
+  id: string;
+  value: string;
+  label: string;
+};
+
 export type CmsQuienesSomosPage = CmsPageHeroText & {
   introParagraphs?: string[];
   presidenciaEyebrow?: string;
@@ -300,6 +326,15 @@ export type CmsQuienesSomosPage = CmsPageHeroText & {
   personas?: CmsPersonaBlock[];
   directorNacional?: CmsPersonaBlock;
   directoresAnteriores?: CmsPersonaBlock[];
+  oinaCifrasEyebrow?: string;
+  oinaCifrasIntro?: string;
+  oinaStats?: CmsOinaStat[];
+  perfilInstitucionalEyebrow?: string;
+  perfilInstitucionalTitle?: string;
+  perfilInstitucionalLede?: string;
+  perfilInstitucionalNote?: string;
+  perfilInstitucionalHref?: string;
+  perfilInstitucionalButtonLabel?: string;
 };
 
 export type CmsRelacionesPage = CmsPageHeroText & {
@@ -315,6 +350,9 @@ export type CmsRelacionesPage = CmsPageHeroText & {
   rdItems?: { id: string; text: string }[];
   ctaTitle?: string;
   ctaText?: string;
+  ctaButtonLabel?: string;
+  ctaWhatsappNumber?: string;
+  ctaWhatsappMessage?: string;
 };
 
 export type CmsCollaborateTabId = "donar" | "voluntario" | "alianzas";
@@ -442,7 +480,7 @@ export type CmsEsferaGallerySlide = {
   poster?: string;
 };
 
-/** Tarjeta de foto o video en bloques opcionales por página. */
+/** Tarjeta de foto o video (legacy / ítems de galería). */
 export type CmsPageMediaCard = {
   id: string;
   kind: "image" | "video";
@@ -454,6 +492,88 @@ export type CmsPageMediaCard = {
   linkHref?: string;
   linkLabel?: string;
 };
+
+export type CmsPageMediaBlockWidth = "normal" | "full";
+
+export type CmsPageMediaTextBlock = {
+  id: string;
+  kind: "text";
+  width?: CmsPageMediaBlockWidth;
+  heading?: string;
+  /** Párrafos separados; cada línea del textarea = un párrafo. */
+  paragraphs: string[];
+};
+
+export type CmsPageMediaMediaLayout = "card" | "voluntariado" | "overlay";
+
+export type CmsPageMediaMediaBlock = {
+  id: string;
+  kind: "media";
+  width?: CmsPageMediaBlockWidth;
+  layout?: CmsPageMediaMediaLayout;
+  imageKind: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  area?: string;
+  title?: string;
+  caption?: string;
+  body?: string;
+  linkHref?: string;
+  linkLabel?: string;
+  /** Con ancho columna: izquierda o centrado (útil si solo hay foto/video). */
+  align?: "left" | "center";
+};
+
+export type CmsPageMediaGalleryDisplay = "grid" | "carousel";
+
+export type CmsPageMediaGalleryBlock = {
+  id: string;
+  kind: "gallery";
+  width?: CmsPageMediaBlockWidth;
+  /** Cuadrícula de fotos o carrusel con texto al lado. */
+  display?: CmsPageMediaGalleryDisplay;
+  columns?: 2 | 3;
+  layout?: "card" | "overlay";
+  /** Carrusel — título junto a las fotos. */
+  carouselTitle?: string;
+  /** Carrusel — texto introductorio. */
+  carouselText?: string;
+  /** Carrusel — lado del mensaje (fotos al otro lado). */
+  carouselSide?: "left" | "right";
+  /** Con ancho columna: izquierda o centrado. */
+  align?: "left" | "center";
+  items: CmsPageMediaCard[];
+};
+
+export type CmsPageMediaButtonVariant = "primary" | "outline" | "whatsapp";
+
+export type CmsPageMediaButtonLinkKind = "url" | "whatsapp" | "internal";
+
+export type CmsPageMediaButtonBlock = {
+  id: string;
+  kind: "button";
+  width?: CmsPageMediaBlockWidth;
+  align?: "left" | "center";
+  label: string;
+  linkKind: CmsPageMediaButtonLinkKind;
+  href?: string;
+  whatsappPhone?: string;
+  whatsappMessage?: string;
+  variant?: CmsPageMediaButtonVariant;
+};
+
+export type CmsPageMediaBlockKind =
+  | "text"
+  | "media"
+  | "gallery"
+  | "button";
+
+export type CmsPageMediaBlock =
+  | CmsPageMediaTextBlock
+  | CmsPageMediaMediaBlock
+  | CmsPageMediaGalleryBlock
+  | CmsPageMediaButtonBlock;
 
 export type CmsPageMediaTarget =
   | "home"
@@ -467,7 +587,8 @@ export type CmsPageMediaTarget =
   | "articulos"
   | "viajes"
   | "quienes-somos"
-  | "relaciones";
+  | "relaciones"
+  | "donde-estamos";
 
 export type CmsPageMediaSection = {
   id: string;
@@ -475,7 +596,10 @@ export type CmsPageMediaSection = {
   eyebrow?: string;
   title?: string;
   intro?: string;
-  cards: CmsPageMediaCard[];
+  /** Bloques ordenados (texto, media, galería, botón). */
+  blocks?: CmsPageMediaBlock[];
+  /** @deprecated Migrado automáticamente a `blocks`. */
+  cards?: CmsPageMediaCard[];
 };
 
 export type CmsEsferaBeneficio = {
@@ -622,10 +746,19 @@ export type CmsCursosCard = {
   accessLabel?: string;
   inscribeKind?: "curso" | "taller" | "actividad" | "conferencia";
   inscribeLabel?: string;
+  /** Vacío = número de WhatsApp cursos del pie de página. */
+  inscribeWhatsappNumber?: string;
+  /** Vacío = mensaje automático según título, tipo y sede. */
+  inscribeWhatsappMessage?: string;
   /** Texto visible, ej. «Apertura: 15 de marzo» o «Temporada 2026». */
   fechaApertura?: string;
   /** Fecha ISO opcional (YYYY-MM-DD) para ordenar o filtrar. */
   fechaAperturaIso?: string;
+  /**
+   * Sección en /cursos: activos (horario fijo) u otros (por temporada).
+   * Sin valor = ubicación automática según el catálogo base.
+   */
+  activo?: boolean;
 };
 
 export type CmsCursosPage = CmsPageHeroText & {
@@ -634,6 +767,11 @@ export type CmsCursosPage = CmsPageHeroText & {
   ofertaEyebrow?: string;
   ofertaCursosIntro?: string;
   ofertaConferenciasIntro?: string;
+  inscribeTitle?: string;
+  inscribeText?: string;
+  inscribeCtaLabel?: string;
+  inscribeWhatsappNumber?: string;
+  inscribeWhatsappMessage?: string;
   cursosTalleres?: CmsCursosCard[];
   conferencias?: CmsCursosCard[];
   cursosTalleresHidden?: string[];
@@ -700,6 +838,7 @@ export type CmsVenue = {
   note?: string;
   mapX?: number;
   mapY?: number;
+  mapHideLabel?: boolean;
 };
 
 export type CmsVenuesContact = {
@@ -708,6 +847,9 @@ export type CmsVenuesContact = {
   phone?: string;
   email?: string;
   ctaLabel?: string;
+  /** Número del botón WhatsApp (solo dígitos o con formato). Vacío = teléfono mostrado arriba. */
+  whatsappNumber?: string;
+  whatsappMessage?: string;
 };
 
 export type CmsSiteFooter = {

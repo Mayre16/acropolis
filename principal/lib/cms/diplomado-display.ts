@@ -1,53 +1,14 @@
 "use client";
 
 import { useFilosofiaCmsEdit } from "@/components/filosofia/cms/FilosofiaCmsEditContext";
+import { DIPLOMADO_HERO_BADGE, DIPLOMADO_INFO_BANNER } from "@/lib/diplomado-content";
 import {
-  DIPLOMADO_HERO_BADGE,
-  DIPLOMADO_INFO_BANNER,
-  DIPLOMADO_INSCRIBE_WHATSAPP,
-  DIPLOMADO_INSCRIPTION,
-  DIPLOMADO_TESTIMONIAL,
-} from "@/lib/diplomado-content";
+  mergeDiplomadoInscription,
+  mergeDiplomadoPage,
+} from "@/lib/cms/diplomado-page-edit";
 import { useCmsDiplomadoBadge, useCmsDiplomadoInfo } from "@/lib/cms/hooks";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
-import type {
-  CmsDiplomadoHero,
-  CmsDiplomadoInscription,
-  CmsDiplomadoPage,
-} from "@/lib/cms/types";
-
-const DEFAULT_DIPLOMADO_PAGE: CmsDiplomadoPage = {
-  heroLede:
-    "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
-  otrasSesionesTitle: "Cupos disponibles",
-  otrasSesionesIntro: "",
-  testimonialEyebrow: DIPLOMADO_TESTIMONIAL.eyebrow,
-  testimonialQuote: DIPLOMADO_TESTIMONIAL.quote,
-  testimonialVideoUrl: DIPLOMADO_TESTIMONIAL.videoUrl,
-};
-
-function mergeInscription(patch?: CmsDiplomadoInscription | null) {
-  return {
-    eyebrow: patch?.eyebrow ?? DIPLOMADO_INSCRIPTION.eyebrow,
-    title: patch?.title ?? DIPLOMADO_INSCRIPTION.title,
-    intro: patch?.intro ?? DIPLOMADO_INSCRIPTION.intro,
-    capacityNote: patch?.capacityNote ?? DIPLOMADO_INSCRIPTION.capacityNote,
-    feeMain: patch?.feeMain ?? DIPLOMADO_INSCRIPTION.feeMain,
-    feeNote: patch?.feeNote ?? DIPLOMADO_INSCRIPTION.feeNote,
-    paymentNote: patch?.paymentNote ?? DIPLOMADO_INSCRIPTION.paymentNote,
-    accountLabel: patch?.accountLabel ?? DIPLOMADO_INSCRIPTION.accountLabel,
-    account: patch?.account ?? DIPLOMADO_INSCRIPTION.account,
-    rncLabel: patch?.rncLabel ?? DIPLOMADO_INSCRIPTION.rncLabel,
-    rnc: patch?.rnc ?? DIPLOMADO_INSCRIPTION.rnc,
-    email: patch?.email ?? DIPLOMADO_INSCRIPTION.email,
-    footnote: patch?.footnote ?? DIPLOMADO_INSCRIPTION.footnote,
-    inscribeWhatsApp: patch?.inscribeWhatsApp ?? DIPLOMADO_INSCRIBE_WHATSAPP,
-  };
-}
-
-function mergeDiplomadoPage(patch?: CmsDiplomadoPage | null): CmsDiplomadoPage {
-  return { ...DEFAULT_DIPLOMADO_PAGE, ...patch };
-}
+import type { CmsDiplomadoHero } from "@/lib/cms/types";
 
 function badgeFromHero(h: CmsDiplomadoHero) {
   return {
@@ -99,11 +60,11 @@ export function useDiplomadoInscriptionDisplay() {
   const edit = useFilosofiaCmsEdit();
   const cms = useCmsDocument();
 
-  if (edit?.ready) return mergeInscription(edit.diplomadoInscription);
+  if (edit?.ready) return mergeDiplomadoInscription(edit.diplomadoInscription);
   if (isCmsEnabled() && cms?.sections.diplomadoInscription) {
-    return mergeInscription(cms.sections.diplomadoInscription);
+    return mergeDiplomadoInscription(cms.sections.diplomadoInscription);
   }
-  return mergeInscription();
+  return mergeDiplomadoInscription();
 }
 
 export function useDiplomadoPageDisplay() {
@@ -116,3 +77,5 @@ export function useDiplomadoPageDisplay() {
   }
   return mergeDiplomadoPage();
 }
+
+export { mergeDiplomadoPage, DEFAULT_DIPLOMADO_PAGE } from "@/lib/cms/diplomado-page-edit";

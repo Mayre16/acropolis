@@ -258,7 +258,7 @@ export function SalonesAlquiler({
     return (
       <div
         id={id}
-        className={`py-14 sm:py-16 ${variant === "civis" ? "scroll-mt-28 bg-na-civis/[0.04]" : ""}`}
+        className={`py-14 sm:py-16 ${variant === "civis" ? "scroll-mt-28 border-b border-na-civis/10 bg-na-surface" : ""}`}
       >
         {inner}
       </div>

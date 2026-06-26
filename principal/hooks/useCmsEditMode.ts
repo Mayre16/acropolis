@@ -21,8 +21,11 @@ function resolveEditMode(param: CmsEditMode | null): CmsEditMode | null {
 
 export function useCmsEditMode(): CmsEditMode | null {
   const params = useSearchParams();
-  const param = parseCmsEditParam(params.get("cmsEdit"));
-  const [mode, setMode] = useState<CmsEditMode | null>(param);
+  const urlParam = parseCmsEditParam(params.get("cmsEdit"));
+  const [mode, setMode] = useState<CmsEditMode | null>(() => {
+    if (typeof window === "undefined") return urlParam;
+    return resolveEditMode(urlParam);
+  });
 
   useLayoutEffect(() => {
     const next = resolveEditMode(parseCmsEditParam(params.get("cmsEdit")));

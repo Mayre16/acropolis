@@ -1,4 +1,4 @@
-import { NA_INTRO_PARAGRAPHS } from "@/lib/institucional-content";
+import { NA_INTRO_PARAGRAPHS, PERFIL_INSTITUCIONAL_OINADOM } from "@/lib/institucional-content";
 import type {
   CmsPersonaBlock,
   CmsQuienesSomosPage,
@@ -63,7 +63,26 @@ export const DEFAULT_QUIENES_SOMOS_PAGE: CmsQuienesSomosPage = {
       photo: "/img/quienes-somos/maria-eugenia.webp",
     },
   ],
+  oinaCifrasEyebrow: "OINA en cifras",
+  oinaCifrasIntro:
+    "Una red mundial con una misma Carta Fundacional. Nueva Acrópolis República Dominicana forma parte de NA Internacional.",
+  oinaStats: [
+    { id: "o1", value: "1957", label: "Fundación en Buenos Aires" },
+    { id: "o2", value: "1998", label: "Fundación en República Dominicana" },
+    { id: "o3", value: "+50 países", label: "Presencia internacional" },
+    { id: "o4", value: "~500 sedes", label: "En todo el mundo" },
+    { id: "o5", value: "Bruselas", label: "Sede internacional (OINA)" },
+  ],
+  perfilInstitucionalEyebrow: "Institucional",
+  perfilInstitucionalTitle: PERFIL_INSTITUCIONAL_OINADOM.title,
+  perfilInstitucionalLede: PERFIL_INSTITUCIONAL_OINADOM.lede,
+  perfilInstitucionalNote: PERFIL_INSTITUCIONAL_OINADOM.note,
+  perfilInstitucionalHref: PERFIL_INSTITUCIONAL_OINADOM.href,
+  perfilInstitucionalButtonLabel: "Descargar perfil institucional (PDF)",
 };
+
+export const OINA_CIFRAS_SECTION_ID = "__oinaCifras__";
+export const PERFIL_INSTITUCIONAL_SECTION_ID = "__perfilInstitucional__";
 
 export const DEFAULT_RELACIONES_PAGE: CmsRelacionesPage = {
   heroEyebrow: "Institucional",
@@ -131,6 +150,10 @@ export const DEFAULT_RELACIONES_PAGE: CmsRelacionesPage = {
   ctaTitle: "¿Tu institución quiere colaborar?",
   ctaText:
     "Si representas a una institución, empresa u organización y deseas construir una alianza con nosotros, conversemos.",
+  ctaButtonLabel: "Proponer una alianza",
+  ctaWhatsappNumber: "",
+  ctaWhatsappMessage:
+    "Hola, represento a una institución y me gustaría explorar una alianza con Nueva Acrópolis RD.",
 };
 
 export function mergeQuienesSomosPage(
@@ -160,6 +183,11 @@ export function mergeQuienesSomosPage(
     directoresAnteriores: mergePersonas(
       DEFAULT_QUIENES_SOMOS_PAGE.directoresAnteriores ?? [],
       overrides.directoresAnteriores,
+    ),
+    oinaStats: mergeById(
+      DEFAULT_QUIENES_SOMOS_PAGE.oinaStats ?? [],
+      overrides.oinaStats,
+      "id",
     ),
   };
 }

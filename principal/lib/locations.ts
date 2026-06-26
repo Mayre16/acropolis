@@ -19,6 +19,8 @@ export type VenueLocation = {  id: string;
   note?: string;
   mapX?: number;
   mapY?: number;
+  /** Si true, el pin en el mapa del sitio no muestra el nombre de la ciudad. */
+  mapHideLabel?: boolean;
 };
 
 export const CONTACT_EMAIL = INFO_EMAIL;

@@ -20,6 +20,13 @@ export function parseCmsEditParam(
   return value === "1" ? value : null;
 }
 
+export function resolveEditModeForPath(
+  mode: CmsEditMode,
+  _pathname: string,
+): CmsEditMode {
+  return mode;
+}
+
 export function isInEditorIframe() {
   if (typeof window === "undefined") return false;
   return window.parent !== window.self;

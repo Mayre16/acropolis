@@ -240,6 +240,7 @@ export const FILOSOFIA_ES_PARA_TI_DEFAULTS = {
 export const FILOSOFIA_CTA_DEFAULTS = {
   title: "Información e inscripción",
   text: "Escríbenos por WhatsApp para conocer fechas, horarios y el proceso de inscripción.",
+  whatsappNumber: "",
   whatsappMessage:
     "Hola, me interesa el Diplomado de Filosofía para la Vida. ¿Me dan información de fechas e inscripción?",
   buttonLabel: "Quiero inscribirme",

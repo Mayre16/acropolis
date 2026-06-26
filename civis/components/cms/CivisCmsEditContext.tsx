@@ -212,15 +212,20 @@ function CivisCmsEditInner({ children }: { children: ReactNode }) {
       const next = buildCivisDoc(latest, state);
       await saveCmsDraft("civis", token, next);
       const publishResult = await publishCms("civis", token);
+      const refreshed = await fetchCmsDraft("civis");
+      applyLoaded(refreshed);
       setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
+      const msg = publishResult.message ?? "Publicado.";
+      setStatus(msg);
+      postToEditor({ type: "cms-status", text: msg, ok: true });
+      postToEditor({ type: "cms-dirty", dirty: false });
+    } catch (e) {
       setStatus(String(e));
       postToEditor({ type: "cms-status", text: String(e), ok: false });
     } finally {
       setBusy(false);
     }
-  }, [token, baseDoc, state]);
+  }, [token, baseDoc, state, applyLoaded]);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {

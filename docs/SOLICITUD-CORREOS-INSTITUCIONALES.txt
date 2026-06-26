@@ -1,0 +1,115 @@
+================================================================================
+  SOLICITUD DE CORREOS — Nueva Acrópolis RD (OINADOM)
+================================================================================
+
+Para:   Administración de correo / hosting
+De:     _______________________________________
+Fecha:  _______________________________________
+
+Estimados/as:
+
+Necesitamos crear o activar los correos que usa nuestro sitio web y los
+formularios (editor.acropolis.org.do). Sin ellos, las consultas de la web no
+llegan al equipo correcto.
+
+Por favor indicar: buzón propio o reenvío a _______________________________
+
+
+--------------------------------------------------------------------------------
+A. CORREOS QUE NECESITAMOS YA (el sitio los usa hoy)
+--------------------------------------------------------------------------------
+
+  Correo                                    Para qué
+  ----------------------------------------  ----------------------------------
+  no-reply@acropolis.org                    Envío automático de formularios
+  smtp_user@acropolis.org                   Cuenta técnica SMTP (CMS)
+  info.oinadom@acropolis.org                Info general, legal, diplomado, sedes
+  cursos.oinadom@acropolis.org              Cursos, talleres, alquiler de salones
+  voluntariado.humanitario-RD@acropolis.org Voluntariado y Esfera (hoy mezclados)
+  civis@acropolis.org                       Civis Consulting — propuestas comerciales
+  Santiago.a@acropolis.org                  Copia interna Esfera (no es público)
+
+  Servidor SMTP: mail.acropolis.org  ·  Puerto: 465 o 587
+  CMS / formularios: editor.acropolis.org.do
+
+
+--------------------------------------------------------------------------------
+B. MODELO RECOMENDADO (más claro — pedimos crear estos)
+--------------------------------------------------------------------------------
+
+  Correo                          Recibe
+  ------------------------------  --------------------------------------------
+  info.oinadom@acropolis.org      Secretaría, sedes, legal, diplomado
+  cursos.oinadom@acropolis.org    Cursos y talleres (Escuela), salones
+  cultura.oinadom@acropolis.org   Toda la página de Cultura: viajes, excursiones,
+                                  eventos y consultas de esa sección
+                                  (alternativa más estrecha: viajes.oinadom@…
+                                  solo para viajes/excursiones)
+  voluntariado.oinadom@…          Todo el voluntariado — humanitario y no
+                                  humanitario — EXCEPTO Esfera
+  esfera.oinadom@acropolis.org    Solo Punto Focal Esfera: talleres, donaciones,
+                                  alianzas, contacto /esfera
+  civis@acropolis.org             Propuestas Civis (/inscribete)
+  editorial@acropolis.org         Editorial Logos — tienda, pedidos, contacto
+  biblioteca@acropolis.org        Biblioteca Sophia — préstamos, catálogo, consultas
+
+  WhatsApp opcional para Cultura/viajes: línea o flota propia (distinta de
+  cursos 849-517-4144 y diplomado 849-352-7054), si el equipo lo desea.
+
+
+--------------------------------------------------------------------------------
+C. QUÉ VA A CADA CORREO (resumen)
+--------------------------------------------------------------------------------
+
+  Página / formulario                         Correo recomendado
+  ------------------------------------------  ---------------------------
+  /cultura (viajes, excursiones, consultas)   cultura.oinadom@…
+  Cursos y talleres                           cursos.oinadom@…
+  Alquiler de salones                         cursos.oinadom@…
+  Quiero ser voluntario/a (sin Esfera)        voluntariado.oinadom@…
+  Donaciones humanitarias (sin Esfera)        voluntariado.oinadom@…
+  Esfera — taller, donar, alianzas, info      esfera.oinadom@…
+  Civis — inscripción / propuesta             civis@acropolis.org
+  Diplomado, Círculo de Amigos, legal         info.oinadom@…
+  Editorial Logos (tienda)                    editorial@acropolis.org
+  Biblioteca Sophia                           biblioteca@acropolis.org
+
+
+--------------------------------------------------------------------------------
+D. NO USAR
+--------------------------------------------------------------------------------
+
+  oinadom@nuevaacropolis.org.do       — no existe
+  amigos_dominicana@acropolis.org     — obsoleto
+  mail.acropolis.org.do               — usar mail.acropolis.org
+  voluntariado.humanitario-RD@…       — sustituir por voluntariado.oinadom@…
+                                        (mantener como reenvío temporal si hace falta)
+
+
+--------------------------------------------------------------------------------
+E. CHECKLIST PARA EL TICKET (copiar y pegar)
+--------------------------------------------------------------------------------
+
+  [ ] no-reply@acropolis.org
+  [ ] smtp_user@acropolis.org
+  [ ] info.oinadom@acropolis.org
+  [ ] cursos.oinadom@acropolis.org
+  [ ] cultura.oinadom@acropolis.org
+  [ ] voluntariado.oinadom@acropolis.org
+  [ ] esfera.oinadom@acropolis.org
+  [ ] civis@acropolis.org
+  [ ] editorial@acropolis.org
+  [ ] biblioteca@acropolis.org
+
+  Reenvío temporal del correo viejo:
+  [ ] voluntariado.humanitario-RD@… → voluntariado.oinadom@… o esfera.oinadom@…
+
+  Confirmar SMTP: mail.acropolis.org (servidor, puerto, usuario, contraseña)
+  para editor.acropolis.org.do
+
+  Cuando estén listos, avisarnos para actualizar los formularios en la web.
+
+
+================================================================================
+Nueva Acrópolis RD — acropolis.org.do
+================================================================================

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { useCmsEditorEmbedded } from "@/hooks/useCmsEditorEmbedded";
 import { usePathname } from "next/navigation";
@@ -21,14 +22,10 @@ import {
 } from "@/lib/cms/agenda-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import type {
   CmsAgendaEntry,
@@ -43,8 +40,11 @@ import type {
 import {
   DIPLOMADO_INSCRIBE_WHATSAPP,
   DIPLOMADO_INSCRIPTION,
-  DIPLOMADO_TESTIMONIAL,
 } from "@/lib/diplomado-content";
+import {
+  DEFAULT_DIPLOMADO_PAGE,
+  mergeDiplomadoPage,
+} from "@/lib/cms/diplomado-page-edit";
 import { DEFAULT_FILOSOFIA_PAGE_BODY } from "@/lib/filosofia-content";
 import {
   mergeFilosofiaCards,
@@ -81,7 +81,7 @@ export type FilosofiaEditSection =
   | "badge"
   | "inscripcion"
   | "sesiones"
-  | "otras";
+  | "impact";
 
 type FilosofiaCmsEditContextValue = {
   ready: boolean;
@@ -146,16 +146,6 @@ const DEFAULT_FILOSOFIA_PAGE: FilosofiaPageContent = {
   sesionesIntro:
     "Algunas de nuestras próximas clases, charlas y encuentros en las distintas sedes.",
   ...DEFAULT_FILOSOFIA_PAGE_BODY,
-};
-
-const DEFAULT_DIPLOMADO_PAGE: CmsDiplomadoPage = {
-  heroLede:
-    "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
-  otrasSesionesTitle: "Cupos disponibles",
-  otrasSesionesIntro: "",
-  testimonialEyebrow: DIPLOMADO_TESTIMONIAL.eyebrow,
-  testimonialQuote: DIPLOMADO_TESTIMONIAL.quote,
-  testimonialVideoUrl: DIPLOMADO_TESTIMONIAL.videoUrl,
 };
 
 const DEFAULT_DIPLOMADO_INSCRIPTION: CmsDiplomadoInscription = {
@@ -244,10 +234,9 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
       ...DEFAULT_DIPLOMADO_INSCRIPTION,
       ...draft.sections.diplomadoInscription,
     });
-    setDiplomadoPage({
-      ...DEFAULT_DIPLOMADO_PAGE,
-      ...draft.sections.diplomadoPage,
-    });
+    setDiplomadoPage(
+      mergeDiplomadoPage(draft.sections.diplomadoPage),
+    );
     const { diplomado, otras } = splitAgenda(draft);
     setDiplomadoAgenda(diplomado);
     setOtrasAgenda(otras);
@@ -299,32 +288,8 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, doc, getBuiltDoc]);
 
   const publish = useCallback(async () => {
-    if (!token || !doc) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    const next = getBuiltDoc();
-    if (!next) return;
-    try {
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDoc(next);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, doc, getBuiltDoc]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -338,18 +303,7 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchFilosofiaPage = useCallback(
     (patch: Partial<FilosofiaPageContent>) => {
@@ -414,7 +368,7 @@ function FilosofiaCmsEditInner({ children }: { children: ReactNode }) {
 
   const patchDiplomadoPage = useCallback(
     (patch: Partial<CmsDiplomadoPage>) => {
-      setDiplomadoPage((p) => ({ ...p, ...patch }));
+      setDiplomadoPage((p) => mergeDiplomadoPage({ ...p, ...patch }));
       markDirty();
     },
     [markDirty],
@@ -603,12 +557,12 @@ const FILOSOFIA_SECTIONS: { id: FilosofiaEditSection; label: string; anchor: str
   { id: "cta", label: "Inscripción", anchor: "inscripcion-cta" },
   { id: "badge", label: "Badge diplomado", anchor: "filosofia-badge" },
   { id: "sesiones", label: "Sesiones diplomado", anchor: "proximas-sesiones" },
-  { id: "otras", label: "Otras actividades (home)", anchor: "otras-actividades" },
 ];
 
 const DIPLOMADO_SECTIONS: { id: FilosofiaEditSection; label: string; anchor: string }[] = [
   { id: "intro", label: "Texto hero", anchor: "diplomado-hero-copy" },
   { id: "badge", label: "Badge y fechas", anchor: "diplomado-hero" },
+  { id: "impact", label: "Cifras e impacto", anchor: "diplomado-impact" },
   { id: "inscripcion", label: "Inscripción", anchor: "inscripcion" },
   { id: "sesiones", label: "Cupos disponibles", anchor: "otras-sesiones" },
 ];
@@ -721,12 +675,10 @@ function FilosofiaEditPanels() {
           {ctx.activeSection === "cta" ? <FilosofiaCtaPanel /> : null}
           {ctx.activeSection === "intro" ? <DiplomadoIntroPanel /> : null}
           {ctx.activeSection === "badge" ? <BadgePanel /> : null}
+          {ctx.activeSection === "impact" ? <DiplomadoImpactPanel /> : null}
           {ctx.activeSection === "inscripcion" ? <InscriptionPanel /> : null}
           {ctx.activeSection === "sesiones" ? (
-            <AgendaPanel mode="diplomado" />
-          ) : null}
-          {ctx.activeSection === "otras" ? (
-            <AgendaPanel mode="otras" />
+            <AgendaPanel />
           ) : null}
         </div>
         <PanelFooter onClose={() => ctx.setActiveSection(null)} />
@@ -908,6 +860,16 @@ function DiplomadoIntroPanel() {
         onChange={(v) => ctx.patchDiplomadoInscription({ inscribeWhatsApp: v })}
         multiline
       />
+      <EditField
+        label="Número WhatsApp del botón"
+        value={ins.inscribeWhatsappNumber ?? ""}
+        onChange={(v) =>
+          ctx.patchDiplomadoInscription({ inscribeWhatsappNumber: v })
+        }
+      />
+      <p className="-mt-2 text-xs text-slate-500">
+        Vacío = número de WhatsApp diplomado del pie de página (CMS global).
+      </p>
       <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
         Tarjeta de testimonio (video)
       </p>
@@ -927,6 +889,95 @@ function DiplomadoIntroPanel() {
         value={p.testimonialVideoUrl ?? ""}
         onChange={(v) => ctx.patchDiplomadoPage({ testimonialVideoUrl: v })}
       />
+    </div>
+  );
+}
+
+function DiplomadoImpactPanel() {
+  const ctx = useFilosofiaCmsEditRequired();
+  const p = mergeDiplomadoPage(ctx.diplomadoPage);
+  const stats = p.impactStats ?? [];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-slate-600">
+        Cifras del bloque verde con mapa mundial (500.000+, escuelas, países, años
+        en RD).
+      </p>
+      <EditField
+        label="Cifra principal (número)"
+        value={String(p.impactHeadlineEnd ?? "")}
+        onChange={(v) => {
+          const n = parseInt(v.replace(/\D/g, ""), 10);
+          if (!Number.isNaN(n)) {
+            ctx.patchDiplomadoPage({ impactHeadlineEnd: n });
+          }
+        }}
+      />
+      <EditField
+        label="Sufijo cifra principal (ej. +)"
+        value={p.impactHeadlineSuffix ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ impactHeadlineSuffix: v })}
+      />
+      <EditField
+        label="Título bajo la cifra principal"
+        value={p.impactTitle ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ impactTitle: v })}
+        multiline
+      />
+      <EditField
+        label="Subtítulo"
+        value={p.impactSubtitle ?? ""}
+        onChange={(v) => ctx.patchDiplomadoPage({ impactSubtitle: v })}
+        multiline
+      />
+      {stats.map((s, i) => (
+        <div
+          key={s.id}
+          className="space-y-2 rounded-lg border border-slate-200 p-3"
+        >
+          <p className="text-xs font-bold uppercase text-slate-500">
+            Cifra {i + 1}
+          </p>
+          <EditField
+            label="Número"
+            value={String(s.end)}
+            onChange={(v) => {
+              const n = parseInt(v.replace(/\D/g, ""), 10);
+              if (!Number.isNaN(n)) {
+                ctx.patchDiplomadoPage({
+                  impactStats: stats.map((st) =>
+                    st.id === s.id ? { ...st, end: n } : st,
+                  ),
+                });
+              }
+            }}
+          />
+          <EditField
+            label="Sufijo (ej. +, « años»)"
+            value={s.suffix}
+            onChange={(v) =>
+              ctx.patchDiplomadoPage({
+                impactStats: stats.map((st) =>
+                  st.id === s.id ? { ...st, suffix: v } : st,
+                ),
+              })
+            }
+          />
+          <EditField
+            label="Descripción"
+            value={s.label}
+            onChange={(v) =>
+              ctx.patchDiplomadoPage({
+                impactStats: stats.map((st) =>
+                  st.id === s.id ? { ...st, label: v } : st,
+                ),
+              })
+            }
+            multiline
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -962,6 +1013,16 @@ function InscriptionPanel() {
         multiline
       />
       <EditField
+        label="Número WhatsApp del botón"
+        value={ins.inscribeWhatsappNumber ?? ""}
+        onChange={(v) =>
+          ctx.patchDiplomadoInscription({ inscribeWhatsappNumber: v })
+        }
+      />
+      <p className="-mt-2 text-xs text-slate-500">
+        Vacío = número de WhatsApp diplomado del pie de página (CMS global).
+      </p>
+      <EditField
         label="Mensaje WhatsApp"
         value={ins.inscribeWhatsApp ?? ""}
         onChange={(v) => ctx.patchDiplomadoInscription({ inscribeWhatsApp: v })}
@@ -971,72 +1032,64 @@ function InscriptionPanel() {
   );
 }
 
-function AgendaPanel({ mode }: { mode: "diplomado" | "otras" }) {
+function AgendaPanel() {
   const ctx = useFilosofiaCmsEditRequired();
   const pathname = usePathname();
   const onDiplomado = pathname.startsWith("/diplomado");
-  const list = mode === "diplomado" ? ctx.diplomadoAgenda : ctx.otrasAgenda;
+  const list = ctx.diplomadoAgenda;
   const selected = list.find((e) => e.id === ctx.selectedAgendaId);
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600">
-        {mode === "diplomado"
-          ? "Sesiones del Diplomado en esta página y en Filosofía."
-          : "Conferencias, cursos y talleres que rotan en el carrusel del home."}
+        Sesiones del Diplomado en esta página y en Filosofía.
       </p>
-      {mode === "diplomado" ? (
-        <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50/60 p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-amber-900">
-            {onDiplomado
-              ? "Título del bloque «Cupos disponibles»"
-              : "Título del bloque «Próximas sesiones»"}
-          </p>
-          {onDiplomado ? (
-            <>
-              <EditField
-                label="Título de la sección"
-                value={ctx.diplomadoPage.otrasSesionesTitle ?? ""}
-                onChange={(v) =>
-                  ctx.patchDiplomadoPage({ otrasSesionesTitle: v })
-                }
-              />
-              <EditField
-                label="Texto introductorio (h3)"
-                value={ctx.diplomadoPage.otrasSesionesIntro ?? ""}
-                onChange={(v) =>
-                  ctx.patchDiplomadoPage({ otrasSesionesIntro: v })
-                }
-                multiline
-              />
-            </>
-          ) : (
-            <>
-              <EditField
-                label="Título de la sección"
-                value={ctx.filosofiaPage.sesionesTitle ?? ""}
-                onChange={(v) => ctx.patchFilosofiaPage({ sesionesTitle: v })}
-              />
-              <EditField
-                label="Texto introductorio de la sección"
-                value={ctx.filosofiaPage.sesionesIntro ?? ""}
-                onChange={(v) => ctx.patchFilosofiaPage({ sesionesIntro: v })}
-                multiline
-              />
-            </>
-          )}
-        </div>
-      ) : null}
+      <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50/60 p-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-amber-900">
+          {onDiplomado
+            ? "Título del bloque «Cupos disponibles»"
+            : "Título del bloque «Próximas sesiones»"}
+        </p>
+        {onDiplomado ? (
+          <>
+            <EditField
+              label="Título de la sección"
+              value={ctx.diplomadoPage.otrasSesionesTitle ?? ""}
+              onChange={(v) =>
+                ctx.patchDiplomadoPage({ otrasSesionesTitle: v })
+              }
+            />
+            <EditField
+              label="Texto introductorio (h3)"
+              value={ctx.diplomadoPage.otrasSesionesIntro ?? ""}
+              onChange={(v) =>
+                ctx.patchDiplomadoPage({ otrasSesionesIntro: v })
+              }
+              multiline
+            />
+          </>
+        ) : (
+          <>
+            <EditField
+              label="Título de la sección"
+              value={ctx.filosofiaPage.sesionesTitle ?? ""}
+              onChange={(v) => ctx.patchFilosofiaPage({ sesionesTitle: v })}
+            />
+            <EditField
+              label="Texto introductorio de la sección"
+              value={ctx.filosofiaPage.sesionesIntro ?? ""}
+              onChange={(v) => ctx.patchFilosofiaPage({ sesionesIntro: v })}
+              multiline
+            />
+          </>
+        )}
+      </div>
       <button
         type="button"
-        onClick={() =>
-          ctx.addAgendaEntry(
-            mode === "diplomado" ? "diplomado" : "conferencia",
-          )
-        }
+        onClick={() => ctx.addAgendaEntry("diplomado")}
         className="w-full rounded-lg border-2 border-dashed border-amber-400 py-2 text-sm font-semibold text-amber-800"
       >
-        + Añadir {mode === "diplomado" ? "sesión" : "actividad"}
+        + Añadir sesión
       </button>
       <ul className="space-y-2">
         {list.map((e) => (
@@ -1061,26 +1114,6 @@ function AgendaPanel({ mode }: { mode: "diplomado" | "otras" }) {
       {selected ? (
         <div className="space-y-3 border-t pt-4">
           <p className="text-sm font-bold text-na-heketDark">Editar seleccionada</p>
-          {mode === "otras" ? (
-            <label className="block text-sm">
-              <span className="font-semibold">Tipo</span>
-              <select
-                value={selected.category}
-                onChange={(e) =>
-                  ctx.patchAgendaEntry(selected.id, {
-                    category: e.target.value as CmsAgendaEntry["category"],
-                  })
-                }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-              >
-                <option value="conferencia">Conferencia</option>
-                <option value="curso">Curso</option>
-                <option value="taller">Taller</option>
-                <option value="cultura">Cultura</option>
-                <option value="voluntariado">Voluntariado</option>
-              </select>
-            </label>
-          ) : null}
           <EditField
             label="Título"
             value={selected.title}

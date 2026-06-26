@@ -17,16 +17,12 @@ import {
 } from "@/lib/cms/agenda-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   resolveCmsMediaUrl,
   saveCmsDraft,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import type {
   CmsAgendaEntry,
@@ -59,6 +55,7 @@ import {
 import { AgendaEntryEditFields } from "@/components/cms/AgendaEntryEditFields";
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
 import { promoteAgendaEntryLocally } from "@/lib/agenda-evento";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
@@ -180,32 +177,8 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, items, culturaPage, viajesPage]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const next = buildDoc(latest, items, culturaPage, viajesPage, eventoDrafts);
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDoc(next);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, items, culturaPage, viajesPage]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -219,17 +192,7 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const promoteToEvento = useCallback(
     (entry: CmsAgendaEntry) => {
@@ -810,6 +773,22 @@ function CulturaCardEditFields({
             ...(patch.imageAlt !== undefined ? { alt: patch.imageAlt } : {}),
           })
         }
+      />
+      <p className="text-xs text-slate-500">
+        Botón «Solicitar info»: si dejas el número vacío, se usa el de cursos del
+        pie de página. Si dejas el mensaje vacío, se genera solo con el título y
+        la sede.
+      </p>
+      <EditField
+        label="WhatsApp — número (opcional)"
+        value={card.inscribeWhatsappNumber ?? ""}
+        onChange={(v) => onChange({ inscribeWhatsappNumber: v })}
+      />
+      <EditField
+        label="WhatsApp — mensaje (opcional)"
+        value={card.inscribeWhatsappMessage ?? ""}
+        onChange={(v) => onChange({ inscribeWhatsappMessage: v })}
+        multiline
       />
     </div>
   );

@@ -6,6 +6,8 @@ import { MessageCircle } from "lucide-react";
 import { preferWebpAssetUrl } from "@/lib/media-assets";
 import { type RegaloItem } from "@/lib/editorial-extras";
 import { useEditorialConfig } from "@/lib/editorial-config";
+import { useEditorialMemorion } from "@/lib/cms/hooks";
+import type { CmsEditorialRegalo } from "@/lib/cms/types";
 import { EditorialEditPencil } from "@/components/cms/CmsEditFields";
 import { useEditorialCmsEdit } from "@/components/cms/EditorialCmsEditContext";
 import { regaloToCartItem, formatCartMoney } from "@/lib/cart";
@@ -37,17 +39,23 @@ function buildRegaloWhatsApp(item: RegaloItem): string {
   return `${WHATSAPP_URL}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
-const MEMORION_IMAGE = "/img/regalos/memorion.webp";
-
-const MEMORION_ITEM: RegaloItem = {
-  id: "memorion",
-  category: "papeleria",
-  title: "Memorion — juego de cartas",
-  description:
-    "Juego educativo de Editorial Nueva Acrópolis para entrenar la memoria. Consulte disponibilidad y precio con nosotros.",
-  imageUrl: MEMORION_IMAGE,
-  priceNote: "Consultar disponibilidad",
-};
+function cmsRegaloToItem(item: CmsEditorialRegalo): RegaloItem {
+  return {
+    id: item.id,
+    category: (item.category ?? "papeleria") as RegaloItem["category"],
+    title: item.title ?? "",
+    description: item.description ?? "",
+    quote: item.quote,
+    author: item.author,
+    imageUrl: item.imageUrl ?? "",
+    detailImageUrl: item.detailImageUrl,
+    backImageUrl: item.backImageUrl,
+    price: item.price ?? undefined,
+    currency: item.currency,
+    priceNote: item.priceNote,
+    sample: item.sample,
+  };
+}
 
 function RegaloCardImage({
   item,
@@ -126,18 +134,30 @@ function RegaloCard({
   const [showBack, setShowBack] = useState(false);
   const isSeparador = item.category === "separadores";
   const isLibreta = item.category === "libretas";
+  const isResaltador = item.id === "resaltador-ideas";
+  const isLapiceros = item.id === "lapiceros-virtudes";
   const aspect = isSeparador
     ? "aspect-[5/12] bg-neutral-50"
     : isLibreta
       ? "aspect-[779/922] bg-neutral-50"
       : item.category === "camisetas"
         ? "aspect-square"
-        : "aspect-[3/4]";
+        : isLapiceros
+          ? "aspect-[3/2] bg-neutral-100"
+          : isResaltador
+            ? "aspect-[3/4] bg-transparent"
+            : "aspect-[3/4]";
   const imagePad = isSeparador
     ? "object-contain object-center p-2"
     : isLibreta
-      ? "object-contain object-center p-0.5"
-      : "object-contain p-3";
+      ? item.id === "libreta-escribir"
+        ? "object-contain object-center p-0.5 pl-2"
+        : "object-contain object-center p-0.5"
+      : isLapiceros
+        ? "object-contain object-center p-2"
+        : isResaltador
+          ? "object-contain object-center p-3 sm:p-[15px]"
+          : "object-contain p-3";
   const imageSizes = isSeparador
     ? "(max-width: 768px) 45vw, 180px"
     : "(max-width: 768px) 50vw, 25vw";
@@ -288,22 +308,31 @@ function RegaloCard({
   );
 }
 
-function MemorionBlock() {
+function MemorionBlock({
+  item,
+  onEdit,
+}: {
+  item: RegaloItem;
+  onEdit?: () => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <article
         id="regalo-memorion"
-        className="overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft sm:flex sm:max-w-2xl"
+        className="relative overflow-hidden rounded-2xl border border-na-editorial/10 bg-white shadow-na-soft sm:flex sm:max-w-2xl"
       >
+        {onEdit ? (
+          <EditorialEditPencil label="Editar Memorion" onClick={onEdit} />
+        ) : null}
         <button
           type="button"
           onClick={() => setOpen(true)}
           className="relative aspect-[3/4] w-full shrink-0 bg-white text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial sm:w-56 md:w-64"
         >
           <Image
-            src={MEMORION_IMAGE}
+            src={resolveRegaloImage(item.imageUrl)}
             alt="Memorion — juego de cartas de Editorial Nueva Acrópolis"
             fill
             className="object-contain p-3"
@@ -317,10 +346,10 @@ function MemorionBlock() {
             onClick={() => setOpen(true)}
             className="text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
           >
-            <h3 className="font-bold text-na-ink">{MEMORION_ITEM.title}</h3>
+            <h3 className="font-bold text-na-ink">{item.title}</h3>
           </button>
           <p className="mt-2 text-sm leading-relaxed text-na-muted">
-            {MEMORION_ITEM.description}
+            {item.description}
           </p>
           <button
             type="button"
@@ -330,7 +359,7 @@ function MemorionBlock() {
             Ver detalle →
           </button>
           <a
-            href={buildRegaloWhatsApp(MEMORION_ITEM)}
+            href={buildRegaloWhatsApp(item)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-na-editorial px-4 py-2 text-sm font-bold text-white transition hover:bg-na-editorialDark"
@@ -341,11 +370,11 @@ function MemorionBlock() {
         </div>
       </article>
       <RegaloDetailDialog
-        item={MEMORION_ITEM}
+        item={item}
         open={open}
         onClose={() => setOpen(false)}
         resolveImage={resolveRegaloImage}
-        whatsAppHref={buildRegaloWhatsApp(MEMORION_ITEM)}
+        whatsAppHref={buildRegaloWhatsApp(item)}
       />
     </>
   );
@@ -358,6 +387,8 @@ type RegalosSectionProps = {
 
 export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
   const { regaloCategories, regalos } = useEditorialConfig();
+  const memorionCms = useEditorialMemorion();
+  const memorion = cmsRegaloToItem(memorionCms);
   const edit = useEditorialCmsEdit();
   const [activeFilter, setActiveFilter] = useState(initialFilter);
 
@@ -393,10 +424,31 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
 
   return (
     <section id="regalos" className="scroll-mt-24">
-      <p className="text-sm leading-relaxed text-na-muted">
-        Separadores, regalos filosóficos, libretas, camisetas y Memorion en un
-        solo catálogo. Use los filtros para explorar por categoría.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="max-w-3xl text-sm leading-relaxed text-na-muted">
+          Separadores, regalos filosóficos, libretas, camisetas, Editio y
+          Memorion en un solo catálogo. Use los filtros para explorar por
+          categoría.
+        </p>
+        {edit?.ready ? (
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="rounded-full border border-na-editorial/25 px-3 py-1 text-xs font-semibold text-na-editorial"
+              onClick={() => edit.setSelectedId("regalos:categories")}
+            >
+              Categorías
+            </button>
+            <button
+              type="button"
+              className="rounded-full border border-na-editorial/25 px-3 py-1 text-xs font-semibold text-na-editorial"
+              onClick={() => edit.setSelectedId("regalos:manage")}
+            >
+              Productos
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       <nav
         className="mt-6 flex flex-wrap gap-2"
@@ -426,7 +478,7 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
         <div className="mt-10 space-y-12">
           {visibleCategories.map((cat) => {
             const items = regalos.filter((item) => item.category === cat.id);
-            if (items.length === 0) return null;
+            if (items.length === 0 && !edit?.ready) return null;
             const gridClass =
               cat.id === "separadores"
                 ? "mt-5 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
@@ -435,19 +487,39 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
               <div key={cat.id} id={`regalo-${cat.id}`}>
                 <h3 className="text-xl font-bold text-na-ink">{cat.label}</h3>
                 <p className="mt-1 text-sm text-na-muted">{cat.description}</p>
-                <div className={gridClass}>
-                  {items.map((item) => (
-                    <RegaloCard
-                      key={item.id}
-                      item={item}
-                      onEdit={
-                        edit?.ready
-                          ? () => edit.setSelectedId(`regalo:${item.id}`)
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
+                {items.length === 0 ? (
+                  <p className="mt-4 text-sm text-na-muted">
+                    Sin productos en esta categoría.
+                    {edit?.ready ? (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="font-semibold text-na-editorial"
+                          onClick={() =>
+                            edit.setSelectedId(`regalos:add:${cat.id}`)
+                          }
+                        >
+                          Añadir producto
+                        </button>
+                      </>
+                    ) : null}
+                  </p>
+                ) : (
+                  <div className={gridClass}>
+                    {items.map((item) => (
+                      <RegaloCard
+                        key={item.id}
+                        item={item}
+                        onEdit={
+                          edit?.ready
+                            ? () => edit.setSelectedId(`regalo:${item.id}`)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -456,7 +528,12 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
 
       {showMemorion ? (
         <div className={activeFilter === "memorion" ? "mt-6" : "mt-10"}>
-          <MemorionBlock />
+          <MemorionBlock
+            item={memorion}
+            onEdit={
+              edit?.ready ? () => edit.setSelectedId("regalo:memorion") : undefined
+            }
+          />
         </div>
       ) : null}
 

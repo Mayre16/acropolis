@@ -6,6 +6,7 @@
     "dev:tienda": "npm run dev --prefix tienda",
     "dev:editor": "npm run dev --prefix editor",
     "dev:editor-api": "npm run dev:api --prefix editor",
+    "dev:local": "node scripts/dev-local-stack.mjs",
     "build:principal": "npm run build --prefix principal",
     "build:civis": "npm run build --prefix civis",
     "build:tienda": "npm run build --prefix tienda",

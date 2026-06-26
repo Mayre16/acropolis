@@ -12,13 +12,26 @@ export const CURSO_PERMANENTE_IDS = new Set([
   "curso-tai-chi-y-chi-kung",
   "curso-crochet",
   "curso-circulo-de-lectura",
+  "curso-circulo-de-amigos",
+]);
+
+/** Activos en /cursos pero no en el carrusel del home (evita duplicar el bloque promocional). */
+export const HOME_CURSOS_CAROUSEL_EXCLUDE_IDS = new Set([
+  "curso-circulo-de-amigos",
 ]);
 export function isCursoPermanente(id: string) {
   return CURSO_PERMANENTE_IDS.has(id);
 }
 
+/** ¿Va en «Cursos activos»? Respeta el CMS; si no hay valor, usa el catálogo base. */
+export function isCursoActivo(card: CmsCursosCard) {
+  if (card.activo === true) return true;
+  if (card.activo === false) return false;
+  return isCursoPermanente(card.id);
+}
+
 export function splitCursosOferta(cards: CmsCursosCard[]) {
-  const permanentes = cards.filter((card) => isCursoPermanente(card.id));
-  const otros = cards.filter((card) => !isCursoPermanente(card.id));
+  const permanentes = cards.filter((card) => isCursoActivo(card));
+  const otros = cards.filter((card) => !isCursoActivo(card));
   return { permanentes, otros };
 }

@@ -79,6 +79,15 @@ export type CmsEditorialDondePage = {
   lede?: string;
 };
 
+export type CmsEditorialDondeContact = {
+  phone?: string;
+  email?: string;
+  whatsappNumber?: string;
+  whatsappCtaLabel?: string;
+  /** Plantilla del mensaje; use `{sede}` para el nombre de la sede. */
+  whatsappMessage?: string;
+};
+
 export type CmsEditorialStorePhoto = {
   src?: string;
   fallbackSrc?: string;
@@ -101,6 +110,7 @@ export type CmsEditorialSede = {
 export type CmsEditorialDonde = {
   visit?: CmsEditorialVisit;
   page?: CmsEditorialDondePage;
+  contact?: CmsEditorialDondeContact;
   storePhoto?: CmsEditorialStorePhoto;
   defaultHours?: string;
   sedes?: CmsEditorialSede[];
@@ -156,6 +166,33 @@ export type CmsEditorialAuthorFilter = {
 export type CmsEditorialBookFilters = {
   themes?: string[];
   authorFilters?: CmsEditorialAuthorFilter[];
+  publishers?: string[];
+};
+
+export type CmsEditorialPrintedBookSyncStatus =
+  | "pending"
+  | "synced"
+  | "error"
+  | "skipped";
+
+export type CmsEditorialPrintedBook = {
+  id: string;
+  title: string;
+  author?: string;
+  isbn?: string;
+  coverUrl?: string;
+  summary?: string;
+  price?: number | null;
+  currency?: string;
+  stock?: number;
+  publisher?: string;
+  area_tema?: string;
+  priceNote?: string;
+  /** ID en Biblioteca/Harmonía (`bookstore_listings` / `store_listings`). */
+  bibliotecaId?: number;
+  syncStatus?: CmsEditorialPrintedBookSyncStatus;
+  syncError?: string;
+  lastSyncedAt?: string;
 };
 
 export type CmsEditorialDigitalBook = {
@@ -181,6 +218,108 @@ export type CmsEditorialHeroImage = {
   objectPosition?: string;
 };
 
+export type CmsPageMediaCard = {
+  id: string;
+  kind: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  title?: string;
+  caption?: string;
+  linkHref?: string;
+  linkLabel?: string;
+};
+
+export type CmsPageMediaBlockWidth = "normal" | "full";
+
+export type CmsPageMediaTextBlock = {
+  id: string;
+  kind: "text";
+  width?: CmsPageMediaBlockWidth;
+  heading?: string;
+  paragraphs: string[];
+};
+
+export type CmsPageMediaMediaLayout = "card" | "voluntariado" | "overlay";
+
+export type CmsPageMediaMediaBlock = {
+  id: string;
+  kind: "media";
+  width?: CmsPageMediaBlockWidth;
+  layout?: CmsPageMediaMediaLayout;
+  imageKind: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  area?: string;
+  title?: string;
+  caption?: string;
+  body?: string;
+  linkHref?: string;
+  linkLabel?: string;
+  align?: "left" | "center";
+};
+
+export type CmsPageMediaGalleryDisplay = "grid" | "carousel";
+
+export type CmsPageMediaGalleryBlock = {
+  id: string;
+  kind: "gallery";
+  width?: CmsPageMediaBlockWidth;
+  display?: CmsPageMediaGalleryDisplay;
+  columns?: 2 | 3;
+  layout?: "card" | "overlay";
+  carouselTitle?: string;
+  carouselText?: string;
+  carouselSide?: "left" | "right";
+  align?: "left" | "center";
+  items: CmsPageMediaCard[];
+};
+
+export type CmsPageMediaButtonVariant = "primary" | "outline" | "whatsapp";
+
+export type CmsPageMediaButtonLinkKind = "url" | "whatsapp" | "internal";
+
+export type CmsPageMediaButtonBlock = {
+  id: string;
+  kind: "button";
+  width?: CmsPageMediaBlockWidth;
+  align?: "left" | "center";
+  label: string;
+  linkKind: CmsPageMediaButtonLinkKind;
+  href?: string;
+  whatsappPhone?: string;
+  whatsappMessage?: string;
+  variant?: CmsPageMediaButtonVariant;
+};
+
+export type CmsPageMediaBlockKind = "text" | "media" | "gallery" | "button";
+
+export type CmsPageMediaBlock =
+  | CmsPageMediaTextBlock
+  | CmsPageMediaMediaBlock
+  | CmsPageMediaGalleryBlock
+  | CmsPageMediaButtonBlock;
+
+export type CmsPageMediaTarget =
+  | "home"
+  | "quienes-somos"
+  | "donde-estamos"
+  | "libros"
+  | "libros-digitales"
+  | "revistas"
+  | "regalos";
+
+export type CmsPageMediaSection = {
+  id: string;
+  pageId: CmsPageMediaTarget;
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  blocks?: CmsPageMediaBlock[];
+  cards?: CmsPageMediaCard[];
+};
+
 export type CmsDocument = {
   version: 1;
   site: "editorial";
@@ -195,9 +334,12 @@ export type CmsDocument = {
     editorialRevistas?: CmsEditorialRevista[];
     editorialRegaloCategories?: CmsEditorialRegaloCategory[];
     editorialRegalos?: CmsEditorialRegalo[];
+    editorialMemorion?: CmsEditorialRegalo;
     editorialShopCategories?: CmsEditorialShopCategory[];
     editorialBookFilters?: CmsEditorialBookFilters;
+    editorialPrintedBooks?: CmsEditorialPrintedBook[];
     editorialDigitalBooks?: CmsEditorialDigitalBookGroup[];
     editorialHeroImages?: CmsEditorialHeroImage[];
+    pageMediaSections?: CmsPageMediaSection[];
   };
 };

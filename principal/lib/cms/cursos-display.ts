@@ -18,6 +18,17 @@ export const DEFAULT_OFERTA_COPY = {
     "Charlas y conferencias abiertas al público sobre filosofía, cultura y valores. Muchas son gratuitas; consulta fechas y sedes por WhatsApp.",
 };
 
+export const DEFAULT_CURSOS_INSCRIBE = {
+  title: "Inscríbete en un curso",
+  text: "Escríbenos para conocer las próximas convocatorias, horarios e inscripción de nuestros cursos y talleres.",
+  ctaLabel: "Quiero más información",
+  whatsappNumber: "",
+  whatsappMessage:
+    "Hola, me interesan los cursos y talleres de Nueva Acrópolis. ¿Me dan información de las próximas convocatorias?",
+};
+
+export const CURSOS_INSCRIBE_SECTION_ID = "__inscribeCta__";
+
 function resolveCard(card: CmsCursosCard): CmsCursosCard {
   return {
     ...card,

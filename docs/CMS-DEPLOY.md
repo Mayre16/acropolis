@@ -50,6 +50,8 @@ Guardar el token; no va en git.
 | `PRINCIPAL_FTP_*` | (servidor, usuario, contraseña, carpeta) | Deploy Acropolis |
 | `CIVIS_FTP_*` | (igual) | Deploy Civis |
 | `TIENDA_FTP_*` | (igual) | Deploy Editorial |
+| `EDITOR_SITE_URL` | `https://editor.acropolis.adesa.com.do` | Build panel editor |
+| `EDITOR_FTP_*` | (igual) | Deploy panel editor (front + api PHP; no borra `data/` ni `config.php`) |
 
 Si FTP no está configurado, el workflow igual hace build y deja un **artifact** descargable en Actions.
 
@@ -83,7 +85,7 @@ npm run cms:deploy:all
 
 ## 5. Probar manualmente
 
-GitHub → **Actions** → **CMS publish — rebuild and deploy** → **Run workflow** → site `all`, `acropolis`, `civis` o `tienda`.
+GitHub → **Actions** → **CMS publish — rebuild and deploy** → **Run workflow** → site `all`, `acropolis`, `civis`, `tienda` o `editor`.
 
 ## 6. Qué se actualiza al instante (sin esperar el build)
 

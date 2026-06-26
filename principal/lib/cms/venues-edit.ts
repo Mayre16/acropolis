@@ -2,8 +2,11 @@ import {
   CONTACT_EMAIL,
   CONTACT_PHONE,
   VENUE_LOCATIONS,
+  venueDisplayName,
   type VenueLocation,
 } from "@/lib/locations";
+import { normalizeVenueMapCoords } from "@/lib/map-coords";
+import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
 import type { CmsDocument, CmsVenue, CmsVenuesContact } from "@/lib/cms/types";
 
 export const VENUES_CONTACT_PANEL_ID = "__venues_contact__";
@@ -14,7 +17,18 @@ export const DEFAULT_VENUES_CONTACT: CmsVenuesContact = {
   phone: CONTACT_PHONE,
   email: CONTACT_EMAIL,
   ctaLabel: "Escribir por WhatsApp",
+  whatsappNumber: "",
+  whatsappMessage: "",
 };
+
+export function venuesContactWhatsAppHref(
+  contact: CmsVenuesContact,
+  fallbackUrl: string,
+): string {
+  const fromPhone = contact.phone?.replace(/\D/g, "") ?? "";
+  const number = contact.whatsappNumber?.trim() || fromPhone;
+  return buildWhatsAppHref(number, contact.whatsappMessage, fallbackUrl);
+}
 
 export function venueToCms(v: VenueLocation): CmsVenue {
   return {
@@ -31,6 +45,7 @@ export function venueToCms(v: VenueLocation): CmsVenue {
     note: v.note,
     mapX: v.mapX,
     mapY: v.mapY,
+    mapHideLabel: v.mapHideLabel,
   };
 }
 
@@ -49,6 +64,7 @@ export function cmsToVenue(v: CmsVenue): VenueLocation {
     note: v.note,
     mapX: v.mapX,
     mapY: v.mapY,
+    mapHideLabel: v.mapHideLabel,
   };
 }
 
@@ -146,25 +162,127 @@ const DEFAULT_MAP: Record<
     mapY: 158,
     kind: "sede",
   },
+  "Puerto Plata:sede": {
+    mapX: 336,
+    mapY: 43,
+    kind: "sede",
+  },
 };
 
-export function getMapPinsFromVenues(venues: VenueLocation[]) {
-  const pins = new Map<
-    string,
-    { city: string; x: number; y: number; variant: "sede" | "centro" }
-  >();
+export type VenueMapPin = {
+  id: string;
+  city: string;
+  label: string;
+  x: number;
+  y: number;
+  variant: "sede" | "centro";
+  hideLabel?: boolean;
+};
+
+function sedePinLabel(v: VenueLocation): string {
+  return v.city.trim();
+}
+
+function mapPinFromVenue(
+  v: VenueLocation,
+  x: number,
+  y: number,
+  variant: "sede" | "centro",
+  label?: string,
+): VenueMapPin {
+  const city = v.city.trim();
+  return {
+    id: v.id,
+    city,
+    label: label ?? city,
+    x,
+    y,
+    variant,
+    hideLabel: v.mapHideLabel === true,
+  };
+}
+
+export function getMapPinsFromVenues(venues: VenueLocation[]): VenueMapPin[] {
+  const citiesWithSede = new Set(
+    venues
+      .filter((v) => v.kind === "sede")
+      .map((v) => v.city.trim())
+      .filter(Boolean),
+  );
+
+  const explicitSedePins: VenueMapPin[] = [];
+  /** Pin por defecto de ciudad si ninguna sede tiene coordenadas propias. */
+  const implicitSedeByCity = new Map<string, VenueMapPin>();
+  const citiesWithExplicitSedePin = new Set<string>();
+  const centroPins: VenueMapPin[] = [];
+  /** Un pin automático de punto cultural por ciudad sin sede. */
+  const autoCentroByCity = new Set<string>();
 
   for (const v of venues) {
-    const defaults = DEFAULT_MAP[`${v.city}:${v.kind}`];
-    const x = v.mapX ?? defaults?.mapX;
-    const y = v.mapY ?? defaults?.mapY;
-    if (x == null || y == null) continue;
-    const variant = v.kind === "sede" ? "sede" : "centro";
-    const existing = pins.get(v.city);
-    if (!existing || (variant === "sede" && existing.variant === "centro")) {
-      pins.set(v.city, { city: v.city, x, y, variant });
+    const city = v.city.trim();
+    if (!city) continue;
+
+    const normalized = normalizeVenueMapCoords(v.mapX, v.mapY);
+    let x = normalized.mapX;
+    let y = normalized.mapY;
+    const hasExplicitCoords = x != null && y != null;
+
+    if (v.kind === "sede") {
+      if (hasExplicitCoords) {
+        citiesWithExplicitSedePin.add(city);
+        explicitSedePins.push(
+          mapPinFromVenue(v, x!, y!, "sede", sedePinLabel(v)),
+        );
+        continue;
+      }
+
+      if (citiesWithExplicitSedePin.has(city) || implicitSedeByCity.has(city)) {
+        continue;
+      }
+
+      const defaults =
+        DEFAULT_MAP[`${city}:sede`] ?? DEFAULT_MAP[`${city}:centro-cultural`];
+      x = defaults?.mapX;
+      y = defaults?.mapY;
+      if (x == null || y == null) continue;
+
+      implicitSedeByCity.set(
+        city,
+        mapPinFromVenue(v, x, y, "sede", city),
+      );
+      continue;
     }
+
+    // Punto cultural
+    if (citiesWithSede.has(city)) {
+      if (!hasExplicitCoords) continue;
+    } else if (!hasExplicitCoords) {
+      const defaults =
+        DEFAULT_MAP[`${city}:centro-cultural`] ??
+        DEFAULT_MAP[`${city}:sede`];
+      x = defaults?.mapX;
+      y = defaults?.mapY;
+      if (x == null || y == null) continue;
+      if (autoCentroByCity.has(city)) continue;
+      autoCentroByCity.add(city);
+    }
+
+    if (x == null || y == null) continue;
+
+    centroPins.push(
+      mapPinFromVenue(
+        v,
+        x,
+        y,
+        "centro",
+        venueDisplayName(v.name, v.kind),
+      ),
+    );
   }
 
-  return [...pins.values()];
+  return [
+    ...explicitSedePins,
+    ...implicitSedeByCity.values(),
+    ...centroPins,
+  ];
 }

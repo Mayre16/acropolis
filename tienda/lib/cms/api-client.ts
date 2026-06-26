@@ -52,12 +52,56 @@ export async function saveCmsDraft(
   if (!res.ok) throw new Error("Error al guardar borrador");
 }
 
-export async function publishCms(site: SiteId, token: string): Promise<void> {
+export type BookstoreSyncResult = {
+  ok: boolean;
+  synced?: number;
+  failed?: number;
+  skipped?: number;
+  message?: string;
+  results?: Array<{
+    cmsId?: string;
+    title?: string;
+    status: string;
+    bibliotecaId?: number;
+    error?: string;
+    reason?: string;
+  }>;
+};
+
+export async function publishCms(
+  site: SiteId,
+  token: string,
+): Promise<BookstoreSyncResult | null> {
   const res = await fetch(`${cmsApiBase()}/content/${site}/publish`, {
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error("Error al publicar");
+  const data = (await res.json().catch(() => ({}))) as {
+    bookstoreSync?: BookstoreSyncResult;
+    message?: string;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Error al publicar");
+  }
+  return data.bookstoreSync ?? null;
+}
+
+export async function syncEditorialBooksCms(
+  token: string,
+): Promise<BookstoreSyncResult> {
+  const res = await fetch(`${cmsApiBase()}/content/editorial/sync-books`, {
+    method: "POST",
+    headers: authHeaders(token),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    bookstoreSync?: BookstoreSyncResult;
+    error?: string;
+  };
+  if (!res.ok && !data.bookstoreSync) {
+    throw new Error(data.error || "Error al sincronizar libros");
+  }
+  return data.bookstoreSync ?? { ok: false, message: "Sin respuesta de sync" };
 }
 
 export async function uploadCmsImage(

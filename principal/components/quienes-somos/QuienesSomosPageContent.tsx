@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ExternalLink, FileDown } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import {
   QuienesSomosHero,
   QuienesSomosIntroSection,
   QuienesSomosPresidenciaSection,
   QuienesSomosDireccionSection,
 } from "@/components/cms/QuienesSomosHero";
+import { PerfilInstitucionalSection } from "@/components/cms/PerfilInstitucionalSection";
 import { QuienesSomosPageShell } from "@/components/cms/QuienesSomosPageShell";
 import { QuienesSomosPageNav } from "@/components/QuienesSomosPageNav";
 import { Values } from "@/components/home/Values";
@@ -18,7 +19,6 @@ import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 import {
   ANUARIO_INTERNACIONAL_URL,
   ANUARIO_PORTADA,
-  PERFIL_INSTITUCIONAL_OINADOM,
   type QuienesSomosSectionId,
 } from "@/lib/institucional-content";
 import {
@@ -71,35 +71,7 @@ export function QuienesSomosPageContent({ initialSection }: Props) {
       <QuienesSomosPresidenciaSection />
       <AreasActuacionInstitucionalSection />
       <QuienesSomosDireccionSection />
-      <section
-        id="perfil-institucional"
-        className="scroll-mt-36 border-t border-na-heket/10 bg-na-heket/[0.04] py-14 sm:py-16"
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
-            Institucional
-          </p>
-          <h2 className="mt-3 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
-            {PERFIL_INSTITUCIONAL_OINADOM.title}
-          </h2>
-          <p className="mt-5 max-w-3xl leading-relaxed text-na-muted">
-            {PERFIL_INSTITUCIONAL_OINADOM.lede}
-          </p>
-          <p className="mt-3 text-sm text-na-muted">
-            {PERFIL_INSTITUCIONAL_OINADOM.note}
-          </p>
-          <div className="mt-6">
-            <a
-              href={PERFIL_INSTITUCIONAL_OINADOM.href}
-              download
-              className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white transition hover:bg-na-kefer"
-            >
-              <FileDown className="h-4 w-4" aria-hidden />
-              Descargar perfil institucional (PDF)
-            </a>
-          </div>
-        </div>
-      </section>
+      <PerfilInstitucionalSection />
       <section
         id="anuario"
         className="scroll-mt-36 border-t border-na-heket/10 bg-na-surface py-14 sm:py-16"

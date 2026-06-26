@@ -23,6 +23,7 @@ import {
   useFilosofiaTemarioDisplay,
 } from "@/lib/cms/filosofia-display";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
 import { accentCardClass, accentCardShell, accentTokens } from "@/lib/brand-accents";
 import { filosofiaSedeEntries } from "@/lib/filosofia-content";
 import { mapsUrl } from "@/lib/locations";
@@ -77,6 +78,11 @@ export function FilosofiaPageBody() {
   const esParaTi = useFilosofiaEsParaTiDisplay();
   const cta = useFilosofiaCtaDisplay();
   const whatsapp = useWhatsAppUrls();
+  const ctaHref = buildWhatsAppHref(
+    cta.whatsappNumber,
+    cta.whatsappMessage,
+    whatsapp.diplomado,
+  );
 
   return (
     <>
@@ -451,7 +457,7 @@ export function FilosofiaPageBody() {
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-white/85">{cta.text}</p>
             <a
-              href={`${whatsapp.diplomado}?text=${encodeURIComponent(cta.whatsappMessage)}`}
+              href={ctaHref}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105"

@@ -186,6 +186,8 @@ export function useFilosofiaCtaDisplay() {
   return {
     title: page?.ctaTitle ?? FILOSOFIA_CTA_DEFAULTS.title,
     text: page?.ctaText ?? FILOSOFIA_CTA_DEFAULTS.text,
+    whatsappNumber:
+      page?.ctaWhatsappNumber?.trim() || FILOSOFIA_CTA_DEFAULTS.whatsappNumber,
     whatsappMessage:
       page?.ctaWhatsappMessage ?? FILOSOFIA_CTA_DEFAULTS.whatsappMessage,
     buttonLabel: page?.ctaButtonLabel ?? FILOSOFIA_CTA_DEFAULTS.buttonLabel,

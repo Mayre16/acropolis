@@ -4,7 +4,7 @@ import { SolicitudPropuestaForm } from "@/components/SolicitudPropuestaForm";
 
 export function CivisInscribete() {
   return (
-    <section className="bg-na-civis/[0.04] py-14 sm:py-16">
+    <section className="border-b border-na-civis/10 bg-na-surface py-14 pb-20 sm:py-16 sm:pb-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-civisDark">
           Solicitud
@@ -18,7 +18,7 @@ export function CivisInscribete() {
           datos prepararemos una propuesta personalizada para su organización.
         </p>
         <div className="mt-10">
-          <SolicitudPropuestaForm collapsedInitially />
+          <SolicitudPropuestaForm />
         </div>
       </div>
     </section>

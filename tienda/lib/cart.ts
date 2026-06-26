@@ -1,4 +1,5 @@
 import { type StoreBook, resolveStoreBookCover } from "@/lib/bookstore";
+import { isBookCheckoutEligible } from "@/lib/bookstore-merge";
 import type { RegaloItem } from "@/lib/editorial-extras";
 import { preferWebpAssetUrl } from "@/lib/media-assets";
 
@@ -30,8 +31,7 @@ export function cartItemKey(kind: CartItemKind, id: string | number): string {
 }
 
 export function bookToCartItem(book: StoreBook, quantity = 1): CartItem | null {
-  if (book.price == null || book.price <= 0) return null;
-  if (book.stock <= 0) return null;
+  if (!isBookCheckoutEligible(book) || book.price == null) return null;
   return {
     key: cartItemKey("book", book.id),
     kind: "book",

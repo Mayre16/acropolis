@@ -3,9 +3,10 @@
 import { ArrowRight, HeartHandshake } from "lucide-react";
 import { EsferaLogo } from "@/components/EsferaLogo";
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { useRelacionesCmsEdit } from "@/components/cms/InstitutionalPageCmsEditContext";
-import { CmsSectionEditBar } from "@/components/cms/CmsEditPencil";
 import { mergeRelacionesPage } from "@/lib/cms/institutional-page-edit";
+import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
+import { CmsSectionEditBar } from "@/components/cms/CmsEditPencil";
+import { useRelacionesCmsEdit } from "@/components/cms/InstitutionalPageCmsEditContext";
 import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
@@ -224,14 +225,16 @@ export function RelacionesPageBody() {
               </h3>
               <p className="mx-auto mt-3 max-w-sm text-white/85">{page.ctaText}</p>
               <a
-                href={`${whatsapp.cursos}?text=${encodeURIComponent(
-                  "Hola, represento a una institución y me gustaría explorar una alianza con Nueva Acrópolis RD.",
-                )}`}
+                href={buildWhatsAppHref(
+                  page.ctaWhatsappNumber,
+                  page.ctaWhatsappMessage,
+                  whatsapp.cursos,
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105"
               >
-                Proponer una alianza
+                {page.ctaButtonLabel ?? "Proponer una alianza"}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>

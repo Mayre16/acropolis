@@ -184,7 +184,8 @@ export function VisualFilosofiaEditor() {
           <strong>curso introductorio</strong>, <strong>temario</strong>,{" "}
           <strong>cursos avanzados</strong>, <strong>¿Es para ti?</strong>,{" "}
           <strong>inscripción</strong>, <strong>badge del diplomado</strong>,{" "}
-          <strong>próximas sesiones</strong> y <strong>otras actividades del home</strong>.
+          <strong>próximas sesiones</strong>. Las actividades del carrusel del home se
+          editan en la página de inicio.
           Pulsa <strong>Guardar</strong> al terminar.
         </>
       }

@@ -17,6 +17,7 @@ if (!is_file($configFile)) {
 $config = require $configFile;
 require __DIR__ . '/mail.php';
 require __DIR__ . '/deploy-webhook.php';
+require __DIR__ . '/bookstore-sync.php';
 $dataRoot = rtrim($config['data_root'] ?? (__DIR__ . '/../data'), '/\\');
 $adminPassword = (string) ($config['admin_password'] ?? '');
 $allowedOrigins = $config['allowed_origins'] ?? [];
@@ -166,6 +167,18 @@ if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
+if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireAuth();
+    $siteDir = sitePath($dataRoot, 'editorial');
+    ensureSite($siteDir);
+    $draft = $siteDir . '/draft.json';
+    if (!is_file($draft)) {
+        jsonOut(400, ['error' => 'Sin borrador']);
+    }
+    $sync = cms_sync_editorial_draft_file($draft, $config);
+    jsonOut(($sync['ok'] ?? false) ? 200 : 207, ['ok' => $sync['ok'] ?? false, 'bookstoreSync' => $sync]);
+}
+
 if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
@@ -179,12 +192,27 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && 
     if (!is_file($draft)) {
         jsonOut(400, ['error' => 'Sin borrador']);
     }
+    $draftJson = file_get_contents($draft);
+    $draftDoc = json_decode($draftJson ?: '{}', true);
+    if (!is_array($draftDoc)) {
+        jsonOut(400, ['error' => 'Borrador inválido']);
+    }
+    $bookstoreSync = null;
+    if ($m[1] === 'editorial') {
+        $bookstoreSync = cms_sync_editorial_printed_books($draftDoc, $config);
+        file_put_contents($draft, json_encode($draftDoc, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    }
     copy($draft, $published);
     $deploy = cms_trigger_deploy_after_publish($config, $m[1]);
+    $message = cms_publish_user_message($deploy);
+    if (is_array($bookstoreSync) && !empty($bookstoreSync['message'])) {
+        $message .= ' ' . $bookstoreSync['message'];
+    }
     jsonOut(200, [
         'ok' => true,
         'deploy' => $deploy,
-        'message' => cms_publish_user_message($deploy),
+        'bookstoreSync' => $bookstoreSync,
+        'message' => $message,
     ]);
 }
 

@@ -24,4 +24,13 @@ return [
     'github_repo' => 'Mayre16/acropolis',
     /** PAT con scope repo + workflow (Actions). NO subir a git. */
     'github_deploy_token' => 'ghp_XXXXXXXXXXXXXXXXXXXX',
+    /**
+     * Sincronización catálogo editorial → Biblioteca/Harmonía (servidor).
+     * Misma base que NEXT_PUBLIC_STORE_API_URL en la tienda.
+     */
+    'store_api_url' => 'https://biblioteca-oina.adesa.com.do',
+  /** Harmonía: '/api/store/listings/upsert' */
+    'store_upsert_path' => '/api/bookstore_upsert.php',
+    /** Token Bearer — debe coincidir con STORE_SYNC_TOKEN en Biblioteca/Harmonía. */
+    'store_sync_token' => '',
 ];

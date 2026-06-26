@@ -32,15 +32,11 @@ import {
 } from "@/lib/cms/esfera-page-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   resolveCmsMediaUrl,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import type {
   CmsActivityPhoto,
   CmsAgendaEntry,
@@ -60,6 +56,7 @@ import { AgendaEntryEditFields, AgendaEntryImageField } from "@/components/cms/A
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
 import { EsferaHomeEditFields, type EsferaHomeLogoFields } from "@/components/cms/EsferaHomeEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { appendEventoDraftsToDoc } from "@/lib/cms/content-edit";
 import { promoteAgendaEntryLocally } from "@/lib/agenda-evento";
@@ -236,20 +233,8 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, buildDoc]);
 
   const publish = useCallback(async () => {
-    if (!token || !window.confirm("¿Publicar cambios del inicio?")) return;
-    setBusy(true);
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      await saveCmsDraft("acropolis", token, buildDoc(latest));
-      const publishResult = await publishCms("acropolis", token);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-    } catch (e) {
-      postToEditor({ type: "cms-status", text: String(e), ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, buildDoc]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -263,17 +248,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const setSelected = useCallback(
     (kind: HomeSelectedKind, id: string | null) => {

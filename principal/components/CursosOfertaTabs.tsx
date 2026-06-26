@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { MapPin, Pencil, Plus, User } from "lucide-react";
+import { EyeOff, MapPin, Pencil, Plus, User } from "lucide-react";
 import { CourseInscribeButton } from "@/components/CourseInscribeButton";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
@@ -14,6 +14,55 @@ import {
   accentEyebrowClass,
   accentTokens,
 } from "@/lib/brand-accents";
+
+function OfertaHiddenGrid({
+  items,
+  onEdit,
+  onRestore,
+}: {
+  items: CmsCursosCard[];
+  onEdit: (id: string) => void;
+  onRestore: (id: string) => void;
+}) {
+  return (
+    <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((c) => (
+        <li
+          key={c.id}
+          className="relative flex flex-col overflow-hidden rounded-2xl border border-dashed border-amber-300 bg-white/80 opacity-90"
+        >
+          <div className="flex items-center gap-2 border-b border-amber-200 bg-amber-100/80 px-4 py-2 text-xs font-bold uppercase tracking-wide text-amber-950">
+            <EyeOff className="h-3.5 w-3.5" />
+            Oculto del sitio
+          </div>
+          <div className="flex flex-1 flex-col p-4">
+            <p className="font-bold text-na-heketDark">{c.title}</p>
+            {c.text ? (
+              <p className="mt-1 line-clamp-2 text-sm text-na-muted">{c.text}</p>
+            ) : null}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onEdit(c.id)}
+                className="inline-flex items-center gap-1 rounded-full border border-amber-400 px-3 py-1 text-xs font-semibold text-amber-950"
+              >
+                <Pencil className="h-3 w-3" />
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => onRestore(c.id)}
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white"
+              >
+                Mostrar de nuevo
+              </button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function OfertaGrid({
   items,
@@ -44,14 +93,20 @@ function OfertaGrid({
               </button>
             ) : null}
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-na-heket/5">
-              <Image
-                src={c.src}
-                alt={c.alt}
-                fill
-                unoptimized
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition duration-500 hover:scale-105"
-              />
+              {c.src?.trim() ? (
+                <Image
+                  src={c.src}
+                  alt={c.alt}
+                  fill
+                  unoptimized
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition duration-500 hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-xs text-na-muted">
+                  Sin imagen
+                </div>
+              )}
               {badge ? (
                 <span
                   className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide backdrop-blur ${a.iconWrap} ${a.icon}`}
@@ -94,7 +149,9 @@ function OfertaGrid({
                 sede={c.sede}
                 facilitador={c.facilitador}
                 accentIndex={i}
-                label={c.inscribeLabel ?? "Solicitar info"}
+                label={c.inscribeLabel?.trim() || "Solicitar info"}
+                whatsappNumber={c.inscribeWhatsappNumber}
+                whatsappMessage={c.inscribeWhatsappMessage}
               />
             </div>
           </li>
@@ -110,6 +167,7 @@ export function CursosOfertaTabs() {
 
   if (edit?.ready) {
     const editItems = edit.getOfertaCards("cursos");
+    const hiddenItems = edit.getHiddenOfertaCards("cursos");
     const { permanentes, otros } = splitCursosOferta(editItems);
     return (
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
@@ -166,6 +224,25 @@ export function CursosOfertaTabs() {
               onEdit={(id) => edit.setSelectedId(ofertaSelectedId("cursos", id))}
             />
           </>
+        ) : null}
+        {hiddenItems.length > 0 ? (
+          <div
+            id="cursos-ocultos"
+            className="mt-14 scroll-mt-24 rounded-2xl border border-amber-200 bg-amber-50/60 p-6 sm:p-8"
+          >
+            <h3 className="text-xl font-black text-amber-950 sm:text-2xl">
+              Ocultos del catálogo
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm text-amber-950/80">
+              Estos cursos no se muestran en la web pública. Puedes editarlos o
+              volver a publicarlos desde aquí.
+            </p>
+            <OfertaHiddenGrid
+              items={hiddenItems}
+              onEdit={(id) => edit.setSelectedId(ofertaSelectedId("cursos", id))}
+              onRestore={(id) => edit.restoreOfertaCard("cursos", id)}
+            />
+          </div>
         ) : null}
       </section>
     );

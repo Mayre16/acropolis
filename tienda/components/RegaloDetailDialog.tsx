@@ -23,6 +23,13 @@ function detailImageLayout(item: RegaloItem) {
       sizes: "(max-width: 640px) 224px, 288px",
     };
   }
+  if (item.id === "resaltador-ideas") {
+    return {
+      box: "relative mx-auto aspect-[3/4] w-[calc(14rem+10px)] shrink-0 overflow-hidden rounded-xl bg-transparent shadow-lg sm:w-[calc(18rem+10px)] lg:w-[calc(20rem+10px)]",
+      imageClass: "object-contain object-center p-3 sm:p-4",
+      sizes: "(max-width: 640px) 234px, 330px",
+    };
+  }
   if (item.id === "memorion") {
     return {
       box: "relative mx-auto aspect-[3/4] w-[14rem] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg sm:w-[16rem] md:w-[18rem]",
@@ -32,8 +39,8 @@ function detailImageLayout(item: RegaloItem) {
   }
   if (item.id === "lapiceros-virtudes") {
     return {
-      box: "relative aspect-[16/10] w-[min(100%,32rem)] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg",
-      imageClass: "object-contain p-3 sm:p-4",
+      box: "relative mx-auto aspect-[3/2] w-full max-w-[32rem] overflow-hidden rounded-xl bg-neutral-100 shadow-lg",
+      imageClass: "object-contain object-center p-2 sm:p-3",
       sizes: "(max-width: 640px) 100vw, 512px",
     };
   }
@@ -139,10 +146,8 @@ export function RegaloDetailDialog({
             }`}
           >
             <div
-              className={`flex w-full shrink-0 flex-col items-center sm:w-auto sm:items-start ${
-                item.id === "lapiceros-virtudes"
-                  ? "sm:w-[min(100%,32rem)]"
-                  : ""
+              className={`flex w-full shrink-0 flex-col items-center sm:items-start ${
+                item.id === "lapiceros-virtudes" ? "sm:max-w-[32rem]" : "sm:w-auto"
               }`}
             >
               {imageSrc ? (

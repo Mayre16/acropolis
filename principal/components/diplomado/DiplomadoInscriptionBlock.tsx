@@ -4,14 +4,17 @@ import { ArrowRight, Pencil } from "lucide-react";
 import { useDiplomadoInscriptionDisplay } from "@/lib/cms/diplomado-display";
 import { useFilosofiaCmsEdit } from "@/components/filosofia/cms/FilosofiaCmsEditContext";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
 
 export function DiplomadoInscriptionBlock() {
   const edit = useFilosofiaCmsEdit();
   const ins = useDiplomadoInscriptionDisplay();
   const whatsapp = useWhatsAppUrls();
-  const inscribeHref = `${whatsapp.diplomado}?text=${encodeURIComponent(
-    ins.inscribeWhatsApp ?? "",
-  )}`;
+  const inscribeHref = buildWhatsAppHref(
+    ins.inscribeWhatsappNumber,
+    ins.inscribeWhatsApp,
+    whatsapp.diplomado,
+  );
 
   return (
     <section

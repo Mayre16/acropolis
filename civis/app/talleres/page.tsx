@@ -1,11 +1,10 @@
 import { TalleresOferta } from "@/components/TalleresOferta";
-import { CivisFooter } from "@/components/CivisFooter";
+import { CivisPageShell } from "@/components/cms/CivisPageShell";
 
 export default function TalleresPage() {
   return (
-    <>
+    <CivisPageShell pageId="talleres">
       <TalleresOferta />
-      <CivisFooter />
-    </>
+    </CivisPageShell>
   );
 }

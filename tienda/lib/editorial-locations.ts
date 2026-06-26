@@ -1,4 +1,9 @@
-import { PRINCIPAL_SITE_URL, STORE_WHATSAPP_NUMBER } from "@/lib/site-config";
+import {
+  INFO_EMAIL,
+  PRINCIPAL_SITE_URL,
+  STORE_WHATSAPP_NUMBER,
+} from "@/lib/site-config";
+import type { CmsEditorialDondeContact } from "@/lib/cms/types";
 import { PRINCIPAL_SEDES } from "@/lib/editorial-sedes.generated";
 
 export type EditorialSedeId = string;
@@ -84,6 +89,23 @@ export const EDITORIAL_DONDE = {
     "La librería principal está en Naco; también puedes acercarte a nuestras otras sedes para consultas y retiro de pedidos.",
 } as const;
 
+export type EditorialDondeContact = {
+  phone: string;
+  email: string;
+  whatsappNumber: string;
+  whatsappCtaLabel: string;
+  whatsappMessage: string;
+};
+
+export const EDITORIAL_DONDE_CONTACT: EditorialDondeContact = {
+  phone: "(849) 352-7054",
+  email: INFO_EMAIL,
+  whatsappNumber: STORE_WHATSAPP_NUMBER,
+  whatsappCtaLabel: "Escribir por WhatsApp",
+  whatsappMessage:
+    "Hola, me interesa visitar la Librería Editorial Logos en {sede}.",
+};
+
 export function editorialMapsUrl(query: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
@@ -92,8 +114,38 @@ export function editorialMapsEmbedUrl(query: string): string {
   return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=es&z=16&output=embed`;
 }
 
-export function editorialWhatsAppUrl(message: string): string {
-  return `https://wa.me/${STORE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+export function mergeEditorialDondeContactFields(
+  cms?: CmsEditorialDondeContact | null,
+): EditorialDondeContact {
+  return {
+    phone: cms?.phone ?? EDITORIAL_DONDE_CONTACT.phone,
+    email: cms?.email ?? EDITORIAL_DONDE_CONTACT.email,
+    whatsappNumber: cms?.whatsappNumber ?? EDITORIAL_DONDE_CONTACT.whatsappNumber,
+    whatsappCtaLabel:
+      cms?.whatsappCtaLabel ?? EDITORIAL_DONDE_CONTACT.whatsappCtaLabel,
+    whatsappMessage:
+      cms?.whatsappMessage ?? EDITORIAL_DONDE_CONTACT.whatsappMessage,
+  };
+}
+
+export function editorialWhatsAppUrl(
+  message: string,
+  whatsappNumber: string = STORE_WHATSAPP_NUMBER,
+): string {
+  const digits = whatsappNumber.replace(/\D/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
+export function editorialSedeWhatsAppUrl(
+  sedeName: string,
+  contact: EditorialDondeContact,
+): string {
+  const text = contact.whatsappMessage.replace(/\{sede\}/g, sedeName);
+  return editorialWhatsAppUrl(text, contact.whatsappNumber);
+}
+
+export function editorialTelHref(phone: string): string {
+  return `tel:${phone.replace(/\D/g, "")}`;
 }
 
 export function editorialPrincipalDondeUrl(): string {

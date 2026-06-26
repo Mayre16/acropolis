@@ -11,6 +11,7 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { matchesAppPath } from "@/lib/cms/edit-mode";
 
 const VENUES_STANDALONE_PATHS = ["/donde-estamos", "/esfera"] as const;
@@ -25,14 +26,10 @@ import {
 } from "@/lib/cms/venues-edit";
 import {
   fetchCmsDraft,
-  publishCms,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
+import { postToEditor } from "@/lib/cms/edit-bridge";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import type { CmsDocument, CmsVenue, CmsVenuesContact } from "@/lib/cms/types";
 import {
@@ -124,32 +121,8 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
   }, [token, items, hidden, contact]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (
-      !window.confirm(
-        "¿Publicar? Los visitantes verán estos cambios. Se guarda un respaldo automático.",
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      const next = buildDocWithVenues(latest, items, hidden, contact);
-      await saveCmsDraft("acropolis", token, next);
-      const publishResult = await publishCms("acropolis", token);
-      setDoc(next);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      const text = String(e);
-      setStatus(text);
-      postToEditor({ type: "cms-status", text, ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, items, hidden, contact]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -163,17 +136,7 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchItem = useCallback(
     (id: string, patch: Partial<CmsVenue>) => {
@@ -296,6 +259,13 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
         >
           <VenueEditFields
             venue={selectedVenue}
+            cityHasSede={items.some(
+              (v) =>
+                v.id !== selectedVenue.id &&
+                v.kind === "sede" &&
+                v.city.trim() === selectedVenue.city.trim() &&
+                v.city.trim().length > 0,
+            )}
             onChange={(patch) => patchItem(selectedVenue.id, patch)}
             onHide={() => {
               if (window.confirm("¿Ocultar este espacio del sitio?")) {
@@ -338,6 +308,21 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
                 onChange={(v) => patchContact({ email: v })}
               />
             </div>
+            <EditField
+              label="Número WhatsApp del botón"
+              value={contact.whatsappNumber ?? ""}
+              onChange={(v) => patchContact({ whatsappNumber: v })}
+            />
+            <p className="-mt-2 text-xs text-slate-500">
+              Si lo deja vacío, el botón usará el teléfono mostrado arriba. Solo
+              dígitos o formato internacional (ej. 18299617843).
+            </p>
+            <EditField
+              label="Mensaje prellenado de WhatsApp (opcional)"
+              value={contact.whatsappMessage ?? ""}
+              onChange={(v) => patchContact({ whatsappMessage: v })}
+              multiline
+            />
             <EditField
               label="Texto del botón WhatsApp"
               value={contact.ctaLabel ?? ""}

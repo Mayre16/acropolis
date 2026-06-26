@@ -11,20 +11,18 @@ import {
 } from "react";
 import {
   fetchCmsDraft,
-  publishCms,
   saveCmsDraft,
 } from "@/lib/cms/api-client";
-import {
-  isCmsEditOrigin,
-  postToEditor,
-  type CmsEditMessage,
-} from "@/lib/cms/edit-bridge";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
 import { registerCmsEditInit } from "@/lib/cms/edit-session";
 import {
   DEFAULT_QUIENES_SOMOS_PAGE,
   DEFAULT_RELACIONES_PAGE,
   mergeQuienesSomosPage,
   mergeRelacionesPage,
+  OINA_CIFRAS_SECTION_ID,
+  PERFIL_INSTITUCIONAL_SECTION_ID,
 } from "@/lib/cms/institutional-page-edit";
 import type {
   CmsDocument,
@@ -39,7 +37,9 @@ import {
   HeroEditFields,
 } from "@/components/cms/CmsEditFields";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
+import { BrochurePdfField } from "@/components/cms/PageMediaCmsPanels";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 
 export type InstitutionalPageKey = "quienesSomos" | "relaciones";
@@ -158,23 +158,8 @@ function InstitutionalPageCmsEditInner({
   }, [token, buildDoc]);
 
   const publish = useCallback(async () => {
-    if (!token) return;
-    if (!window.confirm("¿Publicar estos cambios?")) return;
-    setBusy(true);
-    setStatus("Publicando…");
-    try {
-      const latest = await fetchCmsDraft("acropolis");
-      await saveCmsDraft("acropolis", token, buildDoc(latest));
-      const publishResult = await publishCms("acropolis", token);
-      setDirty(false);
-      setStatus(publishResult.message ?? "Publicado.");
-} catch (e) {
-      setStatus(String(e));
-      postToEditor({ type: "cms-status", text: String(e), ok: false });
-    } finally {
-      setBusy(false);
-    }
-  }, [token, buildDoc]);
+    await runCoordinatedCmsPublish();
+  }, []);
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
@@ -188,17 +173,7 @@ function InstitutionalPageCmsEditInner({
     }, "acropolis");
   }, [applyLoadedDoc]);
 
-  useEffect(() => {
-    function onMessage(ev: MessageEvent<CmsEditMessage>) {
-      if (!isCmsEditOrigin(ev.origin)) return;
-      const msg = ev.data;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "cms-save") void saveDraft();
-      if (msg.type === "cms-publish") void publish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [saveDraft, publish]);
+  useCmsEditBridge(saveDraft);
 
   const patchPage = useCallback(
     (patch: Partial<PageData>) => {
@@ -376,6 +351,129 @@ function InstitutionalPageCmsEditInner({
                 patchPage({ presidenciaIntro: v } as Partial<PageData>)
               }
               multiline
+            />
+          </div>
+        </EditPanelChrome>
+      ) : null}
+
+      {selectedId === OINA_CIFRAS_SECTION_ID && qs ? (
+        <EditPanelChrome
+          title="OINA en cifras"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Etiqueta"
+              value={qs.oinaCifrasEyebrow ?? ""}
+              onChange={(v) =>
+                patchPage({ oinaCifrasEyebrow: v } as Partial<PageData>)
+              }
+            />
+            <EditField
+              label="Texto introductorio"
+              value={qs.oinaCifrasIntro ?? ""}
+              onChange={(v) =>
+                patchPage({ oinaCifrasIntro: v } as Partial<PageData>)
+              }
+              multiline
+            />
+            {(qs.oinaStats ?? []).map((s, i) => (
+              <div
+                key={s.id}
+                className="space-y-2 rounded-lg border border-slate-200 p-3"
+              >
+                <p className="text-xs font-bold uppercase text-slate-500">
+                  Cifra {i + 1}
+                </p>
+                <EditField
+                  label="Número o valor"
+                  value={s.value}
+                  onChange={(v) =>
+                    patchPage({
+                      oinaStats: (qs.oinaStats ?? []).map((st) =>
+                        st.id === s.id ? { ...st, value: v } : st,
+                      ),
+                    } as Partial<PageData>)
+                  }
+                />
+                <EditField
+                  label="Descripción"
+                  value={s.label}
+                  onChange={(v) =>
+                    patchPage({
+                      oinaStats: (qs.oinaStats ?? []).map((st) =>
+                        st.id === s.id ? { ...st, label: v } : st,
+                      ),
+                    } as Partial<PageData>)
+                  }
+                  multiline
+                />
+              </div>
+            ))}
+          </div>
+        </EditPanelChrome>
+      ) : null}
+
+      {selectedId === PERFIL_INSTITUCIONAL_SECTION_ID && qs ? (
+        <EditPanelChrome
+          title="Perfil institucional OINADOM"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Etiqueta superior"
+              value={qs.perfilInstitucionalEyebrow ?? ""}
+              onChange={(v) =>
+                patchPage({ perfilInstitucionalEyebrow: v } as Partial<PageData>)
+              }
+            />
+            <EditField
+              label="Título"
+              value={qs.perfilInstitucionalTitle ?? ""}
+              onChange={(v) =>
+                patchPage({ perfilInstitucionalTitle: v } as Partial<PageData>)
+              }
+            />
+            <EditField
+              label="Descripción"
+              value={qs.perfilInstitucionalLede ?? ""}
+              onChange={(v) =>
+                patchPage({ perfilInstitucionalLede: v } as Partial<PageData>)
+              }
+              multiline
+            />
+            <EditField
+              label="Nota (fecha de actualización, etc.)"
+              value={qs.perfilInstitucionalNote ?? ""}
+              onChange={(v) =>
+                patchPage({ perfilInstitucionalNote: v } as Partial<PageData>)
+              }
+            />
+            <EditField
+              label="Texto del botón"
+              value={qs.perfilInstitucionalButtonLabel ?? ""}
+              onChange={(v) =>
+                patchPage({
+                  perfilInstitucionalButtonLabel: v,
+                } as Partial<PageData>)
+              }
+            />
+            <BrochurePdfField
+              label="Archivo PDF del perfil institucional"
+              href={qs.perfilInstitucionalHref ?? ""}
+              token={token}
+              uploadLabel="Subir nuevo PDF"
+              onChange={(v) =>
+                patchPage({ perfilInstitucionalHref: v } as Partial<PageData>)
+              }
             />
           </div>
         </EditPanelChrome>
@@ -597,6 +695,31 @@ function InstitutionalPageCmsEditInner({
               label="Texto"
               value={rel.ctaText ?? ""}
               onChange={(v) => patchPage({ ctaText: v } as Partial<PageData>)}
+              multiline
+            />
+            <EditField
+              label="Texto del botón"
+              value={rel.ctaButtonLabel ?? ""}
+              onChange={(v) =>
+                patchPage({ ctaButtonLabel: v } as Partial<PageData>)
+              }
+            />
+            <EditField
+              label="Número WhatsApp del botón"
+              value={rel.ctaWhatsappNumber ?? ""}
+              onChange={(v) =>
+                patchPage({ ctaWhatsappNumber: v } as Partial<PageData>)
+              }
+            />
+            <p className="-mt-2 text-xs text-slate-500">
+              Vacío = número de WhatsApp cursos del pie de página (CMS global).
+            </p>
+            <EditField
+              label="Mensaje prellenado de WhatsApp"
+              value={rel.ctaWhatsappMessage ?? ""}
+              onChange={(v) =>
+                patchPage({ ctaWhatsappMessage: v } as Partial<PageData>)
+              }
               multiline
             />
           </div>

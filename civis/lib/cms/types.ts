@@ -240,7 +240,106 @@ export type CmsCivisProximaActividad = {
 
 export type CmsSalonLayout = "butacas" | "mesas" | "herradura";
 
+export type CmsPageMediaCard = {
+  id: string;
+  kind: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  title?: string;
+  caption?: string;
+  linkHref?: string;
+  linkLabel?: string;
+};
 
+export type CmsPageMediaBlockWidth = "normal" | "full";
+
+export type CmsPageMediaTextBlock = {
+  id: string;
+  kind: "text";
+  width?: CmsPageMediaBlockWidth;
+  heading?: string;
+  paragraphs: string[];
+};
+
+export type CmsPageMediaMediaLayout = "card" | "voluntariado" | "overlay";
+
+export type CmsPageMediaMediaBlock = {
+  id: string;
+  kind: "media";
+  width?: CmsPageMediaBlockWidth;
+  layout?: CmsPageMediaMediaLayout;
+  imageKind: "image" | "video";
+  src: string;
+  poster?: string;
+  alt: string;
+  area?: string;
+  title?: string;
+  caption?: string;
+  body?: string;
+  linkHref?: string;
+  linkLabel?: string;
+  align?: "left" | "center";
+};
+
+export type CmsPageMediaGalleryDisplay = "grid" | "carousel";
+
+export type CmsPageMediaGalleryBlock = {
+  id: string;
+  kind: "gallery";
+  width?: CmsPageMediaBlockWidth;
+  display?: CmsPageMediaGalleryDisplay;
+  columns?: 2 | 3;
+  layout?: "card" | "overlay";
+  carouselTitle?: string;
+  carouselText?: string;
+  carouselSide?: "left" | "right";
+  align?: "left" | "center";
+  items: CmsPageMediaCard[];
+};
+
+export type CmsPageMediaButtonVariant = "primary" | "outline" | "whatsapp";
+
+export type CmsPageMediaButtonLinkKind = "url" | "whatsapp" | "internal";
+
+export type CmsPageMediaButtonBlock = {
+  id: string;
+  kind: "button";
+  width?: CmsPageMediaBlockWidth;
+  align?: "left" | "center";
+  label: string;
+  linkKind: CmsPageMediaButtonLinkKind;
+  href?: string;
+  whatsappPhone?: string;
+  whatsappMessage?: string;
+  variant?: CmsPageMediaButtonVariant;
+};
+
+export type CmsPageMediaBlockKind = "text" | "media" | "gallery" | "button";
+
+export type CmsPageMediaBlock =
+  | CmsPageMediaTextBlock
+  | CmsPageMediaMediaBlock
+  | CmsPageMediaGalleryBlock
+  | CmsPageMediaButtonBlock;
+
+export type CmsPageMediaTarget =
+  | "home"
+  | "talleres"
+  | "quienes-somos"
+  | "salones"
+  | "nuestro-equipo"
+  | "clientes-aliados";
+
+export type CmsPageMediaSection = {
+  id: string;
+  pageId: CmsPageMediaTarget;
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  blocks?: CmsPageMediaBlock[];
+  cards?: CmsPageMediaCard[];
+};
 
 export type CmsSalon = {
 
@@ -315,6 +414,8 @@ export type CmsDocument = {
     salones?: CmsSalon[];
 
     civisSalonesPage?: CmsCivisSalonesPage;
+
+    pageMediaSections?: CmsPageMediaSection[];
 
   };
 

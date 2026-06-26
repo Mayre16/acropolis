@@ -61,6 +61,41 @@ export const AUTHOR_FILTERS = [
 
 export type AuthorFilterId = (typeof AUTHOR_FILTERS)[number]["id"];
 
+export function extractCmsSlugFromTags(tags?: string): string | undefined {
+  if (!tags) return undefined;
+  const m = tags.match(/(?:^|,)cms:([^,\s]+)/);
+  return m?.[1];
+}
+
+export function cmsPrintedBookId(slug: string): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) {
+    h = (Math.imul(31, h) + slug.charCodeAt(i)) | 0;
+  }
+  return -Math.abs(h || 1);
+}
+
+export function cmsPrintedBookToStoreBook(
+  book: import("@/lib/cms/types").CmsEditorialPrintedBook,
+): StoreBook {
+  return {
+    id: cmsPrintedBookId(book.id),
+    title: book.title,
+    author: book.author ?? "",
+    isbn: book.isbn ?? "",
+    cover_url: book.coverUrl ?? "",
+    summary: book.summary ?? "",
+    price: book.price ?? null,
+    currency: book.currency ?? "DOP",
+    stock: book.stock ?? 0,
+    publisher: book.publisher ?? "",
+    area_tema: book.area_tema ?? "",
+    edition_note: book.priceNote ?? "",
+    contact_email: "",
+    tags: "cms-manual",
+  };
+}
+
 export function coverImageSrc(raw: string | null | undefined): string {
   const u = (raw == null ? "" : String(raw)).trim();
   if (u === "") return "";

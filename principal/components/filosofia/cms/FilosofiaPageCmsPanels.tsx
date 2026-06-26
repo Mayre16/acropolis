@@ -508,6 +508,14 @@ export function FilosofiaCtaPanel() {
         onChange={(v) => ctx.patchFilosofiaPage({ ctaButtonLabel: v })}
       />
       <EditField
+        label="Número WhatsApp del botón"
+        value={p.ctaWhatsappNumber ?? FILOSOFIA_CTA_DEFAULTS.whatsappNumber}
+        onChange={(v) => ctx.patchFilosofiaPage({ ctaWhatsappNumber: v })}
+      />
+      <p className="-mt-2 text-xs text-slate-500">
+        Vacío = número de WhatsApp diplomado del pie de página (CMS global).
+      </p>
+      <EditField
         label="Mensaje WhatsApp"
         value={p.ctaWhatsappMessage ?? FILOSOFIA_CTA_DEFAULTS.whatsappMessage}
         onChange={(v) => ctx.patchFilosofiaPage({ ctaWhatsappMessage: v })}

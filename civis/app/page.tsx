@@ -6,11 +6,11 @@ import { CivisActividadesRecientesFotos } from "@/components/CivisActividadesRec
 import { CivisClientesHomeSection } from "@/components/CivisClientesHomeSection";
 import { CivisEntrenadoresHome } from "@/components/CivisEntrenadoresHome";
 import { CivisSalonesHomeSection } from "@/components/CivisSalonesHomeSection";
-import { CivisFooter } from "@/components/CivisFooter";
+import { CivisPageShell } from "@/components/cms/CivisPageShell";
 
 export default function HomePage() {
   return (
-    <>
+    <CivisPageShell pageId="home">
       <CivisHeroCms
         title="Civis Consulting"
         lede="Talleres y formación para empresas, equipos y líderes: comunicación, convivencia y habilidades para el entorno laboral."
@@ -25,7 +25,6 @@ export default function HomePage() {
       <CivisEntrenadoresHome />
       <CivisActividadesRecientesFotos />
       <CivisSalonesHomeSection />
-      <CivisFooter />
-    </>
+    </CivisPageShell>
   );
 }

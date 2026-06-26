@@ -4,15 +4,18 @@ import { ArrowRight, Pencil } from "lucide-react";
 import { useDiplomadoInscriptionDisplay, useDiplomadoPageDisplay } from "@/lib/cms/diplomado-display";
 import { useFilosofiaCmsEdit } from "@/components/filosofia/cms/FilosofiaCmsEditContext";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
 
 export function DiplomadoHeroIntro() {
   const edit = useFilosofiaCmsEdit();
   const page = useDiplomadoPageDisplay();
   const inscription = useDiplomadoInscriptionDisplay();
   const whatsapp = useWhatsAppUrls();
-  const inscribeHref = `${whatsapp.diplomado}?text=${encodeURIComponent(
-    inscription.inscribeWhatsApp ?? "",
-  )}`;
+  const inscribeHref = buildWhatsAppHref(
+    inscription.inscribeWhatsappNumber,
+    inscription.inscribeWhatsApp,
+    whatsapp.diplomado,
+  );
 
   return (
     <div id="diplomado-hero-copy" className="relative">

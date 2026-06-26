@@ -6,6 +6,7 @@ import type {
   CmsDocument,
   CmsEditorialDigitalBook,
   CmsEditorialDigitalBookGroup,
+  CmsEditorialPrintedBook,
   CmsEditorialRegalo,
   CmsEditorialRevista,
   CmsEditorialSede,
@@ -25,7 +26,6 @@ import {
   REGALO_CATEGORIES,
   REGALOS,
   REVISTAS,
-  type RegaloCategory,
   type RegaloItem,
   type RevistaItem,
 } from "@/lib/editorial-extras";
@@ -35,10 +35,12 @@ import {
 } from "@/lib/editorial-home-cards";
 import {
   EDITORIAL_DONDE,
+  EDITORIAL_DONDE_CONTACT,
   EDITORIAL_SEDES,
   EDITORIAL_STORE_HOURS,
   EDITORIAL_STORE_PHOTO,
   EDITORIAL_VISIT,
+  mergeEditorialDondeContactFields,
   type EditorialSede,
 } from "@/lib/editorial-locations";
 import {
@@ -176,6 +178,12 @@ export function mergeEditorialDondePage(cms: CmsDocument | null | undefined) {
   };
 }
 
+export function mergeEditorialDondeContact(
+  cms: CmsDocument | null | undefined,
+) {
+  return mergeEditorialDondeContactFields(cms?.sections.editorialDonde?.contact);
+}
+
 export function mergeEditorialStorePhoto(cms: CmsDocument | null | undefined) {
   const photo = cms?.sections.editorialDonde?.storePhoto;
   if (!photo) return EDITORIAL_STORE_PHOTO;
@@ -271,9 +279,9 @@ export function mergeEditorialRegaloCategories(
   if (!items?.length) return fallback;
   const fbMap = new Map(fallback.map((item) => [item.id, item]));
   return items.map((item) => {
-    const fb = fbMap.get(item.id as RegaloCategory);
+    const fb = fbMap.get(item.id);
     return {
-      id: item.id as RegaloCategory,
+      id: item.id,
       label: item.label ?? fb?.label ?? item.id,
       description: item.description ?? fb?.description ?? "",
     };
@@ -310,7 +318,7 @@ function mergeRegaloItem(
       : undefined;
   return {
     id: cms.id,
-    category: (cms.category ?? fb?.category ?? "separadores") as RegaloCategory,
+    category: cms.category ?? fb?.category ?? "separadores",
     title: cms.title ?? fb?.title ?? cms.id,
     description: cms.description ?? fb?.description ?? "",
     quote: cms.quote ?? fb?.quote,
@@ -365,7 +373,32 @@ export function mergeEditorialBookFilters(cms: CmsDocument | null | undefined) {
           item.id,
       }))
     : AUTHOR_FILTERS.map((f) => ({ id: f.id, label: f.label }));
-  return { themes, authorFilters };
+  const publishers = filters?.publishers?.length
+    ? filters.publishers
+    : ["Editorial Nueva Acrópolis"];
+  return { themes, authorFilters, publishers };
+}
+
+const MEMORION_FALLBACK: CmsEditorialRegalo = {
+  id: "memorion",
+  category: "papeleria",
+  title: "Memorion — juego de cartas",
+  description:
+    "Juego educativo de Editorial Nueva Acrópolis para entrenar la memoria. Consulte disponibilidad y precio con nosotros.",
+  imageUrl: "/img/regalos/memorion.webp",
+  priceNote: "Consultar disponibilidad",
+};
+
+export function mergeEditorialMemorion(
+  cms: CmsDocument | null | undefined,
+): CmsEditorialRegalo {
+  return { ...MEMORION_FALLBACK, ...cms?.sections.editorialMemorion };
+}
+
+export function mergeEditorialPrintedBooks(
+  cms: CmsDocument | null | undefined,
+): CmsEditorialPrintedBook[] {
+  return cms?.sections.editorialPrintedBooks ?? [];
 }
 
 function mergeDigitalBook(
@@ -441,6 +474,7 @@ export {
   EDITORIAL_QUIENES_SOMOS,
   EDITORIAL_VISIT,
   EDITORIAL_DONDE,
+  EDITORIAL_DONDE_CONTACT,
   EDITORIAL_STORE_PHOTO,
   EDITORIAL_SEDES,
   REVISTAS,

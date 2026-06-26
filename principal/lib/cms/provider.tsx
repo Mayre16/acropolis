@@ -14,6 +14,7 @@ import {
   type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
 import { HeroCarouselCmsEditProvider } from "@/components/cms/HeroCarouselCmsEditContext";
+import { CmsPublishCoordinator } from "@/components/cms/CmsPublishCoordinator";
 import { SiteFooterCmsEditProvider } from "@/components/cms/SiteFooterCmsEditContext";
 import { PlatformNavCmsEditProvider } from "@/components/cms/PlatformNavCmsEditContext";
 import type { CmsDocument } from "@/lib/cms/types";
@@ -54,6 +55,7 @@ export function CmsProvider({ children }: { children: ReactNode }) {
   return (
     <CmsContext.Provider value={doc}>
       <Suspense fallback={null}>
+        <CmsPublishCoordinator />
         <HeroCarouselCmsEditProvider>
           <SiteFooterCmsEditProvider>
             <PlatformNavCmsEditProvider>{children}</PlatformNavCmsEditProvider>

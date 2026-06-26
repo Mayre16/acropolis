@@ -12,6 +12,38 @@ import { useCmsEditorEmbedded } from "@/hooks/useCmsEditorEmbedded";
 const fieldClass =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm";
 
+export function EditSelectField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder = "Seleccionar…",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+}) {
+  return (
+    <label className="block text-sm">
+      <span className="font-semibold text-slate-700">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={fieldClass}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export function EditField({
   label,
   value,
@@ -199,6 +231,61 @@ export function UrlImageField({
   );
 }
 
+export function ParagraphsField({
+  paragraphs,
+  onChange,
+  label = "Párrafos",
+}: {
+  paragraphs: string[];
+  onChange: (v: string[]) => void;
+  label?: string;
+}) {
+  const body = paragraphs.length > 0 ? paragraphs : [""];
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">{label}</span>
+        <button
+          type="button"
+          className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold"
+          onClick={() => onChange([...body, ""])}
+        >
+          + Párrafo
+        </button>
+      </div>
+      {body.map((p, pi) => (
+        <div key={pi} className="flex gap-2">
+          <label className="min-w-0 flex-1 block text-sm">
+            <span className="text-xs font-semibold text-slate-600">
+              Párrafo {pi + 1}
+            </span>
+            <textarea
+              value={p}
+              onChange={(e) => {
+                const next = [...body];
+                next[pi] = e.target.value;
+                onChange(next);
+              }}
+              rows={3}
+              spellCheck
+              lang="es"
+              className={fieldClass}
+            />
+          </label>
+          <button
+            type="button"
+            className="shrink-0 self-start text-xs text-red-600"
+            onClick={() => onChange(body.filter((_, j) => j !== pi))}
+          >
+            ×
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function EditPanelChrome({
   title,
   dirty,
@@ -371,6 +458,24 @@ export function EditorialEditPencil({
       title={label}
     >
       ✎
+    </button>
+  );
+}
+
+export function CmsSectionEditBar({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase text-amber-950"
+    >
+      ✎ {label}
     </button>
   );
 }

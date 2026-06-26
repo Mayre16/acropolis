@@ -106,24 +106,271 @@ async function darkBgToAlpha(buffer, { threshold = 38 } = {}) {
   return sharp(data, { raw: info }).png().toBuffer();
 }
 
-/** Título del catálogo → blanco nítido sobre camiseta negra. */
-async function titleInkToWhite(buffer) {
-  const { data, info } = await sharp(buffer)
+/** Quita marcas de registro (X, cruces) del arte Metaphysica. */
+function distToSegment(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(px - x1, py - y1);
+  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lenSq));
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+function eraseDiagonalGuideStrips(data, width, height) {
+  const lines = [
+    [
+      [0.25, 0.43],
+      [0.75, 0.92],
+    ],
+    [
+      [0.75, 0.43],
+      [0.25, 0.92],
+    ],
+  ];
+  const strip = 6;
+  const out = Buffer.from(data);
+  for (const [[x1n, y1n], [x2n, y2n]] of lines) {
+    const x1 = x1n * width;
+    const y1 = y1n * height;
+    const x2 = x2n * width;
+    const y2 = y2n * height;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (inMetaphysicaBustArea(x, y, width, height)) continue;
+        if (distToSegment(x, y, x1, y1, x2, y2) > strip) continue;
+        const i = (y * width + x) * 4;
+        const lum = Math.max(data[i], data[i + 1], data[i + 2]);
+        if (lum > 55) continue;
+        out[i] = 0;
+        out[i + 1] = 0;
+        out[i + 2] = 0;
+      }
+    }
+  }
+  return out;
+}
+
+function inMetaphysicaBustArea(x, y, width, height) {
+  const nx = x / width;
+  const ny = y / height;
+  const boxes = [
+    [0.1, 0.4, 0.48, 0.68],
+    [0.52, 0.4, 0.9, 0.68],
+    [0.1, 0.68, 0.48, 0.95],
+    [0.52, 0.68, 0.9, 0.95],
+  ];
+  return boxes.some(
+    ([x0, y0, x1, y1]) => nx >= x0 && nx <= x1 && ny >= y0 && ny <= y1,
+  );
+}
+
+function removeTitleGuideMarks(data, width, height) {
+  const out = Buffer.from(data);
+  const y1 = Math.round(height * 0.3);
+  const R = 3;
+  for (let y = 0; y < y1; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const lum = Math.max(data[i], data[i + 1], data[i + 2]);
+      const sat =
+        Math.max(data[i], data[i + 1], data[i + 2]) -
+        Math.min(data[i], data[i + 1], data[i + 2]);
+      if (lum < 90 || lum > 245 || sat > 18) continue;
+      const neighbors = [];
+      for (let dy = -R; dy <= R; dy++) {
+        for (let dx = -R; dx <= R; dx++) {
+          if (!dx && !dy) continue;
+          const ni = ((y + dy) * width + (x + dx)) * 4;
+          neighbors.push(Math.max(data[ni], data[ni + 1], data[ni + 2]));
+        }
+      }
+      const mean = neighbors.reduce((a, b) => a + b, 0) / neighbors.length;
+      if (mean < 170) continue;
+      neighbors.sort((a, b) => a - b);
+      const med = neighbors[Math.floor(neighbors.length / 2)];
+      if (lum < med + 8) continue;
+      const v = Math.round(med);
+      out[i] = v;
+      out[i + 1] = v;
+      out[i + 2] = v;
+    }
+  }
+  return out;
+}
+
+function removeMetaphysicaWatermarks(data, width, height) {
+  let cur = Buffer.from(data);
+  const R = 6;
+
+  for (let pass = 0; pass < 2; pass++) {
+    const out = Buffer.from(cur);
+    for (let y = R; y < height - R; y++) {
+      for (let x = R; x < width - R; x++) {
+        const i = (y * width + x) * 4;
+        const lum = Math.max(cur[i], cur[i + 1], cur[i + 2]);
+        const sat =
+          Math.max(cur[i], cur[i + 1], cur[i + 2]) -
+          Math.min(cur[i], cur[i + 1], cur[i + 2]);
+        if (lum < 35 || lum > 248 || sat > 18) continue;
+        let dark = 0;
+        let total = 0;
+        for (let dy = -R; dy <= R; dy++) {
+          for (let dx = -R; dx <= R; dx++) {
+            if (!dx && !dy) continue;
+            total++;
+            const ni = ((y + dy) * width + (x + dx)) * 4;
+            if (Math.max(cur[ni], cur[ni + 1], cur[ni + 2]) < 32) dark++;
+          }
+        }
+        if (dark / total > 0.5) {
+          out[i] = 0;
+          out[i + 1] = 0;
+          out[i + 2] = 0;
+        }
+      }
+    }
+    cur = out;
+  }
+
+  const peakR = 3;
+  for (let pass = 0; pass < 3; pass++) {
+    const out = Buffer.from(cur);
+    for (let y = peakR; y < height - peakR; y++) {
+      for (let x = peakR; x < width - peakR; x++) {
+        const i = (y * width + x) * 4;
+        const lum = Math.max(cur[i], cur[i + 1], cur[i + 2]);
+        const sat =
+          Math.max(cur[i], cur[i + 1], cur[i + 2]) -
+          Math.min(cur[i], cur[i + 1], cur[i + 2]);
+        if (lum < 175 || lum > 252 || sat > 22) continue;
+        const neighbors = [];
+        let isPeak = true;
+        for (let dy = -peakR; dy <= peakR; dy++) {
+          for (let dx = -peakR; dx <= peakR; dx++) {
+            if (!dx && !dy) continue;
+            const ni = ((y + dy) * width + (x + dx)) * 4;
+            const l = Math.max(cur[ni], cur[ni + 1], cur[ni + 2]);
+            neighbors.push(l);
+            if (l >= lum) isPeak = false;
+          }
+        }
+        const mean = neighbors.reduce((a, b) => a + b, 0) / neighbors.length;
+        if (!isPeak || lum < mean + 12) continue;
+        neighbors.sort((a, b) => a - b);
+        const v = Math.round(neighbors[Math.floor(neighbors.length / 2)]);
+        out[i] = v;
+        out[i + 1] = v;
+        out[i + 2] = v;
+      }
+    }
+    cur = out;
+  }
+
+  for (let pass = 0; pass < 2; pass++) {
+    const out = Buffer.from(cur);
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const i = (y * width + x) * 4;
+        const lum = Math.max(cur[i], cur[i + 1], cur[i + 2]);
+        const sat =
+          Math.max(cur[i], cur[i + 1], cur[i + 2]) -
+          Math.min(cur[i], cur[i + 1], cur[i + 2]);
+        if (lum < 38 || lum > 100 || sat > 20) continue;
+        let darkCard = 0;
+        for (const [dx, dy] of [
+          [0, -1],
+          [0, 1],
+          [-1, 0],
+          [1, 0],
+        ]) {
+          const ni = ((y + dy) * width + (x + dx)) * 4;
+          if (Math.max(cur[ni], cur[ni + 1], cur[ni + 2]) < 32) darkCard++;
+        }
+        if (darkCard >= 2) {
+          out[i] = 0;
+          out[i + 1] = 0;
+          out[i + 2] = 0;
+        }
+      }
+    }
+    cur = out;
+  }
+
+  const y0 = Math.round(height * 0.32);
+  const y1 = Math.round(height * 0.92);
+  const x0 = Math.round(width * 0.12);
+  const x1 = Math.round(width * 0.88);
+  const inpaintR = 4;
+  for (let pass = 0; pass < 2; pass++) {
+    const out = Buffer.from(cur);
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        const i = (y * width + x) * 4;
+        const lum = Math.max(cur[i], cur[i + 1], cur[i + 2]);
+        if (lum < 115 || lum > 252) continue;
+        const neighbors = [];
+        for (let dy = -inpaintR; dy <= inpaintR; dy++) {
+          for (let dx = -inpaintR; dx <= inpaintR; dx++) {
+            if (!dx && !dy) continue;
+            const ni = ((y + dy) * width + (x + dx)) * 4;
+            neighbors.push(Math.max(cur[ni], cur[ni + 1], cur[ni + 2]));
+          }
+        }
+        neighbors.sort((a, b) => a - b);
+        const med = neighbors[Math.floor(neighbors.length / 2)];
+        if (lum > med + 16) {
+          const v = Math.round(med);
+          out[i] = v;
+          out[i + 1] = v;
+          out[i + 2] = v;
+        }
+      }
+    }
+    cur = out;
+  }
+
+  cur = eraseDiagonalGuideStrips(cur, width, height);
+  cur = removeTitleGuideMarks(cur, width, height);
+
+  return cur;
+}
+
+/** Recorta guías del arte (franjas laterales, marcas de registro). */
+async function prepMetaphysicaArt(catalogPath, designWidth) {
+  const { data, info } = await sharp(catalogPath)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i + 3] === 0) continue;
-    data[i] = 255;
-    data[i + 1] = 255;
-    data[i + 2] = 255;
-  }
-  return sharp(data, { raw: info }).png().toBuffer();
+  const cleaned = removeMetaphysicaWatermarks(
+    data,
+    info.width,
+    info.height,
+  );
+  const cleanedPng = await sharp(cleaned, {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  })
+    .png()
+    .toBuffer();
+
+  const trimmed = await sharp(cleanedPng).trim({ threshold: 20 }).toBuffer();
+  const { width, height } = await sharp(trimmed).metadata();
+  const topCrop = 58;
+  const sideCrop = 12;
+  return sharp(trimmed)
+    .extract({
+      left: sideCrop,
+      top: topCrop,
+      width: width - sideCrop * 2,
+      height: height - topCrop,
+    })
+    .resize({ width: designWidth, kernel: sharp.kernel.lanczos3 })
+    .png()
+    .toBuffer();
 }
 
-/** Metaphysica: mockup + título METAPHYSICA estilo Metallica del arte de catálogo. */
+/** Metaphysica: camiseta negra + póster completo (título + bustos). */
 async function buildMetaphysicaTee(item) {
-  const basePath = path.join(SRC, `tee-base-${item.key}.png`);
+  const basePath = path.join(SRC, "tee-base-negra.png");
   const catalogPath = path.join(SRC, "tee-metaphysica-catalog.png");
   if (!fs.existsSync(basePath)) {
     console.warn("Falta base:", basePath);
@@ -134,22 +381,15 @@ async function buildMetaphysicaTee(item) {
     return;
   }
 
-  const titleWidth = 560;
-  const titleLeft = 768 - Math.round(titleWidth / 2);
-  const titleTop = 158;
-
-  const titleLayer = await titleInkToWhite(
-    await darkBgToAlpha(
-      await sharp(catalogPath)
-        .extract({ left: 0, top: 0, width: 1024, height: 298 })
-        .resize({ width: titleWidth, kernel: sharp.kernel.lanczos3 })
-        .png()
-        .toBuffer(),
-    ),
-  );
+  const designWidth = 520;
+  const resized = await prepMetaphysicaArt(catalogPath, designWidth);
+  const designLayer = await darkBgToAlpha(resized, { threshold: 65 });
+  const { width: dw, height: dh } = await sharp(designLayer).metadata();
+  const designLeft = 768 - Math.round(dw / 2);
+  const designTop = 248;
 
   const composed = await sharp(basePath)
-    .composite([{ input: titleLayer, left: titleLeft, top: titleTop }])
+    .composite([{ input: designLayer, left: designLeft, top: designTop }])
     .png()
     .toBuffer();
 

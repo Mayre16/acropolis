@@ -36,6 +36,7 @@ import {
   triggerDeployAfterPublish,
   cmsPublishUserMessage,
 } from "../lib/deploy-webhook.mjs";
+import { syncEditorialPrintedBooks } from "../lib/bookstore-sync.mjs";
 import {
   loadSmtpConfig,
   publicSmtpConfig,
@@ -46,6 +47,11 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = path.join(ROOT, "data");
 const PORT = Number(process.env.CMS_API_PORT || 3401);
 const ADMIN_PASSWORD = process.env.CMS_ADMIN_PASSWORD || "acropolis-edit";
+const STORE_SYNC_CONFIG = {
+  store_api_url: process.env.STORE_API_URL || "https://biblioteca-oina.adesa.com.do",
+  store_upsert_path: process.env.STORE_UPSERT_PATH || "/api/bookstore_upsert.php",
+  store_sync_token: process.env.STORE_SYNC_TOKEN || "",
+};
 
 ensureAuthUsersSeeded();
 
@@ -540,10 +546,16 @@ const server = http.createServer(async (req, res) => {
         );
       }
       const draft = normalizeCmsDocument(readJson(draftPath(site)));
+      let bookstoreSync = null;
+      if (site === "editorial") {
+        bookstoreSync = await syncEditorialPrintedBooks(draft, STORE_SYNC_CONFIG);
+      }
       draft.updatedAt = new Date().toISOString();
       fs.writeFileSync(publishedPath(site), JSON.stringify(draft, null, 2));
       fs.writeFileSync(draftPath(site), JSON.stringify(draft, null, 2));
       const deploy = await triggerDeployAfterPublish(site);
+      let message = cmsPublishUserMessage(deploy);
+      if (bookstoreSync?.message) message += ` ${bookstoreSync.message}`;
       json(
         res,
         200,
@@ -551,8 +563,25 @@ const server = http.createServer(async (req, res) => {
           ok: true,
           updatedAt: draft.updatedAt,
           deploy,
-          message: cmsPublishUserMessage(deploy),
+          bookstoreSync,
+          message,
         },
+        origin,
+      );
+      return;
+    }
+
+    if (pathname === "/content/editorial/sync-books" && req.method === "POST") {
+      if (!requireAuth(req, res, origin)) return;
+      ensureSite("editorial");
+      const draft = normalizeCmsDocument(readJson(draftPath("editorial")));
+      const bookstoreSync = await syncEditorialPrintedBooks(draft, STORE_SYNC_CONFIG);
+      draft.updatedAt = new Date().toISOString();
+      fs.writeFileSync(draftPath("editorial"), JSON.stringify(draft, null, 2));
+      json(
+        res,
+        bookstoreSync.ok ? 200 : 207,
+        { ok: bookstoreSync.ok, bookstoreSync },
         origin,
       );
       return;

@@ -172,20 +172,24 @@ export function ImageField({
 export function BodyField({
   body,
   onChange,
+  label = "Cuerpo (un párrafo por bloque)",
+  addLabel = "+ Párrafo",
 }: {
   body: string[];
   onChange: (v: string[]) => void;
+  label?: string;
+  addLabel?: string;
 }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Cuerpo (un párrafo por bloque)</span>
+        <span className="text-sm font-medium">{label}</span>
         <button
           type="button"
           className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold"
           onClick={() => onChange([...body, ""])}
         >
-          + Párrafo
+          {addLabel}
         </button>
       </div>
       {body.map((p, pi) => (
