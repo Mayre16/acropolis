@@ -25,11 +25,13 @@ export function HomeHeroCms() {
     "Nueva Acrópolis República Dominicana";
 
   const backgroundSrc =
-    (edit?.ready
-      ? draft?.background?.src
-      : isCmsEnabled()
-        ? published?.background?.src
-        : undefined) ?? HOME_HERO_BACKGROUND.src;
+    (
+      (edit?.ready
+        ? draft?.background?.src
+        : isCmsEnabled()
+          ? published?.background?.src
+          : undefined) ?? HOME_HERO_BACKGROUND.src
+    ).trim() || HOME_HERO_BACKGROUND.src;
   const backgroundAlt =
     (edit?.ready
       ? draft?.background?.alt
@@ -45,18 +47,14 @@ export function HomeHeroCms() {
       id="home-hero"
       className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat md:bg-fixed"
-        style={{ backgroundImage: `url(${resolvedBackgroundSrc})` }}
-        aria-hidden
-      />
+      {/* Imagen con <Image> en todos los breakpoints: md:bg-fixed falla en iframe del editor. */}
       <Image
         src={resolvedBackgroundSrc}
         alt={backgroundAlt}
         fill
         priority
         unoptimized
-        className="object-cover object-center md:hidden"
+        className="object-cover object-center"
         sizes="100vw"
       />
       <div
