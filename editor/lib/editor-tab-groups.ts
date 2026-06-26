@@ -7,10 +7,14 @@ export type TabGroup = {
 };
 
 const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
-  { label: "Inicio y ubicación", tabs: ["home", "homeHero", "sedes"] },
-  { label: "Programas y formación", tabs: ["cursos", "diplomado", "diplomadoHero", "filosofia"] },
-  { label: "Actividades", tabs: ["voluntariado", "eventos", "agenda"] },
-  { label: "Artículos y cultura", tabs: ["articulos", "medios", "cultura"] },
+  { label: "Inicio y ubicación", tabs: ["home", "sedes"] },
+  { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia"] },
+  { label: "Contenido digital", tabs: ["contenido"] },
+  {
+    label: "Actividades",
+    tabs: ["voluntariado", "eventos", "agenda", "cultura", "esfera"],
+  },
+  { label: "Artículos", tabs: ["articulos", "medios"] },
   { label: "Viajes", tabs: ["viajesLocales", "viajesInternacionales"] },
   { label: "Archivos", tabs: ["archivos"] },
 ];

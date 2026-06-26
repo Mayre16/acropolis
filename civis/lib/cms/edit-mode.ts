@@ -32,6 +32,18 @@ export function isInEditorIframe() {
   return window.parent !== window.self;
 }
 
+/** Quita NEXT_PUBLIC_BASE_PATH; Next lo vuelve a prefijar en router.push/replace. */
+export function pathnameForAppRouter(pathname: string): string {
+  const base = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
+  if (!base) return pathname;
+  if (pathname === base) return "/";
+  if (pathname.startsWith(`${base}/`)) {
+    const rest = pathname.slice(base.length);
+    return rest || "/";
+  }
+  return pathname;
+}
+
 /** Normaliza rutas con o sin barra final (Next `trailingSlash: true`). */
 export function normalizeAppPath(pathname: string): string {
   if (!pathname || pathname === "/") return "/";

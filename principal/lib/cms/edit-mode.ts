@@ -22,12 +22,25 @@ export function parseCmsEditParam(
   return value === "1" || value === "medios" ? value : null;
 }
 
+/** Quita NEXT_PUBLIC_BASE_PATH; Next lo vuelve a prefijar en router.push/replace. */
+export function pathnameForAppRouter(pathname: string): string {
+  const base = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
+  if (!base) return pathname;
+  if (pathname === base) return "/";
+  if (pathname.startsWith(`${base}/`)) {
+    const rest = pathname.slice(base.length);
+    return rest || "/";
+  }
+  return pathname;
+}
+
 /** Al salir de /articulos en modo «medios», el resto del sitio usa edición completa. */
 export function resolveEditModeForPath(
   mode: CmsEditMode,
   pathname: string,
 ): CmsEditMode {
-  if (mode === "medios" && !pathname.startsWith("/articulos")) {
+  const route = pathnameForAppRouter(pathname);
+  if (mode === "medios" && !route.startsWith("/articulos")) {
     return "1";
   }
   return mode;

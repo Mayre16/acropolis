@@ -25,8 +25,8 @@ const cmsApiUrl =
   `${editorUrl.replace(/\/$/, "")}/api`;
 
 const githubPagesPreview =
-  process.env.EDITOR_PREVIEW_GITHUB_PAGES === "1" ||
-  process.env.EDITOR_PREVIEW_GITHUB_PAGES === "true";
+  process.env.EDITOR_PREVIEW_GITHUB_PAGES !== "0" &&
+  process.env.EDITOR_PREVIEW_GITHUB_PAGES !== "false";
 const ghUser = process.env.GITHUB_PAGES_USER?.trim() || "mayre16";
 const ghRepo = process.env.GITHUB_PAGES_REPO?.trim() || "acropolis";
 const ghBase = `https://${ghUser}.github.io/${ghRepo}`;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { isCmsEditOrigin, postToEditor, type CmsEditMessage } from "@/lib/cms/edit-bridge";
 import { setCmsEditSession } from "@/lib/cms/edit-session";
 import {
@@ -17,9 +17,11 @@ import {
  * Mantiene el modo edición al navegar por el sitio dentro del iframe del editor:
  * guarda cmsEdit en sessionStorage, añade el parámetro a los enlaces internos y
  * pide al editor que reenvíe el token al cambiar de página.
+ *
+ * Navegación con recarga completa (no App Router): en export estático + iframe,
+ * router.push no actualiza bien la URL ni carga la página destino.
  */
 export function CmsEditModeBootstrap() {
-  const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   const param = parseCmsEditParam(params.get("cmsEdit"));
@@ -56,8 +58,8 @@ export function CmsEditModeBootstrap() {
     const url = new URL(window.location.href);
     if (url.searchParams.get("cmsEdit") === stored) return;
     url.searchParams.set("cmsEdit", stored);
-    router.replace(`${url.pathname}${url.search}${url.hash}`);
-  }, [param, router, pathname]);
+    window.location.replace(url.toString());
+  }, [param, pathname]);
 
   useEffect(() => {
     if (!isInEditorIframe()) return;
@@ -68,6 +70,7 @@ export function CmsEditModeBootstrap() {
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
+      if (!isInEditorIframe()) return;
       const stored = readStoredCmsEditMode();
       if (!stored) return;
 
@@ -94,19 +97,17 @@ export function CmsEditModeBootstrap() {
       }
       if (url.origin !== window.location.origin) return;
 
-      const mode = resolveEditModeForPath(stored, url.pathname);
-      if (url.searchParams.get("cmsEdit") === mode) return;
-
       e.preventDefault();
       e.stopPropagation();
+      const mode = resolveEditModeForPath(stored, url.pathname);
       url.searchParams.set("cmsEdit", mode);
       persistCmsEditMode(mode);
-      router.push(`${url.pathname}${url.search}${url.hash}`);
+      window.location.assign(url.toString());
     }
 
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, [router]);
+  }, []);
 
   /** Next 15 muestra "[object Event]" cuando falla un chunk/recurso sin mensaje. */
   useEffect(() => {

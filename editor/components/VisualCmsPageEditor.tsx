@@ -4,18 +4,11 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getToken } from "@/lib/auth-storage";
 import type { CmsEditMessage } from "@/lib/edit-bridge";
-
-const PRINCIPAL_URL =
-  process.env.NEXT_PUBLIC_PRINCIPAL_URL?.replace(/\/$/, "") ||
-  "http://localhost:3100";
-
-const CIVIS_URL =
-  process.env.NEXT_PUBLIC_CIVIS_URL?.replace(/\/$/, "") ||
-  "http://localhost:3200";
-
-const TIENDA_URL =
-  process.env.NEXT_PUBLIC_TIENDA_URL?.replace(/\/$/, "") ||
-  "http://localhost:3300";
+import {
+  previewCivisUrl,
+  previewPrincipalUrl,
+  previewTiendaUrl,
+} from "@/lib/preview-urls";
 
 type VisualCmsPageEditorProps = {
   title: string;
@@ -39,10 +32,10 @@ export function VisualCmsPageEditor({
 }: VisualCmsPageEditorProps) {
   const siteUrl =
     site === "civis"
-      ? CIVIS_URL
+      ? previewCivisUrl()
       : site === "editorial"
-        ? TIENDA_URL
-        : PRINCIPAL_URL;
+        ? previewTiendaUrl()
+        : previewPrincipalUrl();
   const previewOrigin = useMemo(() => {
     try {
       return new URL(siteUrl).origin;
@@ -194,6 +187,41 @@ export function VisualFilosofiaEditor() {
           <strong>próximas sesiones</strong>. Las actividades del carrusel del home se
           editan en la página de inicio.
           Pulsa <strong>Guardar</strong> al terminar.
+        </>
+      }
+    />
+  );
+}
+
+export function VisualContenidoEditor() {
+  return (
+    <VisualCmsPageEditor
+      title="Contenido digital"
+      path="/contenido/"
+      hint={
+        <>
+          Hub de <strong>contenido digital</strong>: acceso a artículos, eventos, agenda,
+          Revista Esfinge, biblioteca y librería. Para editar actividades concretas usa
+          las pestañas <strong>Agenda</strong>, <strong>Artículos</strong>,{" "}
+          <strong>Eventos</strong> o las páginas de actividades (Inicio, Cursos, Cultura,
+          Voluntariado).
+        </>
+      }
+    />
+  );
+}
+
+export function VisualAgendaEditor() {
+  return (
+    <VisualCmsPageEditor
+      title="Agenda"
+      path="/agenda/"
+      hint={
+        <>
+          Listado público de la <strong>agenda completa</strong>. Las entradas se editan
+          en <strong>Inicio</strong> (carrusel), <strong>Cursos</strong>,{" "}
+          <strong>Cultura</strong>, <strong>Voluntariado</strong> y{" "}
+          <strong>Eventos</strong> — clic en ✎ en cada tarjeta o actividad.
         </>
       }
     />

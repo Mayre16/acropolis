@@ -1271,8 +1271,8 @@ export type CmsDocument = {
 export const CMS_SECTION_LABELS: Record<string, string> = {
   filosofia: "Filosofía — sesiones (visual)",
   homeHero: "Inicio — textos hero",
-  diplomadoHero: "Diplomado — badge y sesión",
-  agenda: "Agenda — cursos, talleres, conferencias",
+  contenido: "Contenido digital (visual)",
+  agenda: "Agenda completa (visual)",
   articulos: "Artículos / blog (visual)",
   medios: "Voz fuera de la sede (visual)",
   viajesLocales: "Viajes locales (visual)",

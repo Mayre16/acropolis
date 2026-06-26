@@ -15,8 +15,6 @@ import { getToken, clearToken, getEditorRole, getEditorLabel } from "@/lib/auth-
 import {
   CMS_SECTION_LABELS,
   SITE_LABELS,
-  type AgendaCategory,
-  type CmsAgendaEntry,
   type CmsCivisProximaActividad,
   type CmsCivisTallerRealizado,
   type CmsDocument,
@@ -31,6 +29,8 @@ import {
   MediaField,
 } from "@/components/MediaFields";
 import {
+  VisualContenidoEditor,
+  VisualAgendaEditor,
   VisualFilosofiaEditor,
   VisualArticulosEditor,
   VisualEventosEditor,
@@ -84,6 +84,8 @@ const VISUAL_TABS = new Set([
   "cursos",
   "diplomado",
   "eventos",
+  "contenido",
+  "agenda",
   "civisHome",
   "civisTalleres",
   "civisQuienesSomos",
@@ -113,6 +115,8 @@ function VisualEditors({
 }) {
   return (
     <>
+      {tab === "contenido" && site === "acropolis" && <VisualContenidoEditor />}
+      {tab === "agenda" && site === "acropolis" && <VisualAgendaEditor />}
       {tab === "filosofia" && site === "acropolis" && <VisualFilosofiaEditor />}
       {tab === "articulos" && site === "acropolis" && <VisualArticulosEditor />}
       {tab === "medios" && site === "acropolis" && <VisualMediosEditor />}
@@ -171,19 +175,6 @@ function VisualEditors({
       {tab === "esfera" && site === "acropolis" && <VisualEsferaEditor />}
     </>
   );
-}
-
-const AGENDA_CATEGORIES: AgendaCategory[] = [
-  "diplomado",
-  "curso",
-  "taller",
-  "conferencia",
-  "cultura",
-  "voluntariado",
-];
-
-function newAgendaId() {
-  return `item-${Date.now().toString(36)}`;
 }
 
 export default function EditSitePage() {
@@ -343,7 +334,6 @@ function EditSitePageInner() {
     );
   }
 
-  const agenda = doc.sections.agenda ?? [];
   const isVisual = VISUAL_TABS.has(tab);
   const isArchivosView = tab === "archivos";
 
@@ -552,204 +542,6 @@ function EditSitePageInner() {
           </section>
         )}
 
-        {tab === "diplomadoHero" && site === "acropolis" && (
-          <section className="rounded-xl border bg-white p-4 space-y-3">
-            <Field
-              label="Badge — día (ej. Lunes)"
-              value={doc.sections.diplomadoHero?.badgeWeekday ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      badgeWeekday: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Badge — fecha (ej. 29 JUN)"
-              value={doc.sections.diplomadoHero?.badgeDate ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: { ...doc.sections.diplomadoHero, badgeDate: v },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Sesión activa — etiqueta"
-              value={doc.sections.diplomadoHero?.activeLabel ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      activeLabel: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Sesión activa — fecha legible"
-              value={doc.sections.diplomadoHero?.activeDate ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      activeDate: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Horario"
-              value={doc.sections.diplomadoHero?.activeTime ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      activeTime: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Modalidad"
-              value={doc.sections.diplomadoHero?.activeModality ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      activeModality: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Duración (franja e inscripción)"
-              value={doc.sections.diplomadoHero?.bannerDuration ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      bannerDuration: v,
-                    },
-                  },
-                })
-              }
-            />
-            <Field
-              label="Inversión (franja)"
-              value={doc.sections.diplomadoHero?.bannerFee ?? ""}
-              onChange={(v) =>
-                setDoc({
-                  ...doc,
-                  sections: {
-                    ...doc.sections,
-                    diplomadoHero: {
-                      ...doc.sections.diplomadoHero,
-                      bannerFee: v,
-                    },
-                  },
-                })
-              }
-            />
-          </section>
-        )}
-
-        {tab === "agenda" && (
-          <section className="space-y-4">
-            <div className="flex justify-between">
-              <p className="text-sm text-slate-600">
-                Cursos, talleres, conferencias y sesiones de diplomado. Fecha ISO{" "}
-                <code>YYYY-MM-DD</code> para orden y filtro automático.
-              </p>
-              <button
-                type="button"
-                className="rounded-lg bg-brand-gold/20 px-3 py-1.5 text-sm font-semibold"
-                onClick={() => {
-                  const entry: CmsAgendaEntry = {
-                    id: newAgendaId(),
-                    category: "conferencia",
-                    title: "Nueva actividad",
-                    startsAt: new Date().toISOString().slice(0, 10),
-                    date: "",
-                    showOnHome: true,
-                  };
-                  setDoc({
-                    ...doc,
-                    sections: {
-                      ...doc.sections,
-                      agenda: [...agenda, entry],
-                    },
-                  });
-                }}
-              >
-                + Añadir
-              </button>
-            </div>
-            {agenda.map((item, index) => (
-              <AgendaCard
-                key={item.id}
-                item={item}
-                onChange={(next) => {
-                  const nextAgenda = [...agenda];
-                  nextAgenda[index] = next;
-                  setDoc({
-                    ...doc,
-                    sections: { ...doc.sections, agenda: nextAgenda },
-                  });
-                }}
-                onDelete={() => {
-                  if (!confirm("¿Eliminar esta entrada?")) return;
-                  setDoc({
-                    ...doc,
-                    sections: {
-                      ...doc.sections,
-                      agenda: agenda.filter((_, i) => i !== index),
-                    },
-                  });
-                }}
-                onUpload={(file, cb) =>
-                  handleUpload(file, (url) => {
-                    const nextAgenda = [...agenda];
-                    nextAgenda[index] = { ...item, image: url };
-                    setDoc({
-                      ...doc,
-                      sections: { ...doc.sections, agenda: nextAgenda },
-                    });
-                  })
-                }
-              />
-            ))}
-          </section>
-        )}
-
         {tab === "civisTalleresRealizados" && site === "civis" && (
           <CivisTalleresTab
             items={doc.sections.civisTalleresRealizados ?? []}
@@ -849,97 +641,6 @@ function Field({
         />
       ) : null}
     </label>
-  );
-}
-
-function AgendaCard({
-  item,
-  onChange,
-  onDelete,
-  onUpload,
-}: {
-  item: CmsAgendaEntry;
-  onChange: (v: CmsAgendaEntry) => void;
-  onDelete: () => void;
-  onUpload: (f: File, cb: (url: string) => void) => void;
-}) {
-  return (
-    <div className="rounded-xl border bg-white p-4 space-y-2">
-      <div className="flex justify-between gap-2">
-        <select
-          value={item.category}
-          onChange={(e) =>
-            onChange({ ...item, category: e.target.value as AgendaCategory })
-          }
-          className="rounded border px-2 py-1 text-sm"
-        >
-          {AGENDA_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="text-sm text-red-600 hover:underline"
-        >
-          Eliminar
-        </button>
-      </div>
-      <Field label="Título" value={item.title} onChange={(v) => onChange({ ...item, title: v })} />
-      <div className="grid gap-2 sm:grid-cols-2">
-        <Field
-          label="Fecha ISO (startsAt)"
-          value={item.startsAt}
-          onChange={(v) => onChange({ ...item, startsAt: v })}
-        />
-        <Field
-          label="Fecha legible"
-          value={item.date}
-          onChange={(v) => onChange({ ...item, date: v })}
-        />
-      </div>
-      <Field label="Hora" value={item.time ?? ""} onChange={(v) => onChange({ ...item, time: v })} />
-      <Field label="Sede" value={item.sede ?? ""} onChange={(v) => onChange({ ...item, sede: v })} />
-      <MediaField
-        label="Foto"
-        media={
-          item.image
-            ? { src: item.image, alt: item.imageAlt ?? item.title }
-            : { src: "", alt: "" }
-        }
-        onChange={(m) =>
-          onChange({ ...item, image: m.src, imageAlt: m.alt })
-        }
-        onUpload={onUpload}
-      />
-      <Field
-        label="Descripción"
-        multiline
-        value={item.description ?? ""}
-        onChange={(v) => onChange({ ...item, description: v })}
-      />
-      <Field
-        label="Mensaje WhatsApp"
-        multiline
-        value={item.inscribeMessage ?? ""}
-        onChange={(v) => onChange({ ...item, inscribeMessage: v })}
-      />
-      <Field
-        label="Etiqueta"
-        value={item.tag ?? ""}
-        onChange={(v) => onChange({ ...item, tag: v })}
-      />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={item.showOnHome !== false}
-          onChange={(e) => onChange({ ...item, showOnHome: e.target.checked })}
-        />
-        Mostrar en carrusel del home
-      </label>
-    </div>
   );
 }
 

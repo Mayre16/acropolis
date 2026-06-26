@@ -120,6 +120,10 @@ export const VISUAL_TAB_IDS = new Set([
 
   "home",
 
+  "contenido",
+
+  "agenda",
+
   "voluntariado",
 
   "cursos",
@@ -166,7 +170,7 @@ export const TAB_LABELS: Record<string, string> = {
 
   homeHero: "Textos del inicio",
 
-  diplomadoHero: "Diplomado — fechas",
+  contenido: "Contenido",
 
   agenda: "Agenda",
 
@@ -236,17 +240,15 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
     "home",
 
-    "homeHero",
-
     "sedes",
 
     "cursos",
 
     "diplomado",
 
-    "diplomadoHero",
-
     "filosofia",
+
+    "contenido",
 
     "voluntariado",
 
@@ -278,7 +280,7 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
   editorial: [],
 
-  filosofia: ["diplomado", "filosofia", "eventos", "diplomadoHero", "agenda"],
+  filosofia: ["diplomado", "filosofia", "eventos", "contenido", "agenda"],
 
   viajes: ["viajesLocales", "viajesInternacionales"],
 
@@ -387,7 +389,7 @@ export function tabsForRole(site: SiteId, role: EditorRole): EditorTabId[] {
 export function defaultTabForRole(site: SiteId, role: EditorRole): EditorTabId {
   const tabs = tabsForRole(site, role);
   if (site === "editorial") return tabs[0] ?? "editorialHome";
-  return tabs[0] ?? (site === "acropolis" ? "agenda" : "civisHome");
+  return tabs[0] ?? (site === "acropolis" ? "contenido" : "civisHome");
 }
 
 
