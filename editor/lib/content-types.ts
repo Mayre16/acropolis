@@ -930,6 +930,7 @@ export type CmsHeroCarouselKey =
   | "cursos"
   | "eventos"
   | "articulos"
+  | "agenda"
   | "quienesSomos"
   | "relaciones"
   | "esfera";
