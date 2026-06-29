@@ -780,6 +780,8 @@ export type CmsCursosPage = CmsPageHeroText & {
 
 export type CmsEventosPage = CmsPageHeroText;
 
+export type CmsAgendaPage = CmsPageHeroText;
+
 export type CmsArticulosPage = CmsPageHeroText;
 
 export type CmsViajeCategoriaPage = CmsPageHeroText & {
@@ -909,6 +911,7 @@ export type CmsDocument = {
     esferaPage?: CmsEsferaPage;
     cursosPage?: CmsCursosPage;
     eventosPage?: CmsEventosPage;
+    agendaPage?: CmsAgendaPage;
     articulosPage?: CmsArticulosPage;
     viajesPage?: CmsViajesPage;
     activityPhotos?: CmsActivityPhoto[];

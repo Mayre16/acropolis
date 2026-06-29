@@ -227,10 +227,12 @@ export function VisualAgendaEditor() {
       path="/agenda/"
       hint={
         <>
-          Listado público de la <strong>agenda completa</strong>. Las entradas se editan
-          en <strong>Inicio</strong> (carrusel), <strong>Cursos</strong>,{" "}
-          <strong>Cultura</strong>, <strong>Voluntariado</strong> y{" "}
-          <strong>Eventos</strong> — clic en ✎ en cada tarjeta o actividad.
+          Vista de la página <strong>/agenda</strong>. Botón{" "}
+          <strong>✎ Editar encabezado</strong> en el hero (textos y carrusel de
+          fotos). Las actividades del listado se editan en{" "}
+          <strong>Inicio</strong>, <strong>Cursos</strong>, <strong>Cultura</strong>,{" "}
+          <strong>Voluntariado</strong>, <strong>Eventos</strong> y{" "}
+          <strong>Esfera</strong>.
         </>
       }
     />

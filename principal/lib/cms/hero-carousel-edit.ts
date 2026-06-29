@@ -2,6 +2,7 @@ import type { HeroImage } from "@/lib/hero-images";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
   ARTICULOS_HERO_IMAGES,
+  AGENDA_HERO_IMAGES,
   CULTURA_HERO_IMAGES,
   CURSOS_HERO_IMAGES,
   ESFERA_HERO_IMAGES,
@@ -20,6 +21,7 @@ export type CmsHeroCarouselKey =
   | "cursos"
   | "eventos"
   | "articulos"
+  | "agenda"
   | "quienesSomos"
   | "relaciones"
   | "esfera";
@@ -44,6 +46,7 @@ export const HERO_CAROUSEL_DEFAULTS: Record<CmsHeroCarouselKey, HeroImage[]> =
     cursos: CURSOS_HERO_IMAGES,
     eventos: EVENTOS_HERO_IMAGES,
     articulos: ARTICULOS_HERO_IMAGES,
+    agenda: AGENDA_HERO_IMAGES,
     quienesSomos: QUIENES_SOMOS_HERO_IMAGES,
     relaciones: RELACIONES_HERO_IMAGES,
     esfera: ESFERA_HERO_IMAGES,
@@ -56,6 +59,7 @@ export const HERO_CAROUSEL_LABELS: Record<CmsHeroCarouselKey, string> = {
   cursos: "Cursos",
   eventos: "Eventos",
   articulos: "Artículos",
+  agenda: "Agenda",
   quienesSomos: "Quiénes somos",
   relaciones: "Relaciones institucionales",
   esfera: "Punto Focal Esfera",

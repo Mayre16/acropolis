@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AgendaFullListing } from "@/components/contenido/AgendaFullListing";
-import { PageHero } from "@/components/PageHero";
-import { AGENDA_HERO_IMAGES } from "@/lib/hero-images";
+import { AgendaHero } from "@/components/cms/AgendaHero";
+import { AgendaPageShell } from "@/components/cms/AgendaPageShell";
 
 export const metadata: Metadata = {
   title: "Agenda de actividades",
@@ -12,19 +12,9 @@ export const metadata: Metadata = {
 
 export default function AgendaPage() {
   return (
-    <>
-      <PageHero
-        eyebrow="Contenido"
-        title="Agenda de actividades"
-        lede="Consulta fechas, sedes e inscripciones de todo lo programado en Nueva Acrópolis República Dominicana."
-        crumbs={[
-          { label: "Inicio", href: "/" },
-          { label: "Contenido", href: "/contenido" },
-          { label: "Agenda" },
-        ]}
-        images={AGENDA_HERO_IMAGES}
-      />
+    <AgendaPageShell>
+      <AgendaHero />
       <AgendaFullListing />
-    </>
+    </AgendaPageShell>
   );
 }
