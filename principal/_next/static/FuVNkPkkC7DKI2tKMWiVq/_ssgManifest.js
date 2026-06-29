@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F[articulo]","\u002Fcultura\u002Fviajes\u002F[categoria]","\u002Fcultura\u002Fviajes\u002F[categoria]\u002F[slug]","\u002Feventos\u002F[slug]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

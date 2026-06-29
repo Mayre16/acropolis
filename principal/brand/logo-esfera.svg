@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" role="img" aria-labelledby="title">
+  <title id="title">Sphere  est�ndares humanitarios</title>
+  <g fill="#1f9078">
+    <circle cx="26" cy="26" r="22"/>
+    <circle cx="10" cy="18" r="2.2" opacity="0.85"/>
+    <circle cx="8" cy="28" r="1.6" opacity="0.75"/>
+    <circle cx="12" cy="36" r="1.4" opacity="0.7"/>
+    <circle cx="42" cy="14" r="1.5" opacity="0.75"/>
+    <circle cx="44" cy="38" r="1.7" opacity="0.8"/>
+  </g>
+  <g fill="none" stroke="#ffffff" stroke-width="1.35" stroke-linecap="round">
+    <ellipse cx="26" cy="26" rx="9" ry="22"/>
+    <path d="M4 26h44"/>
+    <path d="M26 4c7 11 7 33 0 44"/>
+  </g>
+  <text
+    x="58"
+    y="34"
+    font-family="system-ui, Segoe UI, sans-serif"
+    font-size="28"
+    font-weight="600"
+    fill="#1f9078"
+    letter-spacing="-0.02em"
+  >sphere</text>
+</svg>

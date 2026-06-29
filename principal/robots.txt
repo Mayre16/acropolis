@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://mayre16.github.io/acropolis/principal/sitemap.xml
