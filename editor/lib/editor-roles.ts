@@ -168,6 +168,8 @@ export const TAB_LABELS: Record<string, string> = {
 
   filosofia: "Filosofía",
 
+  plataformas: "Enlaces superiores",
+
   homeHero: "Textos del inicio",
 
   contenido: "Contenido",
@@ -238,6 +240,8 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
   admin: [
 
+    "plataformas",
+
     "home",
 
     "sedes",
@@ -284,7 +288,7 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
   viajes: ["viajesLocales", "viajesInternacionales"],
 
-  esfera: ["sedes", "esfera", "agenda", "archivos", "home"],
+  esfera: ["plataformas", "sedes", "esfera", "agenda", "archivos", "home"],
 
 };
 

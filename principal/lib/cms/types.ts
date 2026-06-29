@@ -867,9 +867,11 @@ export type CmsSiteFooter = {
   whatsappDiplomadoNumber?: string;
 };
 
-/** Bandeja verde superior — visibilidad de enlaces a otras plataformas. */
+/** Bandeja verde superior — visibilidad y URLs de enlaces a otras plataformas. */
 export type CmsPlatformNav = {
   hidden?: ("biblioteca" | "civis" | "tienda")[];
+  /** URL por plataforma. Vacío = valor por defecto del código (adesa / variables de entorno). */
+  urls?: Partial<Record<"biblioteca" | "civis" | "tienda", string>>;
 };
 
 export type CmsSalonLayout = "butacas" | "mesas" | "herradura";

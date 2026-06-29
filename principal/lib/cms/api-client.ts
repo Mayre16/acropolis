@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/asset-url";
 import type { CmsDocument } from "@/lib/cms/types";
 import { getCmsEditSession } from "@/lib/cms/edit-session";
 
@@ -42,7 +43,7 @@ export function resolveCmsMediaUrl(src?: string): string | undefined {
   if (uploadPath) return `${cmsEditorOrigin()}${uploadPath}`;
   if (src.startsWith("http://") || src.startsWith("https://")) return src;
   if (src.startsWith("/uploads/")) return `${cmsEditorOrigin()}${src}`;
-  return src;
+  return assetUrl(src);
 }
 
 /** Ruta sugerida al subir o pegar una imagen del CMS. */

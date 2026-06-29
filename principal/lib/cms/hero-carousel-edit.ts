@@ -145,5 +145,28 @@ export function getHeroSlidesForKey(
   carousels: CmsHeroCarousels,
   key: CmsHeroCarouselKey,
 ): CmsHeroCarouselItem[] {
-  return carousels[key] ?? itemsFromHeroImages(HERO_CAROUSEL_DEFAULTS[key]);
+  const defaults = itemsFromHeroImages(HERO_CAROUSEL_DEFAULTS[key]);
+  const stored = carousels[key];
+  if (!stored?.length) return defaults;
+  return stored;
+}
+
+/** Imágenes listas para el hero; si el CMS no tiene fotos válidas, usa el catálogo base. */
+export function heroImagesForKey(
+  carousels: CmsHeroCarousels,
+  key: CmsHeroCarouselKey,
+): HeroImage[] {
+  const fromSlides = getHeroSlidesForKey(carousels, key)
+    .map(toHeroImage)
+    .filter((img): img is HeroImage => img !== null);
+  if (fromSlides.length) return fromSlides;
+  return HERO_CAROUSEL_DEFAULTS[key]
+    .map((img) => toHeroImage({
+      id: "fallback",
+      src: img.src,
+      alt: img.alt,
+      media: img.media,
+      poster: img.poster,
+    }))
+    .filter((img): img is HeroImage => img !== null);
 }
