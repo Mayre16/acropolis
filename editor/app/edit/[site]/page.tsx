@@ -29,10 +29,6 @@ import {
   MediaField,
 } from "@/components/MediaFields";
 import {
-  PlatformNavTab,
-  mergePlatformNavSection,
-} from "@/components/PlatformNavTab";
-import {
   VisualContenidoEditor,
   VisualAgendaEditor,
   VisualFilosofiaEditor,
@@ -468,15 +464,6 @@ function EditSitePageInner() {
 
       <div className="mt-6 space-y-4">
         {tab === "archivos" && <UploadInventoryTab site={site} />}
-
-        {tab === "plataformas" && site === "acropolis" && (
-          <PlatformNavTab
-            nav={doc.sections.platformNav ?? {}}
-            onChange={(platformNav) =>
-              setDoc(mergePlatformNavSection(doc, platformNav))
-            }
-          />
-        )}
 
         {tab === "homeHero" && (
           <section className="rounded-xl border bg-white p-4 space-y-3">

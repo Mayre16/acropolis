@@ -1276,7 +1276,6 @@ export type CmsDocument = {
 
 export const CMS_SECTION_LABELS: Record<string, string> = {
   filosofia: "Filosofía — sesiones (visual)",
-  plataformas: "Enlaces superiores (Biblioteca, Civis, Tienda)",
   homeHero: "Inicio — textos hero",
   contenido: "Contenido digital (visual)",
   agenda: "Agenda completa (visual)",
@@ -1317,7 +1316,6 @@ export const SITE_LABELS: Record<SiteId, string> = {
 };
 
 export const ACROPOLIS_TABS = [
-  "plataformas",
   "filosofia",
   "homeHero",
   "diplomadoHero",
