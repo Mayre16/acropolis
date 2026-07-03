@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
 import { preferWebpAssetUrl } from "@/lib/media-assets";
+import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { assetUrl } from "@/lib/asset-url";
 import { type RegaloItem } from "@/lib/editorial-extras";
 import { useEditorialConfig } from "@/lib/editorial-config";
 import { useEditorialMemorion } from "@/lib/cms/hooks";
@@ -17,15 +19,15 @@ import {
   navigateEditorialHash,
   regaloFilterToHash,
 } from "@/lib/editorial-navigation";
-import { STORE_API_URL, WHATSAPP_URL } from "@/lib/site-config";
+import { WHATSAPP_URL } from "@/lib/site-config";
 
 function resolveRegaloImage(url: string): string {
   if (!url) return url;
-  if (url.startsWith("http") || url.startsWith("data:")) return url;
-  if (url.startsWith("/uploads/")) {
-    return `${STORE_API_URL.replace(/\/$/, "")}${preferWebpAssetUrl(url)}`;
+  const resolved = resolveCmsMediaUrl(url) ?? url;
+  if (resolved.startsWith("http") || resolved.startsWith("data:")) {
+    return preferWebpAssetUrl(resolved);
   }
-  return preferWebpAssetUrl(url);
+  return preferWebpAssetUrl(assetUrl(resolved));
 }
 
 function buildRegaloWhatsApp(item: RegaloItem): string {

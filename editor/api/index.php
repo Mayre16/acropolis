@@ -349,6 +349,12 @@ if ($uri === '/spellcheck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(200, ['issues' => $issues]);
 }
 
+if (preg_match('#^/uploads/(acropolis|civis|editorial)/inventory$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    requireAuth();
+    require __DIR__ . '/upload-inventory.php';
+    jsonOut(200, cms_build_upload_inventory($m[1], $dataRoot));
+}
+
 if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $siteDir = sitePath($dataRoot, $m[1]);
     $safe = basename($m[2]);
