@@ -16,12 +16,12 @@ function cms_smtp_file(): string
 function cms_load_smtp_config(array $config): array
 {
     $defaults = [
-        'host' => 'mail.acropolis.org',
+        'host' => 'mail.acropolis.adesa.com.do',
         'port' => 465,
         'secure' => 'ssl',
-        'user' => 'smtp_user@acropolis.org',
+        'user' => 'formularios@editor.acropolis.adesa.com.do',
         'password' => '',
-        'from_email' => 'no-reply@acropolis.org',
+        'from_email' => 'formularios@editor.acropolis.adesa.com.do',
         'from_name' => 'Nueva Acrópolis RD',
         'forms' => [
             'civis_solicitud' => [
@@ -50,6 +50,18 @@ function cms_load_smtp_config(array $config): array
     }
 
     $merged = array_replace_recursive($defaults, $stored);
+    foreach ([
+        'smtp_host' => 'host',
+        'smtp_port' => 'port',
+        'smtp_secure' => 'secure',
+        'smtp_user' => 'user',
+        'smtp_from_email' => 'from_email',
+        'smtp_from_name' => 'from_name',
+    ] as $cfgKey => $smtpKey) {
+        if (!empty($config[$cfgKey])) {
+            $merged[$smtpKey] = $config[$cfgKey];
+        }
+    }
     if (empty($merged['password'])) {
         $merged['password'] = (string) ($config['smtp_password'] ?? '');
     }
@@ -344,6 +356,24 @@ function cms_turnstile_secret(array $config = []): string
     return '';
 }
 
+function cms_is_preview_form_request(): bool
+{
+    foreach (['HTTP_ORIGIN', 'HTTP_REFERER'] as $header) {
+        $url = (string) ($_SERVER[$header] ?? '');
+        if ($url === '') {
+            continue;
+        }
+        if (
+            str_contains($url, 'github.io')
+            || str_contains($url, 'localhost')
+            || str_contains($url, '127.0.0.1')
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function cms_verify_turnstile(array $body, ?string $remoteIp, array $config = []): array
 {
     $honeypot = trim((string) ($body['website'] ?? ''));
@@ -354,10 +384,12 @@ function cms_verify_turnstile(array $body, ?string $remoteIp, array $config = []
     $token = trim((string) ($body['turnstileToken'] ?? ''));
     $secret = cms_turnstile_secret($config);
     if ($secret === '') {
-        return [
-            'ok' => false,
-            'error' => 'La verificación de seguridad no está configurada. Contacte al administrador.',
-        ];
+        // Sin clave secreta: omitir Turnstile (preview GitHub / pruebas SMTP).
+        return ['ok' => true];
+    }
+    if ($token === '' && cms_is_preview_form_request()) {
+        // Preview en GitHub Pages o pruebas desde el iframe del editor.
+        return ['ok' => true];
     }
     if ($token === '') {
         return ['ok' => false, 'error' => 'Complete la verificación «No soy un robot».'];

@@ -28,6 +28,12 @@ import {
   adminResetPassword,
   adminUpdateUser,
 } from "../lib/auth-users-admin.mjs";
+import {
+  acceptInvite,
+  adminInviteUser,
+  adminResendInvite,
+  getInviteInfo,
+} from "../lib/auth-invites-service.mjs";
 import { sendCivisSolicitudMail } from "../lib/civis-solicitud-mail.mjs";
 import { sendEsferaSolicitudMail } from "../lib/esfera-solicitud-mail.mjs";
 import { sendVolunteerSolicitudMail } from "../lib/volunteer-solicitud-mail.mjs";
@@ -154,6 +160,10 @@ async function readBody(req) {
   return JSON.parse(raw);
 }
 
+function requestReferer(req) {
+  return req.headers.origin ?? req.headers.referer ?? null;
+}
+
 function parseMultipart(buf, boundary) {
   const parts = [];
   const sep = Buffer.from(`--${boundary}`);
@@ -209,7 +219,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const remoteIp = req.socket?.remoteAddress ?? null;
       try {
-        const result = await sendCivisSolicitudMail(body ?? {}, remoteIp);
+        const result = await sendCivisSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
           const status = result.error?.includes("SMTP") ? 503 : 400;
           json(res, status, result, origin);
@@ -238,7 +248,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const remoteIp = req.socket?.remoteAddress ?? null;
       try {
-        const result = await sendEsferaSolicitudMail(body ?? {}, remoteIp);
+        const result = await sendEsferaSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
           const status = result.error?.includes("SMTP") ? 503 : 400;
           json(res, status, result, origin);
@@ -267,7 +277,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const remoteIp = req.socket?.remoteAddress ?? null;
       try {
-        const result = await sendVolunteerSolicitudMail(body ?? {}, remoteIp);
+        const result = await sendVolunteerSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
           const status = result.error?.includes("SMTP") ? 503 : 400;
           json(res, status, result, origin);
@@ -293,7 +303,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const remoteIp = req.socket?.remoteAddress ?? null;
       try {
-        const result = await sendSiteInquiryMail(body ?? {}, remoteIp);
+        const result = await sendSiteInquiryMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
           const status = result.error?.includes("SMTP") ? 503 : 400;
           json(res, status, result, origin);
@@ -471,7 +481,34 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const userIdMatch = /^\/auth\/users\/([^/]+)(\/reset-password|\/totp)?$/.exec(
+    if (pathname === "/auth/users/invite" && req.method === "POST") {
+      if (!requireAuth(req, res, origin)) return;
+      const body = await readBody(req);
+      const result = await adminInviteUser(getToken(req), body);
+      json(res, result.status ?? (result.ok ? 201 : 400), result, origin);
+      return;
+    }
+
+    const inviteMatch = /^\/auth\/invite\/([^/]+)(\/accept)?$/.exec(pathname);
+    if (inviteMatch) {
+      const inviteToken = inviteMatch[1];
+      const isAccept = inviteMatch[2] === "/accept";
+
+      if (!isAccept && req.method === "GET") {
+        const result = getInviteInfo(inviteToken);
+        json(res, result.status ?? (result.ok ? 200 : 404), result, origin);
+        return;
+      }
+
+      if (isAccept && req.method === "POST") {
+        const body = await readBody(req);
+        const result = acceptInvite(inviteToken, body?.password ?? "");
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+    }
+
+    const userIdMatch = /^\/auth\/users\/([^/]+)(\/reset-password|\/totp|\/resend-invite)?$/.exec(
       pathname,
     );
     if (userIdMatch) {
@@ -493,6 +530,12 @@ const server = http.createServer(async (req, res) => {
 
       if (action === "/totp" && req.method === "DELETE") {
         const result = adminClearUserTotp(token, userId);
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
+
+      if (action === "/resend-invite" && req.method === "POST") {
+        const result = await adminResendInvite(token, userId);
         json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
         return;
       }

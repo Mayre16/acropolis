@@ -14,6 +14,7 @@ import {
   setUserPassword,
   updateUserProfile,
 } from "./auth-store.mjs";
+import { revokeInvitesForUser } from "./auth-invites.mjs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -148,6 +149,7 @@ export function adminDeleteUser(token, userId) {
   }
 
   deleteUser(userId);
+  revokeInvitesForUser(userId);
   return { ok: true, message: "Usuario eliminado" };
 }
 

@@ -13,6 +13,7 @@ upload-cpanel-*/
 .env.local
 .env.*.local
 editor/api/config.php
+editor/api/config.local.php
 editor/data/auth/users.json
 editor/data/system/smtp.json
 

@@ -96,13 +96,7 @@ export function TurnstileWidget({
     };
   }, [onToken, onExpire, onError]);
 
-  if (!turnstileSiteKey()) {
-    return (
-      <p className="text-xs text-na-amon">
-        Verificación de seguridad no configurada.
-      </p>
-    );
-  }
+  if (!turnstileSiteKey()) return null;
 
   return <div ref={containerRef} className="min-h-[65px]" />;
 }

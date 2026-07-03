@@ -248,8 +248,6 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
     "filosofia",
 
-    "contenido",
-
     "voluntariado",
 
     "eventos",
@@ -267,10 +265,6 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
     "viajesInternacionales",
 
     "archivos",
-
-    "quienesSomos",
-
-    "relaciones",
 
     "esfera",
 
@@ -389,7 +383,7 @@ export function tabsForRole(site: SiteId, role: EditorRole): EditorTabId[] {
 export function defaultTabForRole(site: SiteId, role: EditorRole): EditorTabId {
   const tabs = tabsForRole(site, role);
   if (site === "editorial") return tabs[0] ?? "editorialHome";
-  return tabs[0] ?? (site === "acropolis" ? "contenido" : "civisHome");
+  return tabs[0] ?? (site === "acropolis" ? "home" : "civisHome");
 }
 
 

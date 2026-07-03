@@ -128,6 +128,15 @@ export function loginWithPassword(username, password, clientIp = "") {
     recordLoginFailure(clientIp, normalized);
     return { ok: false, error: LOGIN_ERROR, status: 401 };
   }
+  if (user && !user.passwordHash) {
+    recordLoginFailure(clientIp, normalized);
+    return {
+      ok: false,
+      error:
+        "Tu cuenta aún no está activa. Revisa tu correo y usa el enlace de invitación para crear tu contraseña.",
+      status: 401,
+    };
+  }
   const passwordOk = user && verifyPassword(password, user.passwordHash);
   if (!passwordOk) {
     recordLoginFailure(clientIp, normalized);

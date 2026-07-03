@@ -1,7 +1,5 @@
 "use client";
 
-import { useCmsEditorEmbedded } from "@/hooks/useCmsEditorEmbedded";
-
 import { useState, type ReactNode } from "react";
 import { Images } from "lucide-react";
 import {
@@ -382,11 +380,11 @@ export function EditToolbar({
   onSave: () => void;
   onPublish: () => void;
 }) {
-  const embeddedInEditor = useCmsEditorEmbedded();
-  if (embeddedInEditor) return null;
-
   return (
-    <div className="sticky top-0 z-50 border-b border-amber-300 bg-amber-50 shadow-sm">
+    <div
+      data-cms-edit-toolbar
+      className="sticky top-0 z-50 border-b border-amber-300 bg-amber-50 shadow-sm"
+    >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3 py-2">
         <p className="text-xs font-semibold text-amber-950 sm:text-sm">
           Modo edición — {label}

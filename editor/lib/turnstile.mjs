@@ -7,18 +7,28 @@ export function turnstileSecret() {
   return "";
 }
 
-export async function verifyTurnstile(token, remoteIp, honeypot) {
+function isPreviewFormRequest(referer) {
+  const url = String(referer ?? "");
+  return (
+    url.includes("github.io") ||
+    url.includes("localhost") ||
+    url.includes("127.0.0.1")
+  );
+}
+
+export async function verifyTurnstile(token, remoteIp, honeypot, referer) {
   if (honeypot && String(honeypot).trim() !== "") {
     return { ok: false, error: "No se pudo enviar el formulario." };
   }
 
   const secret = turnstileSecret();
   if (!secret) {
-    return {
-      ok: false,
-      error:
-        "La verificación de seguridad no está configurada. Contacte al administrador.",
-    };
+    // Sin clave secreta: omitir Turnstile (preview GitHub / pruebas SMTP).
+    return { ok: true };
+  }
+
+  if ((!token || String(token).trim() === "") && isPreviewFormRequest(referer)) {
+    return { ok: true };
   }
 
   if (!token || String(token).trim() === "") {

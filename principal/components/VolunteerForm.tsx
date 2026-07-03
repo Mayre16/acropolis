@@ -15,6 +15,7 @@ import {
   resetTurnstileWidget,
   TurnstileWidget,
 } from "@/components/TurnstileWidget";
+import { turnstileEnabled } from "@/lib/turnstile-config";
 import { VOLUNTEER_AREAS } from "@/lib/contact-routing";
 import { submitVolunteerSolicitud } from "@/lib/submit-volunteer-solicitud";
 
@@ -123,7 +124,7 @@ export function VolunteerForm({
     if (!values.nombre.trim()) e.nombre = "Indica tu nombre.";
     if (!values.telefono.trim()) e.telefono = "Indica un teléfono o WhatsApp.";
     if (values.areas.length === 0) e.areas = "Elige al menos una línea.";
-    if (!turnstileToken) {
+    if (turnstileEnabled() && !turnstileToken) {
       e.turnstile = "Marca la casilla «No soy un robot».";
     }
     setErrors(e);
@@ -346,15 +347,17 @@ export function VolunteerForm({
         />
       </div>
 
-      <div className="mt-5">
-        <TurnstileWidget
-          onToken={setTurnstileToken}
-          onExpire={() => setTurnstileToken("")}
-        />
-        {errors.turnstile && (
-          <p className="mt-2 text-xs text-na-amon">{errors.turnstile}</p>
-        )}
-      </div>
+      {turnstileEnabled() ? (
+        <div className="mt-5">
+          <TurnstileWidget
+            onToken={setTurnstileToken}
+            onExpire={() => setTurnstileToken("")}
+          />
+          {errors.turnstile && (
+            <p className="mt-2 text-xs text-na-amon">{errors.turnstile}</p>
+          )}
+        </div>
+      ) : null}
 
       {submitError ? (
         <p className="mt-4 rounded-xl border border-na-amon/30 bg-na-amon/10 px-4 py-3 text-sm text-na-heketDark">

@@ -57,11 +57,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var q=location.search;if(/[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q)||(window.parent!==window&&sessionStorage.getItem("acropolis-cms-edit"))){document.documentElement.classList.add("cms-edit-pending-hero")}}catch(e){}})();`,
+            __html: `(function(){try{var inFrame=window.parent!==window;if(inFrame){document.documentElement.classList.add("cms-edit-embedded")}var q=location.search;if(/[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q)||(inFrame&&sessionStorage.getItem("acropolis-cms-edit"))){document.documentElement.classList.add("cms-edit-pending-hero")}}catch(e){}})();`,
           }}
         />
       </head>

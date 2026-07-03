@@ -5,12 +5,12 @@ import { fetchSmtpSettings, saveSmtpSettings, type SmtpSettings } from "@/lib/ap
 import { getToken } from "@/lib/auth-storage";
 
 const empty: SmtpSettings = {
-  host: "mail.acropolis.org",
+  host: "mail.acropolis.adesa.com.do",
   port: 465,
   secure: "ssl",
-  user: "smtp_user@acropolis.org",
+  user: "formularios@editor.acropolis.adesa.com.do",
   passwordSet: false,
-  from_email: "no-reply@acropolis.org",
+  from_email: "formularios@editor.acropolis.adesa.com.do",
   from_name: "Nueva Acrópolis RD",
   forms: {
     civis_solicitud: {
@@ -22,7 +22,7 @@ const empty: SmtpSettings = {
   },
 };
 
-export function SmtpSettingsPanel() {
+export function SmtpSettingsPanel({ embedded = false }: { embedded?: boolean }) {
   const [values, setValues] = useState<SmtpSettings>(empty);
   const [saved, setSaved] = useState<SmtpSettings>(empty);
   const [password, setPassword] = useState("");
@@ -86,9 +86,11 @@ export function SmtpSettingsPanel() {
     "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/20";
   const label = "block text-sm font-medium text-slate-700";
 
+  const shellClass = `${embedded ? "" : "mt-8 "}rounded-xl border border-slate-200 bg-white p-5 shadow-sm`;
+
   if (loading) {
     return (
-      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
+      <div className={`${shellClass} text-sm text-slate-500`}>
         Cargando configuración de correo…
       </div>
     );
@@ -98,12 +100,15 @@ export function SmtpSettingsPanel() {
 
   if (!editing) {
     return (
-      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className={shellClass}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-slate-800">Correo (SMTP compartido)</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Mismo servidor que Biblioteca y formularios de los sitios.
+            {!embedded ? (
+              <h2 className="text-sm font-bold text-slate-800">Correo (SMTP compartido)</h2>
+            ) : null}
+            <p className={`${embedded ? "" : "mt-1 "}text-sm text-slate-600`}>
+              Correo provisional para formularios e invitaciones al editor (
+              <strong>{empty.from_email}</strong>). Servidor: {empty.host}.
             </p>
           </div>
           <button
@@ -162,14 +167,13 @@ export function SmtpSettingsPanel() {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <h2 className="text-sm font-bold text-slate-800">Correo (SMTP compartido)</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Mismo servidor que Biblioteca y formularios de los sitios. Las copias automáticas
-        salen desde <strong>no-reply@acropolis.org</strong>.
+    <form onSubmit={onSubmit} className={shellClass}>
+      {!embedded ? (
+        <h2 className="text-sm font-bold text-slate-800">Correo (SMTP compartido)</h2>
+      ) : null}
+      <p className={`${embedded ? "" : "mt-1 "}text-sm text-slate-600`}>
+        Correo provisional para formularios e invitaciones (
+        <strong>{empty.from_email}</strong>). Servidor: {empty.host}.
       </p>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">

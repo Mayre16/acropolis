@@ -4,19 +4,30 @@ import { TAB_LABELS, tabsForRole, type EditorRole } from "./editor-roles";
 export type TabGroup = {
   label: string;
   tabs: string[];
+  hint?: string;
 };
 
 const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
   { label: "Inicio y ubicación", tabs: ["home", "sedes"] },
   { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia"] },
-  { label: "Contenido digital", tabs: ["contenido"] },
   {
     label: "Actividades",
-    tabs: ["voluntariado", "eventos", "agenda", "cultura", "esfera"],
+    tabs: [
+      "voluntariado",
+      "eventos",
+      "agenda",
+      "cultura",
+      "esfera",
+      "viajesLocales",
+      "viajesInternacionales",
+    ],
   },
   { label: "Artículos", tabs: ["articulos", "medios"] },
-  { label: "Viajes", tabs: ["viajesLocales", "viajesInternacionales"] },
-  { label: "Archivos", tabs: ["archivos"] },
+  {
+    label: "Archivos",
+    tabs: ["archivos"],
+    hint: "CV institucional, brochure",
+  },
 ];
 
 const CIVIS_TAB_GROUPS: TabGroup[] = [

@@ -3,8 +3,14 @@
 return [
     'admin_password' => 'CAMBIA_ESTA_CONTRASEÑA',
     'data_root' => __DIR__ . '/../data',
-    /** Contraseña SMTP (mismo servidor que Biblioteca). También editable en el panel del editor. */
+    /** Contraseña de formularios@editor.acropolis.adesa.com.do (cPanel). */
     'smtp_password' => 'CONTRASEÑA_SMTP',
+    'smtp_host' => 'mail.acropolis.adesa.com.do',
+    'smtp_port' => 465,
+    'smtp_secure' => 'ssl',
+    'smtp_user' => 'formularios@editor.acropolis.adesa.com.do',
+    'smtp_from_email' => 'formularios@editor.acropolis.adesa.com.do',
+    'smtp_from_name' => 'Nueva Acrópolis RD',
     'allowed_origins' => [
         'https://editor.acropolis.adesa.com.do',
         'https://mayre16.github.io',

@@ -4,13 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkAuth, fetchAuthMe } from "@/lib/api";
-import { getToken, clearToken, getEditorRole, getEditorLabel } from "@/lib/auth-storage";
+import { clearToken, getEditorLabel, getEditorRole, getToken } from "@/lib/auth-storage";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { CmsTabNav } from "@/components/CmsTabNav";
+import { DashboardAdminBar } from "@/components/DashboardAdminBar";
 import { DashboardSiteJumpNav } from "@/components/DashboardSiteJumpNav";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
-import { SmtpSettingsPanel } from "@/components/SmtpSettingsPanel";
-import { UsersAdminPanel } from "@/components/UsersAdminPanel";
 import { SITE_LABELS, type SiteId } from "@/lib/content-types";
 import {
   DASHBOARD_SITES,
@@ -81,18 +80,11 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-4xl px-4 py-8">
-      <header className="relative border-b border-slate-200 pb-8">
-        <button
-          type="button"
-          onClick={() => {
-            clearToken();
-            router.push("/login/");
-          }}
-          className="absolute right-0 top-0 text-sm text-slate-600 hover:underline"
-        >
-          Salir
-        </button>
-        <CmsBrandHeader subtitle={`Panel de edición · ${editorLabel}`} />
+      <header className="border-b border-slate-200 pb-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <CmsBrandHeader subtitle={`Panel de edición · ${editorLabel}`} />
+          <DashboardAdminBar role={role} />
+        </div>
       </header>
 
       <div className="mt-6">
@@ -152,12 +144,6 @@ export default function DashboardPage() {
       </div>
 
       <TwoFactorSetup enabled={totpEnabled} />
-      {role === "admin" ? (
-        <>
-          <UsersAdminPanel />
-          <SmtpSettingsPanel />
-        </>
-      ) : null}
     </div>
   );
 }

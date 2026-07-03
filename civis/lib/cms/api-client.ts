@@ -55,11 +55,59 @@ function authHeaders(token: string): HeadersInit {
   };
 }
 
-export async function fetchCmsDraft(
+const DRAFT_CACHE_PREFIX = "cms-draft-cache:";
+const DRAFT_CACHE_TTL_MS = 5 * 60 * 1000;
+const inflightDrafts = new Map<string, Promise<CmsDocument>>();
+
+type StoredDraft = { doc: CmsDocument; at: number };
+
+function readDraftCache(site: string): CmsDocument | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(`${DRAFT_CACHE_PREFIX}${site}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredDraft;
+    if (!parsed?.doc || Date.now() - parsed.at > DRAFT_CACHE_TTL_MS) return null;
+    return parsed.doc;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraftCache(site: string, doc: CmsDocument) {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(
+      `${DRAFT_CACHE_PREFIX}${site}`,
+      JSON.stringify({ doc, at: Date.now() } satisfies StoredDraft),
+    );
+  } catch {
+    // quota exceeded — skip cache
+  }
+}
+
+export function invalidateCmsDraftCache(site?: "acropolis" | "civis") {
+  if (site) {
+    for (const key of inflightDrafts.keys()) {
+      if (key.startsWith(`${site}:`)) inflightDrafts.delete(key);
+    }
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(`${DRAFT_CACHE_PREFIX}${site}`);
+    }
+    return;
+  }
+  inflightDrafts.clear();
+  if (typeof window === "undefined") return;
+  for (let i = sessionStorage.length - 1; i >= 0; i--) {
+    const key = sessionStorage.key(i);
+    if (key?.startsWith(DRAFT_CACHE_PREFIX)) sessionStorage.removeItem(key);
+  }
+}
+
+async function fetchCmsDraftFromNetwork(
   site: "acropolis" | "civis",
-  token?: string,
+  bearer?: string,
 ): Promise<CmsDocument> {
-  const bearer = token ?? getCmsEditSession()?.token;
   const headers: HeadersInit = bearer
     ? { Authorization: `Bearer ${bearer}` }
     : {};
@@ -68,7 +116,40 @@ export async function fetchCmsDraft(
     headers,
   });
   if (!res.ok) throw new Error("No se pudo cargar el borrador");
-  return res.json() as Promise<CmsDocument>;
+  const doc = (await res.json()) as CmsDocument;
+  writeDraftCache(site, doc);
+  return doc;
+}
+
+export async function fetchCmsDraft(
+  site: "acropolis" | "civis",
+  token?: string,
+  opts?: { force?: boolean },
+): Promise<CmsDocument> {
+  const bearer = token ?? getCmsEditSession()?.token;
+  const force = opts?.force ?? false;
+
+  if (!force) {
+    const cached = readDraftCache(site);
+    if (cached) {
+      if (bearer) {
+        void fetchCmsDraftFromNetwork(site, bearer).catch(() => {});
+      }
+      return cached;
+    }
+  }
+
+  const inflightKey = `${site}:${bearer ?? ""}`;
+  const existing = inflightDrafts.get(inflightKey);
+  if (existing) return existing;
+
+  const promise = fetchCmsDraftFromNetwork(site, bearer);
+  inflightDrafts.set(inflightKey, promise);
+  try {
+    return await promise;
+  } finally {
+    inflightDrafts.delete(inflightKey);
+  }
 }
 
 export async function saveCmsDraft(
@@ -82,6 +163,7 @@ export async function saveCmsDraft(
     body: JSON.stringify(doc),
   });
   if (!res.ok) throw new Error("Error al guardar borrador");
+  writeDraftCache(site, doc);
 }
 
 export async function publishCms(
@@ -94,6 +176,7 @@ export async function publishCms(
   });
   if (!res.ok) throw new Error("Error al publicar");
   const result = (await res.json()) as CmsPublishResult;
+  invalidateCmsDraftCache(site);
   const { notifyCmsPublishSuccess } = await import("@/lib/cms/publish-notify");
   notifyCmsPublishSuccess(result);
   return result;

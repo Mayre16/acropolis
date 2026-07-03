@@ -6,6 +6,9 @@ export const CMS_EDIT_STORAGE_KEY = "acropolis-cms-edit";
 export const CMS_EDIT_HERO_PENDING_CLASS = "cms-edit-pending-hero";
 export const CMS_EDIT_HERO_READY_CLASS = "cms-edit-hero-ready";
 
+/** Página dentro del iframe del editor — oculta la barra ámbar duplicada al instante. */
+export const CMS_EDIT_EMBEDDED_CLASS = "cms-edit-embedded";
+
 export type CmsEditMode = "1" | "medios";
 
 export function readStoredCmsEditMode(): CmsEditMode | null {

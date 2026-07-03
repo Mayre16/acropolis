@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack -p 3400",
     "dev:api": "node scripts/dev-api.mjs",
+    "sync:smtp": "node scripts/sync-smtp-from-biblioteca.mjs",
     "build": "next build",
     "build:cpanel": "node scripts/build-cpanel.mjs",
     "start": "next start -p 3400",

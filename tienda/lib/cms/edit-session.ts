@@ -9,13 +9,51 @@ export type CmsEditSession = {
   site: "acropolis" | "civis" | "editorial";
 };
 
+const CMS_EDIT_SESSION_KEY = "acropolis-cms-edit-session";
+
 let session: CmsEditSession | null = null;
 const listeners = new Set<(value: CmsEditSession) => void>();
+
+function readStoredSession(): CmsEditSession | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(CMS_EDIT_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CmsEditSession;
+    if (!parsed?.token || !parsed?.site) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function persistSession(value: CmsEditSession | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (value) {
+      sessionStorage.setItem(CMS_EDIT_SESSION_KEY, JSON.stringify(value));
+    } else {
+      sessionStorage.removeItem(CMS_EDIT_SESSION_KEY);
+    }
+  } catch {
+    // quota exceeded — in-memory session still works this navigation
+  }
+}
+
+if (typeof window !== "undefined") {
+  session = readStoredSession();
+}
 
 export function setCmsEditSession(value: CmsEditSession) {
   if (session?.token === value.token && session.site === value.site) return;
   session = value;
+  persistSession(value);
   for (const listener of listeners) listener(value);
+}
+
+export function clearCmsEditSession() {
+  session = null;
+  persistSession(null);
 }
 
 export function getCmsEditSession(): CmsEditSession | null {

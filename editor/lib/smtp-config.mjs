@@ -1,18 +1,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  EDITOR_SMTP_DEFAULTS,
+  isRealSmtpSecret,
+} from "./editor-smtp-defaults.mjs";
+import { readBibliotecaSmtpFromPhp } from "./smtp-biblioteca-config.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SMTP_FILE = path.join(ROOT, "data", "system", "smtp.json");
 const LOCAL_CONFIG = path.join(ROOT, "api", "config.local.php");
+const PHP_CONFIG = path.join(ROOT, "api", "config.php");
 
 const DEFAULTS = {
-  host: "mail.acropolis.org",
-  port: 465,
-  secure: "ssl",
-  user: "smtp_user@acropolis.org",
+  ...EDITOR_SMTP_DEFAULTS,
   password: "",
-  from_email: "no-reply@acropolis.org",
   from_name: "Nueva Acrópolis RD",
   forms: {
     civis_solicitud: {
@@ -41,10 +43,14 @@ function ensureSystemDir() {
 }
 
 function readLocalPhpPassword() {
-  if (!fs.existsSync(LOCAL_CONFIG)) return "";
-  const raw = fs.readFileSync(LOCAL_CONFIG, "utf8");
-  const m = /['"]smtp_password['"]\s*=>\s*['"]([^'"]*)['"]/.exec(raw);
-  return m?.[1] ?? "";
+  for (const file of [LOCAL_CONFIG, PHP_CONFIG]) {
+    if (!fs.existsSync(file)) continue;
+    const raw = fs.readFileSync(file, "utf8");
+    const m = /['"]smtp_password['"]\s*=>\s*['"]([^'"]*)['"]/.exec(raw);
+    const value = m?.[1]?.trim() ?? "";
+    if (isRealSmtpSecret(value)) return value;
+  }
+  return "";
 }
 
 export function loadSmtpConfig() {
@@ -56,9 +62,6 @@ export function loadSmtpConfig() {
     } catch {
       stored = {};
     }
-  } else {
-    fs.writeFileSync(SMTP_FILE, JSON.stringify(DEFAULTS, null, 2));
-    stored = { ...DEFAULTS };
   }
 
   const merged = {
@@ -84,7 +87,10 @@ export function loadSmtpConfig() {
 
   if (!merged.password) {
     merged.password =
-      process.env.CMS_SMTP_PASSWORD?.trim() || readLocalPhpPassword();
+      process.env.CMS_SMTP_PASSWORD?.trim() ||
+      readLocalPhpPassword() ||
+      readBibliotecaSmtpFromPhp().password ||
+      "";
   }
 
   return merged;

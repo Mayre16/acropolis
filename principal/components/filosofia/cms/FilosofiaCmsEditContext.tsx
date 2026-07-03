@@ -12,7 +12,6 @@ import {
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
-import { useCmsEditorEmbedded } from "@/hooks/useCmsEditorEmbedded";
 import { usePathname } from "next/navigation";
 import { DIPLOMADO_PROXIMAS_SESIONES } from "@/lib/diplomado-sessions";
 import {
@@ -568,17 +567,17 @@ const DIPLOMADO_SECTIONS: { id: FilosofiaEditSection; label: string; anchor: str
 ];
 
 function FilosofiaEditToolbar() {
-  const embeddedInEditor = useCmsEditorEmbedded();
   const ctx = useFilosofiaCmsEditRequired();
   const pathname = usePathname();
   const onDiplomado = pathname.startsWith("/diplomado");
   const sections = onDiplomado ? DIPLOMADO_SECTIONS : FILOSOFIA_SECTIONS;
   const pageLabel = onDiplomado ? "Diplomado" : "Filosofía";
 
-  if (embeddedInEditor) return null;
-
   return (
-    <div className="sticky top-0 z-50 border-b border-amber-300 bg-amber-50 shadow-sm">
+    <div
+      data-cms-edit-toolbar
+      className="sticky top-0 z-50 border-b border-amber-300 bg-amber-50 shadow-sm"
+    >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3 py-2">
         <p className="text-xs font-semibold text-amber-950 sm:text-sm">
           Modo edición — {pageLabel}

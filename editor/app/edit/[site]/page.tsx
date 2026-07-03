@@ -68,6 +68,7 @@ import {
   SpellcheckHints,
 } from "@/components/SpellcheckHints";
 import { UploadInventoryTab } from "@/components/UploadInventoryTab";
+import { ArchivosDocumentsPanel } from "@/components/ArchivosDocumentsPanel";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { CmsTabNav } from "@/components/CmsTabNav";
 
@@ -402,6 +403,12 @@ function EditSitePageInner() {
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 overflow-auto px-4 py-4">
+          <ArchivosDocumentsPanel
+            site={site}
+            doc={doc}
+            token={token}
+            onChange={setDoc}
+          />
           <UploadInventoryTab site={site} />
         </main>
       </div>

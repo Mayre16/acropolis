@@ -72,11 +72,12 @@ export function validateSiteInquiryPayload(body) {
   };
 }
 
-export async function sendSiteInquiryMail(body, remoteIp) {
+export async function sendSiteInquiryMail(body, remoteIp, referer) {
   const bot = await verifyTurnstile(
     body?.turnstileToken,
     remoteIp,
     body?.website,
+    referer,
   );
   if (!bot.ok) return bot;
 

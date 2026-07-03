@@ -49,12 +49,19 @@ export function VisualCmsPageEditor({
   const [dirty, setDirty] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [loadGeneration, setLoadGeneration] = useState(0);
   const iframeSrc = `${siteUrl}${path}?${query}`;
 
   useEffect(() => {
     setIframeLoaded(false);
     setReady(false);
-  }, [iframeSrc]);
+    setStatus(`Cargando ${title}…`);
+  }, [iframeSrc, title]);
+
+  const handleIframeLoad = useCallback(() => {
+    setIframeLoaded(true);
+    setLoadGeneration((n) => n + 1);
+  }, []);
 
   const sendInit = useCallback(() => {
     const token = getToken();
@@ -85,12 +92,14 @@ export function VisualCmsPageEditor({
 
   useEffect(() => {
     if (!iframeLoaded) return;
+    setReady(false);
+    setStatus(`Conectando con ${title}…`);
     sendInit();
-    const timers = [250, 750, 1500, 3000].map((ms) =>
+    const timers = [100, 250, 500, 1000, 2000, 4000].map((ms) =>
       window.setTimeout(() => sendInit(), ms),
     );
     return () => timers.forEach((id) => window.clearTimeout(id));
-  }, [sendInit, iframeLoaded, iframeSrc]);
+  }, [sendInit, iframeLoaded, loadGeneration, title]);
 
   function postToIframe(message: CmsEditMessage) {
     const win = iframeRef.current?.contentWindow;
@@ -171,13 +180,23 @@ export function VisualCmsPageEditor({
         </p>
       ) : null}
 
-      <iframe
-        ref={iframeRef}
-        title={`${title} — edición visual`}
-        src={iframeSrc}
-        className="min-h-0 flex-1 w-full border-0"
-        onLoad={() => setIframeLoaded(true)}
-      />
+      <div className="relative min-h-0 flex-1">
+        {!ready ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden bg-slate-100"
+            aria-hidden
+          >
+            <div className="h-full w-1/3 animate-pulse bg-brand-teal/70" />
+          </div>
+        ) : null}
+        <iframe
+          ref={iframeRef}
+          title={`${title} — edición visual`}
+          src={iframeSrc}
+          className="h-full w-full border-0"
+          onLoad={handleIframeLoad}
+        />
+      </div>
     </div>
   );
 }
@@ -570,7 +589,9 @@ export function VisualEsferaEditor() {
           una para texto y foto; <strong>Añadir tarjeta</strong> para crear nuevas.
           En <strong>Modalidades disponibles</strong>: <strong>Editar sección</strong>{" "}
           o ✎ en cada taller para texto, foto y temas; <strong>Añadir taller</strong>{" "}
-          para crear nuevos. En{" "}
+          para crear nuevos. El botón de <strong>descarga del brochure</strong> tiene
+          ✎ para cambiar el PDF; también puedes subir una nueva versión en{" "}
+          <strong>Archivos</strong> del panel de sitios. En{" "}
           <strong>Actividades y próximos entrenamientos</strong>: ✎ en cada
           tarjeta para cambiar título, fecha, texto y foto;{" "}
           <strong>Añadir entrenamiento</strong> para crear nuevos. En cada

@@ -12,14 +12,27 @@ function isLocalPreviewHost(): boolean {
   return h === "localhost" || h === "127.0.0.1";
 }
 
+function isLoopbackUrl(url: string): boolean {
+  try {
+    const h = new URL(url).hostname;
+    return h === "localhost" || h === "127.0.0.1";
+  } catch {
+    return /localhost|127\.0\.0\.1/i.test(url);
+  }
+}
+
 function resolveSiteUrl(
   envKey: string | undefined,
   localPort: number,
   ghSlug: string,
 ): string {
+  const local = isLocalPreviewHost();
   const fromEnv = envKey?.replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
-  if (isLocalPreviewHost()) return `http://localhost:${localPort}`;
+  // Ignorar localhost embebido en builds hechos en PC de desarrollo
+  if (fromEnv && (local || !isLoopbackUrl(fromEnv))) {
+    return fromEnv;
+  }
+  if (local) return `http://localhost:${localPort}`;
   return `${GH_BASE}/${ghSlug}`;
 }
 

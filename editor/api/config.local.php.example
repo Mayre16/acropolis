@@ -1,5 +1,12 @@
 <?php
 /** Copiar a config.local.php (no versionar). Solo desarrollo local. */
 return [
+    /** Contraseña de formularios@editor.acropolis.adesa.com.do */
     'smtp_password' => 'CONTRASEÑA_SMTP',
+    'smtp_host' => 'mail.acropolis.adesa.com.do',
+    'smtp_port' => 465,
+    'smtp_secure' => 'ssl',
+    'smtp_user' => 'formularios@editor.acropolis.adesa.com.do',
+    'smtp_from_email' => 'formularios@editor.acropolis.adesa.com.do',
+    'smtp_from_name' => 'Nueva Acrópolis RD',
 ];

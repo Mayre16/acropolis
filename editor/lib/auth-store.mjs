@@ -35,6 +35,12 @@ export function findUserById(id) {
   return readStore().users.find((u) => u.id === id) ?? null;
 }
 
+export function userInvitePending(user) {
+  if (!user) return false;
+  if (user.invitePending === true) return true;
+  return !user.passwordHash;
+}
+
 export function publicUserView(user) {
   if (!user) return null;
   return {
@@ -45,11 +51,12 @@ export function publicUserView(user) {
     label: user.label,
     totpEnabled: !!user.totpSecret,
     disabled: !!user.disabled,
+    invitePending: userInvitePending(user),
     createdAt: user.createdAt ?? null,
   };
 }
 
-export function createUser({ email, passwordHash, role, label }) {
+export function createUser({ email, passwordHash = null, role, label, invitePending = false }) {
   const username = String(email).trim().toLowerCase();
   const store = readStore();
   const user = {
@@ -61,6 +68,7 @@ export function createUser({ email, passwordHash, role, label }) {
     label,
     totpSecret: null,
     disabled: false,
+    invitePending: invitePending || !passwordHash,
     createdAt: new Date().toISOString(),
   };
   store.users.push(user);
@@ -78,7 +86,7 @@ export function updateUserProfile(userId, patch) {
 }
 
 export function setUserPassword(userId, passwordHash) {
-  return updateUserProfile(userId, { passwordHash });
+  return updateUserProfile(userId, { passwordHash, invitePending: false });
 }
 
 export function setUserDisabled(userId, disabled) {

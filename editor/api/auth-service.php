@@ -298,7 +298,10 @@ function cms_auth_admin_reset_password(string $dataRoot, string $userId, string 
     if (!$policy['ok']) {
         return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
     }
-    cms_auth_update_user($dataRoot, $userId, ['passwordHash' => cms_hash_password($password)]);
+    cms_auth_update_user($dataRoot, $userId, [
+        'passwordHash' => cms_hash_password($password),
+        'invitePending' => false,
+    ]);
     return ['ok' => true, 'message' => 'Contraseña actualizada'];
 }
 
@@ -330,6 +333,7 @@ function cms_auth_admin_delete_user(string $dataRoot, string $userId, array $ses
         static fn ($u) => is_array($u) && ($u['id'] ?? '') !== $userId,
     ));
     cms_auth_save_users($dataRoot, $users);
+    cms_auth_revoke_invites_for_user($dataRoot, $userId);
     return ['ok' => true, 'message' => 'Usuario eliminado'];
 }
 
@@ -500,6 +504,13 @@ function cms_auth_login(array $body, array $config, string $dataRoot): array
         if (!empty($user['disabled'])) {
             return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
         }
+        if (empty($user['passwordHash'])) {
+            return [
+                'ok' => false,
+                'error' => 'Tu cuenta aún no está activa. Revisa tu correo y usa el enlace de invitación para crear tu contraseña.',
+                'status' => 401,
+            ];
+        }
         if (!cms_verify_password($password, (string) ($user['passwordHash'] ?? ''))) {
             return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
         }
@@ -601,6 +612,267 @@ function cms_auth_confirm_2fa(array $body, string $token, string $dataRoot): arr
     return cms_auth_create_session($dataRoot, $user);
 }
 
+function cms_auth_user_invite_pending(array $user): bool
+{
+    if (!empty($user['invitePending'])) {
+        return true;
+    }
+    return empty($user['passwordHash']);
+}
+
+const CMS_INVITE_TTL_MS = 72 * 60 * 60 * 1000;
+
+function cms_auth_invites(string $dataRoot): array
+{
+    $data = cms_auth_read_json(cms_auth_json_file($dataRoot, 'invites.json'));
+    $invites = $data['invites'] ?? [];
+    return is_array($invites) ? $invites : [];
+}
+
+function cms_auth_save_invites(string $dataRoot, array $invites): void
+{
+    cms_auth_write_json(cms_auth_json_file($dataRoot, 'invites.json'), ['invites' => $invites]);
+}
+
+function cms_auth_revoke_invites_for_user(string $dataRoot, string $userId): void
+{
+    $invites = array_values(array_filter(
+        cms_auth_invites($dataRoot),
+        static fn ($invite) => !is_array($invite)
+            || ($invite['userId'] ?? '') !== $userId
+            || !empty($invite['usedAt']),
+    ));
+    cms_auth_save_invites($dataRoot, $invites);
+}
+
+function cms_auth_invite_expired(array $invite): bool
+{
+    $expiresAt = strtotime((string) ($invite['expiresAt'] ?? ''));
+    return $expiresAt === false || $expiresAt <= time();
+}
+
+function cms_auth_create_invite(string $dataRoot, string $userId, string $email): array
+{
+    cms_auth_revoke_invites_for_user($dataRoot, $userId);
+    $now = time();
+    $invite = [
+        'token' => bin2hex(random_bytes(32)),
+        'userId' => $userId,
+        'email' => strtolower(trim($email)),
+        'createdAt' => gmdate('c', $now),
+        'expiresAt' => gmdate('c', $now + (int) (CMS_INVITE_TTL_MS / 1000)),
+        'usedAt' => null,
+    ];
+    $invites = cms_auth_invites($dataRoot);
+    $invites[] = $invite;
+    cms_auth_save_invites($dataRoot, $invites);
+    return $invite;
+}
+
+function cms_auth_find_valid_invite(string $dataRoot, string $token): ?array
+{
+    $normalized = trim($token);
+    if ($normalized === '') {
+        return null;
+    }
+    foreach (cms_auth_invites($dataRoot) as $invite) {
+        if (!is_array($invite) || ($invite['token'] ?? '') !== $normalized) {
+            continue;
+        }
+        if (!empty($invite['usedAt']) || cms_auth_invite_expired($invite)) {
+            return null;
+        }
+        return $invite;
+    }
+    return null;
+}
+
+function cms_auth_mark_invite_used(string $dataRoot, string $token): void
+{
+    $invites = cms_auth_invites($dataRoot);
+    foreach ($invites as $i => $invite) {
+        if (!is_array($invite) || ($invite['token'] ?? '') !== $token) {
+            continue;
+        }
+        $invites[$i]['usedAt'] = gmdate('c');
+        cms_auth_save_invites($dataRoot, $invites);
+        return;
+    }
+}
+
+function cms_auth_editor_public_url(array $config): string
+{
+    $url = trim((string) ($config['editor_url'] ?? $config['editor_public_url'] ?? ''));
+    if ($url === '') {
+        $url = 'https://editor.acropolis.adesa.com.do';
+    }
+    return rtrim($url, '/');
+}
+
+function cms_auth_build_invite_url(array $config, string $token): string
+{
+    return cms_auth_editor_public_url($config)
+        . '/invitacion/?token='
+        . rawurlencode($token);
+}
+
+function cms_auth_send_invite_mail(array $config, string $email, string $label, string $token): void
+{
+    require_once __DIR__ . '/mail.php';
+    $inviteUrl = cms_auth_build_invite_url($config, $token);
+    $greeting = $label !== '' ? "Hola {$label}" : 'Hola';
+    $body = "{$greeting},\n\n"
+        . "Te han invitado al editor de contenidos de Nueva Acrópolis RD.\n\n"
+        . "Para activar tu cuenta, abre este enlace y crea tu contraseña:\n\n"
+        . "{$inviteUrl}\n\n"
+        . "El enlace caduca en 72 horas. Si no esperabas este mensaje, puedes ignorarlo.\n\n"
+        . "— Nueva Acrópolis RD";
+    cms_send_plain_mail(cms_load_smtp_config($config), [
+        'to' => $email,
+        'toName' => $label !== '' ? $label : $email,
+        'subject' => 'Invitación al editor de Nueva Acrópolis RD',
+        'body' => $body,
+    ]);
+}
+
+function cms_auth_get_invite_info(string $dataRoot, string $token): array
+{
+    $invite = cms_auth_find_valid_invite($dataRoot, $token);
+    if ($invite === null) {
+        return ['ok' => false, 'error' => 'Invitación inválida o caducada', 'status' => 404];
+    }
+    $user = cms_auth_find_user_by_id($dataRoot, (string) ($invite['userId'] ?? ''));
+    if ($user === null || !empty($user['disabled'])) {
+        return ['ok' => false, 'error' => 'Invitación inválida o caducada', 'status' => 404];
+    }
+    if (!cms_auth_user_invite_pending($user)) {
+        return [
+            'ok' => false,
+            'error' => 'Esta invitación ya fue utilizada. Inicia sesión con tu contraseña.',
+            'status' => 409,
+        ];
+    }
+    return [
+        'ok' => true,
+        'email' => (string) ($invite['email'] ?? ''),
+        'label' => (string) ($user['label'] ?? ''),
+    ];
+}
+
+function cms_auth_accept_invite(string $dataRoot, string $token, string $password): array
+{
+    $invite = cms_auth_find_valid_invite($dataRoot, $token);
+    if ($invite === null) {
+        return ['ok' => false, 'error' => 'Invitación inválida o caducada', 'status' => 404];
+    }
+    $user = cms_auth_find_user_by_id($dataRoot, (string) ($invite['userId'] ?? ''));
+    if ($user === null || !empty($user['disabled'])) {
+        return ['ok' => false, 'error' => 'Invitación inválida o caducada', 'status' => 404];
+    }
+    if (!cms_auth_user_invite_pending($user)) {
+        return [
+            'ok' => false,
+            'error' => 'Esta invitación ya fue utilizada. Inicia sesión con tu contraseña.',
+            'status' => 409,
+        ];
+    }
+    $policy = cms_validate_password($password);
+    if (!$policy['ok']) {
+        return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
+    }
+    cms_auth_update_user($dataRoot, (string) $user['id'], [
+        'passwordHash' => cms_hash_password($password),
+        'invitePending' => false,
+    ]);
+    cms_auth_mark_invite_used($dataRoot, $token);
+    $updated = cms_auth_find_user_by_id($dataRoot, (string) $user['id']);
+    return cms_auth_create_session($dataRoot, $updated ?? $user);
+}
+
+function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config): array
+{
+    $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
+    $role = trim((string) ($body['role'] ?? ''));
+    $label = trim((string) ($body['label'] ?? ''));
+
+    if ($email === '' || !cms_auth_is_valid_email($email)) {
+        return ['ok' => false, 'error' => 'Correo electrónico inválido', 'status' => 400];
+    }
+    if ($role === '') {
+        return ['ok' => false, 'error' => 'Rol requerido', 'status' => 400];
+    }
+    if ($label === '') {
+        return ['ok' => false, 'error' => 'Nombre visible requerido', 'status' => 400];
+    }
+    if (cms_auth_find_user($dataRoot, $email) !== null) {
+        return ['ok' => false, 'error' => 'Ya existe un usuario con ese correo', 'status' => 409];
+    }
+
+    $user = cms_auth_append_user($dataRoot, [
+        'id' => bin2hex(random_bytes(16)),
+        'username' => $email,
+        'email' => $email,
+        'passwordHash' => null,
+        'role' => $role,
+        'label' => $label,
+        'totpSecret' => null,
+        'disabled' => false,
+        'invitePending' => true,
+        'createdAt' => gmdate('c'),
+    ]);
+    $invite = cms_auth_create_invite($dataRoot, (string) $user['id'], $email);
+
+    try {
+        cms_auth_send_invite_mail($config, $email, $label, (string) $invite['token']);
+    } catch (Throwable $e) {
+        return [
+            'ok' => false,
+            'error' => $e->getMessage() ?: 'No se pudo enviar el correo',
+            'status' => 502,
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'user' => cms_auth_public_user($user),
+        'inviteUrl' => cms_auth_build_invite_url($config, (string) $invite['token']),
+        'message' => "Invitación enviada a {$email}.",
+        'status' => 201,
+    ];
+}
+
+function cms_auth_admin_resend_invite(string $dataRoot, string $userId, array $config): array
+{
+    $user = cms_auth_find_user_by_id($dataRoot, $userId);
+    if ($user === null) {
+        return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
+    }
+    if (!cms_auth_user_invite_pending($user)) {
+        return ['ok' => false, 'error' => 'Este usuario ya activó su cuenta', 'status' => 400];
+    }
+    $email = (string) ($user['email'] ?? $user['username'] ?? '');
+    $invite = cms_auth_create_invite($dataRoot, $userId, $email);
+    try {
+        cms_auth_send_invite_mail(
+            $config,
+            $email,
+            (string) ($user['label'] ?? ''),
+            (string) $invite['token'],
+        );
+    } catch (Throwable $e) {
+        return [
+            'ok' => false,
+            'error' => $e->getMessage() ?: 'No se pudo enviar el correo',
+            'status' => 502,
+        ];
+    }
+    return [
+        'ok' => true,
+        'inviteUrl' => cms_auth_build_invite_url($config, (string) $invite['token']),
+        'message' => "Invitación reenviada a {$email}.",
+    ];
+}
+
 function cms_auth_public_user(array $user): array
 {
     return [
@@ -611,6 +883,7 @@ function cms_auth_public_user(array $user): array
         'label' => $user['label'] ?? '',
         'totpEnabled' => !empty($user['totpSecret']),
         'disabled' => !empty($user['disabled']),
+        'invitePending' => cms_auth_user_invite_pending($user),
         'createdAt' => $user['createdAt'] ?? null,
     ];
 }
@@ -725,7 +998,42 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
         return ['status' => $status, 'body' => $result];
     }
 
-    if (preg_match('#^/auth/users/([^/]+)(/reset-password|/totp)?$#', $uri, $m)) {
+    if ($uri === '/auth/users/invite' && $method === 'POST') {
+        $gate = cms_auth_require_admin($dataRoot, $token);
+        if (!$gate['ok']) {
+            return [
+                'status' => (int) ($gate['status'] ?? 401),
+                'body' => ['ok' => false, 'error' => $gate['error'] ?? 'No autorizado'],
+            ];
+        }
+        $result = cms_auth_admin_invite_user($dataRoot, $body, $config);
+        $status = (int) ($result['status'] ?? ($result['ok'] ? 201 : 400));
+        unset($result['status']);
+        return ['status' => $status, 'body' => $result];
+    }
+
+    if (preg_match('#^/auth/invite/([^/]+)(/accept)?$#', $uri, $im)) {
+        $inviteToken = $im[1];
+        $isAccept = ($im[2] ?? '') === '/accept';
+        if (!$isAccept && $method === 'GET') {
+            $result = cms_auth_get_invite_info($dataRoot, $inviteToken);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 404));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+        if ($isAccept && $method === 'POST') {
+            $result = cms_auth_accept_invite(
+                $dataRoot,
+                $inviteToken,
+                (string) ($body['password'] ?? ''),
+            );
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+    }
+
+    if (preg_match('#^/auth/users/([^/]+)(/reset-password|/totp|/resend-invite)?$#', $uri, $m)) {
         $gate = cms_auth_require_admin($dataRoot, $token);
         if (!$gate['ok']) {
             return [
@@ -750,6 +1058,13 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
 
         if ($action === '/totp' && $method === 'DELETE') {
             $result = cms_auth_admin_clear_totp($dataRoot, $userId);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+
+        if ($action === '/resend-invite' && $method === 'POST') {
+            $result = cms_auth_admin_resend_invite($dataRoot, $userId, $config);
             $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
             unset($result['status']);
             return ['status' => $status, 'body' => $result];

@@ -479,8 +479,11 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         onPublish={() => void publish()}
       />
       {!ready ? (
-        <div className="bg-amber-50 py-3 text-center text-sm text-na-muted">
-          Conectando con el editor…
+        <div
+          data-cms-edit-connecting
+          className="bg-amber-50 py-3 text-center text-sm text-na-muted"
+        >
+          {status || "Conectando con el editor…"}
         </div>
       ) : null}
       {children}

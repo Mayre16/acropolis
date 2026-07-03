@@ -73,6 +73,9 @@ function GroupBlock({
       <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
         {group.label}
       </h3>
+      {group.hint ? (
+        <p className="mt-1 text-xs text-slate-500">{group.hint}</p>
+      ) : null}
       <div className="mt-2.5 flex flex-wrap gap-2">
         {group.tabs.map((id) =>
           mode === "nav" && onSelect ? (

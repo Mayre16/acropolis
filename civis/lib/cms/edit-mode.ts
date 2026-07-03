@@ -1,5 +1,8 @@
 export const CMS_EDIT_STORAGE_KEY = "civis-cms-edit";
 
+/** Página dentro del iframe del editor — oculta la barra ámbar duplicada al instante. */
+export const CMS_EDIT_EMBEDDED_CLASS = "cms-edit-embedded";
+
 export type CmsEditMode = "1";
 
 export function readStoredCmsEditMode(): CmsEditMode | null {

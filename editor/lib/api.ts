@@ -274,6 +274,7 @@ export type CmsUser = {
   label: string;
   totpEnabled: boolean;
   disabled: boolean;
+  invitePending?: boolean;
   createdAt: string | null;
 };
 
@@ -389,4 +390,78 @@ export async function deleteCmsUser(
   if (!res.ok || !data.ok) {
     throw new Error(data.error || "No se pudo eliminar el usuario");
   }
+}
+
+export type InviteInfo = {
+  email: string;
+  label: string;
+};
+
+export async function fetchInviteInfo(token: string): Promise<InviteInfo> {
+  const res = await fetch(`${API_URL}/auth/invite/${encodeURIComponent(token)}`);
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    email?: string;
+    label?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok || !data.email) {
+    throw new Error(data.error || "Invitación inválida o caducada");
+  }
+  return { email: data.email, label: data.label ?? "" };
+}
+
+export async function acceptInvite(
+  inviteToken: string,
+  password: string,
+): Promise<AuthResult> {
+  const { res, data } = await authFetch(
+    `/auth/invite/${encodeURIComponent(inviteToken)}/accept`,
+    { password },
+  );
+  return { ok: res.ok && data.ok !== false, ...data };
+}
+
+export async function inviteCmsUser(
+  token: string,
+  body: {
+    email: string;
+    role: string;
+    label: string;
+  },
+): Promise<{ user: CmsUser; message?: string }> {
+  const res = await fetch(`${API_URL}/auth/users/invite`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    user?: CmsUser;
+    message?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok || !data.user) {
+    throw new Error(data.error || "No se pudo enviar la invitación");
+  }
+  return { user: data.user, message: data.message };
+}
+
+export async function resendCmsUserInvite(
+  token: string,
+  userId: string,
+): Promise<string> {
+  const res = await fetch(`${API_URL}/auth/users/${userId}/resend-invite`, {
+    method: "POST",
+    headers: authHeaders(token),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    message?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo reenviar la invitación");
+  }
+  return data.message || "Invitación reenviada.";
 }

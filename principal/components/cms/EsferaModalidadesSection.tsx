@@ -120,14 +120,22 @@ export function EsferaModalidadesSection() {
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <SolicitudEsferaDialog triggerLabel="Solicitar taller o charla para mi organización" />
         {brochureHref ? (
-          <a
-            href={brochureHref}
-            download
-            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-na-heket px-6 py-3 text-sm font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
-          >
-            <FileDown className="h-4 w-4" aria-hidden />
-            {brochureLabel}
-          </a>
+          <div className="relative">
+            {edit?.ready ? (
+              <CmsEditPencil
+                label="Cambiar brochure PDF"
+                onClick={() => edit.setSelectedId(ESFERA_BROCHURE_SECTION_ID)}
+              />
+            ) : null}
+            <a
+              href={brochureHref}
+              download
+              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-na-heket px-6 py-3 text-sm font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
+            >
+              <FileDown className="h-4 w-4" aria-hidden />
+              {brochureLabel}
+            </a>
+          </div>
         ) : edit?.ready ? (
           <button
             type="button"

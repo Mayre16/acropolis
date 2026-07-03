@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import {
   clearCmsUserTotp,
-  createCmsUser,
   deleteCmsUser,
   fetchCmsUsers,
+  inviteCmsUser,
+  resendCmsUserInvite,
   resetCmsUserPassword,
   updateCmsUser,
   type CmsUser,
@@ -18,7 +19,7 @@ const PASSWORD_HINT =
 
 const ROLE_OPTIONS = Object.values(EDITOR_ROLE_META);
 
-export function UsersAdminPanel() {
+export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   const [users, setUsers] = useState<CmsUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -26,7 +27,6 @@ export function UsersAdminPanel() {
   const [status, setStatus] = useState("");
   const [form, setForm] = useState({
     email: "",
-    password: "",
     label: "",
     role: "editorial" as EditorRole,
   });
@@ -48,22 +48,34 @@ export function UsersAdminPanel() {
     void reload();
   }, []);
 
-  async function onCreate(e: React.FormEvent) {
+  async function onInvite(e: React.FormEvent) {
     e.preventDefault();
     const token = getToken();
     if (!token) return;
     setCreating(true);
     setStatus("");
     try {
-      await createCmsUser(token, form);
-      setForm({ email: "", password: "", label: "", role: "editorial" });
+      const result = await inviteCmsUser(token, form);
+      setForm({ email: "", label: "", role: "editorial" });
       setOpen(false);
-      setStatus("Usuario creado.");
+      setStatus(result.message || "Invitación enviada.");
       await reload();
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Error al crear usuario");
+      setStatus(err instanceof Error ? err.message : "Error al enviar invitación");
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function resendInvite(user: CmsUser) {
+    const token = getToken();
+    if (!token) return;
+    setStatus("");
+    try {
+      const message = await resendCmsUserInvite(token, user.id);
+      setStatus(message);
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Error al reenviar invitación");
     }
   }
 
@@ -152,21 +164,34 @@ export function UsersAdminPanel() {
 
   if (loading) {
     return (
-      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
+      <section
+        className={`${embedded ? "" : "mt-8 "}rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm`}
+      >
         Cargando usuarios…
       </section>
     );
   }
 
   return (
-    <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section
+      className={`${embedded ? "" : "mt-8 "}rounded-xl border border-slate-200 bg-white p-5 shadow-sm`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-slate-800">Usuarios del CMS</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Cada editor entra con correo y contraseña. Puede activar 2FA con
-            Google o Microsoft Authenticator.
-          </p>
+          {!embedded ? (
+            <>
+              <h2 className="text-sm font-bold text-slate-800">Usuarios del CMS</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Invita editores por correo. Recibirán un enlace para crear su
+                contraseña y entrar al editor.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-slate-600">
+              Invita editores por correo. Recibirán un enlace para crear su
+              contraseña y entrar al editor.
+            </p>
+          )}
         </div>
         <button
           type="button"
@@ -176,12 +201,12 @@ export function UsersAdminPanel() {
           }}
           className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
         >
-          {open ? "Cerrar" : "Agregar usuario"}
+          {open ? "Cerrar" : "Enviar invitación"}
         </button>
       </div>
 
       {open ? (
-        <form onSubmit={onCreate} className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+        <form onSubmit={onInvite} className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
           <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
             Correo electrónico
             <input
@@ -218,25 +243,13 @@ export function UsersAdminPanel() {
               ))}
             </select>
           </label>
-          <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-            Contraseña inicial
-            <input
-              type="password"
-              required
-              className={field}
-              value={form.password}
-              onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))}
-              autoComplete="new-password"
-            />
-            <span className="mt-1 block text-xs text-slate-500">{PASSWORD_HINT}</span>
-          </label>
           <div className="sm:col-span-2">
             <button
               type="submit"
               disabled={creating}
               className="rounded-lg bg-brand-teal px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
             >
-              {creating ? "Creando…" : "Crear usuario"}
+              {creating ? "Enviando…" : "Enviar invitación"}
             </button>
           </div>
         </form>
@@ -284,12 +297,23 @@ export function UsersAdminPanel() {
                 <td className="py-3 pr-3">
                   {user.disabled ? (
                     <span className="text-red-600">Desactivado</span>
+                  ) : user.invitePending ? (
+                    <span className="text-amber-700">Invitación pendiente</span>
                   ) : (
                     <span className="text-emerald-700">Activo</span>
                   )}
                 </td>
                 <td className="py-3">
                   <div className="flex flex-wrap gap-1.5">
+                    {user.invitePending ? (
+                      <button
+                        type="button"
+                        onClick={() => void resendInvite(user)}
+                        className="rounded border border-brand-teal/40 px-2 py-1 text-xs text-brand-teal hover:bg-teal-50"
+                      >
+                        Reenviar invitación
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => void toggleDisabled(user)}

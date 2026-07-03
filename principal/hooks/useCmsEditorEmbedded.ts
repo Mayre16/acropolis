@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
   isCmsEditOrigin,
   type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
-import { isInEditorIframe } from "@/lib/cms/edit-mode";
+import {
+  CMS_EDIT_EMBEDDED_CLASS,
+  isInEditorIframe,
+} from "@/lib/cms/edit-mode";
+
+function readEmbeddedInEditor(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    isInEditorIframe() ||
+    document.documentElement.classList.contains(CMS_EDIT_EMBEDDED_CLASS)
+  );
+}
 
 /** True cuando la página está en un iframe del editor (3400). */
 export function useCmsEditorEmbedded() {
   const [embedded, setEmbedded] = useState(false);
 
-  useEffect(() => {
-    if (isInEditorIframe()) setEmbedded(true);
+  useLayoutEffect(() => {
+    if (readEmbeddedInEditor()) setEmbedded(true);
 
     function onMessage(ev: MessageEvent<CmsEditMessage>) {
       if (!isCmsEditOrigin(ev.origin)) return;

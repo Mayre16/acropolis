@@ -1,6 +1,6 @@
 <?php
 /**
- * API CMS â€” producciÃ³n (editor.acropolis.adesa.com.do/api/)
+ * API CMS âÿÿ producciÃ³n (editor.acropolis.adesa.com.do/api/)
  * Desarrollo local: node scripts/dev-api.mjs
  */
 declare(strict_types=1);
@@ -107,6 +107,13 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $ur
             requireAuth();
         }
         if (!is_file($file)) {
+            if ($m[2] === 'draft') {
+                $published = $siteDir . DIRECTORY_SEPARATOR . 'published.json';
+                if (is_file($published)) {
+                    readfile($published);
+                    exit;
+                }
+            }
             jsonOut(404, ['error' => 'Sin contenido']);
         }
         readfile($file);

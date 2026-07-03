@@ -45,11 +45,12 @@ export function validateEsferaSolicitudPayload(body) {
   };
 }
 
-export async function sendEsferaSolicitudMail(body, remoteIp) {
+export async function sendEsferaSolicitudMail(body, remoteIp, referer) {
   const bot = await verifyTurnstile(
     body?.turnstileToken,
     remoteIp,
     body?.website,
+    referer,
   );
   if (!bot.ok) return bot;
 

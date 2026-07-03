@@ -59,12 +59,42 @@ Si las listas del CMS están vacías, el sitio sigue mostrando las fotos del có
 
 ## Despliegue (editor.acropolis.adesa.com.do)
 
-1. Subdominio en cPanel apuntando a `editor/` (build estático + carpeta `api/` PHP).
-2. `npm run build:cpanel` en `editor/` → subir `out/` (incluye `api/` y `na-assets/`).
-3. Copiar `api/config.php.example` → `config.php` con contraseña admin, `github_repo` y `github_deploy_token`.
-4. En builds de principal/civis: `NEXT_PUBLIC_CMS_URL=https://editor.acropolis.adesa.com.do/api` (sin barra final).
+**Flujo:** el **agente** ejecuta el build en local; **Martha** sube manualmente el contenido de `editor/out/` a cPanel (sin ZIP salvo que lo pida).
 
-**Deploy automático al publicar:** ver `docs/CMS-DEPLOY.md` (webhook → GitHub Actions → FTP cPanel).
+Regla detallada para el agente: `.cursor/rules/editor-cpanel-deploy.mdc`
+
+### 1. Build (lo corre el agente, no a mano en cPanel)
+
+Desde `editor/`, **sin** `next dev` ni `dev:api` corriendo:
+
+```powershell
+cd editor
+$env:EDITOR_PREVIEW_GITHUB_PAGES = "1"
+$env:NEXT_PUBLIC_CMS_API_URL = "https://editor.acropolis.adesa.com.do/api"
+npm run build:cpanel
+```
+
+Eso genera `editor/out/` con `na-assets/` (no `_next/`), HTML, y `api/` PHP.
+
+**Importante:** un `npm run build` a secas (sin variables) puede embebir `localhost:3200` / `:3300` para Civis y Editorial → iframe roto en producción.
+
+### 2. Subida manual a cPanel
+
+Subir **el contenido** de `out/` a la raíz del subdominio editor:
+
+- `na-assets/`, `edit/`, `login/`, `dashboard/`, `invitacion/`, `index.html`, `.htaccess`
+- `api/` (PHP nuevo; **conservar** `api/config.php` del servidor)
+- **No borrar** `data/` del servidor
+
+### 3. Config en servidor (una vez)
+
+- `api/config.php` desde `config.php.example`: admin, SMTP, `github_deploy_token`, `allowed_origins` (incluir `https://mayre16.github.io`)
+
+### 4. Sitio público (iframe)
+
+El editor carga la preview desde **GitHub Pages** (`mayre16.github.io/acropolis/...`). Cambios en principal/civis/tienda → push a GitHub (Actions), no solo cPanel.
+
+**Deploy automático al publicar contenido CMS:** ver `docs/CMS-DEPLOY.md`.
 
 ## Secciones conectadas al sitio
 

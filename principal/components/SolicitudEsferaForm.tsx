@@ -8,6 +8,7 @@ import {
   resetTurnstileWidget,
   TurnstileWidget,
 } from "@/components/TurnstileWidget";
+import { turnstileEnabled } from "@/lib/turnstile-config";
 import { CheckCircle2 } from "lucide-react";
 
 const MAX_PERSONAS = 25;
@@ -209,7 +210,7 @@ export function SolicitudEsferaForm({
     ev.preventDefault();
     setSubmitError("");
     const v = validate(values);
-    if (!turnstileToken) {
+    if (turnstileEnabled() && !turnstileToken) {
       v.turnstile = "Marca la casilla «No soy un robot».";
     }
     setErrors(v);
@@ -635,15 +636,17 @@ export function SolicitudEsferaForm({
         />
       </div>
 
-      <div className="mt-6">
-        <TurnstileWidget
-          onToken={setTurnstileToken}
-          onExpire={() => setTurnstileToken("")}
-        />
-        {errors.turnstile && (
-          <p className="mt-2 text-xs text-red-400">{errors.turnstile}</p>
-        )}
-      </div>
+      {turnstileEnabled() ? (
+        <div className="mt-6">
+          <TurnstileWidget
+            onToken={setTurnstileToken}
+            onExpire={() => setTurnstileToken("")}
+          />
+          {errors.turnstile && (
+            <p className="mt-2 text-xs text-red-400">{errors.turnstile}</p>
+          )}
+        </div>
+      ) : null}
 
       {submitError ? (
         <p className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
