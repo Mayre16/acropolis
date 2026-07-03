@@ -56,7 +56,7 @@ export function EventosListing() {
   function confirmHide(slug: string) {
     const seed = isSeedEvento(slug);
     const msg = seed
-      ? "¿Ocultar esta crónica del sitio?"
+      ? "¿Eliminar esta crónica del listado? Se ocultará de /eventos (puedes restaurarla después)."
       : "¿Eliminar esta crónica?";
     if (window.confirm(msg)) {
       edit?.hideItem(slug);
@@ -74,28 +74,28 @@ export function EventosListing() {
         className: string;
       }) => (
         <div className={`${className} relative`}>
-          <button
-            type="button"
-            onClick={() => openEdit(slug)}
-            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow"
-            aria-label="Editar crónica"
-          >
-            <Pencil className="h-4 w-4" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              confirmHide(slug);
-            }}
-            className="absolute right-14 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
-            aria-label={
-              isSeedEvento(slug) ? "Ocultar crónica" : "Eliminar crónica"
-            }
-            title={isSeedEvento(slug) ? "Ocultar del sitio" : "Eliminar"}
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-          </button>
+          <div className="absolute right-3 top-3 z-10 flex flex-col gap-1.5">
+            <button
+              type="button"
+              onClick={() => openEdit(slug)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow"
+              aria-label="Editar crónica"
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                confirmHide(slug);
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
+              aria-label="Eliminar crónica"
+              title="Eliminar"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => openEdit(slug)}

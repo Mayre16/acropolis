@@ -47,6 +47,7 @@ import {
 } from "@/components/cms/PublishCategoryFields";
 import { normalizeCmsEventoCategory } from "@/lib/agenda-publish-categories";
 import type { AgendaCategory } from "@/lib/agenda";
+import { Trash2 } from "lucide-react";
 
 type EventosCmsEditContextValue = {
   ready: boolean;
@@ -400,18 +401,23 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
               onClick={() => {
                 const seed = isSeedEvento(selected.slug);
                 const msg = seed
-                  ? "¿Ocultar esta crónica del sitio?"
+                  ? "¿Eliminar esta crónica del listado? Se ocultará de /eventos (puedes restaurarla después)."
                   : "¿Eliminar esta crónica?";
                 if (window.confirm(msg)) {
                   hideItem(selected.slug);
                 }
               }}
-              className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"
             >
-              {isSeedEvento(selected.slug)
-                ? "Ocultar del sitio"
-                : "Eliminar crónica"}
+              <Trash2 className="h-4 w-4 shrink-0" aria-hidden />
+              Eliminar crónica
             </button>
+            {isSeedEvento(selected.slug) ? (
+              <p className="text-center text-xs text-slate-500">
+                Crónica del catálogo base: desaparece del sitio al eliminar, pero
+                puedes mostrarla de nuevo al final de /eventos.
+              </p>
+            ) : null}
           </div>
         </EditPanelChrome>
       ) : null}
