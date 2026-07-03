@@ -17,11 +17,13 @@ import {
 
   Radio,
 
+  Trash2,
+
   Video,
 
 } from "lucide-react";
 
-import { MEDIOS, type MedioItem } from "@/lib/medios";
+import { MEDIOS, type MedioItem, isSeedMedio } from "@/lib/medios";
 
 import { useMergedMedios } from "@/lib/cms/hooks";
 
@@ -59,11 +61,15 @@ function MediaCard({
 
   onEdit,
 
+  onDelete,
+
 }: {
 
   m: MedioItem;
 
   onEdit?: () => void;
+
+  onDelete?: () => void;
 
 }) {
 
@@ -86,6 +92,32 @@ function MediaCard({
           <Pencil className="h-4 w-4" aria-hidden />
 
         </span>
+
+      ) : null}
+
+      {onDelete ? (
+
+        <button
+
+          type="button"
+
+          onClick={(e) => {
+
+            e.stopPropagation();
+
+            onDelete();
+
+          }}
+
+          className="absolute right-3 top-14 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
+
+          title={isSeedMedio(m.id) ? "Ocultar del sitio" : "Eliminar"}
+
+        >
+
+          <Trash2 className="h-4 w-4" aria-hidden />
+
+        </button>
 
       ) : null}
 
@@ -331,6 +363,32 @@ export function EnLosMedios() {
                   edit?.ready
 
                     ? () => edit.setSelectedId(m.id)
+
+                    : undefined
+
+                }
+
+                onDelete={
+
+                  edit?.ready
+
+                    ? () => {
+
+                        const seed = isSeedMedio(m.id);
+
+                        const msg = seed
+
+                          ? "¿Ocultar esta aparición del sitio?"
+
+                          : "¿Eliminar esta aparición?";
+
+                        if (window.confirm(msg)) {
+
+                          edit.hideItem(m.id);
+
+                        }
+
+                      }
 
                     : undefined
 

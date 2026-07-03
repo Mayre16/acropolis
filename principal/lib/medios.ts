@@ -126,3 +126,9 @@ export const MEDIOS: MedioItem[] = [
 ];
 
 
+
+/** Tarjetas definidas en código; en el CMS solo se pueden ocultar, no borrar del repo. */
+export function isSeedMedio(id: string): boolean {
+  return MEDIOS.some((m) => m.id === id);
+}
+

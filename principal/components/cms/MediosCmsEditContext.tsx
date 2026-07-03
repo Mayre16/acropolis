@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
-import { MEDIOS, type MedioKind } from "@/lib/medios";
+import { MEDIOS, type MedioKind, isSeedMedio } from "@/lib/medios";
 import {
   buildDocWithMedios,
   getMediosForEdit,
@@ -321,13 +321,19 @@ function MediosCmsEditInner({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Ocultar esta aparición del sitio?")) {
+                const seed = isSeedMedio(selected.id);
+                const msg = seed
+                  ? "¿Ocultar esta aparición del sitio? (sigue en el catálogo base; puedes restaurarla editando el borrador)."
+                  : "¿Eliminar esta aparición? Se quitará del borrador al guardar.";
+                if (window.confirm(msg)) {
                   hideItem(selected.id);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Ocultar del sitio
+              {isSeedMedio(selected.id)
+                ? "Ocultar del sitio"
+                : "Eliminar aparición"}
             </button>
           </div>
         </EditPanelChrome>
