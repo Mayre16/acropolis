@@ -36,7 +36,9 @@ import type {
 } from "@/lib/cms/types";
 import {
   CULTURA_EVENTOS_PREVIEW_DEFAULTS,
+  CULTURA_EVENTOS_SECTION,
   CULTURA_TALLERES_DEFAULTS,
+  CULTURA_TALLERES_SECTION,
   CULTURA_VIAJES_SECTION,
 } from "@/lib/cultura-content";
 import {
@@ -44,7 +46,12 @@ import {
   mergeCulturaCards,
   parseCulturaCardSelectedId,
 } from "@/lib/cms/cultura-display";
-import { parseViajeCardSelectedId, mergeViajeCategoriaPage } from "@/lib/cms/viajes-display";
+import {
+  defaultViajeCategoriaPage,
+  parseViajeCardSelectedId,
+  mergeViajeCategoriaPage,
+} from "@/lib/cms/viajes-display";
+import { coalesceCmsText } from "@/lib/cms/page-hero";
 import {
   EditField,
   EditPanelChrome,
@@ -497,12 +504,18 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <EditField
               label="Título de la sección"
-              value={culturaPage.proximasTitle ?? ""}
+              value={coalesceCmsText(
+                culturaPage.proximasTitle,
+                DEFAULT_CULTURA_PAGE.proximasTitle,
+              )}
               onChange={(v) => patchCulturaPage({ proximasTitle: v })}
             />
             <EditField
               label="Texto introductorio"
-              value={culturaPage.proximasIntro ?? ""}
+              value={coalesceCmsText(
+                culturaPage.proximasIntro,
+                DEFAULT_CULTURA_PAGE.proximasIntro,
+              )}
               onChange={(v) => patchCulturaPage({ proximasIntro: v })}
               multiline
             />
@@ -537,17 +550,26 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <EditField
               label="Etiqueta superior"
-              value={culturaPage.talleresEyebrow ?? ""}
+              value={coalesceCmsText(
+                culturaPage.talleresEyebrow,
+                CULTURA_TALLERES_SECTION.eyebrow,
+              )}
               onChange={(v) => patchCulturaPage({ talleresEyebrow: v })}
             />
             <EditField
               label="Título"
-              value={culturaPage.talleresTitle ?? ""}
+              value={coalesceCmsText(
+                culturaPage.talleresTitle,
+                CULTURA_TALLERES_SECTION.title,
+              )}
               onChange={(v) => patchCulturaPage({ talleresTitle: v })}
             />
             <EditField
               label="Introducción"
-              value={culturaPage.talleresIntro ?? ""}
+              value={coalesceCmsText(
+                culturaPage.talleresIntro,
+                CULTURA_TALLERES_SECTION.intro,
+              )}
               onChange={(v) => patchCulturaPage({ talleresIntro: v })}
               multiline
             />
@@ -582,17 +604,26 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <EditField
               label="Etiqueta superior"
-              value={culturaPage.eventosEyebrow ?? ""}
+              value={coalesceCmsText(
+                culturaPage.eventosEyebrow,
+                CULTURA_EVENTOS_SECTION.eyebrow,
+              )}
               onChange={(v) => patchCulturaPage({ eventosEyebrow: v })}
             />
             <EditField
               label="Título"
-              value={culturaPage.eventosTitle ?? ""}
+              value={coalesceCmsText(
+                culturaPage.eventosTitle,
+                CULTURA_EVENTOS_SECTION.title,
+              )}
               onChange={(v) => patchCulturaPage({ eventosTitle: v })}
             />
             <EditField
               label="Introducción"
-              value={culturaPage.eventosIntro ?? ""}
+              value={coalesceCmsText(
+                culturaPage.eventosIntro,
+                CULTURA_EVENTOS_SECTION.intro,
+              )}
               onChange={(v) => patchCulturaPage({ eventosIntro: v })}
               multiline
             />
@@ -638,19 +669,26 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <EditField
               label="Etiqueta superior"
-              value={
-                culturaPage.viajesEyebrow ?? CULTURA_VIAJES_SECTION.eyebrow
-              }
+              value={coalesceCmsText(
+                culturaPage.viajesEyebrow,
+                CULTURA_VIAJES_SECTION.eyebrow,
+              )}
               onChange={(v) => patchCulturaPage({ viajesEyebrow: v })}
             />
             <EditField
               label="Título"
-              value={culturaPage.viajesTitle ?? CULTURA_VIAJES_SECTION.title}
+              value={coalesceCmsText(
+                culturaPage.viajesTitle,
+                CULTURA_VIAJES_SECTION.title,
+              )}
               onChange={(v) => patchCulturaPage({ viajesTitle: v })}
             />
             <EditField
               label="Introducción"
-              value={culturaPage.viajesIntro ?? CULTURA_VIAJES_SECTION.intro}
+              value={coalesceCmsText(
+                culturaPage.viajesIntro,
+                CULTURA_VIAJES_SECTION.intro,
+              )}
               onChange={(v) => patchCulturaPage({ viajesIntro: v })}
               multiline
             />
@@ -681,11 +719,22 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
               onChange={(patch) =>
                 patchViajeCategoria(selectedViajeCategoria, patch)
               }
+              fallback={{
+                eyebrow: defaultViajeCategoriaPage(selectedViajeCategoria)
+                  .heroEyebrow!,
+                title: defaultViajeCategoriaPage(selectedViajeCategoria)
+                  .heroTitle!,
+                lede: defaultViajeCategoriaPage(selectedViajeCategoria).heroLede,
+              }}
             />
             <ImageField
               label="Foto de portada"
               media={
-                selectedViajeValues?.heroImage ?? { src: "", alt: "" }
+                selectedViajeValues?.heroImage ??
+                defaultViajeCategoriaPage(selectedViajeCategoria).heroImage ?? {
+                  src: "",
+                  alt: "",
+                }
               }
               token={token}
               onChange={(heroImage) =>
@@ -694,7 +743,10 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
             />
             <EditField
               label="Introducción (página de destinos)"
-              value={selectedViajeValues?.intro ?? ""}
+              value={coalesceCmsText(
+                selectedViajeValues?.intro,
+                defaultViajeCategoriaPage(selectedViajeCategoria).intro,
+              )}
               onChange={(v) =>
                 patchViajeCategoria(selectedViajeCategoria, { intro: v })
               }
@@ -702,7 +754,10 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
             />
             <EditField
               label="Texto de la tarjeta en /cultura"
-              value={selectedViajeValues?.cardText ?? ""}
+              value={coalesceCmsText(
+                selectedViajeValues?.cardText,
+                defaultViajeCategoriaPage(selectedViajeCategoria).cardText,
+              )}
               onChange={(v) =>
                 patchViajeCategoria(selectedViajeCategoria, { cardText: v })
               }

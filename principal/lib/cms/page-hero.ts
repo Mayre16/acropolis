@@ -73,14 +73,24 @@ export const PAGE_HERO_FALLBACKS: Partial<
   },
 };
 
+/** Usa el fallback cuando el CMS tiene vacío o solo espacios. */
+export function coalesceCmsText(
+  value: string | undefined,
+  fallback?: string,
+): string {
+  const trimmed = value?.trim();
+  if (trimmed) return trimmed;
+  return fallback?.trim() ?? "";
+}
+
 export function mergePageHeroFields(
   value: CmsPageHeroText | null | undefined,
   fallback?: PageHeroFallback | null,
 ) {
   return {
-    heroEyebrow: value?.heroEyebrow ?? fallback?.eyebrow ?? "",
-    heroTitle: value?.heroTitle ?? fallback?.title ?? "",
-    heroLede: value?.heroLede ?? fallback?.lede ?? "",
+    heroEyebrow: coalesceCmsText(value?.heroEyebrow, fallback?.eyebrow),
+    heroTitle: coalesceCmsText(value?.heroTitle, fallback?.title),
+    heroLede: coalesceCmsText(value?.heroLede, fallback?.lede),
   };
 }
 
@@ -92,16 +102,16 @@ export function resolvePageHero(
 ): PageHeroFallback {
   if (editReady && edit) {
     return {
-      eyebrow: edit.heroEyebrow ?? fallback.eyebrow,
-      title: edit.heroTitle ?? fallback.title,
-      lede: edit.heroLede ?? fallback.lede,
+      eyebrow: coalesceCmsText(edit.heroEyebrow, fallback.eyebrow),
+      title: coalesceCmsText(edit.heroTitle, fallback.title),
+      lede: coalesceCmsText(edit.heroLede, fallback.lede),
     };
   }
   if (isCmsEnabled() && cms) {
     return {
-      eyebrow: cms.heroEyebrow ?? fallback.eyebrow,
-      title: cms.heroTitle ?? fallback.title,
-      lede: cms.heroLede ?? fallback.lede,
+      eyebrow: coalesceCmsText(cms.heroEyebrow, fallback.eyebrow),
+      title: coalesceCmsText(cms.heroTitle, fallback.title),
+      lede: coalesceCmsText(cms.heroLede, fallback.lede),
     };
   }
   return fallback;
