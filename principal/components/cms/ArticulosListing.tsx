@@ -13,7 +13,6 @@ import { useMergedArticulos } from "@/lib/cms/hooks";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 
 import { ARTICULOS, isSeedArticulo } from "@/lib/articulos";
-import { isSeedMedio } from "@/lib/medios";
 
 import { isCmsEnabled } from "@/lib/cms/provider";
 
@@ -188,62 +187,6 @@ export function ArticulosListing() {
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Eliminar
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {mediosEdit?.ready && mediosEdit.items.length > 0 ? (
-        <div className="mb-10 rounded-2xl border border-sky-200/80 bg-sky-50/60 p-4 sm:p-5">
-          <h3 className="text-sm font-black uppercase tracking-wide text-sky-950">
-            Voz fuera de la sede
-          </h3>
-          <p className="mt-1 text-xs text-sky-900/80">
-            Enlaces a medios externos. También aparecen abajo en la sección
-            «Nuestra voz fuera de la sede».
-          </p>
-          <ul className="mt-4 space-y-2">
-            {mediosEdit.items.map((m) => (
-              <li
-                key={m.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white px-3 py-2.5 shadow-sm"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-na-heketDark">
-                    {m.title || "Sin título"}
-                  </p>
-                  <p className="truncate text-xs text-na-muted">
-                    {m.outlet || "Medio sin nombre"}
-                    {m.url ? ` · ${m.url.replace(/^https?:\/\//, "")}` : ""}
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => mediosEdit.setSelectedId(m.id)}
-                    className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-xs font-bold text-white"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const seed = isSeedMedio(m.id);
-                      const msg = seed
-                        ? "¿Ocultar esta aparición del sitio?"
-                        : "¿Eliminar esta aparición?";
-                      if (window.confirm(msg)) {
-                        mediosEdit.hideItem(m.id);
-                      }
-                    }}
-                    className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {isSeedMedio(m.id) ? "Ocultar" : "Eliminar"}
                   </button>
                 </div>
               </li>
