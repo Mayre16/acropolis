@@ -94,6 +94,25 @@ export function mergePageHeroFields(
   };
 }
 
+/** Al abrir el editor: rellena el formulario con los textos visibles en el sitio. */
+export function loadPageWithHeroDefaults<
+  T extends CmsPageHeroText & Record<string, unknown>,
+>(
+  base: T,
+  raw?: Partial<T> | null,
+  carouselKey?: CmsHeroCarouselKey,
+  fallback?: PageHeroFallback | null,
+): T {
+  const resolvedFallback =
+    fallback ??
+    (carouselKey ? PAGE_HERO_FALLBACKS[carouselKey] : undefined);
+  return {
+    ...base,
+    ...raw,
+    ...mergePageHeroFields(raw, resolvedFallback),
+  } as T;
+}
+
 export function resolvePageHero(
   fallback: PageHeroFallback,
   cms?: CmsPageHeroText | null,

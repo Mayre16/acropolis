@@ -37,6 +37,7 @@ import {
   HeroEditFields,
   ImageField,
 } from "@/components/cms/CmsEditFields";
+import { loadPageWithHeroDefaults } from "@/lib/cms/page-hero";
 
 type ArticulosCmsEditContextValue = {
   ready: boolean;
@@ -67,7 +68,9 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [items, setItems] = useState<CmsArticulo[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
-  const [page, setPage] = useState<CmsArticulosPage>({});
+  const [page, setPage] = useState<CmsArticulosPage>(() =>
+    loadPageWithHeroDefaults({}, undefined, "articulos"),
+  );
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -85,7 +88,9 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
     const { items: loaded, hidden: h } = getArticulosForEdit(draft, ARTICULOS);
     setItems(loaded);
     setHidden(h);
-    setPage(draft.sections.articulosPage ?? {});
+    setPage(
+      loadPageWithHeroDefaults({}, draft.sections.articulosPage, "articulos"),
+    );
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
   }, []);

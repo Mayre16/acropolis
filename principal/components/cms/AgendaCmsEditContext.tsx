@@ -36,6 +36,7 @@ import {
   EditToolbar,
   HeroEditFields,
 } from "@/components/cms/CmsEditFields";
+import { loadPageWithHeroDefaults } from "@/lib/cms/page-hero";
 
 type AgendaCmsEditContextValue = {
   ready: boolean;
@@ -82,7 +83,9 @@ function buildDoc(
 function AgendaCmsEditInner({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [doc, setDoc] = useState<CmsDocument | null>(null);
-  const [page, setPage] = useState<CmsAgendaPage>({});
+  const [page, setPage] = useState<CmsAgendaPage>(() =>
+    loadPageWithHeroDefaults({}, undefined, "agenda"),
+  );
   const [items, setItems] = useState<CmsAgendaEntry[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
   const [eventoDrafts, setEventoDrafts] = useState<CmsEvento[]>([]);
@@ -100,7 +103,7 @@ function AgendaCmsEditInner({ children }: { children: ReactNode }) {
 
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
     setDoc(draft);
-    setPage(draft.sections.agendaPage ?? {});
+    setPage(loadPageWithHeroDefaults({}, draft.sections.agendaPage, "agenda"));
     setItems(getHomeAgendaEntries(draft, ALL_AGENDA_ENTRIES));
     setHidden(draft.sections.agendaHidden ?? []);
     setDirty(false);

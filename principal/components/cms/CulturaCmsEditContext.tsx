@@ -51,7 +51,7 @@ import {
   parseViajeCardSelectedId,
   mergeViajeCategoriaPage,
 } from "@/lib/cms/viajes-display";
-import { coalesceCmsText } from "@/lib/cms/page-hero";
+import { coalesceCmsText, loadPageWithHeroDefaults } from "@/lib/cms/page-hero";
 import {
   EditField,
   EditPanelChrome,
@@ -68,11 +68,15 @@ import { promoteAgendaEntryLocally } from "@/lib/agenda-evento";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { CIRCULO_AMIGOS_SELECTED_ID, mergeCirculoAmigos } from "@/lib/cms/circulo-amigos-display";
 
-const DEFAULT_CULTURA_PAGE: CmsCulturaPage = {
-  proximasTitle: "Próximas actividades",
-  proximasIntro:
-    "Clases, ensayos y encuentros culturales en nuestras sedes de Santo Domingo y en el Punto Cultural Roberto Pastoriza. Haz clic para ver más.",
-};
+const DEFAULT_CULTURA_PAGE: CmsCulturaPage = loadPageWithHeroDefaults(
+  {
+    proximasTitle: "Próximas actividades",
+    proximasIntro:
+      "Clases, ensayos y encuentros culturales en nuestras sedes de Santo Domingo y en el Punto Cultural Roberto Pastoriza. Haz clic para ver más.",
+  },
+  undefined,
+  "cultura",
+);
 
 type CulturaCmsEditContextValue = {
   ready: boolean;
@@ -152,10 +156,13 @@ function CulturaCmsEditInner({ children }: { children: ReactNode }) {
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
     setDoc(draft);
     setItems(getCulturaEntries(draft, CULTURA_PROXIMAS_ACTIVIDADES));
-    setCulturaPage({
-      ...DEFAULT_CULTURA_PAGE,
-      ...draft.sections.culturaPage,
-    });
+    setCulturaPage(
+      loadPageWithHeroDefaults(
+        DEFAULT_CULTURA_PAGE,
+        draft.sections.culturaPage,
+        "cultura",
+      ),
+    );
     setViajesPage(draft.sections.viajesPage ?? {});
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });

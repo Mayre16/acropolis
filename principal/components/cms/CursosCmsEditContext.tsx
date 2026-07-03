@@ -71,6 +71,11 @@ import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
 import { DEFAULT_OFERTA_COPY, CURSOS_INSCRIBE_SECTION_ID } from "@/lib/cms/cursos-display";
+import {
+  coalesceCmsText,
+  loadPageWithHeroDefaults,
+  PAGE_HERO_FALLBACKS,
+} from "@/lib/cms/page-hero";
 
 const LAYOUT_OPTIONS = [
   { value: "butacas", label: "Butacas en filas" },
@@ -78,14 +83,18 @@ const LAYOUT_OPTIONS = [
   { value: "herradura", label: "Disposición herradura" },
 ] as const;
 
-const DEFAULT_PAGE: CmsCursosPage = {
-  proximasTitle: "Próximas convocatorias",
-  proximasIntro:
-    "Cursos, talleres y conferencias con fecha próxima — la misma agenda que en /agenda. Haz clic para inscribirte o pedir más información.",
-  ofertaEyebrow: DEFAULT_OFERTA_COPY.eyebrow,
-  ofertaCursosIntro: DEFAULT_OFERTA_COPY.cursosIntro,
-  ofertaConferenciasIntro: DEFAULT_OFERTA_COPY.conferenciasIntro,
-};
+const DEFAULT_PAGE: CmsCursosPage = loadPageWithHeroDefaults(
+  {
+    proximasTitle: "Próximas convocatorias",
+    proximasIntro:
+      "Cursos, talleres y conferencias con fecha próxima — la misma agenda que en /agenda. Haz clic para inscribirte o pedir más información.",
+    ofertaEyebrow: DEFAULT_OFERTA_COPY.eyebrow,
+    ofertaCursosIntro: DEFAULT_OFERTA_COPY.cursosIntro,
+    ofertaConferenciasIntro: DEFAULT_OFERTA_COPY.conferenciasIntro,
+  },
+  undefined,
+  "cursos",
+);
 
 type CursosCmsEditContextValue = {
   ready: boolean;
@@ -222,7 +231,13 @@ function CursosCmsEditInner({
   }, []);
 
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
-    setPage({ ...DEFAULT_PAGE, ...draft.sections.cursosPage });
+    setPage(
+      loadPageWithHeroDefaults(
+        DEFAULT_PAGE,
+        draft.sections.cursosPage,
+        "cursos",
+      ),
+    );
     setAgendaItems(
       getCursosAgendaEntries(draft, CURSOS_PROXIMAS_CONVOCATORIAS),
     );
@@ -683,7 +698,12 @@ function CursosCmsEditInner({
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <HeroEditFields value={page} onChange={patchPage} carouselKey="cursos" />
+          <HeroEditFields
+            value={page}
+            onChange={patchPage}
+            carouselKey="cursos"
+            fallback={PAGE_HERO_FALLBACKS.cursos}
+          />
         </EditPanelChrome>
       ) : null}
 
@@ -699,12 +719,18 @@ function CursosCmsEditInner({
           <div className="space-y-4">
             <EditField
               label="Título"
-              value={page.proximasTitle ?? ""}
+              value={coalesceCmsText(
+                page.proximasTitle,
+                DEFAULT_PAGE.proximasTitle,
+              )}
               onChange={(v) => patchPage({ proximasTitle: v })}
             />
             <EditField
               label="Introducción"
-              value={page.proximasIntro ?? ""}
+              value={coalesceCmsText(
+                page.proximasIntro,
+                DEFAULT_PAGE.proximasIntro,
+              )}
               onChange={(v) => patchPage({ proximasIntro: v })}
               multiline
             />
@@ -794,18 +820,27 @@ function CursosCmsEditInner({
           <div className="space-y-4">
             <EditField
               label="Etiqueta superior"
-              value={page.ofertaEyebrow ?? ""}
+              value={coalesceCmsText(
+                page.ofertaEyebrow,
+                DEFAULT_PAGE.ofertaEyebrow,
+              )}
               onChange={(v) => patchPage({ ofertaEyebrow: v })}
             />
             <EditField
               label="Intro — Cursos y talleres"
-              value={page.ofertaCursosIntro ?? ""}
+              value={coalesceCmsText(
+                page.ofertaCursosIntro,
+                DEFAULT_PAGE.ofertaCursosIntro,
+              )}
               onChange={(v) => patchPage({ ofertaCursosIntro: v })}
               multiline
             />
             <EditField
               label="Intro — Conferencias culturales"
-              value={page.ofertaConferenciasIntro ?? ""}
+              value={coalesceCmsText(
+                page.ofertaConferenciasIntro,
+                DEFAULT_PAGE.ofertaConferenciasIntro,
+              )}
               onChange={(v) => patchPage({ ofertaConferenciasIntro: v })}
               multiline
             />

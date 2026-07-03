@@ -39,6 +39,7 @@ import {
   HeroEditFields,
   ImageField,
 } from "@/components/cms/CmsEditFields";
+import { loadPageWithHeroDefaults } from "@/lib/cms/page-hero";
 import {
   PublishCategorySelect,
   SeoTagsField,
@@ -77,7 +78,9 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [items, setItems] = useState<CmsEvento[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
-  const [page, setPage] = useState<CmsEventosPage>({});
+  const [page, setPage] = useState<CmsEventosPage>(() =>
+    loadPageWithHeroDefaults({}, undefined, "eventos"),
+  );
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -95,7 +98,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
     const { items: loaded, hidden: h } = getEventosForEdit(draft, EVENTOS);
     setItems(loaded);
     setHidden(h);
-    setPage(draft.sections.eventosPage ?? {});
+    setPage(loadPageWithHeroDefaults({}, draft.sections.eventosPage, "eventos"));
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
   }, []);
