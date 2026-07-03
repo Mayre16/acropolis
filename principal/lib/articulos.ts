@@ -242,3 +242,8 @@ export const ARTICULOS: Articulo[] = [
 export function getArticulo(slug: string): Articulo | undefined {
   return ARTICULOS.find((a) => a.slug === slug);
 }
+
+/** Artículos definidos en código; en el CMS solo se pueden ocultar, no borrar del repo. */
+export function isSeedArticulo(slug: string): boolean {
+  return ARTICULOS.some((a) => a.slug === slug);
+}

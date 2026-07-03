@@ -131,6 +131,30 @@ export function UpcomingAgenda({
         )
       : null;
 
+  const inscribeCtaClassName =
+    "inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105";
+
+  const inscribeCta =
+    selected && selectedCategory === "esfera" ? (
+      <EsferaInquiryButton
+        taller={selected.title}
+        date={selected.date}
+        time={selected.time}
+        sede={selected.sede}
+        triggerClassName={inscribeCtaClassName}
+      />
+    ) : selected && inscribeHref ? (
+      <a
+        href={inscribeHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={inscribeCtaClassName}
+      >
+        {modalInscribeLabel(selected)}
+        <ArrowRight className="h-4 w-4" />
+      </a>
+    ) : null;
+
   const grid = (
     <ul className={embedded ? "mt-8 grid gap-4 sm:grid-cols-2" : "mt-10 grid gap-4 sm:grid-cols-2"}>
       {items.map((it, i) => {
@@ -218,7 +242,7 @@ export function UpcomingAgenda({
             </button>
 
             {selected.image ? (
-              <div className="relative aspect-[16/9] w-full shrink-0 bg-na-heket/5">
+              <div className="relative aspect-[2/1] w-full shrink-0 bg-na-heket/5 sm:aspect-[16/9]">
                 <Image
                   src={selected.image}
                   alt={selected.imageAlt ?? selected.title}
@@ -230,91 +254,79 @@ export function UpcomingAgenda({
               </div>
             ) : null}
 
-            <div className="flex flex-1 flex-col overflow-y-auto p-6 sm:p-8">
-              {selected.tag ? (
-                <span className="inline-block w-fit rounded-full bg-na-amon/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-na-amon">
-                  {selected.tag}
-                </span>
-              ) : null}
-              <OfertaFormativaItem
-                titleId="agenda-modal-title"
-                title={selected.title}
-                intro={
-                  selected.description ??
-                  `Sesión presencial del ${selected.title.toLowerCase()}. Consulta disponibilidad de cupos y confirma horario con la sede.`
-                }
-                titleClassName="text-2xl sm:text-3xl"
-              />
-
-              <dl className="mt-5 space-y-3 rounded-xl bg-na-heket/[0.05] p-4">
-                {selected.date ? (
-                  <div className="flex items-start gap-3">
-                    <CalendarDays
-                      className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
-                      aria-hidden
-                    />
-                    <div>
-                      <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
-                        Fecha
-                      </dt>
-                      <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
-                        {selected.date}
-                      </dd>
-                    </div>
-                  </div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+                {selected.tag ? (
+                  <span className="inline-block w-fit rounded-full bg-na-amon/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-na-amon">
+                    {selected.tag}
+                  </span>
                 ) : null}
-                {selected.time ? (
-                  <div className="flex items-start gap-3">
-                    <Clock
-                      className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
-                      aria-hidden
-                    />
-                    <div>
-                      <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
-                        Hora
-                      </dt>
-                      <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
-                        {selected.time}
-                      </dd>
-                    </div>
-                  </div>
-                ) : null}
-                {selected.sede ? (
-                  <div className="flex items-start gap-3">
-                    <MapPin
-                      className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
-                      aria-hidden
-                    />
-                    <div>
-                      <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
-                        Lugar
-                      </dt>
-                      <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
-                        {selected.sede}
-                      </dd>
-                    </div>
-                  </div>
-                ) : null}
-              </dl>
-
-              {selectedCategory === "esfera" ? (
-                <EsferaInquiryButton
-                  taller={selected.title}
-                  date={selected.date}
-                  time={selected.time}
-                  sede={selected.sede}
-                  triggerClassName="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105 sm:w-auto sm:self-start"
+                <OfertaFormativaItem
+                  titleId="agenda-modal-title"
+                  title={selected.title}
+                  intro={
+                    selected.description ??
+                    `Sesión presencial del ${selected.title.toLowerCase()}. Consulta disponibilidad de cupos y confirma horario con la sede.`
+                  }
+                  titleClassName="text-2xl sm:text-3xl"
                 />
-              ) : inscribeHref ? (
-                <a
-                  href={inscribeHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-helios px-7 py-3.5 text-sm font-bold text-na-ink shadow-lg shadow-na-helios/30 transition hover:brightness-105 sm:w-auto sm:self-start"
-                >
-                  {modalInscribeLabel(selected)}
-                  <ArrowRight className="h-4 w-4" />
-                </a>
+
+                <dl className="mt-5 space-y-3 rounded-xl bg-na-heket/[0.05] p-4">
+                  {selected.date ? (
+                    <div className="flex items-start gap-3">
+                      <CalendarDays
+                        className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
+                        aria-hidden
+                      />
+                      <div>
+                        <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
+                          Fecha
+                        </dt>
+                        <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
+                          {selected.date}
+                        </dd>
+                      </div>
+                    </div>
+                  ) : null}
+                  {selected.time ? (
+                    <div className="flex items-start gap-3">
+                      <Clock
+                        className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
+                        aria-hidden
+                      />
+                      <div>
+                        <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
+                          Hora
+                        </dt>
+                        <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
+                          {selected.time}
+                        </dd>
+                      </div>
+                    </div>
+                  ) : null}
+                  {selected.sede ? (
+                    <div className="flex items-start gap-3">
+                      <MapPin
+                        className="mt-0.5 h-5 w-5 shrink-0 text-na-kefer"
+                        aria-hidden
+                      />
+                      <div>
+                        <dt className="text-xs font-bold uppercase tracking-wide text-na-muted">
+                          Lugar
+                        </dt>
+                        <dd className="mt-0.5 text-base font-semibold text-na-heketDark">
+                          {selected.sede}
+                        </dd>
+                      </div>
+                    </div>
+                  ) : null}
+                </dl>
+              </div>
+
+              {inscribeCta ? (
+                <div className="shrink-0 border-t border-na-heket/10 bg-na-surface p-4 sm:px-8 sm:pb-6">
+                  {inscribeCta}
+                </div>
               ) : null}
             </div>
           </div>

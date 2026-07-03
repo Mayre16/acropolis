@@ -13,6 +13,11 @@ import {
 } from "@/lib/cms/hero-carousel-edit";
 import type { CmsMedia } from "@/lib/cms/types";
 import {
+  mergePageHeroFields,
+  PAGE_HERO_FALLBACKS,
+  type PageHeroFallback,
+} from "@/lib/cms/page-hero";
+import {
   applySpellReplacement,
   shouldSpellcheckField,
   useSpellcheck,
@@ -430,6 +435,7 @@ export function HeroEditFields({
   value,
   onChange,
   carouselKey,
+  fallback,
 }: {
   value: { heroEyebrow?: string; heroTitle?: string; heroLede?: string };
   onChange: (patch: {
@@ -438,24 +444,29 @@ export function HeroEditFields({
     heroLede?: string;
   }) => void;
   carouselKey?: CmsHeroCarouselKey;
+  /** Textos por defecto si el CMS aún no tiene override (p. ej. viajes por categoría). */
+  fallback?: PageHeroFallback;
 }) {
   const carouselEdit = useHeroCarouselCmsEdit();
+  const resolvedFallback =
+    fallback ?? (carouselKey ? PAGE_HERO_FALLBACKS[carouselKey] : undefined);
+  const display = mergePageHeroFields(value, resolvedFallback);
 
   return (
     <div className="space-y-4">
       <EditField
         label="Etiqueta superior (texto pequeño)"
-        value={value.heroEyebrow ?? ""}
+        value={display.heroEyebrow}
         onChange={(v) => onChange({ heroEyebrow: v })}
       />
       <EditField
         label="Título principal (h1)"
-        value={value.heroTitle ?? ""}
+        value={display.heroTitle}
         onChange={(v) => onChange({ heroTitle: v })}
       />
       <EditField
         label="Texto introductorio (h3)"
-        value={value.heroLede ?? ""}
+        value={display.heroLede}
         onChange={(v) => onChange({ heroLede: v })}
         multiline
       />

@@ -62,19 +62,19 @@ function cmsRegaloToItem(item: CmsEditorialRegalo): RegaloItem {
 function RegaloCardImage({
   item,
   showBack,
-  aspect,
+  imageBoxClass,
   imagePad,
   imageSizes,
 }: {
   item: RegaloItem;
   showBack: boolean;
-  aspect: string;
+  imageBoxClass: string;
   imagePad: string;
   imageSizes: string;
 }) {
   const isLibreta = item.category === "libretas";
   return (
-    <div className={`relative ${aspect} ${aspect.includes("bg-") ? "" : "bg-white"} [perspective:1400px]`}>
+    <div className={`${imageBoxClass} [perspective:1400px]`}>
       {item.backImageUrl ? (
         <div className="relative h-full w-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] group-focus-visible:[transform:rotateY(180deg)]">
           <div className="absolute inset-0 [backface-visibility:hidden]">
@@ -136,19 +136,22 @@ function RegaloCard({
   const [showBack, setShowBack] = useState(false);
   const isSeparador = item.category === "separadores";
   const isLibreta = item.category === "libretas";
+  const isPapeleria = item.category === "papeleria";
   const isResaltador = item.id === "resaltador-ideas";
   const isLapiceros = item.id === "lapiceros-virtudes";
-  const aspect = isSeparador
-    ? "aspect-[5/12] bg-neutral-50"
+  const imageBoxClass = isSeparador
+    ? "relative aspect-[5/12] bg-neutral-50"
     : isLibreta
-      ? "aspect-[779/922] bg-neutral-50"
+      ? "relative aspect-[779/922] bg-neutral-50"
       : item.category === "camisetas"
-        ? "aspect-square"
-        : isLapiceros
-          ? "aspect-[3/2] bg-neutral-100"
-          : isResaltador
-            ? "aspect-[3/4] bg-transparent"
-            : "aspect-[3/4]";
+        ? "relative aspect-square"
+        : isPapeleria
+          ? "relative h-32 bg-neutral-50 sm:h-36"
+          : isLapiceros
+            ? "relative aspect-[3/2] bg-neutral-100"
+            : isResaltador
+              ? "relative aspect-square bg-transparent"
+              : "relative aspect-[3/4]";
   const imagePad = isSeparador
     ? "object-contain object-center p-2"
     : isLibreta
@@ -158,8 +161,8 @@ function RegaloCard({
       : isLapiceros
         ? "object-contain object-center p-2"
         : isResaltador
-          ? "object-contain object-center p-3 sm:p-[15px]"
-          : "object-contain p-3";
+          ? "object-contain object-center p-2"
+          : "object-contain p-2";
   const imageSizes = isSeparador
     ? "(max-width: 768px) 45vw, 180px"
     : "(max-width: 768px) 50vw, 25vw";
@@ -189,7 +192,7 @@ function RegaloCard({
           <RegaloCardImage
             item={item}
             showBack={showBack}
-            aspect={aspect}
+            imageBoxClass={imageBoxClass}
             imagePad={imagePad}
             imageSizes={imageSizes}
           />
@@ -239,12 +242,12 @@ function RegaloCard({
           <RegaloCardImage
             item={item}
             showBack={showBack}
-            aspect={aspect}
+            imageBoxClass={imageBoxClass}
             imagePad={imagePad}
             imageSizes={imageSizes}
           />
         </button>
-        <div className="p-3">
+        <div className="px-3 pb-3 pt-2">
           <button
             type="button"
             onClick={openDetail}
@@ -253,32 +256,32 @@ function RegaloCard({
             <h4 className="text-sm font-bold leading-snug text-na-ink">{titleText}</h4>
           </button>
           {item.price != null && item.price > 0 ? (
-            <p className="mt-1.5 text-[11px] font-semibold text-na-editorialDark">
+            <p className="mt-1 text-[11px] font-semibold text-na-editorialDark">
               {formatCartMoney(item.price, item.currency ?? "DOP")}
             </p>
           ) : item.priceNote ? (
-            <p className="mt-1.5 text-[11px] font-semibold text-na-editorialDark">
+            <p className="mt-1 text-[11px] font-semibold text-na-editorialDark">
               {item.priceNote}
             </p>
           ) : null}
           <button
             type="button"
             onClick={openDetail}
-            className="mt-1.5 text-[11px] font-semibold text-na-editorial hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
+            className="mt-1 text-[11px] font-semibold text-na-editorial hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-na-editorial"
           >
             Ver detalle →
           </button>
-          <div className="mt-2.5 space-y-2">
+          <div className="mt-2 space-y-1.5">
             <AddToCartButton
               item={regaloToCartItem(item)}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-na-editorial px-3 py-2 text-xs font-bold text-white transition hover:bg-na-editorialDark"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-na-editorial px-3 py-1.5 text-xs font-bold text-white transition hover:bg-na-editorialDark"
             />
             <a
               href={buildRegaloWhatsApp(item)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-na-heket/30 bg-na-heket/5 px-3 py-2 text-xs font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-na-heket/30 bg-na-heket/5 px-3 py-1.5 text-xs font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
             >
               <MessageCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
               Consultar por WhatsApp
@@ -470,8 +473,8 @@ export function RegalosSection({ initialFilter = "all" }: RegalosSectionProps) {
             if (items.length === 0 && !edit?.ready) return null;
             const gridClass =
               cat.id === "separadores"
-                ? "mt-5 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
-                : "mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+                ? "mt-5 grid items-start gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
+                : "mt-5 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
             return (
               <div key={cat.id} id={`regalo-${cat.id}`}>
                 <h3 className="text-xl font-bold text-na-ink">{cat.label}</h3>

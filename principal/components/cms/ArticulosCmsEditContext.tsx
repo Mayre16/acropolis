@@ -12,7 +12,7 @@ import {
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
-import { ARTICULOS } from "@/lib/articulos";
+import { ARTICULOS, isSeedArticulo } from "@/lib/articulos";
 import {
   buildDocWithArticulos,
   ensureUniqueSlug,
@@ -358,13 +358,19 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Ocultar este artículo del sitio?")) {
+                const seed = isSeedArticulo(selected.slug);
+                const msg = seed
+                  ? "¿Ocultar este artículo del sitio?"
+                  : "¿Eliminar este artículo?";
+                if (window.confirm(msg)) {
                   hideItem(selected.slug);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Ocultar del sitio
+              {isSeedArticulo(selected.slug)
+                ? "Ocultar del sitio"
+                : "Eliminar artículo"}
             </button>
           </div>
         </EditPanelChrome>
