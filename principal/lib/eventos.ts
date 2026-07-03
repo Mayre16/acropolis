@@ -100,3 +100,8 @@ export const EVENTOS: EventoItem[] = [
 export function getEvento(slug: string): EventoItem | undefined {
   return EVENTOS.find((e) => e.slug === slug);
 }
+
+/** Crónicas definidas en código; en el CMS solo se pueden ocultar, no borrar del repo. */
+export function isSeedEvento(slug: string): boolean {
+  return EVENTOS.some((e) => e.slug === slug);
+}

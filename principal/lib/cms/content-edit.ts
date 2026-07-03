@@ -47,6 +47,31 @@ export function eventoToCms(e: EventoItem): CmsEvento {
   };
 }
 
+/** Borrador inicial al pulsar «Añadir evento» en /eventos. */
+export function newEventoDraft(existingSlugs: string[]): CmsEvento {
+  const title = "Nueva crónica";
+  const slug = uniqueSlug(title, existingSlugs);
+  const date = new Date().toLocaleDateString("es-DO", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  return {
+    slug,
+    title,
+    date,
+    category: "cultura",
+    excerpt: `Breve resumen de «${title}» para la tarjeta en /eventos.`,
+    image: { src: "", alt: title },
+    gallery: [],
+    body: [
+      "Completa aquí la crónica del evento: qué se vivió, quién participó y qué aprendimos.",
+    ],
+    published: false,
+    seoTags: [],
+  };
+}
+
 export function getArticulosForEdit(
   doc: CmsDocument,
   fallback: Articulo[],

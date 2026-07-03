@@ -17,9 +17,11 @@ import {
   buildDocWithEventos,
   ensureUniqueSlug,
   getEventosForEdit,
+  newEventoDraft,
   shouldAutoUpdateSlug,
   uniqueSlug,
 } from "@/lib/cms/content-edit";
+import { isSeedEvento } from "@/lib/eventos";
 import {
   fetchCmsDraft,
   saveCmsDraft,
@@ -158,25 +160,9 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
   );
 
   const addItem = useCallback(() => {
-    const title = "Nuevo evento";
     setItems((list) => {
-      const slug = uniqueSlug(
-        title,
-        list.map((e) => e.slug),
-      );
-      const entry: CmsEvento = {
-        slug,
-        title,
-        date: "",
-        category: "cultura",
-        excerpt: "",
-        image: { src: "", alt: "" },
-        gallery: [],
-        body: [""],
-        published: false,
-        seoTags: [],
-      };
-      setSelectedSlug(slug);
+      const entry = newEventoDraft(list.map((e) => e.slug));
+      setSelectedSlug(entry.slug);
       return [...list, entry];
     });
     markDirty();
@@ -386,13 +372,19 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("¿Ocultar este evento del sitio?")) {
+                const seed = isSeedEvento(selected.slug);
+                const msg = seed
+                  ? "¿Ocultar esta crónica del sitio?"
+                  : "¿Eliminar esta crónica?";
+                if (window.confirm(msg)) {
                   hideItem(selected.slug);
                 }
               }}
               className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
             >
-              Ocultar del sitio
+              {isSeedEvento(selected.slug)
+                ? "Ocultar del sitio"
+                : "Eliminar crónica"}
             </button>
           </div>
         </EditPanelChrome>
