@@ -16,6 +16,7 @@ import { EVENTOS } from "@/lib/eventos";
 import {
   buildDocWithEventos,
   ensureUniqueSlug,
+  eventoToCms,
   getEventosForEdit,
   newEventoDraft,
   shouldAutoUpdateSlug,
@@ -50,6 +51,7 @@ import type { AgendaCategory } from "@/lib/agenda";
 type EventosCmsEditContextValue = {
   ready: boolean;
   items: CmsEvento[];
+  hidden: string[];
   page: CmsEventosPage;
   selectedSlug: string | null;
   setSelectedSlug: (slug: string | null) => void;
@@ -57,6 +59,7 @@ type EventosCmsEditContextValue = {
   patchPage: (patch: Partial<CmsEventosPage>) => void;
   addItem: () => void;
   hideItem: (slug: string) => void;
+  restoreItem: (slug: string) => void;
   publishItem: (slug: string) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
@@ -188,6 +191,22 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const restoreItem = useCallback(
+    (slug: string) => {
+      setHidden((h) => h.filter((s) => s !== slug));
+      setItems((list) => {
+        if (list.some((e) => e.slug === slug)) return list;
+        const cms = doc?.sections.eventos?.find((e) => e.slug === slug);
+        const seed = EVENTOS.find((e) => e.slug === slug);
+        if (cms) return [...list, cms];
+        if (seed) return [...list, eventoToCms(seed)];
+        return list;
+      });
+      markDirty();
+    },
+    [doc, markDirty],
+  );
+
   const patchPage = useCallback(
     (patch: Partial<CmsEventosPage>) => {
       setPage((p) => ({ ...p, ...patch }));
@@ -200,6 +219,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
     (): EventosCmsEditContextValue => ({
       ready,
       items,
+      hidden,
       page,
       selectedSlug,
       setSelectedSlug,
@@ -207,6 +227,7 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
       patchPage,
       addItem,
       hideItem,
+      restoreItem,
       publishItem,
       saveDraft,
       publish,
@@ -217,12 +238,14 @@ function EventosCmsEditInner({ children }: { children: ReactNode }) {
     [
       ready,
       items,
+      hidden,
       page,
       selectedSlug,
       patchItem,
       patchPage,
       addItem,
       hideItem,
+      restoreItem,
       publishItem,
       saveDraft,
       publish,

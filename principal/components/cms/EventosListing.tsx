@@ -82,19 +82,20 @@ export function EventosListing() {
           >
             <Pencil className="h-4 w-4" aria-hidden />
           </button>
-          {!isSeedEvento(slug) ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                confirmHide(slug);
-              }}
-              className="absolute right-14 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
-              aria-label="Eliminar crónica"
-            >
-              <Trash2 className="h-4 w-4" aria-hidden />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              confirmHide(slug);
+            }}
+            className="absolute right-14 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
+            aria-label={
+              isSeedEvento(slug) ? "Ocultar crónica" : "Eliminar crónica"
+            }
+            title={isSeedEvento(slug) ? "Ocultar del sitio" : "Eliminar"}
+          >
+            <Trash2 className="h-4 w-4" aria-hidden />
+          </button>
           <button
             type="button"
             onClick={() => openEdit(slug)}
@@ -240,6 +241,45 @@ export function EventosListing() {
           </li>
         ))}
       </ul>
+
+      {edit?.ready && edit.hidden.length > 0 ? (
+        <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <h3 className="text-sm font-black uppercase tracking-wide text-slate-800">
+            Crónicas ocultas
+          </h3>
+          <p className="mt-1 text-xs text-slate-600">
+            No aparecen en /eventos. Puedes mostrarlas de nuevo cuando quieras.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {edit.hidden.map((slug) => {
+              const seed = EVENTOS.find((e) => e.slug === slug);
+              const title = seed?.title ?? slug.replace(/-/g, " ");
+              return (
+                <li
+                  key={slug}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white bg-white px-3 py-2.5 shadow-sm"
+                >
+                  <span className="truncate text-sm font-semibold text-na-heketDark">
+                    {title}
+                    {seed ? (
+                      <span className="ml-2 text-[10px] font-normal uppercase text-slate-500">
+                        catálogo base
+                      </span>
+                    ) : null}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => edit.restoreItem(slug)}
+                    className="shrink-0 rounded-lg border border-emerald-300 bg-white px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
+                  >
+                    Mostrar de nuevo
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
     </>
   );
 }
