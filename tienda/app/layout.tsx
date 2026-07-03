@@ -35,7 +35,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(window.parent!==window){document.documentElement.classList.add("cms-edit-embedded")}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${notoSans.variable} flex min-h-screen flex-col bg-white font-sans antialiased text-na-ink`}
       >

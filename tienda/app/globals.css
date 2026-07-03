@@ -8,6 +8,11 @@
   --editorial-header-offset: var(--editorial-mark-height);
 }
 
+/* Iframe del editor: oculta la barra ámbar duplicada (Guardar/Publicar van arriba en el editor). */
+html.cms-edit-embedded [data-cms-edit-toolbar] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;
