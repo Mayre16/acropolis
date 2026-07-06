@@ -228,9 +228,9 @@ export function VisualContenidoEditor() {
       path="/contenido/"
       hint={
         <>
-          Hub de <strong>contenido digital</strong>: acceso a artículos, eventos, agenda,
+          Hub de <strong>contenido digital</strong>: acceso al blog, eventos, agenda,
           Revista Esfinge, biblioteca y librería. Para editar actividades concretas usa
-          las pestañas <strong>Agenda</strong>, <strong>Artículos</strong>,{" "}
+          las pestañas <strong>Agenda</strong>, <strong>Blog</strong>,{" "}
           <strong>Eventos</strong> o las páginas de actividades (Inicio, Cursos, Cultura,
           Voluntariado).
         </>
@@ -261,12 +261,12 @@ export function VisualAgendaEditor() {
 export function VisualArticulosEditor() {
   return (
     <VisualCmsPageEditor
-      title="Artículos"
+      title="Blog"
       path="/articulos"
       hint={
         <>
           Botón <strong>✎ Editar encabezado</strong> en el hero.{" "}
-          <strong>Artículo en el sitio</strong> — páginas propias abajo.{" "}
+          <strong>Entrada del blog</strong> — páginas propias abajo.{" "}
           <strong>Enlace externo</strong> — «Nuestra voz fuera de la sede» o pestaña{" "}
           <strong>Voz fuera de la sede</strong>.
         </>

@@ -1,5 +1,23 @@
+import { isAgendaActive } from "@/lib/agenda";
 import type { CmsEsferaTrainingItem } from "@/lib/cms/types";
 import { MANUAL_ESFERA_COVER, MANUAL_ESFERA_COVER_CARD } from "@/lib/esfera-content";
+
+export { AGENDA_EMPTY_STATE as ESFERA_TRAININGS_EMPTY } from "@/lib/agenda";
+
+export function isEsferaTrainingActive(
+  item: Pick<CmsEsferaTrainingItem, "startsAt">,
+  reference = new Date(),
+): boolean {
+  if (!item.startsAt?.trim()) return true;
+  return isAgendaActive({ startsAt: item.startsAt, category: "esfera" }, reference);
+}
+
+export function filterActiveEsferaTrainings(
+  items: CmsEsferaTrainingItem[],
+  reference = new Date(),
+): CmsEsferaTrainingItem[] {
+  return items.filter((item) => isEsferaTrainingActive(item, reference));
+}
 
 /** Próximos talleres Esfera — aparecen en /esfera y en la agenda del sitio. */
 export const ESFERA_PROXIMOS_ENTRENAMIENTOS: CmsEsferaTrainingItem[] = [

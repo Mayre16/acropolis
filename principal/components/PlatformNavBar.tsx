@@ -7,6 +7,7 @@ import {
   Library,
   Pencil,
   ShoppingBag,
+  Users,
 } from "lucide-react";
 import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditContext";
 import { useMergedPlatformNavItems } from "@/lib/cms/hooks";
@@ -16,6 +17,7 @@ const ICONS: Record<PlatformId, typeof Library> = {
   biblioteca: Library,
   tienda: ShoppingBag,
   civis: Briefcase,
+  circulo: Users,
 };
 
 function itemClassName(id: PlatformId): string {
@@ -27,6 +29,8 @@ function itemClassName(id: PlatformId): string {
       return base + "bg-na-editorial text-white hover:bg-na-editorialDark";
     case "civis":
       return base + "bg-na-civis text-white hover:bg-na-civisDark";
+    case "circulo":
+      return base + "bg-na-circulo text-white hover:bg-na-circuloDark";
     case "biblioteca":
       return base + "bg-na-helios text-na-ink hover:brightness-105";
     default:

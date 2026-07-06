@@ -20,7 +20,7 @@ export async function generateMetadata({
   const a =
     (await getMergedArticulo(articulo)) ?? getArticulo(articulo) ?? null;
   if (!a) {
-    return { title: "Artículo" };
+    return { title: "Blog" };
   }
   return {
     title: a.title,

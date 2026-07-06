@@ -44,10 +44,9 @@ import {
 } from "../lib/deploy-webhook.mjs";
 import { syncEditorialPrintedBooks } from "../lib/bookstore-sync.mjs";
 import {
-  loadSmtpConfig,
-  publicSmtpConfig,
-  saveSmtpConfig,
-} from "../lib/smtp-config.mjs";
+  recordAnalyticsEvent,
+  buildAnalyticsSummary,
+} from "../lib/analytics-store.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = path.join(ROOT, "data");
@@ -71,10 +70,20 @@ function cors(res, origin) {
     "http://127.0.0.1:3200",
     "http://localhost:3300",
     "http://127.0.0.1:3300",
+    "http://localhost:3300",
+    "http://127.0.0.1:3300",
+    "http://localhost:3500",
+    "http://127.0.0.1:3500",
     "https://editor.acropolis.adesa.com.do",
     "https://acropolis.adesa.com.do",
+    "https://acropolis.org.do",
+    "https://www.acropolis.org.do",
     "https://civis.acropolis.adesa.com.do",
     "https://civis.acropolis.org.do",
+    "https://tienda.acropolis.org.do",
+    "https://editorial.acropolis.org.do",
+    "https://biblioteca-oina.adesa.com.do",
+    "https://biblioteca.acropolis.org.do",
   ];
   if (origin && allowed.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -716,6 +725,26 @@ const server = http.createServer(async (req, res) => {
       };
       res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
       fs.createReadStream(fp).pipe(res);
+      return;
+    }
+
+    if (pathname === "/analytics/collect" && req.method === "POST") {
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+      const remoteIp = req.socket.remoteAddress ?? "";
+      json(res, 200, recordAnalyticsEvent(DATA, body, remoteIp), origin);
+      return;
+    }
+
+    const summaryMatch = /^\/analytics\/summary\/(acropolis|civis|editorial|biblioteca)$/.exec(
+      pathname,
+    );
+    if (summaryMatch && req.method === "GET") {
+      if (!requireAuth(req, res, origin)) return;
+      const year = Number(new URL(req.url, "http://x").searchParams.get("year")) || new Date().getUTCFullYear();
+      const month = Number(new URL(req.url, "http://x").searchParams.get("month")) || new Date().getUTCMonth() + 1;
+      json(res, 200, buildAnalyticsSummary(DATA, summaryMatch[1], year, month), origin);
       return;
     }
 

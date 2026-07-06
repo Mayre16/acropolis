@@ -44,11 +44,14 @@ export function EsferaLogo({
   const src = resolveLogoSrc(tone === "white" ? logo.white : logo.color);
   const useWhiteFilter =
     tone === "white" &&
+    !brand.whiteIsDedicated &&
+    !logo.white.startsWith("/uploads/") &&
     !logo.white.includes("-white") &&
     !logo.white.endsWith(".webp");
 
   const image = (
     <img
+      key={src}
       src={src}
       alt={logo.alt}
       width={logo.width}

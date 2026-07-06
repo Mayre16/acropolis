@@ -60,8 +60,8 @@ export function ArticulosListing() {
   function confirmHide(slug: string) {
     const seed = isSeedArticulo(slug);
     const msg = seed
-      ? "¿Ocultar este artículo del sitio?"
-      : "¿Eliminar este artículo?";
+      ? "¿Ocultar esta entrada del blog?"
+      : "¿Eliminar esta entrada del blog?";
     if (window.confirm(msg)) {
       edit?.hideItem(slug);
     }
@@ -82,7 +82,7 @@ export function ArticulosListing() {
             type="button"
             onClick={() => openEdit(slug)}
             className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow"
-            aria-label="Editar artículo"
+            aria-label="Editar entrada"
           >
             <Pencil className="h-4 w-4" aria-hidden />
           </button>
@@ -94,7 +94,7 @@ export function ArticulosListing() {
                 confirmHide(slug);
               }}
               className="absolute right-14 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-white text-red-700 shadow hover:bg-red-50"
-              aria-label="Eliminar artículo"
+              aria-label="Eliminar entrada"
             >
               <Trash2 className="h-4 w-4" aria-hidden />
             </button>
@@ -132,7 +132,7 @@ export function ArticulosListing() {
             className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow"
           >
             <Plus className="h-4 w-4" />
-            Artículo en el sitio
+            Entrada del blog
           </button>
           {mediosEdit?.ready ? (
             <button
@@ -150,7 +150,7 @@ export function ArticulosListing() {
       {cmsOnly.length > 0 ? (
         <div className="mb-10 rounded-2xl border border-amber-200/80 bg-amber-50/60 p-4 sm:p-5">
           <h3 className="text-sm font-black uppercase tracking-wide text-amber-950">
-            Artículos creados en el editor
+            Entradas del blog creadas en el editor
           </h3>
           <p className="mt-1 text-xs text-amber-900/80">
             Páginas nuevas en el sitio. Los del catálogo original solo se pueden

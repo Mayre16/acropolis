@@ -150,7 +150,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
   );
 
   const addItem = useCallback(() => {
-    const title = "Nuevo artículo";
+    const title = "Nueva entrada del blog";
     setItems((list) => {
       const slug = uniqueSlug(
         title,
@@ -234,7 +234,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
   return (
     <ArticulosCmsEditContext.Provider value={value}>
       <EditToolbar
-        label="Artículos"
+        label="Blog"
         dirty={dirty}
         busy={busy}
         status={status}
@@ -249,7 +249,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
       {children}
       {selected ? (
         <EditPanelChrome
-          title="Editar artículo"
+          title="Editar entrada"
           dirty={dirty}
           busy={busy}
           status={status}
@@ -258,7 +258,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
         >
           <div className="space-y-4">
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-950">
-              <strong>Artículo propio</strong> — página completa en este sitio.
+              <strong>Entrada del blog</strong> — página completa en este sitio.
               Para un enlace a un medio externo usa{" "}
               <strong>Voz fuera de la sede</strong> (pestaña o botón abajo en la
               página).
@@ -303,7 +303,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
               rel="noopener noreferrer"
               className="inline-flex text-sm font-semibold text-na-kefer hover:underline"
             >
-              Ver artículo en el sitio ↗
+              Ver entrada en el sitio ↗
             </a>
             <div className="grid gap-2 sm:grid-cols-2">
               <EditField
@@ -365,8 +365,8 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
               onClick={() => {
                 const seed = isSeedArticulo(selected.slug);
                 const msg = seed
-                  ? "¿Ocultar este artículo del sitio?"
-                  : "¿Eliminar este artículo?";
+                  ? "¿Ocultar esta entrada del blog?"
+                  : "¿Eliminar esta entrada del blog?";
                 if (window.confirm(msg)) {
                   hideItem(selected.slug);
                 }
@@ -375,7 +375,7 @@ function ArticulosCmsEditInner({ children }: { children: ReactNode }) {
             >
               {isSeedArticulo(selected.slug)
                 ? "Ocultar del sitio"
-                : "Eliminar artículo"}
+                : "Eliminar entrada"}
             </button>
           </div>
         </EditPanelChrome>

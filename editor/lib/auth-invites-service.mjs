@@ -15,13 +15,16 @@ import {
   markInviteUsed,
 } from "./auth-invites.mjs";
 import { sendInviteMail } from "./auth-invite-mail.mjs";
+import { smtpReady } from "./form-mail-utils.mjs";
+import { loadSmtpConfig } from "./smtp-config.mjs";
 import {
   adminCreateUser as adminCreateUserWithPassword,
   isValidEmail,
   normalizeLoginId,
   requireAdminSession,
 } from "./auth-users-admin.mjs";
-import { createUser } from "./auth-store.mjs";
+import { createUser, deleteUser } from "./auth-store.mjs";
+import { revokeInvitesForUser } from "./auth-invites.mjs";
 
 export function getInviteInfo(token) {
   const invite = findValidInvite(token);
@@ -77,6 +80,15 @@ export async function adminInviteUser(token, body) {
   const gate = requireAdminSession(token);
   if (!gate.ok) return gate;
 
+  if (!smtpReady(loadSmtpConfig())) {
+    return {
+      ok: false,
+      error:
+        "SMTP no configurado. Ve a Configuración → Correo (SMTP) en el editor y guarda la contraseña del servidor.",
+      status: 503,
+    };
+  }
+
   const email = normalizeLoginId(body?.email ?? body?.username);
   const role = String(body?.role ?? "").trim();
   const label = String(body?.label ?? "").trim();
@@ -102,10 +114,12 @@ export async function adminInviteUser(token, body) {
   try {
     await sendInviteMail({ email, label, token: invite.token });
   } catch (err) {
+    deleteUser(user.id);
+    revokeInvitesForUser(user.id);
     return {
       ok: false,
       error: err instanceof Error ? err.message : "No se pudo enviar el correo",
-      status: 502,
+      status: 503,
     };
   }
 
@@ -120,6 +134,15 @@ export async function adminInviteUser(token, body) {
 export async function adminResendInvite(token, userId) {
   const gate = requireAdminSession(token);
   if (!gate.ok) return gate;
+
+  if (!smtpReady(loadSmtpConfig())) {
+    return {
+      ok: false,
+      error:
+        "SMTP no configurado. Ve a Configuración → Correo (SMTP) en el editor y guarda la contraseña del servidor.",
+      status: 503,
+    };
+  }
 
   const user = findUserById(userId);
   if (!user) return { ok: false, error: "Usuario no encontrado", status: 404 };
@@ -146,7 +169,7 @@ export async function adminResendInvite(token, userId) {
     return {
       ok: false,
       error: err instanceof Error ? err.message : "No se pudo enviar el correo",
-      status: 502,
+      status: 503,
     };
   }
 

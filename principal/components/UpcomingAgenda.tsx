@@ -13,6 +13,7 @@ import { whatsAppHref, whatsAppUrlForCategory, type WhatsAppUrls } from "@/lib/w
 import type { AgendaCategory } from "@/lib/agenda";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import { EsferaInquiryButton } from "@/components/EsferaInquiryButton";
+import { AgendaProximamenteEmpty } from "@/components/AgendaProximamenteEmpty";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
 import { accentCardShell, accentTokens } from "@/lib/brand-accents";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
@@ -154,6 +155,55 @@ export function UpcomingAgenda({
         <ArrowRight className="h-4 w-4" />
       </a>
     ) : null;
+
+  const emptyWhatsAppHref =
+    whatsappCategory === "esfera"
+      ? null
+      : inscribeUrlFor(
+          { title: "", date: "", time: "", sede: "" },
+          defaultInscribeMessage,
+          whatsappCategory,
+          whatsappUrls,
+        );
+
+  const emptyBlock = (
+    <AgendaProximamenteEmpty
+      className={embedded ? "mt-8" : "mt-10"}
+      contact={whatsappCategory === "esfera" ? "esfera" : "whatsapp"}
+      whatsappHref={emptyWhatsAppHref}
+    />
+  );
+
+  if (items.length === 0) {
+    return (
+      <>
+        {embedded ? (
+          emptyBlock
+        ) : (
+          <section
+            className={
+              tinted
+                ? "border-t border-na-heket/10 bg-na-heket/[0.04] py-14 sm:py-16"
+                : "border-t border-na-heket/10 py-14 sm:py-16"
+            }
+          >
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+              <p className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
+                {eyebrow}
+              </p>
+              <h2 className="mt-2 text-balance text-3xl font-black text-na-heketDark sm:text-4xl">
+                {title ?? "Próximas actividades"}
+              </h2>
+              {intro ? (
+                <p className="mt-3 max-w-2xl text-na-muted">{intro}</p>
+              ) : null}
+              {emptyBlock}
+            </div>
+          </section>
+        )}
+      </>
+    );
+  }
 
   const grid = (
     <ul className={embedded ? "mt-8 grid gap-4 sm:grid-cols-2" : "mt-10 grid gap-4 sm:grid-cols-2"}>

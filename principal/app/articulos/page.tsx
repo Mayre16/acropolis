@@ -15,11 +15,11 @@ import { ArticulosPageShell } from "@/components/cms/ArticulosPageShell";
 
 export const metadata: Metadata = {
 
-  title: "Artículos — Pensamientos filosóficos",
+  title: "Blog — Pensamientos filosóficos",
 
   description:
 
-    "Artículos y reflexiones de filosofía práctica de Nueva Acrópolis RD. Ideas de Oriente y Occidente para pensar mejor y vivir con sentido.",
+    "Blog de filosofía práctica de Nueva Acrópolis RD. Reflexiones e ideas de Oriente y Occidente para pensar mejor y vivir con sentido.",
 
   alternates: { canonical: "/articulos" },
 

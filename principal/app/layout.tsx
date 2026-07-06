@@ -4,6 +4,7 @@ import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/SiteChrome";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { CmsProvider } from "@/lib/cms/provider";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { SITE_URL } from "@/lib/site-config";
@@ -70,6 +71,7 @@ export default function RootLayout({
       >
         <Suspense fallback={null}>
           <GoogleAnalytics />
+          <SiteAnalytics site="acropolis" />
         </Suspense>
         <Suspense fallback={null}>
           <CmsEditModeBootstrap />

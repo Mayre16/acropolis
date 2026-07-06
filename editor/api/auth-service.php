@@ -315,6 +315,16 @@ function cms_auth_admin_clear_totp(string $dataRoot, string $userId): array
     return ['ok' => true, 'message' => 'Verificación en dos pasos desactivada'];
 }
 
+function cms_auth_remove_user_rollback(string $dataRoot, string $userId): void
+{
+    $users = array_values(array_filter(
+        cms_auth_users($dataRoot),
+        static fn ($u) => !is_array($u) || ($u['id'] ?? '') !== $userId,
+    ));
+    cms_auth_save_users($dataRoot, $users);
+    cms_auth_revoke_invites_for_user($dataRoot, $userId);
+}
+
 function cms_auth_admin_delete_user(string $dataRoot, string $userId, array $session): array
 {
     $user = cms_auth_find_user_by_id($dataRoot, $userId);
@@ -791,6 +801,16 @@ function cms_auth_accept_invite(string $dataRoot, string $token, string $passwor
 
 function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config): array
 {
+    require_once __DIR__ . '/mail.php';
+    $smtpCfg = cms_load_smtp_config($config);
+    if (!cms_smtp_ready($smtpCfg)) {
+        return [
+            'ok' => false,
+            'error' => 'SMTP no configurado. Ve a Configuración → Correo (SMTP) en el editor y guarda la contraseña del servidor.',
+            'status' => 503,
+        ];
+    }
+
     $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
     $role = trim((string) ($body['role'] ?? ''));
     $label = trim((string) ($body['label'] ?? ''));
@@ -825,10 +845,11 @@ function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config
     try {
         cms_auth_send_invite_mail($config, $email, $label, (string) $invite['token']);
     } catch (Throwable $e) {
+        cms_auth_remove_user_rollback($dataRoot, (string) $user['id']);
         return [
             'ok' => false,
             'error' => $e->getMessage() ?: 'No se pudo enviar el correo',
-            'status' => 502,
+            'status' => 503,
         ];
     }
 
@@ -843,6 +864,16 @@ function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config
 
 function cms_auth_admin_resend_invite(string $dataRoot, string $userId, array $config): array
 {
+    require_once __DIR__ . '/mail.php';
+    $smtpCfg = cms_load_smtp_config($config);
+    if (!cms_smtp_ready($smtpCfg)) {
+        return [
+            'ok' => false,
+            'error' => 'SMTP no configurado. Ve a Configuración → Correo (SMTP) en el editor y guarda la contraseña del servidor.',
+            'status' => 503,
+        ];
+    }
+
     $user = cms_auth_find_user_by_id($dataRoot, $userId);
     if ($user === null) {
         return ['ok' => false, 'error' => 'Usuario no encontrado', 'status' => 404];
@@ -863,7 +894,7 @@ function cms_auth_admin_resend_invite(string $dataRoot, string $userId, array $c
         return [
             'ok' => false,
             'error' => $e->getMessage() ?: 'No se pudo enviar el correo',
-            'status' => 502,
+            'status' => 503,
         ];
     }
     return [

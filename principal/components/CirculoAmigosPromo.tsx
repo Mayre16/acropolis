@@ -2,15 +2,14 @@
 
 import Image from "next/image";
 import { ArrowRight, MessageCircle, Users } from "lucide-react";
+import { CirculoAmigosInquiryButton } from "@/components/CirculoAmigosInquiryButton";
 import {
   CIRCULO_AMIGOS_HIGHLIGHTS,
   CIRCULO_AMIGOS_IMAGE,
   CIRCULO_AMIGOS_LEDE,
   CIRCULO_AMIGOS_WHATSAPP_MESSAGE,
 } from "@/lib/circulo-amigos-content";
-import { buildCirculoAmigosMailto } from "@/lib/contact-routing";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
-import { INFO_EMAIL } from "@/lib/site-config";
 
 type CirculoAmigosPromoProps = {
   /** `home` = sección completa; `compact` = banda en cursos/cultura. */
@@ -20,7 +19,6 @@ type CirculoAmigosPromoProps = {
 export function CirculoAmigosPromo({ variant = "home" }: CirculoAmigosPromoProps) {
   const whatsapp = useWhatsAppUrls();
   const whatsappHref = `${whatsapp.diplomado}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
-  const mailtoHref = buildCirculoAmigosMailto().href;
 
   if (variant === "compact") {
     return (
@@ -37,20 +35,15 @@ export function CirculoAmigosPromo({ variant = "home" }: CirculoAmigosPromoProps
               {CIRCULO_AMIGOS_LEDE}
             </h2>
             <div className="mt-6 flex flex-wrap gap-3">
+              <CirculoAmigosInquiryButton triggerLabel="Inscríbete" />
               <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-heket/20 transition hover:bg-na-kefer"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden />
-                Quiero saber más
-              </a>
-              <a
-                href={mailtoHref}
                 className="inline-flex items-center gap-2 rounded-full border border-na-heket/25 px-5 py-2.5 text-sm font-semibold text-na-heket transition hover:bg-na-heket/5"
               >
-                {INFO_EMAIL}
+                <MessageCircle className="h-4 w-4" aria-hidden />
+                WhatsApp
               </a>
             </div>
           </div>
@@ -113,20 +106,15 @@ export function CirculoAmigosPromo({ variant = "home" }: CirculoAmigosPromoProps
             </ul>
 
             <div className="mt-5 flex flex-wrap gap-2.5">
+              <CirculoAmigosInquiryButton triggerLabel="Unirme al Círculo de Amigos" />
               <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-heket/20 transition hover:bg-na-kefer"
-              >
-                Unirme al Círculo de Amigos
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </a>
-              <a
-                href={mailtoHref}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-na-heket/20 px-5 py-2.5 text-sm font-semibold text-na-heket transition hover:border-na-heket/40"
               >
-                Escribir por correo
+                WhatsApp
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </a>
             </div>
           </div>

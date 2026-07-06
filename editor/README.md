@@ -44,7 +44,7 @@ NEXT_PUBLIC_CMS_URL=http://localhost:3401
 ### Flujo de prueba — Acropolis
 
 1. Entra al editor → elige **Acropolis**.
-2. Pestaña **Artículos** o **Eventos** → crea entrada con foto portada + galería (1 o varias fotos).
+2. Pestaña **Blog** o **Eventos** → crea entrada con foto portada + galería (1 o varias fotos).
 3. **Guardar borrador** → **Publicar**.
 4. Recarga http://localhost:3100/articulos o /eventos — verás el contenido del CMS mezclado con los del código.
 
@@ -103,7 +103,7 @@ El editor carga la preview desde **GitHub Pages** (`mayre16.github.io/acropolis/
 | Inicio (H1/H2) | ✓ home | ✓ hero |
 | Diplomado badge | ✓ | — |
 | Agenda | ✓ home + diplomado | ✓ (guardado) |
-| Artículos / blog | ✓ listado + detalle + galería | — |
+| Blog | ✓ listado + detalle + galería | — |
 | Eventos | ✓ listado + detalle + galería | — |
 | Talleres realizados | — | ✓ carrusel home |
 | Próximas actividades | — | ✓ /talleres |

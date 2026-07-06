@@ -1,0 +1,20 @@
+/* Landing Círculo de Amigos — azul claro OINA */
+.circulo-amigos-shell {
+  --ca-brand-light: #7ec8f0;
+  --ca-brand: #5bb5e8;
+  --ca-brand-dark: #3a9ad4;
+  --ca-brand-deep: #2e8bc7;
+  --ca-bg: #e8f4fc;
+  --ca-bg-deep: #d4ebf9;
+  --ca-ink: #111631;
+  --ca-muted: #404245;
+  --ca-surface: #ffffff;
+  --ca-panel: #f0f8fd;
+  background: linear-gradient(
+    165deg,
+    var(--ca-brand-dark) 0%,
+    var(--ca-brand) 38%,
+    var(--ca-bg) 100%
+  );
+  min-height: 100%;
+}

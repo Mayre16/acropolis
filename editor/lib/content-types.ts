@@ -1279,7 +1279,7 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
   homeHero: "Inicio — textos hero",
   contenido: "Contenido digital (visual)",
   agenda: "Agenda completa (visual)",
-  articulos: "Artículos / blog (visual)",
+  articulos: "Blog (visual)",
   medios: "Voz fuera de la sede (visual)",
   viajesLocales: "Viajes locales (visual)",
   viajesInternacionales: "Viajes internacionales (visual)",
@@ -1307,6 +1307,7 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
   editorialRegalos: "Regalos (visual)",
   editorialDonde: "Dónde estamos (visual)",
   editorialQuienesSomos: "Quiénes somos (visual)",
+  estadisticas: "Estadísticas de visitas",
 };
 
 export const SITE_LABELS: Record<SiteId, string> = {

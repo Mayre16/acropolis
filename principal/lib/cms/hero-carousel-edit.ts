@@ -58,7 +58,7 @@ export const HERO_CAROUSEL_LABELS: Record<CmsHeroCarouselKey, string> = {
   voluntariado: "Voluntariado",
   cursos: "Cursos",
   eventos: "Eventos",
-  articulos: "Artículos",
+  articulos: "Blog",
   agenda: "Agenda",
   quienesSomos: "Quiénes somos",
   relaciones: "Relaciones institucionales",

@@ -13,10 +13,10 @@ export const PAGE_HERO_FALLBACKS: Partial<
   Record<CmsHeroCarouselKey, PageHeroFallback>
 > = {
   articulos: {
-    eyebrow: "Artículos",
+    eyebrow: "Blog",
     title: "Pensamientos filosóficos",
     lede:
-      "Artículos y reflexiones de filosofía práctica para pensar mejor y vivir con sentido. Ideas de Oriente y Occidente al alcance de todos.",
+      "Reflexiones de filosofía práctica en nuestro blog — ideas de Oriente y Occidente para pensar mejor y vivir con sentido.",
   },
   eventos: {
     eyebrow: "Eventos y Noticias",

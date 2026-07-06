@@ -6,6 +6,7 @@ import "./globals.css";
 import { CivisSiteChrome } from "@/components/CivisSiteChrome";
 import { CivisFooter } from "@/components/CivisFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { CivisCmsEditProvider } from "@/components/cms/CivisCmsEditContext";
 import { CmsProvider } from "@/lib/cms/provider";
@@ -61,6 +62,7 @@ export default function RootLayout({
       >
         <Suspense fallback={null}>
           <GoogleAnalytics />
+          <SiteAnalytics site="civis" />
           <CmsEditModeBootstrap />
         </Suspense>
         <CmsProvider>

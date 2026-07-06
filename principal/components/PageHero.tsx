@@ -48,7 +48,7 @@ export function PageHero({
         <EsferaLogo
           variant="punto-focal"
           priority
-          tone="white"
+          tone="color"
           className="h-auto w-auto max-h-[4.5rem] max-w-[21rem] sm:max-h-20 sm:max-w-[23rem] md:max-h-[5.5rem] md:max-w-[25rem]"
         />
       </div>

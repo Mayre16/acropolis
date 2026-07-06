@@ -43,6 +43,11 @@ const ROUTES = {
     to_name: "Nueva Acrópolis RD",
     copy_to_sender: false,
   },
+  circulo_amigos_inscription: {
+    to_email: "info.oinadom@acropolis.org",
+    to_name: "Círculo de Amigos OINADOM",
+    copy_to_sender: false,
+  },
 };
 
 export function validateSiteInquiryPayload(body) {

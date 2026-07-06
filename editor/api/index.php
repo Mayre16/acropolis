@@ -1,6 +1,6 @@
 <?php
 /**
- * API CMS âÿÿ producciÃ³n (editor.acropolis.adesa.com.do/api/)
+ * API CMS ÿÿÿ producci?n (editor.acropolis.adesa.com.do/api/)
  * Desarrollo local: node scripts/dev-api.mjs
  */
 declare(strict_types=1);
@@ -21,6 +21,7 @@ require __DIR__ . '/auth-service.php';
 require __DIR__ . '/mail.php';
 require __DIR__ . '/deploy-webhook.php';
 require __DIR__ . '/bookstore-sync.php';
+require __DIR__ . '/analytics.php';
 $dataRoot = rtrim($config['data_root'] ?? (__DIR__ . '/../data'), '/\\');
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
@@ -59,7 +60,7 @@ function jsonOut(int $code, array $body): void
 function sitePath(string $root, string $site): string
 {
     if (!preg_match('/^(acropolis|civis|editorial)$/', $site)) {
-        jsonOut(400, ['error' => 'Sitio invÃ¡lido']);
+        jsonOut(400, ['error' => 'Sitio inv?lido']);
     }
     return $root . DIRECTORY_SEPARATOR . $site;
 }
@@ -153,11 +154,11 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/rollback$#', $uri, $m) &&
     ensureSite($siteDir);
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['error' => 'JSON inv?lido']);
     }
     $filename = basename((string) ($body['filename'] ?? ''));
     if ($filename === '' || $filename === '.' || $filename === '..') {
-        jsonOut(400, ['error' => 'Archivo invÃ¡lido']);
+        jsonOut(400, ['error' => 'Archivo inv?lido']);
     }
     $backupFile = $siteDir . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . $filename;
     if (!is_file($backupFile)) {
@@ -176,7 +177,7 @@ if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
     requireAuth();
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['error' => 'JSON inv?lido']);
     }
     cms_save_smtp_config($body);
     jsonOut(200, ['ok' => true, ...cms_public_smtp_config(cms_load_smtp_config($config))]);
@@ -185,7 +186,7 @@ if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
 if ($uri === '/forms/civis-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['ok' => false, 'error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
     $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
     $result = cms_send_civis_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
@@ -195,7 +196,7 @@ if ($uri === '/forms/civis-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') 
 if ($uri === '/forms/esfera-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['ok' => false, 'error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
     $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
     $result = cms_send_esfera_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
@@ -205,7 +206,7 @@ if ($uri === '/forms/esfera-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST')
 if ($uri === '/forms/voluntariado-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['ok' => false, 'error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
     $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
     $result = cms_send_voluntariado_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
@@ -215,7 +216,7 @@ if ($uri === '/forms/voluntariado-solicitud' && $_SERVER['REQUEST_METHOD'] === '
 if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['ok' => false, 'error' => 'JSON invÃ¡lido']);
+        jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
     $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
     $result = cms_send_site_inquiry($body, $config, is_string($remoteIp) ? $remoteIp : null);
@@ -250,7 +251,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && 
     $draftJson = file_get_contents($draft);
     $draftDoc = json_decode($draftJson ?: '{}', true);
     if (!is_array($draftDoc)) {
-        jsonOut(400, ['error' => 'Borrador invÃ¡lido']);
+        jsonOut(400, ['error' => 'Borrador inv?lido']);
     }
     $bookstoreSync = null;
     if ($m[1] === 'editorial') {
@@ -359,7 +360,7 @@ if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_S
     $siteDir = sitePath($dataRoot, $m[1]);
     $safe = basename($m[2]);
     if ($safe === '' || $safe === '.' || $safe === '..') {
-        jsonOut(400, ['error' => 'Archivo invÃ¡lido']);
+        jsonOut(400, ['error' => 'Archivo inv?lido']);
     }
     $path = $siteDir . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $safe;
     if (!is_file($path)) {
@@ -378,6 +379,19 @@ if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_S
     header('X-Content-Type-Options: nosniff');
     readfile($path);
     exit;
+}
+
+if ($uri === '/analytics/collect' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $body = json_decode((string) file_get_contents('php://input'), true) ?? [];
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
+    jsonOut(200, cms_analytics_collect($body, $dataRoot, $remoteIp));
+}
+
+if (preg_match('#^/analytics/summary/(acropolis|civis|editorial|biblioteca)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    requireAuth();
+    $year = (int) ($_GET['year'] ?? gmdate('Y'));
+    $month = (int) ($_GET['month'] ?? gmdate('n'));
+    jsonOut(200, cms_analytics_summary($m[1], $dataRoot, $year, $month));
 }
 
 jsonOut(404, ['error' => 'Not found']);

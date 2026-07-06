@@ -16,13 +16,13 @@ const SLIDE_META: Record<
   string,
   Omit<ContenidoSlide, keyof NavContenidoItem | "href" | "label" | "external">
 > = {
-  Artículos: {
+  Blog: {
     title: "Pensamientos filosóficos",
     description:
       "Reflexiones de filosofía práctica para pensar mejor y vivir con sentido.",
     image: "/img/hero/filosofia/01.webp",
     imageAlt: "Libro abierto en biblioteca — reflexión y filosofía práctica",
-    cta: "Leer artículos",
+    cta: "Ver el blog",
   },
   Eventos: {
     title: "Eventos y noticias",
@@ -91,4 +91,4 @@ export function getContenidoHubSlides(): ContenidoSlide[] {
 }
 
 export const CONTENIDO_HUB_LEDE =
-  "Artículos, eventos, agenda, la Revista Esfinge, nuestra biblioteca y la librería editorial — todo el ecosistema digital de Nueva Acrópolis en República Dominicana.";
+  "Blog, eventos, agenda, la Revista Esfinge, nuestra biblioteca y la librería editorial — todo el ecosistema digital de Nueva Acrópolis en República Dominicana.";

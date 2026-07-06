@@ -68,6 +68,7 @@ import {
   SpellcheckHints,
 } from "@/components/SpellcheckHints";
 import { UploadInventoryTab } from "@/components/UploadInventoryTab";
+import { AnalyticsPanel } from "@/components/AnalyticsPanel";
 import { ArchivosDocumentsPanel } from "@/components/ArchivosDocumentsPanel";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { CmsTabNav } from "@/components/CmsTabNav";
@@ -222,7 +223,9 @@ function EditSitePageInner() {
 
   const menuTab = useMemo((): TabId => {
     const fallback = defaultTabForRole(site, role) as TabId;
-    const first = allowedTabs.find((id) => id !== "archivos");
+    const first = allowedTabs.find(
+      (id) => id !== "archivos" && id !== "estadisticas",
+    );
     return (first ?? fallback) as TabId;
   }, [allowedTabs, site, role]);
 
@@ -337,6 +340,7 @@ function EditSitePageInner() {
 
   const isVisual = VISUAL_TABS.has(tab);
   const isArchivosView = tab === "archivos";
+  const isEstadisticasView = tab === "estadisticas";
 
   if (isVisual) {
     return (
@@ -346,7 +350,11 @@ function EditSitePageInner() {
     );
   }
 
-  if (isArchivosView) {
+  if (isArchivosView || isEstadisticasView) {
+    const panelTitle = isEstadisticasView
+      ? CMS_SECTION_LABELS.estadisticas
+      : CMS_SECTION_LABELS.archivos;
+
     return (
       <div className="flex min-h-screen flex-col bg-white">
         <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
@@ -370,30 +378,32 @@ function EditSitePageInner() {
                 aria-hidden
               />
               <h1 className="truncate text-base font-bold text-brand-ink sm:text-lg">
-                {CMS_SECTION_LABELS.archivos}
+                {panelTitle}
               </h1>
               <span className="shrink-0 rounded-full bg-brand-teal px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
                 {SITE_LABELS[site]}
               </span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
-              >
-                Guardar borrador
-              </button>
-              <button
-                type="button"
-                onClick={handlePublish}
-                disabled={saving}
-                className="rounded-lg bg-brand-teal px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
-              >
-                Publicar
-              </button>
-            </div>
+            {!isEstadisticasView ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+                >
+                  Guardar borrador
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={saving}
+                  className="rounded-lg bg-brand-teal px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+                >
+                  Publicar
+                </button>
+              </div>
+            ) : null}
           </div>
           {status ? (
             <p className="mx-auto mt-2 max-w-6xl rounded-lg bg-slate-100 px-3 py-2 text-sm">
@@ -403,13 +413,19 @@ function EditSitePageInner() {
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 overflow-auto px-4 py-4">
-          <ArchivosDocumentsPanel
-            site={site}
-            doc={doc}
-            token={token}
-            onChange={setDoc}
-          />
-          <UploadInventoryTab site={site} />
+          {isEstadisticasView ? (
+            <AnalyticsPanel site={site} />
+          ) : (
+            <>
+              <ArchivosDocumentsPanel
+                site={site}
+                doc={doc}
+                token={token}
+                onChange={setDoc}
+              />
+              <UploadInventoryTab site={site} />
+            </>
+          )}
         </main>
       </div>
     );

@@ -27,12 +27,15 @@ export function useEsferaPageDisplay(): CmsEsferaPage {
 
 export function useEsferaBrandLogo() {
   const page = useEsferaPageDisplay();
+  const whiteSrc =
+    page.esferaLogoWhiteSrc ??
+    page.esferaLogoSrc ??
+    "/brand/logo-esfera-punto-focal-white.webp";
   return {
     color: page.esferaLogoSrc ?? "/brand/logo-esfera-punto-focal.webp",
-    white:
-      page.esferaLogoWhiteSrc ??
-      page.esferaLogoSrc ??
-      "/brand/logo-esfera-punto-focal-white.webp",
+    white: whiteSrc,
     alt: page.esferaLogoAlt ?? "Esfera Punto Focal",
+    /** Logo blanco subido en el CMS — no aplicar filtro CSS de inversión. */
+    whiteIsDedicated: Boolean(page.esferaLogoWhiteSrc),
   };
 }

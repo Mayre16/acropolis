@@ -16,15 +16,22 @@ export const PLATFORM_NAV_LABELS: Record<PlatformId, string> = {
   biblioteca: "Biblioteca",
   tienda: "Librería Editorial Logos",
   civis: "Civis",
+  circulo: "Círculo de Amigos",
 };
 
-export const PLATFORM_NAV_ORDER: PlatformId[] = ["biblioteca", "tienda", "civis"];
+export const PLATFORM_NAV_ORDER: PlatformId[] = [
+  "biblioteca",
+  "tienda",
+  "civis",
+  "circulo",
+];
 
 /** URLs de producción en código (adesa). Se muestran como referencia en el editor. */
 export const PLATFORM_NAV_DEFAULT_URLS: Record<PlatformId, string> = {
   biblioteca: "https://biblioteca-oina.adesa.com.do",
   civis: "https://civis.acropolis.adesa.com.do",
   tienda: "https://tienda.acropolis.adesa.com.do",
+  circulo: "https://circulodeamigos.acropolis.org.do",
 };
 
 /** Preview GitHub Pages (civis y tienda). Biblioteca sigue en adesa. */
@@ -32,6 +39,7 @@ export const PLATFORM_NAV_GITHUB_URLS: Record<PlatformId, string> = {
   biblioteca: PLATFORM_NAV_DEFAULT_URLS.biblioteca,
   civis: "https://mayre16.github.io/acropolis/civis/",
   tienda: "https://mayre16.github.io/acropolis/tienda/",
+  circulo: "https://mayre16.github.io/acropolis/circulodeamigos/",
 };
 
 export function resolvePlatformNavHref(

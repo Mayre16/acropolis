@@ -35,7 +35,7 @@ export function ArticuloDetail({ slug }: { slug: string }) {
   if (!a) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center text-na-muted">
-        Cargando artículo…
+        Cargando entrada…
       </div>
     );
   }
@@ -71,7 +71,7 @@ export function ArticuloDetail({ slug }: { slug: string }) {
           </Link>
           <span aria-hidden>/</span>
           <Link href="/articulos" className="hover:text-na-kefer">
-            Artículos
+            Blog
           </Link>
           <span aria-hidden>/</span>
           <span className="text-na-heketDark">{a.category}</span>
@@ -128,14 +128,14 @@ export function ArticuloDetail({ slug }: { slug: string }) {
             className="inline-flex items-center gap-2 text-sm font-bold text-na-kefer transition hover:gap-3"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver a Artículos
+            Volver al blog
           </Link>
         </div>
       </div>
 
       {next.slug !== a.slug && list.length > 1 ? (
         <nav
-          aria-label="Navegación entre artículos"
+          aria-label="Navegación entre entradas del blog"
           className="mx-auto mt-16 max-w-4xl px-4 sm:px-6"
         >
           <h2 className="text-xs font-bold uppercase tracking-[0.32em] text-na-kefer">
@@ -173,7 +173,7 @@ export function ArticuloDetail({ slug }: { slug: string }) {
             >
               <div className="min-w-0 flex-1 order-1">
                 <span className="text-[11px] font-bold uppercase tracking-wide text-na-kefer">
-                  Siguiente artículo
+                  Siguiente entrada
                 </span>
                 <h3 className="line-clamp-2 text-sm font-black leading-snug text-na-heketDark">
                   {next.title}

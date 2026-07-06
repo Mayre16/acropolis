@@ -122,6 +122,9 @@ export const SUBMARCA_LOGOS = {
 /** Ruta del landing del Diplomado en este sitio. */
 export const DIPLOMADO_PATH = "/diplomado";
 
+/** Ruta del landing del Círculo de Amigos en este sitio. */
+export const CIRCULO_AMIGOS_PATH = "/circulo-de-amigos";
+
 export type NavLink = {
   href: string;
   label: string;
@@ -149,6 +152,7 @@ export const FOOTER_NAV_PRIMARY: NavLink[] = [
 /** Navegación del pie de página — segunda fila. */
 export const FOOTER_NAV_SECONDARY: NavLink[] = [
   { href: DIPLOMADO_PATH, label: "Diplomado" },
+  { href: CIRCULO_AMIGOS_PATH, label: "Círculo de Amigos" },
   { href: "/cursos", label: "Cursos" },
   { href: "/donde-estamos", label: "Dónde estamos" },
 ];
@@ -161,10 +165,10 @@ export const FOOTER_NAV_LINKS: NavLink[] = [
 
 /** Enlaces de contenido en el pie de página (editorial + hub). */
 export const FOOTER_CONTENT_LINKS: NavLink[] = [
-  { href: "/articulos", label: "Artículos" },
+  { href: "/articulos", label: "Blog" },
   { href: "/eventos", label: "Eventos" },
   {
-    href: "https://www.revistaesfinge.com/",
+    href: REVISTA_ESFINGE_URL,
     label: "Revista Esfinge",
     external: true,
   },
@@ -181,6 +185,9 @@ export const NAV_CONTENIDO = {
   label: "Contenido",
   hubHref: "/contenido",
 } as const;
+
+/** Revista Esfinge — publicación digital OINADOM (República Dominicana). */
+export const REVISTA_ESFINGE_URL = "https://www.revistaesfinge.do/";
 
 export const INSTAGRAM_HANDLE = "nuevaacropolisdominicana";
 export const YOUTUBE_HANDLE = "NuevaAcrópolisRD";
@@ -269,7 +276,7 @@ export const INTRO_VIDEO_ID = "NgxhR_ppPmI";
 export const INTRO_VIDEO_START = 9;
 
 /** Plataformas en subdominio propio (apps independientes con su submarca). */
-export type PlatformId = "biblioteca" | "civis" | "tienda";
+export type PlatformId = "biblioteca" | "civis" | "tienda" | "circulo";
 
 export type Platform = {
   id: PlatformId;
@@ -299,12 +306,19 @@ export const PLATAFORMAS: Platform[] = [
     href: "https://tienda.acropolis.adesa.com.do",
     devHref: "https://tienda.acropolis.adesa.com.do",
   },
+  {
+    id: "circulo",
+    label: "Círculo de Amigos",
+    href: "https://circulodeamigos.acropolis.org.do",
+    devHref: "http://localhost:3500",
+  },
 ];
 
 const PLATFORM_ENV_KEYS: Record<PlatformId, string> = {
   biblioteca: "NEXT_PUBLIC_BIBLIOTECA_URL",
   civis: "NEXT_PUBLIC_CIVIS_URL",
   tienda: "NEXT_PUBLIC_TIENDA_URL",
+  circulo: "NEXT_PUBLIC_CIRCULO_URL",
 };
 
 export function isDevPlatformsMode(): boolean {
@@ -347,11 +361,11 @@ export function platformEffectiveUrl(id: PlatformId): string {
 /** Enlaces del menú Contenido (artículos, eventos, revista, biblioteca, librería, redes). */
 export function getNavContenidoItems(): NavContenidoItem[] {
   return [
-    { href: "/articulos", label: "Artículos" },
+    { href: "/articulos", label: "Blog" },
     { href: "/eventos", label: "Eventos" },
     { href: "/agenda", label: "Agenda" },
     {
-      href: "https://www.revistaesfinge.com/",
+      href: REVISTA_ESFINGE_URL,
       label: "Revista Esfinge",
       external: true,
     },

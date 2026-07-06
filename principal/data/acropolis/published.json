@@ -1,7 +1,7 @@
 {
   "version": 1,
   "site": "acropolis",
-  "updatedAt": "2026-06-14T17:12:04.196Z",
+  "updatedAt": "2026-07-06T21:00:00.000Z",
   "sections": {
     "homeHero": {
       "h1": "Nueva Acrópolis República Dominicana",
@@ -1167,6 +1167,11 @@
           "inscribeLabel": "Quiero unirme"
         }
       ]
+    },
+    "esferaPage": {
+      "esferaLogoSrc": "/brand/logo-esfera-punto-focal.webp",
+      "esferaLogoWhiteSrc": "/brand/logo-esfera-punto-focal-white.webp",
+      "esferaLogoAlt": "Esfera Punto Focal"
     }
   }
 }

@@ -1,4 +1,5 @@
 import type { CmsDocument, SiteId } from "./content-types";
+import type { AnalyticsSiteId, AnalyticsSummary } from "./analytics-types";
 
 const API_URL =
   process.env.NEXT_PUBLIC_CMS_API_URL?.replace(/\/$/, "") ||
@@ -464,4 +465,21 @@ export async function resendCmsUserInvite(
     throw new Error(data.error || "No se pudo reenviar la invitación");
   }
   return data.message || "Invitación reenviada.";
+}
+
+export async function fetchAnalyticsSummary(
+  site: AnalyticsSiteId,
+  token: string,
+  year: number,
+  month: number,
+): Promise<AnalyticsSummary> {
+  const params = new URLSearchParams({
+    year: String(year),
+    month: String(month),
+  });
+  const res = await fetch(
+    `${API_URL}/analytics/summary/${site}?${params.toString()}`,
+    { headers: authHeaders(token) },
+  );
+  return (await res.json()) as AnalyticsSummary;
 }

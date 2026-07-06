@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { UpcomingAgenda } from "@/components/UpcomingAgenda";
+import { AgendaProximamenteEmpty } from "@/components/AgendaProximamenteEmpty";
 import { AgendaFiltersBar } from "@/components/contenido/AgendaFiltersBar";
 import { useAgendaCmsEdit } from "@/components/cms/AgendaCmsEditContext";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
@@ -20,6 +21,8 @@ import {
   getAgendaFilterOptions,
   hasActiveAgendaFilters,
 } from "@/lib/agenda-filters";
+import { whatsAppHref, whatsAppUrlForCategory } from "@/lib/whatsapp-messages";
+import { useWhatsAppUrls } from "@/lib/cms/hooks";
 
 const DEFAULT_INSCRIBE =
   "Hola, me interesa una actividad de Nueva Acrópolis. ¿Me pueden dar más información?";
@@ -36,6 +39,7 @@ export function AgendaFullListing() {
   const edit = useAgendaCmsEdit();
   const cmsItems = useCmsHomeAgenda();
   const esferaTrainings = useCmsEsferaTrainings();
+  const whatsappUrls = useWhatsAppUrls();
   const fallbackItems = getHomeUpcomingAgenda(undefined, esferaTrainings);
   const [filters, setFilters] = useState(EMPTY_AGENDA_FILTERS);
 
@@ -88,6 +92,10 @@ export function AgendaFullListing() {
   );
 
   if (items.length === 0) {
+    const whatsappHrefEmpty = whatsAppHref(
+      DEFAULT_INSCRIBE,
+      whatsAppUrlForCategory("curso", whatsappUrls),
+    );
     return (
       <section
         id="agenda-listing"
@@ -95,11 +103,17 @@ export function AgendaFullListing() {
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           {sectionHeader}
-          <p className="mt-8 text-sm text-na-muted">
-            {edit?.ready
-              ? "No hay actividades con fecha próxima. Pulsa «Añadir actividad» para crear una (elige categoría, fecha ISO y sede en el panel)."
-              : "No hay actividades programadas en este momento. Vuelve pronto o contáctanos por WhatsApp para más información."}
-          </p>
+          {edit?.ready ? (
+            <p className="mt-8 text-sm text-na-muted">
+              No hay actividades con fecha próxima. Pulsa «Añadir actividad» para
+              crear una (elige categoría, fecha ISO y sede en el panel).
+            </p>
+          ) : (
+            <AgendaProximamenteEmpty
+              className="mt-8"
+              whatsappHref={whatsappHrefEmpty}
+            />
+          )}
         </div>
       </section>
     );

@@ -11,6 +11,7 @@ import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { CmsProvider } from "@/lib/cms/provider";
 import { EditorialCmsEditProvider } from "@/components/cms/EditorialCmsEditContext";
 import { EditorialPageMedia } from "@/components/cms/EditorialPageMedia";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { SITE_URL } from "@/lib/site-config";
 
 const notoSans = Noto_Sans({
@@ -47,6 +48,7 @@ export default function RootLayout({
         className={`${notoSans.variable} flex min-h-screen flex-col bg-white font-sans antialiased text-na-ink`}
       >
         <Suspense fallback={null}>
+          <SiteAnalytics site="editorial" />
           <CmsEditModeBootstrap />
         </Suspense>
         <CmsProvider>

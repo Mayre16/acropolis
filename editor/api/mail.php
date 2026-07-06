@@ -68,6 +68,11 @@ function cms_load_smtp_config(array $config): array
     return $merged;
 }
 
+function cms_smtp_ready(array $cfg): bool
+{
+    return !empty($cfg['host']) && !empty($cfg['user']) && !empty($cfg['password']);
+}
+
 function cms_public_smtp_config(array $cfg): array
 {
     return [
@@ -164,8 +169,10 @@ function cms_mailer(array $cfg): PHPMailer
 
 function cms_send_plain_mail(array $cfg, array $opts): void
 {
-    if (empty($cfg['host']) || empty($cfg['user']) || empty($cfg['password'])) {
-        throw new RuntimeException('SMTP no configurado. Revisa la configuración en el editor.');
+    if (!cms_smtp_ready($cfg)) {
+        throw new RuntimeException(
+            'SMTP no configurado. Ve a Configuración → Correo (SMTP) en el editor y guarda la contraseña del servidor.',
+        );
     }
 
     $mail = cms_mailer($cfg);
@@ -185,7 +192,15 @@ function cms_send_plain_mail(array $cfg, array $opts): void
     $mail->Subject = (string) $opts['subject'];
     $mail->isHTML(false);
     $mail->Body = (string) $opts['body'];
-    $mail->send();
+    try {
+        $mail->send();
+    } catch (Exception $e) {
+        throw new RuntimeException(
+            'No se pudo enviar el correo: ' . ($e->getMessage() ?: 'error de conexión SMTP'),
+            0,
+            $e,
+        );
+    }
 }
 
 function cms_validate_civis_solicitud(array $body): array
@@ -552,6 +567,11 @@ function cms_site_inquiry_route(string $formKey): ?array
         'viaje_info' => [
             'to_email' => 'info.oinadom@acropolis.org',
             'to_name' => 'Nueva Acrópolis RD',
+            'copy_to_sender' => false,
+        ],
+        'circulo_amigos_inscription' => [
+            'to_email' => 'info.oinadom@acropolis.org',
+            'to_name' => 'Círculo de Amigos OINADOM',
             'copy_to_sender' => false,
         ],
     ];

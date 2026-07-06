@@ -10,6 +10,8 @@ import {
 } from "@/lib/cms/hooks";
 import { mergeEsferaPage } from "@/lib/cms/esfera-page-edit";
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
+import { filterActiveEsferaTrainings } from "@/lib/esfera-agenda";
+import { AgendaProximamenteEmpty } from "@/components/AgendaProximamenteEmpty";
 
 export function EsferaProximosEntrenamientos() {
   const edit = useEsferaCmsEdit();
@@ -17,7 +19,11 @@ export function EsferaProximosEntrenamientos() {
   const sectionText = useCmsEsferaSectionText();
 
   const page = edit?.ready ? mergeEsferaPage(edit.page) : null;
-  const trainings = page?.trainings ?? publicTrainings;
+  const allTrainings = page?.trainings ?? publicTrainings;
+  const trainings = edit?.ready
+    ? allTrainings
+    : filterActiveEsferaTrainings(allTrainings);
+  const showProximamente = !edit?.ready && trainings.length === 0;
   const eyebrow = page?.agendaEyebrow ?? sectionText.eyebrow;
   const title = page?.agendaTitle ?? sectionText.title;
   const intro = page?.agendaIntro ?? sectionText.intro;
@@ -59,6 +65,9 @@ export function EsferaProximosEntrenamientos() {
         ) : null}
       </div>
 
+      {showProximamente ? (
+        <AgendaProximamenteEmpty className="mt-10" contact="esfera" />
+      ) : (
       <ul className="mt-10 grid gap-6 md:grid-cols-3">
         {trainings.map((item) => {
           const imageSrc =
@@ -135,7 +144,8 @@ export function EsferaProximosEntrenamientos() {
           );
         })}
       </ul>
-      {edit?.ready && trainings.length === 0 ? (
+      )}
+      {edit?.ready && allTrainings.length === 0 ? (
         <p className="mt-6 text-sm text-na-muted">
           No hay entrenamientos — pulsa «Añadir entrenamiento».
         </p>

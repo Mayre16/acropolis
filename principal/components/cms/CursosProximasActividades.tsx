@@ -120,8 +120,6 @@ export function CursosProximasActividades() {
     );
   }
 
-  if (publicItems.length === 0) return null;
-
   return (
     <section
       id="cursos-proximas"
@@ -138,13 +136,15 @@ export function CursosProximasActividades() {
             </h2>
             <p className="mt-3 max-w-2xl text-na-muted">{sectionText.intro}</p>
           </div>
-          <Link
-            href="/agenda"
-            className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer"
-          >
-            Ver agenda completa
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+          {publicItems.length > 0 ? (
+            <Link
+              href="/agenda"
+              className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer"
+            >
+              Ver agenda completa
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          ) : null}
         </div>
         <UpcomingAgenda
           embedded

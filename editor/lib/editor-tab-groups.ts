@@ -22,11 +22,11 @@ const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
       "viajesInternacionales",
     ],
   },
-  { label: "Artículos", tabs: ["articulos", "medios"] },
+  { label: "Blog", tabs: ["articulos", "medios"] },
   {
-    label: "Archivos",
-    tabs: ["archivos"],
-    hint: "CV institucional, brochure",
+    label: "Administración",
+    tabs: ["estadisticas", "archivos"],
+    hint: "Visitas e inventario de imágenes",
   },
 ];
 
@@ -35,13 +35,42 @@ const CIVIS_TAB_GROUPS: TabGroup[] = [
     label: "Páginas del sitio",
     tabs: ["civisHome", "civisTalleres", "civisSalones", "civisQuienesSomos"],
   },
-  { label: "Archivos", tabs: ["archivos"] },
+  {
+    label: "Administración",
+    tabs: ["estadisticas", "archivos"],
+    hint: "Visitas e inventario de imágenes",
+  },
+];
+
+const EDITORIAL_TAB_GROUPS: TabGroup[] = [
+  {
+    label: "Páginas de la tienda",
+    tabs: [
+      "editorialHome",
+      "editorialLibros",
+      "editorialDigitales",
+      "editorialRevistas",
+      "editorialRegalos",
+      "editorialDonde",
+      "editorialQuienesSomos",
+    ],
+  },
+  {
+    label: "Administración",
+    tabs: ["estadisticas", "archivos"],
+    hint: "Visitas e inventario de imágenes",
+  },
 ];
 
 export function tabGroupsForRole(site: SiteId, role: EditorRole): TabGroup[] {
   const allowed = tabsForRole(site, role);
   const allowedSet = new Set(allowed);
-  const templates = site === "acropolis" ? ACROPOLIS_TAB_GROUPS : CIVIS_TAB_GROUPS;
+  const templates =
+    site === "acropolis"
+      ? ACROPOLIS_TAB_GROUPS
+      : site === "civis"
+        ? CIVIS_TAB_GROUPS
+        : EDITORIAL_TAB_GROUPS;
 
   const grouped = templates
     .map((group) => ({

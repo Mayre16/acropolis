@@ -43,6 +43,8 @@ export default {
           editorialDark: "#CD4B0C",
           civis: "#5BA6DC",
           civisDark: "#4A86B0",
+          circulo: "#5BB5E8",
+          circuloDark: "#3A9AD4",
         },
       },
       fontFamily: {

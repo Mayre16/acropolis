@@ -162,7 +162,7 @@ export function BodyEditor({
             placeholder={
               pi === 0
                 ? "Primer párrafo (lead, más destacado)"
-                : "Párrafo o mini-título (línea corta = subtítulo en artículos)"
+                : "Párrafo o mini-título (línea corta = subtítulo en entradas del blog)"
             }
             className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />

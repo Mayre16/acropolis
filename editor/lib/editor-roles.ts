@@ -174,7 +174,7 @@ export const TAB_LABELS: Record<string, string> = {
 
   agenda: "Agenda",
 
-  articulos: "Artículos",
+  articulos: "Blog",
 
   medios: "Voz fuera de la sede",
 
@@ -229,6 +229,8 @@ export const TAB_LABELS: Record<string, string> = {
   editorialDonde: "Dónde estamos",
 
   editorialQuienesSomos: "Quiénes somos",
+
+  estadisticas: "Estadísticas de visitas",
 
 };
 
@@ -298,6 +300,8 @@ const CIVIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
     "archivos",
 
+    "estadisticas",
+
   ],
 
   voluntariado: [],
@@ -334,6 +338,8 @@ const EDITORIAL_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
     "archivos",
 
+    "estadisticas",
+
   ],
 
   voluntariado: [],
@@ -355,6 +361,8 @@ const EDITORIAL_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
     "editorialQuienesSomos",
 
     "archivos",
+
+    "estadisticas",
 
   ],
 

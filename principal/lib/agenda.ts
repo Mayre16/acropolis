@@ -229,3 +229,11 @@ export function getHomeAgendaItems(
     reference,
   );
 }
+
+/** Bloque «Próximamente» cuando no hay actividades activas en agenda. */
+export const AGENDA_EMPTY_STATE = {
+  title: "Próximamente",
+  text: "Estamos preparando nuevas fechas de actividades. Escríbenos y te avisamos cuando abramos convocatoria.",
+  whatsappLabel: "Avísenme cuando haya convocatoria",
+  esferaLabel: "Avísenme cuando haya convocatoria",
+} as const;
