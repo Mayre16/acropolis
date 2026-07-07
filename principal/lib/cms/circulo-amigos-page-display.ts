@@ -28,7 +28,7 @@ function resolvePage(page: CmsCirculoAmigosPage): CmsCirculoAmigosPage {
   };
 }
 
-export function useCirculoAmigosPageDisplay() {
+export function useCirculoAmigosPageDisplay(): CmsCirculoAmigosPage {
   const cms = useCmsDocument();
   const edit = useCirculoAmigosCmsEdit();
   const overrides = edit?.ready

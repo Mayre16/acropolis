@@ -147,7 +147,7 @@ export function CirculoAmigosLanding() {
                 {page.introEyebrow}
               </h2>
               <div className="mt-5 space-y-4 text-base leading-relaxed text-[var(--ca-muted)]">
-                {(page.introParagraphs ?? []).map((p) => (
+                {(page.introParagraphs ?? []).map((p: string) => (
                   <p key={p.slice(0, 40)}>{p}</p>
                 ))}
               </div>
