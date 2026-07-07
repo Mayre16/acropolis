@@ -30,6 +30,7 @@ Tras cada push a `main`:
 |-------------|--------|
 | https://mayre16.github.io/acropolis/ | Índice con enlaces |
 | https://mayre16.github.io/acropolis/principal/ | Acropolis |
+| https://mayre16.github.io/acropolis/circulodeamigos/ | Círculo de Amigos |
 | https://mayre16.github.io/acropolis/civis/ | Civis |
 | https://mayre16.github.io/acropolis/tienda/ | Tienda |
 

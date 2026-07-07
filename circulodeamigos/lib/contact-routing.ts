@@ -1,4 +1,11 @@
 import {
+  CIRCULO_AMIGOS_EMAIL,
+  CIRCULO_AMIGOS_INTEREST_AREAS,
+  CIRCULO_AMIGOS_DOCUMENT_TYPES,
+  CIRCULO_AMIGOS_REFERRAL_SOURCES,
+  type CirculoAmigosInscriptionValues,
+} from "@/lib/circulo-amigos-content";
+import {
   CURSOS_EMAIL,
   ESFERA_CC_EMAIL,
   ESFERA_SOLICITUD_EMAIL,
@@ -394,29 +401,52 @@ export function buildCirculoAmigosMailto(): {
 }
 
 export function buildCirculoAmigosInscriptionMessage(
-  values: InquiryContactValues,
+  values: CirculoAmigosInscriptionValues,
 ): string {
+  const docLabel =
+    CIRCULO_AMIGOS_DOCUMENT_TYPES.find((d) => d.value === values.tipoDocumento)
+      ?.label ?? values.tipoDocumento;
+  const viaLabel =
+    CIRCULO_AMIGOS_REFERRAL_SOURCES.find((v) => v.value === values.viaReferencia)
+      ?.label ?? values.viaReferencia;
+  const areas = values.areasInteres
+    .map(
+      (id) =>
+        CIRCULO_AMIGOS_INTEREST_AREAS.find((a) => a.value === id)?.label ?? id,
+    )
+    .join(", ");
+
   return [
     "=== INSCRIPCIÓN — CÍRCULO DE AMIGOS OINADOM ===",
     "",
     "Solicito inscribirme en el Círculo de Amigos de Nueva Acrópolis República Dominicana.",
     "",
-    `Nombre: ${values.nombre.trim()}`,
+    `Correo: ${values.email.trim()}`,
+    `Nombre completo: ${values.nombre.trim()}`,
+    `Tipo de documento: ${docLabel}`,
+    `Número de documento: ${values.numeroDocumento.trim()}`,
+    `Fecha de nacimiento: ${values.fechaNacimiento}`,
     `Teléfono / WhatsApp: ${values.telefono.trim()}`,
-    values.email.trim() ? `Correo: ${values.email.trim()}` : null,
+    `País: ${values.pais.trim()}`,
+    `Ciudad: ${values.ciudad.trim()}`,
+    `¿Por cuál vía te enteraste?: ${viaLabel}`,
     "",
-    "Mensaje / intereses:",
-    values.mensaje.trim(),
-  ]
-    .filter(Boolean)
-    .join("\n");
+    "¿Qué te motiva a unirte?",
+    values.motivacion.trim(),
+    "",
+    areas ? `Áreas de interés: ${areas}` : "Áreas de interés: (ninguna marcada)",
+    "",
+    values.confirmaCompromiso
+      ? "Compromiso: Confirmo principios de Nueva Acrópolis y cuota anual RD$2,500.00."
+      : "Compromiso: NO confirmado",
+  ].join("\n");
 }
 
 export function buildCirculoAmigosInscriptionMailto(
-  values: InquiryContactValues,
+  values: CirculoAmigosInscriptionValues,
 ): MailtoResult {
   return buildMailtoLink(
-    [INFO_EMAIL],
+    [CIRCULO_AMIGOS_EMAIL],
     `[Círculo de Amigos] Inscripción — ${values.nombre.trim()}`,
     buildCirculoAmigosInscriptionMessage(values),
   );

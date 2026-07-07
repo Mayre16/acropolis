@@ -1,7 +1,7 @@
-/* Landing Círculo de Amigos — azul claro OINA */
+/* Landing Círculo de Amigos — paleta submarca */
 .circulo-amigos-shell {
   --ca-brand-light: #7ec8f0;
-  --ca-brand: #5bb5e8;
+  --ca-brand: #53a3da;
   --ca-brand-dark: #3a9ad4;
   --ca-brand-deep: #2e8bc7;
   --ca-bg: #e8f4fc;
@@ -10,11 +10,108 @@
   --ca-muted: #404245;
   --ca-surface: #ffffff;
   --ca-panel: #f0f8fd;
-  background: linear-gradient(
-    165deg,
-    var(--ca-brand-dark) 0%,
-    var(--ca-brand) 38%,
-    var(--ca-bg) 100%
-  );
+  --ca-header-brand: #53a3da;
+  background: transparent;
   min-height: 100%;
+}
+
+/* Ritmo de secciones — alterna fondos para no saturar de azul */
+.circulo-amigos-shell .ca-sec-mist {
+  background: linear-gradient(180deg, var(--ca-surface) 0%, var(--ca-bg) 100%);
+}
+
+.circulo-amigos-shell .ca-sec-panel {
+  background: var(--ca-panel);
+}
+
+.circulo-amigos-shell .ca-sec-sky {
+  background: linear-gradient(
+    180deg,
+    var(--ca-bg) 0%,
+    var(--ca-bg-deep) 55%,
+    var(--ca-panel) 100%
+  );
+}
+
+.circulo-amigos-shell .ca-sec-snow {
+  background: var(--ca-surface);
+}
+
+.circulo-amigos-shell .ca-sec-steps {
+  background: linear-gradient(
+    135deg,
+    var(--ca-surface) 0%,
+    var(--ca-bg) 48%,
+    var(--ca-bg-deep) 100%
+  );
+  color: var(--ca-ink);
+}
+
+.circulo-amigos-shell .ca-sec-cta {
+  background: linear-gradient(
+    135deg,
+    var(--ca-brand-deep) 0%,
+    var(--ca-brand-dark) 42%,
+    var(--ca-brand) 100%
+  );
+  color: #fff;
+}
+
+.circulo-amigos-shell .ca-title {
+  color: var(--ca-ink);
+}
+
+.circulo-amigos-shell .ca-title--deep {
+  color: var(--ca-brand-deep);
+}
+
+.circulo-amigos-shell .ca-title--dark {
+  color: var(--ca-brand-dark);
+}
+
+.circulo-amigos-shell .ca-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ca-brand-dark);
+}
+
+.circulo-amigos-shell .ca-pilar-card {
+  border-top: 3px solid var(--ca-brand-light);
+}
+
+.circulo-amigos-shell .ca-benefit-card {
+  background: var(--ca-surface);
+  border: 1px solid rgba(126, 200, 240, 0.45);
+  box-shadow: 0 10px 28px rgba(58, 154, 212, 0.1);
+}
+
+.circulo-amigos-shell .ca-step-card {
+  background: var(--ca-surface);
+  border: 1px solid rgba(83, 163, 218, 0.2);
+  box-shadow: 0 12px 32px rgba(46, 139, 199, 0.1);
+}
+
+.circulo-amigos-shell .ca-step-num--0 {
+  background: var(--ca-brand);
+  color: #fff;
+}
+
+.circulo-amigos-shell .ca-step-num--1 {
+  background: var(--ca-brand-dark);
+  color: #fff;
+}
+
+.circulo-amigos-shell .ca-step-num--2 {
+  background: var(--ca-brand-deep);
+  color: #fff;
+}
+
+.circulo-amigos-shell .ca-card-recibes {
+  border-left: 4px solid var(--ca-brand-light);
+}
+
+.circulo-amigos-shell .ca-card-esperamos {
+  border-left: 4px solid var(--ca-brand-deep);
 }

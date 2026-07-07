@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CirculoAmigosLanding } from "@/components/circulo-amigos/CirculoAmigosLanding";
+import { CirculoAmigosPageShell } from "@/components/cms/CirculoAmigosPageShell";
 import { CirculoAmigosShell } from "@/components/circulo-amigos/CirculoAmigosShell";
 import { CIRCULO_AMIGOS_PATH } from "@/lib/circulo-amigos-content";
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
 export default function CirculoDeAmigosPage() {
   return (
     <CirculoAmigosShell>
-      <CirculoAmigosLanding />
+      <CirculoAmigosPageShell>
+        <CirculoAmigosLanding />
+      </CirculoAmigosPageShell>
     </CirculoAmigosShell>
   );
 }

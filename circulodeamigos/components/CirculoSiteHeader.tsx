@@ -2,34 +2,42 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import {
   CIRCULO_HEADER_MARK_ASPECT,
   CirculoBrandMark,
 } from "@/components/CirculoBrandMark";
-import { PRINCIPAL_SITE_URL } from "@/lib/site-config";
+import {
+  CIRCULO_QUIENES_SOMOS_PATH,
+} from "@/lib/circulo-amigos-content";
+import { CirculoInscribeteNavLink } from "@/components/CirculoInscribeteNavLink";
 import "./CirculoSiteHeader.css";
 
-const NAV: Array<{
-  id: string;
-  label: string;
-  href: string;
-  external?: boolean;
-}> = [
+const NAV = [
   { id: "inicio", label: "Inicio", href: "/" },
-  { id: "inscripcion", label: "Inscríbete", href: "/#inscripcion" },
-  {
-    id: "na",
-    label: "Nueva Acrópolis",
-    href: PRINCIPAL_SITE_URL,
-    external: true,
-  },
+  { id: "quienes-somos", label: "Quiénes somos", href: CIRCULO_QUIENES_SOMOS_PATH },
+  { id: "inscripcion", label: "Inscríbete", href: null },
 ] as const;
 
-/** Header integrado — identificador Círculo de Amigos (placeholder) + menú azul claro. */
+function navIsActive(pathname: string, href: string | null): boolean {
+  if (!href) return false;
+  if (href === "/") return pathname === "/";
+  if (href.startsWith("/#")) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** Header integrado — identificador Círculo de Amigos + menú azul claro. */
 export function CirculoSiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const closeMobile = () => setOpen(false);
+
+  const desktopLinkClass = (active: boolean) =>
+    `circulo-site-header__link${active ? " circulo-site-header__link--active" : ""}`;
+
+  const mobileLinkClass = (active: boolean) =>
+    `circulo-site-header__mobile-link${active ? " circulo-site-header__mobile-link--active" : ""}`;
 
   return (
     <header
@@ -68,21 +76,18 @@ export function CirculoSiteHeader() {
           aria-label="Secciones del Círculo de Amigos"
         >
           {NAV.map((item) =>
-            item.external ? (
-              <a
+            item.id === "inscripcion" ? (
+              <CirculoInscribeteNavLink
                 key={item.id}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="circulo-site-header__link"
+                className={desktopLinkClass(false)}
               >
                 {item.label}
-              </a>
+              </CirculoInscribeteNavLink>
             ) : (
               <Link
                 key={item.id}
                 href={item.href}
-                className="circulo-site-header__link"
+                className={desktopLinkClass(navIsActive(pathname, item.href))}
               >
                 {item.label}
               </Link>
@@ -100,20 +105,17 @@ export function CirculoSiteHeader() {
           <ul className="circulo-site-header__mobile-list">
             {NAV.map((item) => (
               <li key={item.id}>
-                {item.external ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="circulo-site-header__mobile-link"
-                    onClick={closeMobile}
+                {item.id === "inscripcion" ? (
+                  <CirculoInscribeteNavLink
+                    className={mobileLinkClass(false)}
+                    onNavigate={closeMobile}
                   >
                     {item.label}
-                  </a>
+                  </CirculoInscribeteNavLink>
                 ) : (
                   <Link
                     href={item.href}
-                    className="circulo-site-header__mobile-link"
+                    className={mobileLinkClass(navIsActive(pathname, item.href))}
                     onClick={closeMobile}
                   >
                     {item.label}

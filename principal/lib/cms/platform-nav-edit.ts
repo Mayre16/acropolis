@@ -20,10 +20,10 @@ export const PLATFORM_NAV_LABELS: Record<PlatformId, string> = {
 };
 
 export const PLATFORM_NAV_ORDER: PlatformId[] = [
+  "circulo",
   "biblioteca",
   "tienda",
   "civis",
-  "circulo",
 ];
 
 /** URLs de producción en código (adesa). Se muestran como referencia en el editor. */

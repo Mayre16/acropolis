@@ -44,17 +44,19 @@ export const LEGAL_LINKS = [
   { href: `${PRINCIPAL_SITE_URL}/legal/cookies`, label: "Política de cookies" },
 ] as const;
 
-/** Placeholder hasta recibir identificador oficial de la submarca. */
+/** Identificador oficial Círculo de Amigos OINADOM. */
 export const SUBMARCA_LOGO = {
-  src: "/brand/identificadores/civis-identificador.webp",
+  src: "/img/circulo-amigos/logo-header.png",
   alt: "Círculo de Amigos OINADOM — Nueva Acrópolis",
-  width: 960,
-  height: 160,
+  width: 2358,
+  height: 244,
 } as const;
 
+/** Identificador recortado para header integrado y footer (sin franja vacía a la derecha). */
 export const HEADER_SUBMARCA_LOGO = {
-  src: "/brand/identificadores/civis-identificador-header.webp",
+  src: "/img/circulo-amigos/logo-header-cropped.webp",
+  fallback: "/img/circulo-amigos/logo-header-cropped.png",
   alt: SUBMARCA_LOGO.alt,
-  width: 951,
-  height: 161,
+  width: 1856,
+  height: 244,
 } as const;

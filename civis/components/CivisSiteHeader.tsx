@@ -13,6 +13,9 @@ import {
   civisNavIsActive,
   type CivisNavItem,
 } from "@/lib/civis-content";
+import {
+  CIVIS_BRAND,
+} from "@/lib/site-config";
 import "./CivisSiteHeader.css";
 
 /** Header integrado: identificador Civis a color + menú sobre la franja de marca. */
@@ -35,6 +38,7 @@ export function CivisSiteHeader() {
       className="civis-site-header"
       style={{
         ["--civis-mark-aspect" as string]: String(CIVIS_HEADER_MARK_ASPECT),
+        ["--civis-header-brand" as string]: CIVIS_BRAND.main,
       }}
     >
       <div className="civis-site-header__row">

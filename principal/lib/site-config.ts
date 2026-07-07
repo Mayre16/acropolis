@@ -164,6 +164,9 @@ export const FOOTER_NAV_LINKS: NavLink[] = [
 ];
 
 /** Enlaces de contenido en el pie de página (editorial + hub). */
+/** Revista Esfinge — publicación digital OINADOM (República Dominicana). */
+export const REVISTA_ESFINGE_URL = "https://www.revistaesfinge.do/";
+
 export const FOOTER_CONTENT_LINKS: NavLink[] = [
   { href: "/articulos", label: "Blog" },
   { href: "/eventos", label: "Eventos" },
@@ -185,9 +188,6 @@ export const NAV_CONTENIDO = {
   label: "Contenido",
   hubHref: "/contenido",
 } as const;
-
-/** Revista Esfinge — publicación digital OINADOM (República Dominicana). */
-export const REVISTA_ESFINGE_URL = "https://www.revistaesfinge.do/";
 
 export const INSTAGRAM_HANDLE = "nuevaacropolisdominicana";
 export const YOUTUBE_HANDLE = "NuevaAcrópolisRD";
@@ -289,6 +289,12 @@ export type Platform = {
 
 export const PLATAFORMAS: Platform[] = [
   {
+    id: "circulo",
+    label: "Círculo de Amigos",
+    href: "https://circulodeamigos.acropolis.org.do",
+    devHref: "http://localhost:3100/circulo-de-amigos",
+  },
+  {
     id: "biblioteca",
     label: "Biblioteca",
     href: "https://biblioteca-oina.adesa.com.do",
@@ -305,12 +311,6 @@ export const PLATAFORMAS: Platform[] = [
     label: "Librería Editorial Logos",
     href: "https://tienda.acropolis.adesa.com.do",
     devHref: "https://tienda.acropolis.adesa.com.do",
-  },
-  {
-    id: "circulo",
-    label: "Círculo de Amigos",
-    href: "https://circulodeamigos.acropolis.org.do",
-    devHref: "http://localhost:3500",
   },
 ];
 

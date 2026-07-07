@@ -1,57 +1,85 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import { CirculoBrandMark } from "@/components/CirculoBrandMark";
-import { LEGAL_LINKS, PRINCIPAL_SITE_URL } from "@/lib/site-config";
+import { CirculoInscribeteNavLink } from "@/components/CirculoInscribeteNavLink";
+import {
+  CIRCULO_FOOTER_NAV,
+  CIRCULO_HOME_PATH,
+} from "@/lib/circulo-amigos-content";
+import { footerNavGridColumns } from "@/lib/footer-nav-grid";
+import "./CirculoFooter.css";
+
+const OINADOM_LOGO = {
+  src: "/brand/logo-oinadom.webp",
+  alt: "Nueva Acrópolis — República Dominicana",
+  width: 320,
+  height: 120,
+} as const;
+
+function footerNavRows() {
+  const split = footerNavGridColumns(CIRCULO_FOOTER_NAV.length);
+  return [CIRCULO_FOOTER_NAV.slice(0, split), CIRCULO_FOOTER_NAV.slice(split)] as const;
+}
 
 export function CirculoFooter() {
+  const [navRowTop, navRowBottom] = footerNavRows();
+
   return (
-    <footer className="border-t border-[var(--ca-brand)]/15 bg-[var(--ca-brand-dark)] text-white">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-          <div>
-            <Link href="/" aria-label="Círculo de Amigos — inicio">
-              <div className="max-w-xs rounded-xl bg-white p-3">
-                <CirculoBrandMark size="sm" />
-              </div>
+    <footer className="circulo-footer">
+      <div className="circulo-footer__inner">
+        <div className="circulo-footer__grid">
+          <div className="circulo-footer__brand-col">
+            <Link
+              href={CIRCULO_HOME_PATH}
+              className="circulo-footer__brand"
+              aria-label="Círculo de Amigos — inicio"
+            >
+              <CirculoBrandMark size="sm" className="circulo-footer__mark" />
             </Link>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/85">
-              Espacio abierto para quienes valoran los principios de Nueva
-              Acrópolis y desean participar en sus actividades.
-            </p>
           </div>
-          <nav aria-label="Enlaces legales e institucionales">
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-white/70">
-              Enlaces
-            </p>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>
-                <a
-                  href={PRINCIPAL_SITE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/90 hover:text-white hover:underline"
+
+          <div className="circulo-footer__na-mark">
+            <Image
+              src={OINADOM_LOGO.src}
+              alt={OINADOM_LOGO.alt}
+              width={OINADOM_LOGO.width}
+              height={OINADOM_LOGO.height}
+              unoptimized
+              className="circulo-footer__oinadom-img"
+            />
+          </div>
+
+          <nav aria-label="Secciones del sitio" className="circulo-footer__nav">
+            <p className="circulo-footer__nav-label">Navegación</p>
+            <div className="circulo-footer__nav-rows">
+              {[navRowTop, navRowBottom].map((row) => (
+                <ul
+                  key={row.map((item) => item.id).join("-")}
+                  className="circulo-footer__nav-row"
                 >
-                  Nueva Acrópolis RD
-                </a>
-              </li>
-              {LEGAL_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/90 hover:text-white hover:underline"
-                  >
-                    {link.label}
-                  </a>
-                </li>
+                  {row.map((item) => (
+                    <li key={item.id}>
+                      {item.id === "inscripcion" ? (
+                        <CirculoInscribeteNavLink>{item.label}</CirculoInscribeteNavLink>
+                      ) : (
+                        <Link href={item.href!}>{item.label}</Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               ))}
-            </ul>
+            </div>
           </nav>
         </div>
-        <p className="mt-8 border-t border-white/15 pt-6 text-xs text-white/70">
-          © {new Date().getFullYear()} Círculo de Amigos OINADOM · Nueva
-          Acrópolis República Dominicana
-        </p>
+
+        <div className="circulo-footer__legal-row">
+          <p className="circulo-footer__legal">
+            © {new Date().getFullYear()} Círculo de Amigos OINADOM · Nueva
+            Acrópolis RD
+          </p>
+        </div>
       </div>
     </footer>
   );

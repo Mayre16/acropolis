@@ -16,7 +16,7 @@ const config: Config = {
         },
         site: {
           acropolis: { DEFAULT: "#0d6e6e", dark: "#0a5555" },
-          civis: { DEFAULT: "#5BA6DC", dark: "#4A86B0" },
+          civis: { DEFAULT: "#3B4BA0", dark: "#2F3D85" },
           biblioteca: { DEFAULT: "#fdcb20", dark: "#e6b800", ink: "#1a1a1a" },
           editorial: { DEFAULT: "#ee934c", dark: "#d97a32" },
         },

@@ -36,6 +36,12 @@ export const SUBMARCA_LOGO = {
   height: 165,
 };
 
+/** Azul oscuro Civis (submarca OINA — bandeja superior y header integrado). */
+export const CIVIS_BRAND = {
+  main: "#3B4BA0",
+  dark: "#2F3D85",
+} as const;
+
 /** Identificador para header integrado (recorte superior/derecho sin borde del PNG). */
 export const HEADER_SUBMARCA_LOGO = {
   src: "/brand/identificadores/civis-identificador-header.webp",

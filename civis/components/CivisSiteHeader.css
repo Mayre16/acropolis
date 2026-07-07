@@ -4,7 +4,7 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  --civis-header-brand: #3e48a1;
+  --civis-header-brand: #3b4ba0;
   --civis-mark-height: 4.5rem;
   /* Margen transparente izquierdo del PNG (curva NA sobre blanco) */
   --civis-header-white-max: calc(

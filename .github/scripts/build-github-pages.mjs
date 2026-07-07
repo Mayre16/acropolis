@@ -24,6 +24,16 @@ const sites = [
       NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_CIVIS_URL: `${ORIGIN}${PAGES_BASE}/civis`,
       NEXT_PUBLIC_TIENDA_URL: `${ORIGIN}${PAGES_BASE}/tienda`,
+      NEXT_PUBLIC_CIRCULO_URL: `${ORIGIN}${PAGES_BASE}/circulodeamigos`,
+      NEXT_PUBLIC_CMS_URL: CMS_API,
+    },
+  },
+  {
+    dir: "circulodeamigos",
+    basePath: `${PAGES_BASE}/circulodeamigos`,
+    env: {
+      NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/circulodeamigos`,
+      NEXT_PUBLIC_PRINCIPAL_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_CMS_URL: CMS_API,
     },
   },

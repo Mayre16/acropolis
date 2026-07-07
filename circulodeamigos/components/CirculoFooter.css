@@ -1,0 +1,169 @@
+/* Footer Círculo de Amigos — franja azul + cuerpo claro (patrón Civis / Editorial). */
+.circulo-footer {
+  width: 100%;
+  margin-top: auto;
+  color: #4a5754;
+  border-top: 3px solid #53a3da;
+  background: linear-gradient(
+    180deg,
+    rgba(83, 163, 218, 0.14) 0%,
+    rgba(255, 255, 255, 0.98) 38%,
+    rgba(58, 154, 212, 0.08) 100%
+  );
+}
+
+.circulo-footer__inner {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+  padding: 1.25rem 1rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .circulo-footer__inner {
+    padding-inline: 1.5rem;
+  }
+}
+
+.circulo-footer__grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.circulo-footer__brand-col {
+  min-width: 0;
+  overflow: visible;
+}
+
+.circulo-footer__brand {
+  display: block;
+  overflow: visible;
+  width: fit-content;
+  max-width: 100%;
+  padding-right: 0.625rem;
+  line-height: 0;
+}
+
+.circulo-footer__mark {
+  width: calc(
+    var(--circulo-mark-aspect, 7.607) * var(--circulo-footer-mark-h, 2.35rem) +
+      var(--circulo-footer-mark-pad, 0.5rem)
+  ) !important;
+  max-width: 100% !important;
+  min-width: unset !important;
+  object-position: left center;
+}
+
+@media (min-width: 640px) {
+  .circulo-footer__grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .circulo-footer__na-mark {
+    justify-self: center;
+  }
+
+  .circulo-footer__nav {
+    justify-self: end;
+    max-width: min(100%, 32rem);
+    text-align: right;
+  }
+}
+
+.circulo-footer__tagline {
+  margin: 0.625rem 0 0;
+  max-width: min(100%, 18rem);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #4a5754;
+}
+
+.circulo-footer__na-mark {
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+  margin-top: 10px;
+  padding-block: 0.5rem 0.75rem;
+  max-width: min(100%, 14rem);
+  margin-inline: auto;
+  --circulo-footer-oinadom-h: 3.1875rem;
+}
+
+.circulo-footer__na-mark img {
+  display: block;
+  height: var(--circulo-footer-oinadom-h) !important;
+  max-height: var(--circulo-footer-oinadom-h) !important;
+  width: auto !important;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (min-width: 640px) {
+  .circulo-footer__na-mark {
+    --circulo-footer-oinadom-h: 3.5375rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .circulo-footer__na-mark {
+    --circulo-footer-oinadom-h: 3.7875rem;
+  }
+}
+
+.circulo-footer__nav-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(83, 163, 218, 0.75);
+}
+
+.circulo-footer__nav-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.circulo-footer__nav-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.circulo-footer__nav-row li {
+  display: inline-flex;
+}
+
+.circulo-footer__nav-row a {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(83, 163, 218, 0.95);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.circulo-footer__nav-row a:hover {
+  color: #3a9ad4;
+}
+
+.circulo-footer__legal-row {
+  margin-top: 1rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid rgba(83, 163, 218, 0.22);
+}
+
+.circulo-footer__legal {
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: rgba(74, 87, 84, 0.75);
+}
