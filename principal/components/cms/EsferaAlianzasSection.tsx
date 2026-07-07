@@ -60,7 +60,7 @@ function AlianzaCard({
     <div
       className={`relative flex h-full flex-col items-center justify-between gap-4 p-5 text-center ${accentCardShell(index, "min-h-[168px]")}`}
     >
-      {editing ? (
+      {editing && onEdit ? (
         <CmsEditPencil
           label={`Editar ${alianza.name}`}
           onClick={onEdit}
