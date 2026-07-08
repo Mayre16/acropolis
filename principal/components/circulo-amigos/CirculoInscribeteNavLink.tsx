@@ -3,10 +3,8 @@
 import type { MouseEvent, ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CIRCULO_INSCRIPCION_HREF } from "@/lib/circulo-amigos-content";
-import {
-  applyCirculoInscripcionHash,
-  isCirculoHomePath,
-} from "@/lib/circulo-inscribete-nav";
+import { dispatchCirculoInscripcionOpen } from "@/components/circulo-amigos/CirculoInscripcionProvider";
+import { isCirculoHomePath } from "@/lib/circulo-inscribete-nav";
 
 type CirculoInscribeteNavLinkProps = {
   className?: string;
@@ -14,7 +12,7 @@ type CirculoInscribeteNavLinkProps = {
   onNavigate?: () => void;
 };
 
-/** Inscríbete — home + scroll a la tarjeta «¿Listo para dar el paso?». */
+/** Inscríbete — abre el formulario de inscripción (o navega a home + #inscribete). */
 export function CirculoInscribeteNavLink({
   className,
   children,
@@ -22,13 +20,12 @@ export function CirculoInscribeteNavLink({
 }: CirculoInscribeteNavLinkProps) {
   const pathname = usePathname();
   const router = useRouter();
-
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     onNavigate?.();
 
     if (isCirculoHomePath(pathname)) {
-      applyCirculoInscripcionHash();
+      dispatchCirculoInscripcionOpen();
       return;
     }
 

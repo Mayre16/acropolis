@@ -79,15 +79,11 @@ export function CirculoAmigosLanding() {
 
   return (
     <div className="font-sans text-[var(--ca-ink)]">
-      <section className="relative overflow-hidden border-b border-[var(--ca-brand-deep)]/30 bg-gradient-to-br from-[var(--ca-brand-deep)] via-[var(--ca-brand-dark)] to-[var(--ca-brand)] text-white">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(255,255,255,0.14),transparent_52%),radial-gradient(circle_at_82%_0%,rgba(126,200,240,0.28),transparent_42%)]"
-          aria-hidden
-        />
+      <section className="ca-sec-hero relative overflow-hidden">
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <div className="lg:grid lg:min-h-[min(32rem,82vh)] lg:grid-cols-2 lg:items-center lg:gap-x-8 xl:gap-x-12">
             <div className="order-first pt-3 pb-8 sm:pt-4 lg:order-last lg:flex lg:w-full lg:justify-center lg:pb-10 lg:pt-5">
-              <div className="relative mx-auto aspect-[1024/478] w-full max-w-[28rem] overflow-hidden rounded-2xl border-2 border-white/25 bg-white/10 shadow-[0_16px_48px_rgba(17,22,49,0.22)] sm:max-w-[36rem] lg:max-w-none lg:w-full lg:rounded-[1.25rem]">
+              <div className="ca-hero-photo relative mx-auto aspect-[1024/478] w-full max-w-[28rem] overflow-hidden rounded-2xl sm:max-w-[36rem] lg:max-w-none lg:w-full lg:rounded-[1.25rem]">
                 <Image
                   src={page.heroImageSrc ?? ""}
                   alt={page.heroImageAlt ?? ""}
@@ -96,10 +92,6 @@ export function CirculoAmigosLanding() {
                   priority
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 640px"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-t from-[var(--ca-brand-deep)]/35 via-transparent to-transparent"
-                  aria-hidden
                 />
               </div>
             </div>
@@ -111,27 +103,25 @@ export function CirculoAmigosLanding() {
                   onClick={() => edit.setSelectedId("__hero__")}
                 />
               ) : null}
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-white/75 sm:text-sm">
-                {page.heroEyebrow}
-              </p>
-              <h1 className="mt-3 max-w-3xl text-balance text-[2rem] font-black leading-[1.08] tracking-tight text-white sm:text-[2.65rem] lg:text-[3rem]">
+              <p className="ca-eyebrow">{page.heroEyebrow}</p>
+              <h1 className="ca-title mt-3 max-w-3xl text-balance text-[2rem] font-black leading-[1.08] tracking-tight sm:text-[2.65rem] lg:text-[3rem]">
                 {page.heroTitle}
               </h1>
-              <h2 className="mt-4 max-w-2xl text-balance text-xl font-bold leading-snug text-[var(--ca-brand-light)] sm:text-2xl">
+              <h2 className="ca-title--deep mt-4 max-w-2xl text-balance text-xl font-bold leading-snug sm:text-2xl">
                 {page.heroSubtitle}
               </h2>
-              <h3 className="mt-5 max-w-2xl text-base font-normal leading-relaxed text-white/88 sm:text-lg">
+              <h3 className="mt-5 max-w-2xl text-base font-normal leading-relaxed text-[var(--ca-muted)] sm:text-lg">
                 {page.heroLede}
               </h3>
               <div className="mt-8 flex flex-wrap gap-3" id="inscripcion">
                 <CirculoAmigosInquiryButton
                   triggerLabel="Inscríbete ahora"
                   variant="landing"
-                  triggerClassName="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[var(--ca-brand-dark)] shadow-md shadow-black/15 transition hover:bg-white/90"
+                  triggerClassName="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[rgba(58,154,212,0.28)] transition hover:bg-[var(--ca-brand-dark)]"
                 />
                 <a
                   href={`mailto:${page.ctaEmail}?subject=${encodeURIComponent("Consulta — Círculo de Amigos")}`}
-                  className="inline-flex items-center justify-center rounded-full border-2 border-white/35 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+                  className="inline-flex items-center justify-center rounded-full border-2 border-[var(--ca-brand)]/35 bg-white px-6 py-3 text-sm font-bold text-[var(--ca-brand-dark)] transition hover:bg-[var(--ca-panel)]"
                 >
                   Más información
                 </a>

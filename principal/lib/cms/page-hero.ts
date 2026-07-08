@@ -71,6 +71,12 @@ export const PAGE_HERO_FALLBACKS: Partial<
     lede:
       "Un espacio para pensar, conocerse y vivir mejor. La filosofía no como teoría abstracta, sino como una forma práctica de afrontar la vida.",
   },
+  circuloAmigos: {
+    eyebrow: "Círculo de Amigos OINADOM",
+    title: "Tu camino hacia la sabiduría y el servicio comienza aquí",
+    lede:
+      "¿Te has sentido atraído por la filosofía y por la idea de un mundo mejor? El Círculo de Amigos es tu espacio para conectar con personas que comparten tus valores.",
+  },
 };
 
 /** Usa el fallback cuando el CMS tiene vacío o solo espacios. */

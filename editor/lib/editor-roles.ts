@@ -146,6 +146,8 @@ export const VISUAL_TAB_IDS = new Set([
 
   "esfera",
 
+  "circuloAmigos",
+
   "editorialHome",
 
   "editorialLibros",
@@ -216,6 +218,8 @@ export const TAB_LABELS: Record<string, string> = {
 
   esfera: "Esfera",
 
+  circuloAmigos: "Círculo de Amigos",
+
   editorialHome: "Inicio — tienda",
 
   editorialLibros: "Libros impresos",
@@ -249,6 +253,8 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
     "diplomado",
 
     "filosofia",
+
+    "circuloAmigos",
 
     "voluntariado",
 

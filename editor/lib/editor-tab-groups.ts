@@ -9,7 +9,7 @@ export type TabGroup = {
 
 const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
   { label: "Inicio y ubicación", tabs: ["home", "sedes"] },
-  { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia"] },
+  { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia", "circuloAmigos"] },
   {
     label: "Actividades",
     tabs: [

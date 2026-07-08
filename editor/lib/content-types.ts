@@ -394,6 +394,43 @@ export type CmsCirculoAmigosPromo = {
   imageAlt?: string;
 };
 
+export type CmsCirculoAmigosCard = {
+  id: string;
+  title: string;
+  text: string;
+  imageSrc: string;
+  imageAlt: string;
+};
+
+export type CmsCirculoAmigosPaso = CmsCirculoAmigosCard & {
+  n: number;
+};
+
+export type CmsCirculoAmigosPage = CmsPageHeroText & {
+  heroImageSrc?: string;
+  heroImageAlt?: string;
+  introEyebrow?: string;
+  introParagraphs?: string[];
+  introBannerSrc?: string;
+  introBannerAlt?: string;
+  introGrupoSrc?: string;
+  introGrupoAlt?: string;
+  pilaresTitle?: string;
+  pilares?: CmsCirculoAmigosCard[];
+  beneficiosTitle?: string;
+  beneficios?: CmsCirculoAmigosCard[];
+  pasosTitle?: string;
+  pasos?: CmsCirculoAmigosPaso[];
+  recibesTitle?: string;
+  recibesItems?: string[];
+  esperamosTitle?: string;
+  esperamosItems?: string[];
+  ctaTitle?: string;
+  ctaText?: string;
+  ctaEmail?: string;
+  notaLegal?: string;
+};
+
 export type CmsCulturaPage = CmsPageHeroText & {
   proximasTitle?: string;
   proximasIntro?: string;
@@ -711,6 +748,7 @@ export type CmsPageMediaTarget =
   | "viajes"
   | "quienes-somos"
   | "relaciones"
+  | "circulo-amigos"
   | "donde-estamos";
 
 export type CmsPageMediaSection = {
@@ -933,7 +971,8 @@ export type CmsHeroCarouselKey =
   | "agenda"
   | "quienesSomos"
   | "relaciones"
-  | "esfera";
+  | "esfera"
+  | "circuloAmigos";
 
 export type CmsHeroCarousels = Partial<
   Record<CmsHeroCarouselKey, CmsHeroCarouselItem[]>
@@ -1172,9 +1211,9 @@ export type CmsSiteFooter = {
 
 /** Bandeja verde superior — visibilidad y URLs de enlaces a otras plataformas. */
 export type CmsPlatformNav = {
-  hidden?: ("biblioteca" | "civis" | "tienda")[];
+  hidden?: ("biblioteca" | "civis" | "tienda" | "circulo")[];
   /** URL por plataforma. Vacío = valor por defecto del código (adesa / variables de entorno). */
-  urls?: Partial<Record<"biblioteca" | "civis" | "tienda", string>>;
+  urls?: Partial<Record<"biblioteca" | "civis" | "tienda" | "circulo", string>>;
 };
 
 export type CmsSalonLayout = "butacas" | "mesas" | "herradura";
@@ -1239,6 +1278,7 @@ export type CmsSections = {
   salonesPage?: CmsSalonesPage;
   quienesSomosPage?: CmsQuienesSomosPage;
   relacionesPage?: CmsRelacionesPage;
+  circuloAmigosPage?: CmsCirculoAmigosPage;
   pageMediaSections?: CmsPageMediaSection[];
   civisSalonesPage?: CmsCivisSalonesPage;
   civisTalleresRealizados?: CmsCivisTallerRealizado[];
@@ -1300,6 +1340,7 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
   quienesSomos: "Quiénes somos (visual)",
   relaciones: "Relaciones institucionales (visual)",
   esfera: "Esfera — entrenamientos (visual)",
+  circuloAmigos: "Círculo de Amigos (visual)",
   editorialHome: "Inicio — tienda (visual)",
   editorialLibros: "Libros impresos (visual)",
   editorialDigitales: "Libros digitales (visual)",
@@ -1336,6 +1377,7 @@ export const ACROPOLIS_TABS = [
   "quienesSomos",
   "relaciones",
   "esfera",
+  "circuloAmigos",
 ] as const;
 
 export const CIVIS_TABS = [

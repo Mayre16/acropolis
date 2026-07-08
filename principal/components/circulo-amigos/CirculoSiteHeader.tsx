@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import {
   CIRCULO_HEADER_MARK_ASPECT,
   CirculoBrandMark,
@@ -34,8 +33,6 @@ function navIsActive(pathname: string, href: string | null): boolean {
 
 export function CirculoSiteHeader() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const closeMobile = () => setOpen(false);
 
   const desktopLinkClass = (active: boolean) =>
     `circulo-site-header__link${active ? " circulo-site-header__link--active" : ""}`;
@@ -53,7 +50,6 @@ export function CirculoSiteHeader() {
       <div className="circulo-site-header__row">
         <Link
           href={CIRCULO_AMIGOS_PATH}
-          onClick={closeMobile}
           className="circulo-site-header__brand"
           aria-label="Círculo de Amigos OINADOM — inicio"
         >
@@ -64,16 +60,38 @@ export function CirculoSiteHeader() {
           />
         </Link>
 
-        <button
-          type="button"
-          className="circulo-site-header__menu-btn"
-          aria-expanded={open}
-          aria-controls="circulo-mobile-nav"
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <details className="circulo-site-header__mobile-menu">
+          <summary
+            className="circulo-site-header__menu-btn"
+            aria-label="Abrir menú"
+          >
+            <Menu className="h-6 w-6" aria-hidden />
+          </summary>
+          <nav
+            id="circulo-mobile-nav"
+            className="circulo-site-header__mobile-nav"
+            aria-label="Menú móvil"
+          >
+            <ul className="circulo-site-header__mobile-list">
+              {NAV.map((item) => (
+                <li key={item.id}>
+                  {item.id === "inscripcion" ? (
+                    <CirculoInscribeteNavLink className={mobileLinkClass(false)}>
+                      {item.label}
+                    </CirculoInscribeteNavLink>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={mobileLinkClass(navIsActive(pathname, item.href))}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </details>
 
         <nav
           className="circulo-site-header__nav"
@@ -99,37 +117,6 @@ export function CirculoSiteHeader() {
           )}
         </nav>
       </div>
-
-      {open ? (
-        <nav
-          id="circulo-mobile-nav"
-          className="circulo-site-header__mobile-nav"
-          aria-label="Menú móvil"
-        >
-          <ul className="circulo-site-header__mobile-list">
-            {NAV.map((item) => (
-              <li key={item.id}>
-                {item.id === "inscripcion" ? (
-                  <CirculoInscribeteNavLink
-                    className={mobileLinkClass(false)}
-                    onNavigate={closeMobile}
-                  >
-                    {item.label}
-                  </CirculoInscribeteNavLink>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className={mobileLinkClass(navIsActive(pathname, item.href))}
-                    onClick={closeMobile}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-      ) : null}
     </header>
   );
 }

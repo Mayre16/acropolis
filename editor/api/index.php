@@ -1,6 +1,6 @@
 <?php
 /**
- * API CMS ÿÿÿ producci?n (editor.acropolis.adesa.com.do/api/)
+ * API CMS ï¿½ï¿½ï¿½ producci?n (editor.acropolis.adesa.com.do/api/)
  * Desarrollo local: node scripts/dev-api.mjs
  */
 declare(strict_types=1);

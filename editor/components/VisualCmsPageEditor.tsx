@@ -341,6 +341,26 @@ export function VisualViajesInternacionalesEditor() {
   );
 }
 
+export function VisualCirculoAmigosEditor() {
+  return (
+    <VisualCmsPageEditor
+      title="Círculo de Amigos"
+      path="/circulo-de-amigos"
+      hint={
+        <>
+          Botón <strong>✎ Editar encabezado</strong> en el hero (textos, carrusel y
+          foto lateral). En <strong>¿Qué es?</strong>, <strong>pilares</strong>,{" "}
+          <strong>beneficios</strong> y <strong>pasos</strong>: ✎ en la sección o en
+          cada tarjeta (texto e imagen). También puedes editar{" "}
+          <strong>lo que recibirás</strong>, <strong>lo que esperamos</strong> y el{" "}
+          <strong>llamado final</strong> con el correo de contacto. Al final de la
+          página puedes <strong>añadir bloques</strong> (galerías, texto, botones).
+        </>
+      }
+    />
+  );
+}
+
 export function VisualDiplomadoEditor() {
   return (
     <VisualCmsPageEditor

@@ -44,7 +44,7 @@ const ROUTES = {
     copy_to_sender: false,
   },
   circulo_amigos_inscription: {
-    to_email: "info.oinadom@acropolis.org",
+    to_email: "amigos_dominicana@acropolis.org",
     to_name: "Círculo de Amigos OINADOM",
     copy_to_sender: false,
   },

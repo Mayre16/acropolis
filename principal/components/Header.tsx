@@ -269,7 +269,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 overflow-visible border-b border-na-heket/10 bg-na-surface/95 shadow-na-soft backdrop-blur-md">
+      <header className="overflow-visible border-b border-na-heket/10 bg-na-surface/95 shadow-na-soft backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-3.5">
           <Link
             href="/"

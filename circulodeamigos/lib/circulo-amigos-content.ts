@@ -192,7 +192,7 @@ export const CIRCULO_AMIGOS_NA_QUIENES = {
   ],
   ctaIntro:
     "Conoce nuestra historia, actividades y sedes en República Dominicana.",
-  ctaLabel: "Visitar acropolis.org.do",
+  ctaLabel: "Conocer Nueva Acrópolis",
 } as const;
 
 export const CIRCULO_AMIGOS_INSCRIPTION_DEFAULT_MESSAGE =

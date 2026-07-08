@@ -4,7 +4,8 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   --circulo-header-brand: #53a3da;
   --circulo-mark-height: clamp(
     2.65rem,
@@ -19,6 +20,7 @@
 
 .circulo-site-header__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
   min-height: var(--circulo-mark-height);
   padding: 0;
@@ -42,25 +44,19 @@
 
 .circulo-site-header__brand {
   display: block;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 0;
   line-height: 0;
   text-decoration: none;
   padding: 0;
   margin: 0;
   position: relative;
   z-index: 1;
-  overflow: visible;
+  overflow: hidden;
   height: var(--circulo-mark-height);
-  width: min(
-    calc(
-      var(--circulo-mark-aspect, 7.607) * var(--circulo-mark-height) +
-        var(--circulo-header-mark-pad, 0.75rem)
-    ),
-    calc(100vw - 3.25rem)
-  );
-  max-width: calc(100vw - 3.25rem);
+  max-width: calc(100% - 3.25rem);
   padding-right: var(--circulo-header-mark-pad, 0.75rem);
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 .circulo-site-header__brand :is(span, img) {
@@ -85,6 +81,8 @@
 }
 
 .circulo-site-header__menu-btn {
+  position: relative;
+  z-index: 3;
   margin-left: auto;
   align-self: center;
   display: inline-flex;
@@ -97,6 +95,27 @@
   color: #fff;
   cursor: pointer;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+  list-style: none;
+}
+
+.circulo-site-header__menu-btn::-webkit-details-marker {
+  display: none;
+}
+
+.circulo-site-header__mobile-menu {
+  margin-left: auto;
+  align-self: center;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 3;
+}
+
+.circulo-site-header__mobile-menu[open] {
+  width: 100%;
+}
+
+.circulo-site-header__mobile-menu[open] > .circulo-site-header__menu-btn {
+  margin-left: auto;
 }
 
 .circulo-site-header__menu-btn:hover {
@@ -224,12 +243,30 @@
     padding-right: 1rem;
   }
 
+  .circulo-site-header__brand {
+    flex: 0 0 auto;
+    width: min(
+      calc(
+        var(--circulo-mark-aspect, 7.607) * var(--circulo-mark-height) +
+          var(--circulo-header-mark-pad, 0.75rem)
+      ),
+      calc(100vw - 3.25rem)
+    );
+    max-width: calc(100vw - 3.25rem);
+    overflow: visible;
+    box-sizing: content-box;
+  }
+
   .circulo-site-header__link {
     padding: 0 1rem;
     font-size: 0.9375rem;
   }
 
   .circulo-site-header__menu-btn {
+    display: none;
+  }
+
+  .circulo-site-header__mobile-menu {
     display: none;
   }
 

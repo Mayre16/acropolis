@@ -5,6 +5,7 @@ import {
   AGENDA_HERO_IMAGES,
   CULTURA_HERO_IMAGES,
   CURSOS_HERO_IMAGES,
+  CIRCULO_AMIGOS_HERO_IMAGES,
   ESFERA_HERO_IMAGES,
   EVENTOS_HERO_IMAGES,
   FILOSOFIA_HERO_IMAGES,
@@ -24,7 +25,8 @@ export type CmsHeroCarouselKey =
   | "agenda"
   | "quienesSomos"
   | "relaciones"
-  | "esfera";
+  | "esfera"
+  | "circuloAmigos";
 
 export type CmsHeroCarouselItem = {
   id: string;
@@ -50,6 +52,7 @@ export const HERO_CAROUSEL_DEFAULTS: Record<CmsHeroCarouselKey, HeroImage[]> =
     quienesSomos: QUIENES_SOMOS_HERO_IMAGES,
     relaciones: RELACIONES_HERO_IMAGES,
     esfera: ESFERA_HERO_IMAGES,
+    circuloAmigos: CIRCULO_AMIGOS_HERO_IMAGES,
   };
 
 export const HERO_CAROUSEL_LABELS: Record<CmsHeroCarouselKey, string> = {
@@ -63,6 +66,7 @@ export const HERO_CAROUSEL_LABELS: Record<CmsHeroCarouselKey, string> = {
   quienesSomos: "Quiénes somos",
   relaciones: "Relaciones institucionales",
   esfera: "Punto Focal Esfera",
+  circuloAmigos: "Círculo de Amigos",
 };
 
 export function newHeroSlideId() {

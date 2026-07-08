@@ -314,23 +314,29 @@ export const PLATAFORMAS: Platform[] = [
   },
 ];
 
-const PLATFORM_ENV_KEYS: Record<PlatformId, string> = {
-  biblioteca: "NEXT_PUBLIC_BIBLIOTECA_URL",
-  civis: "NEXT_PUBLIC_CIVIS_URL",
-  tienda: "NEXT_PUBLIC_TIENDA_URL",
-  circulo: "NEXT_PUBLIC_CIRCULO_URL",
-};
-
 export function isDevPlatformsMode(): boolean {
   if (process.env.NEXT_PUBLIC_PLATFORMS_DEV === "true") return true;
   if (process.env.NEXT_PUBLIC_PLATFORMS_DEV === "false") return false;
   return process.env.NODE_ENV === "development";
 }
 
+/** Acceso estático para que Next.js inyecte las URLs en el bundle del cliente. */
+function platformEnvOverride(id: PlatformId): string | undefined {
+  switch (id) {
+    case "biblioteca":
+      return process.env.NEXT_PUBLIC_BIBLIOTECA_URL?.trim();
+    case "civis":
+      return process.env.NEXT_PUBLIC_CIVIS_URL?.trim();
+    case "tienda":
+      return process.env.NEXT_PUBLIC_TIENDA_URL?.trim();
+    case "circulo":
+      return process.env.NEXT_PUBLIC_CIRCULO_URL?.trim();
+  }
+}
+
 /** URL efectiva de una plataforma (dev o producción). */
 export function platformUrl(id: PlatformId): string {
-  const envKey = PLATFORM_ENV_KEYS[id];
-  const override = process.env[envKey]?.trim();
+  const override = platformEnvOverride(id);
   if (override) return override;
 
   const platform = PLATAFORMAS.find((p) => p.id === id);

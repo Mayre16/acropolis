@@ -21,6 +21,18 @@
 }
 
 /* Ritmo de secciones — alterna fondos para no saturar de azul */
+.circulo-amigos-shell .ca-sec-hero {
+  background: var(--ca-surface);
+  color: var(--ca-ink);
+  border-bottom: 1px solid rgba(83, 163, 218, 0.12);
+}
+
+.circulo-amigos-shell .ca-hero-photo {
+  border: 1px solid rgba(83, 163, 218, 0.15);
+  background: var(--ca-panel);
+  box-shadow: 0 16px 48px rgba(58, 154, 212, 0.12);
+}
+
 .circulo-amigos-shell .ca-sec-mist {
   background: linear-gradient(180deg, var(--ca-surface) 0%, var(--ca-bg) 100%);
 }

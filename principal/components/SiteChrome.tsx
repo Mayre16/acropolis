@@ -7,7 +7,7 @@ import { PlatformNavBar } from "@/components/PlatformNavBar";
 import { PrincipalLegacyHashRedirect } from "@/components/PrincipalLegacyHashRedirect";
 import { CirculoSiteHeader } from "@/components/circulo-amigos/CirculoSiteHeader";
 import { CirculoFooter } from "@/components/circulo-amigos/CirculoFooter";
-import { CirculoInscripcionHashListener } from "@/components/circulo-amigos/CirculoInscripcionHashListener";
+import { CirculoInscripcionProvider } from "@/components/circulo-amigos/CirculoInscripcionProvider";
 import { CIRCULO_AMIGOS_PATH } from "@/lib/circulo-amigos-content";
 
 function isCirculoRoute(pathname: string) {
@@ -25,19 +25,22 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <>
       <PrincipalLegacyHashRedirect />
       {circulo ? (
-        <>
+        <CirculoInscripcionProvider>
           <CirculoSiteHeader />
           <div className="h-2 shrink-0 bg-white sm:h-3" aria-hidden="true" />
-          <CirculoInscripcionHashListener />
-        </>
+          <main className="flex-1">{children}</main>
+          <CirculoFooter />
+        </CirculoInscripcionProvider>
       ) : (
-        <div className="sticky top-0 z-50">
-          <PlatformNavBar />
-          <Header />
-        </div>
+        <>
+          <div className="sticky top-0 z-50">
+            <PlatformNavBar />
+            <Header />
+          </div>
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </>
       )}
-      <main className="flex-1">{children}</main>
-      {circulo ? <CirculoFooter /> : <Footer />}
     </>
   );
 }

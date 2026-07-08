@@ -133,3 +133,19 @@ export const ESFERA_HERO_IMAGES: HeroImage[] = [
   { src: "/img/esfera/cards/gestion.webp", alt: "Ejercicio de evaluación de daños en formación Esfera" },
   { src: "/img/esfera/cards/comunidad.webp", alt: "Equipo comunitario en capacitación humanitaria" },
 ];
+
+/** Círculo de Amigos — comunidad, diálogo y participación. */
+export const CIRCULO_AMIGOS_HERO_IMAGES: HeroImage[] = [
+  {
+    src: "/img/circulo-amigos/hero-conectate.jpg",
+    alt: "Personas conectándose en el Círculo de Amigos de Nueva Acrópolis",
+  },
+  {
+    src: "/img/circulo-amigos/grupo-dialogo.jpg",
+    alt: "Grupo en diálogo filosófico",
+  },
+  {
+    src: "/img/circulo-amigos/conecta-mundo.jpg",
+    alt: "Participantes del Círculo de Amigos en actividad internacional",
+  },
+];

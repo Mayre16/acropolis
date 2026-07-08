@@ -8,18 +8,22 @@ const TEST_SITE_KEY = "1x00000000000000000000AA";
 
 /** Preview GitHub Pages e iframe del editor: sin captcha (Turnstile no aplica ahí). */
 export function isTurnstileBypassContext(): boolean {
-  if (typeof window === "undefined") return false;
-  if (isInEditorIframe()) return true;
-  if (window.location.hostname.endsWith(".github.io")) return true;
-  if (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-  ) {
-    return true;
+  if (typeof window !== "undefined") {
+    if (isInEditorIframe()) return true;
+    if (window.location.hostname.endsWith(".github.io")) return true;
+    if (
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
+    ) {
+      return true;
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (parseCmsEditParam(params.get("cmsEdit"))) return true;
+    if (readStoredCmsEditMode()) return true;
+    return false;
   }
-  const params = new URLSearchParams(window.location.search);
-  if (parseCmsEditParam(params.get("cmsEdit"))) return true;
-  if (readStoredCmsEditMode()) return true;
+  // SSR en desarrollo: el cliente en localhost también omite Turnstile.
+  if (process.env.NODE_ENV !== "production") return true;
   return false;
 }
 

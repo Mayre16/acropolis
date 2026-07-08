@@ -32,6 +32,9 @@ type CirculoAmigosInscriptionFormProps = {
   hideHeading?: boolean;
   hideTrigger?: boolean;
   watchHash?: boolean;
+  /** Modo controlado: oculta el disparador y usa `open` / `onOpenChange`. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   className?: string;
   triggerLabel?: string;
   triggerClassName?: string;
@@ -47,12 +50,16 @@ const DEFAULT_TRIGGER_CLASS =
 const LANDING_TRIGGER_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[var(--ca-brand)]/30 transition hover:bg-[var(--ca-brand-dark)]";
 
+export { DEFAULT_TRIGGER_CLASS, LANDING_TRIGGER_CLASS };
+
 export function CirculoAmigosInscriptionForm({
   variant = "default",
   inline = false,
   hideHeading = false,
   hideTrigger = false,
   watchHash = false,
+  open: openControlled,
+  onOpenChange,
   className = "",
   triggerLabel = "Inscríbete",
   triggerClassName,
@@ -60,7 +67,15 @@ export function CirculoAmigosInscriptionForm({
   triggerIconAfter = true,
 }: CirculoAmigosInscriptionFormProps) {
   const fieldId = useId().replace(/:/g, "");
-  const [open, setOpen] = useState(false);
+  const [openInternal, setOpenInternal] = useState(false);
+  const open = openControlled ?? openInternal;
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (onOpenChange) onOpenChange(next);
+      else setOpenInternal(next);
+    },
+    [onOpenChange],
+  );
   const [values, setValues] = useState<CirculoAmigosInscriptionValues>({
     ...CIRCULO_AMIGOS_INSCRIPTION_INITIAL,
   });
@@ -83,7 +98,7 @@ export function CirculoAmigosInscriptionForm({
     ? "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-[var(--ca-brand)]/30 transition hover:bg-[var(--ca-brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
     : "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-heket px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer disabled:cursor-not-allowed disabled:opacity-60";
 
-  const close = useCallback(() => setOpen(false), []);
+  const close = useCallback(() => setOpen(false), [setOpen]);
 
   const openForm = useCallback(() => {
     setValues({ ...CIRCULO_AMIGOS_INSCRIPTION_INITIAL });
@@ -94,7 +109,7 @@ export function CirculoAmigosInscriptionForm({
     setSubmitError("");
     setTurnstileToken("");
     setOpen(true);
-  }, []);
+  }, [setOpen]);
 
   const closeForm = useCallback(() => {
     close();
@@ -109,6 +124,17 @@ export function CirculoAmigosInscriptionForm({
       );
     }
   }, [close]);
+
+  useEffect(() => {
+    if (!open || openControlled === undefined) return;
+    setValues({ ...CIRCULO_AMIGOS_INSCRIPTION_INITIAL });
+    setWebsite("");
+    setErrors({});
+    setDone(false);
+    setDoneDev(false);
+    setSubmitError("");
+    setTurnstileToken("");
+  }, [open, openControlled]);
 
   useEffect(() => {
     if (!open) return;
@@ -137,6 +163,14 @@ export function CirculoAmigosInscriptionForm({
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
   }, [watchHash, openForm]);
+
+  useEffect(() => {
+    if (!hideTrigger) return;
+    const onExternalOpen = () => openForm();
+    window.addEventListener("circulo-amigos:open-inscription", onExternalOpen);
+    return () =>
+      window.removeEventListener("circulo-amigos:open-inscription", onExternalOpen);
+  }, [hideTrigger, openForm]);
 
   const toggleArea = (id: CirculoInterestArea) => {
     setValues((s) => ({
@@ -529,7 +563,7 @@ export function CirculoAmigosInscriptionForm({
     open && !inline && typeof document !== "undefined"
       ? createPortal(
           <div
-            className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-na-ink/70 p-4 backdrop-blur-sm sm:p-6"
+            className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto bg-na-ink/70 p-4 backdrop-blur-sm sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label="Inscripción — Círculo de Amigos"

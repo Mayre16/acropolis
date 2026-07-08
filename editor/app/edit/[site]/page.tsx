@@ -38,6 +38,7 @@ import {
   VisualViajesInternacionalesEditor,
   VisualViajesLocalesEditor,
   VisualDiplomadoEditor,
+  VisualCirculoAmigosEditor,
   VisualCulturaEditor,
   VisualSedesEditor,
   VisualHomeEditor,
@@ -102,6 +103,7 @@ const VISUAL_TABS = new Set([
   "quienesSomos",
   "relaciones",
   "esfera",
+  "circuloAmigos",
 ]);
 
 type TabId = keyof typeof CMS_SECTION_LABELS;
@@ -129,6 +131,9 @@ function VisualEditors({
         <VisualViajesInternacionalesEditor />
       )}
       {tab === "diplomado" && site === "acropolis" && <VisualDiplomadoEditor />}
+      {tab === "circuloAmigos" && site === "acropolis" && (
+        <VisualCirculoAmigosEditor />
+      )}
       {tab === "cultura" && site === "acropolis" && <VisualCulturaEditor />}
       {tab === "sedes" && site === "acropolis" && <VisualSedesEditor />}
       {tab === "home" && site === "acropolis" && <VisualHomeEditor />}

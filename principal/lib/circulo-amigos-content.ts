@@ -209,7 +209,7 @@ export const CIRCULO_AMIGOS_NA_QUIENES = {
   ],
   ctaIntro:
     "Conoce nuestra historia, actividades y sedes en República Dominicana.",
-  ctaLabel: "Visitar acropolis.org.do",
+  ctaLabel: "Conocer Nueva Acrópolis",
   ctaHref: "/que-es",
 } as const;
 
