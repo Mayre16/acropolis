@@ -270,7 +270,7 @@ function cms_send_civis_solicitud(array $body, array $config, ?string $remoteIp 
             'body' => $check['data']['message'],
         ]);
     } catch (Throwable $e) {
-        return ['ok' => false, 'error' => 'No se pudo enviar la solicitud. Inténtelo más tarde.'];
+        return cms_form_mail_error($e);
     }
 
     return ['ok' => true];
@@ -352,7 +352,7 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
             'body' => $check['data']['message'],
         ]);
     } catch (Throwable $e) {
-        return ['ok' => false, 'error' => 'No se pudo enviar la solicitud. Inténtelo más tarde.'];
+        return cms_form_mail_error($e);
     }
 
     return ['ok' => true];
@@ -387,6 +387,17 @@ function cms_is_preview_form_request(): bool
         }
     }
     return false;
+}
+
+function cms_form_mail_error(Throwable $e, string $fallback = 'No se pudo enviar la solicitud. Inténtelo más tarde.'): array
+{
+    if (cms_is_preview_form_request() && $e instanceof RuntimeException) {
+        $detail = trim($e->getMessage());
+        if ($detail !== '') {
+            return ['ok' => false, 'error' => $detail];
+        }
+    }
+    return ['ok' => false, 'error' => $fallback];
 }
 
 function cms_verify_turnstile(array $body, ?string $remoteIp, array $config = []): array
@@ -522,7 +533,7 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
             'body' => $message,
         ]);
     } catch (Throwable $e) {
-        return ['ok' => false, 'error' => 'No se pudo enviar la solicitud. Inténtelo más tarde.'];
+        return cms_form_mail_error($e);
     }
 
     return ['ok' => true];
@@ -628,7 +639,7 @@ function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): a
             'body' => $message,
         ]);
     } catch (Throwable $e) {
-        return ['ok' => false, 'error' => 'No se pudo enviar la solicitud. Inténtelo más tarde.'];
+        return cms_form_mail_error($e);
     }
 
     return ['ok' => true];

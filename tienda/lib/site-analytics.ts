@@ -21,6 +21,7 @@ function analyticsApiBase(): string {
 function shouldTrack(): boolean {
   if (typeof window === "undefined") return false;
   if (window.parent !== window) return false;
+  if (window.location.hostname.endsWith(".github.io")) return false;
   if (document.documentElement.classList.contains("cms-edit-embedded")) {
     return false;
   }
