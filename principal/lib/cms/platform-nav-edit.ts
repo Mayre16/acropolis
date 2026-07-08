@@ -14,7 +14,7 @@ export const DEFAULT_PLATFORM_NAV: CmsPlatformNav = {
 /** Etiquetas de la bandeja verde superior (pueden diferir de PLATAFORMAS). */
 export const PLATFORM_NAV_LABELS: Record<PlatformId, string> = {
   biblioteca: "Biblioteca",
-  tienda: "Librería Editorial Logos",
+  tienda: "Librería",
   civis: "Civis",
   circulo: "Círculo de Amigos",
 };

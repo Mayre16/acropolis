@@ -83,8 +83,13 @@ function mergeCards(
   overrides?: CmsCirculoAmigosCard[] | null,
 ): CmsCirculoAmigosCard[] {
   if (!overrides?.length) return defaults;
+  const defaultIds = new Set(defaults.map((d) => d.id));
   const byId = new Map(overrides.map((c) => [c.id, c]));
-  return defaults.map((d) => ({ ...d, ...byId.get(d.id) }));
+  const merged = defaults.map((d) => ({ ...d, ...byId.get(d.id) }));
+  for (const item of overrides) {
+    if (!defaultIds.has(item.id)) merged.push(item);
+  }
+  return merged;
 }
 
 function mergePasos(
@@ -92,14 +97,29 @@ function mergePasos(
   overrides?: CmsCirculoAmigosPaso[] | null,
 ): CmsCirculoAmigosPaso[] {
   if (!overrides?.length) return defaults;
+  const defaultIds = new Set(defaults.map((d) => d.id));
   const byId = new Map(overrides.map((c) => [c.id, c]));
-  return defaults.map((d) => ({ ...d, ...byId.get(d.id) }));
+  const merged = defaults.map((d) => ({ ...d, ...byId.get(d.id) }));
+  for (const item of overrides) {
+    if (!defaultIds.has(item.id)) merged.push(item);
+  }
+  return merged.map((p, i) => ({ ...p, n: p.n || i + 1 }));
 }
 
 function mergeLines(defaults: string[], overrides?: string[] | null): string[] {
   if (!overrides?.length) return defaults;
-  return overrides.map((line, i) => line.trim() || defaults[i] || line).filter(Boolean);
+  if (overrides.length >= defaults.length) return overrides.filter(Boolean);
+  return overrides
+    .map((line, i) => line.trim() || defaults[i] || line)
+    .filter(Boolean);
 }
+
+export function newCirculoCardId(kind: "pilar" | "beneficio" | "paso") {
+  return `${kind}-${Date.now().toString(36)}`;
+}
+
+export const CIRCULO_CARD_PLACEHOLDER_IMAGE =
+  "/img/circulo-amigos/banner-quienes.webp";
 
 export function mergeCirculoAmigosPage(
   overrides?: CmsCirculoAmigosPage | null,

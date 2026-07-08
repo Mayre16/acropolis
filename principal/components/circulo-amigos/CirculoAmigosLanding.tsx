@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { CirculoAmigosInquiryButton } from "@/components/CirculoAmigosInquiryButton";
 import { useCirculoAmigosCmsEdit } from "@/components/cms/CirculoAmigosCmsEditContext";
 import {
@@ -30,6 +30,25 @@ function SectionEditButton({
       className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-[11px] font-bold uppercase text-white shadow"
     >
       <Pencil className="h-3.5 w-3.5" aria-hidden />
+      {label}
+    </button>
+  );
+}
+
+function AddCardButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white shadow"
+    >
+      <Plus className="h-4 w-4" aria-hidden />
       {label}
     </button>
   );
@@ -168,6 +187,11 @@ export function CirculoAmigosLanding() {
           <h2 className="ca-title--deep mt-3 text-2xl font-black sm:text-3xl">
             {page.pilaresTitle}
           </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton label="Añadir tarjeta" onClick={() => edit.addPilar()} />
+            </div>
+          ) : null}
         </div>
         <ul className="mt-10 grid gap-5 sm:grid-cols-3">
           {(page.pilares ?? []).map((item) => (
@@ -218,6 +242,14 @@ export function CirculoAmigosLanding() {
           <h2 className="ca-title mt-3 text-2xl font-black sm:text-3xl">
             {page.beneficiosTitle}
           </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton
+                label="Añadir tarjeta"
+                onClick={() => edit.addBeneficio()}
+              />
+            </div>
+          ) : null}
         </div>
         <ul className="mt-10 grid gap-6 sm:grid-cols-2">
           {(page.beneficios ?? []).map((item) => (
@@ -264,6 +296,11 @@ export function CirculoAmigosLanding() {
           <h2 className="ca-title--deep mt-3 text-2xl font-black sm:text-3xl">
             {page.pasosTitle}
           </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton label="Añadir paso" onClick={() => edit.addPaso()} />
+            </div>
+          ) : null}
         </div>
         <ol className="mt-10 grid gap-5 sm:grid-cols-3">
           {(page.pasos ?? []).map((step, i) => (

@@ -10,8 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import {
+  CIRCULO_CARD_PLACEHOLDER_IMAGE,
   DEFAULT_CIRCULO_AMIGOS_PAGE,
+  circuloCardSelectedId,
   mergeCirculoAmigosPage,
+  newCirculoCardId,
   parseCirculoCardSelectedId,
 } from "@/lib/cms/circulo-amigos-page-edit";
 import {
@@ -46,6 +49,16 @@ type CirculoAmigosCmsEditContextValue = {
   patchPilar: (id: string, patch: Partial<CmsCirculoAmigosCard>) => void;
   patchBeneficio: (id: string, patch: Partial<CmsCirculoAmigosCard>) => void;
   patchPaso: (id: string, patch: Partial<CmsCirculoAmigosPaso>) => void;
+  addPilar: () => void;
+  addBeneficio: () => void;
+  addPaso: () => void;
+  deletePilar: (id: string) => void;
+  deleteBeneficio: (id: string) => void;
+  deletePaso: (id: string) => void;
+  addRecibeItem: () => void;
+  removeRecibeItem: (index: number) => void;
+  addEsperamosItem: () => void;
+  removeEsperamosItem: (index: number) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
   dirty: boolean;
@@ -134,12 +147,15 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
 
   const patchPilar = useCallback(
     (id: string, patch: Partial<CmsCirculoAmigosCard>) => {
-      setPage((p) => ({
-        ...p,
-        pilares: (p.pilares ?? DEFAULT_CIRCULO_AMIGOS_PAGE.pilares!).map((item) =>
-          item.id === id ? { ...item, ...patch } : item,
-        ),
-      }));
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          pilares: (merged.pilares ?? []).map((item) =>
+            item.id === id ? { ...item, ...patch } : item,
+          ),
+        };
+      });
       markDirty();
     },
     [markDirty],
@@ -147,12 +163,15 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
 
   const patchBeneficio = useCallback(
     (id: string, patch: Partial<CmsCirculoAmigosCard>) => {
-      setPage((p) => ({
-        ...p,
-        beneficios: (p.beneficios ?? DEFAULT_CIRCULO_AMIGOS_PAGE.beneficios!).map(
-          (item) => (item.id === id ? { ...item, ...patch } : item),
-        ),
-      }));
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          beneficios: (merged.beneficios ?? []).map((item) =>
+            item.id === id ? { ...item, ...patch } : item,
+          ),
+        };
+      });
       markDirty();
     },
     [markDirty],
@@ -160,12 +179,166 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
 
   const patchPaso = useCallback(
     (id: string, patch: Partial<CmsCirculoAmigosPaso>) => {
-      setPage((p) => ({
-        ...p,
-        pasos: (p.pasos ?? DEFAULT_CIRCULO_AMIGOS_PAGE.pasos!).map((item) =>
-          item.id === id ? { ...item, ...patch } : item,
-        ),
-      }));
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          pasos: (merged.pasos ?? []).map((item) =>
+            item.id === id ? { ...item, ...patch } : item,
+          ),
+        };
+      });
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const addPilar = useCallback(() => {
+    const item: CmsCirculoAmigosCard = {
+      id: newCirculoCardId("pilar"),
+      title: "Nuevo pilar",
+      text: "",
+      imageSrc: CIRCULO_CARD_PLACEHOLDER_IMAGE,
+      imageAlt: "Imagen del pilar",
+    };
+    setPage((p) => {
+      const merged = mergeCirculoAmigosPage(p);
+      return { ...merged, pilares: [...(merged.pilares ?? []), item] };
+    });
+    setSelectedId(circuloCardSelectedId("pilar", item.id));
+    markDirty();
+  }, [markDirty]);
+
+  const addBeneficio = useCallback(() => {
+    const item: CmsCirculoAmigosCard = {
+      id: newCirculoCardId("beneficio"),
+      title: "Nuevo beneficio",
+      text: "",
+      imageSrc: CIRCULO_CARD_PLACEHOLDER_IMAGE,
+      imageAlt: "Imagen del beneficio",
+    };
+    setPage((p) => {
+      const merged = mergeCirculoAmigosPage(p);
+      return { ...merged, beneficios: [...(merged.beneficios ?? []), item] };
+    });
+    setSelectedId(circuloCardSelectedId("beneficio", item.id));
+    markDirty();
+  }, [markDirty]);
+
+  const addPaso = useCallback(() => {
+    const id = newCirculoCardId("paso");
+    setPage((p) => {
+      const m = mergeCirculoAmigosPage(p);
+      const n = (m.pasos?.length ?? 0) + 1;
+      const item: CmsCirculoAmigosPaso = {
+        id,
+        n,
+        title: `Paso ${n}`,
+        text: "",
+        imageSrc: CIRCULO_CARD_PLACEHOLDER_IMAGE,
+        imageAlt: `Paso ${n}`,
+      };
+      return { ...m, pasos: [...(m.pasos ?? []), item] };
+    });
+    setSelectedId(circuloCardSelectedId("paso", id));
+    markDirty();
+  }, [markDirty]);
+
+  const deletePilar = useCallback(
+    (id: string) => {
+      if (!window.confirm("¿Eliminar esta tarjeta de pilares?")) return;
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          pilares: (merged.pilares ?? []).filter((item) => item.id !== id),
+        };
+      });
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const deleteBeneficio = useCallback(
+    (id: string) => {
+      if (!window.confirm("¿Eliminar esta tarjeta de beneficios?")) return;
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          beneficios: (merged.beneficios ?? []).filter((item) => item.id !== id),
+        };
+      });
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const deletePaso = useCallback(
+    (id: string) => {
+      if (!window.confirm("¿Eliminar este paso?")) return;
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          pasos: (merged.pasos ?? [])
+            .filter((item) => item.id !== id)
+            .map((item, i) => ({ ...item, n: i + 1 })),
+        };
+      });
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const addRecibeItem = useCallback(() => {
+    setPage((p) => {
+      const merged = mergeCirculoAmigosPage(p);
+      return {
+        ...merged,
+        recibesItems: [...(merged.recibesItems ?? []), "Nuevo ítem"],
+      };
+    });
+    markDirty();
+  }, [markDirty]);
+
+  const removeRecibeItem = useCallback(
+    (index: number) => {
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          recibesItems: (merged.recibesItems ?? []).filter((_, i) => i !== index),
+        };
+      });
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const addEsperamosItem = useCallback(() => {
+    setPage((p) => {
+      const merged = mergeCirculoAmigosPage(p);
+      return {
+        ...merged,
+        esperamosItems: [...(merged.esperamosItems ?? []), "Nuevo ítem"],
+      };
+    });
+    markDirty();
+  }, [markDirty]);
+
+  const removeEsperamosItem = useCallback(
+    (index: number) => {
+      setPage((p) => {
+        const merged = mergeCirculoAmigosPage(p);
+        return {
+          ...merged,
+          esperamosItems: (merged.esperamosItems ?? []).filter((_, i) => i !== index),
+        };
+      });
       markDirty();
     },
     [markDirty],
@@ -193,6 +366,16 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
       patchPilar,
       patchBeneficio,
       patchPaso,
+      addPilar,
+      addBeneficio,
+      addPaso,
+      deletePilar,
+      deleteBeneficio,
+      deletePaso,
+      addRecibeItem,
+      removeRecibeItem,
+      addEsperamosItem,
+      removeEsperamosItem,
       saveDraft,
       publish,
       dirty,
@@ -207,6 +390,16 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
       patchPilar,
       patchBeneficio,
       patchPaso,
+      addPilar,
+      addBeneficio,
+      addPaso,
+      deletePilar,
+      deleteBeneficio,
+      deletePaso,
+      addRecibeItem,
+      removeRecibeItem,
+      addEsperamosItem,
+      removeEsperamosItem,
       saveDraft,
       publish,
       dirty,
@@ -299,19 +492,32 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
               value={page.introEyebrow ?? ""}
               onChange={(v) => patchPage({ introEyebrow: v })}
             />
-            {(page.introParagraphs ?? []).map((p, i) => (
+            {(mergeCirculoAmigosPage(page).introParagraphs ?? []).map((p, i) => (
               <EditField
                 key={`intro-${i}`}
                 label={`Párrafo ${i + 1}`}
                 value={p}
                 onChange={(v) => {
-                  const next = [...(page.introParagraphs ?? [])];
+                  const merged = mergeCirculoAmigosPage(page);
+                  const next = [...(merged.introParagraphs ?? [])];
                   next[i] = v;
                   patchPage({ introParagraphs: next });
                 }}
                 multiline
               />
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                const merged = mergeCirculoAmigosPage(page);
+                patchPage({
+                  introParagraphs: [...(merged.introParagraphs ?? []), ""],
+                });
+              }}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir párrafo
+            </button>
             <AgendaEntryImageField
               label="Foto de la sección"
               site="acropolis"
@@ -333,52 +539,79 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
 
       {selectedId === "__circulo-pilares__" ? (
         <EditPanelChrome
-          title="Tres pilares — textos"
+          title="Pilares"
           dirty={dirty}
           busy={busy}
           status={status}
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <EditField
-            label="Título de sección"
-            value={page.pilaresTitle ?? ""}
-            onChange={(v) => patchPage({ pilaresTitle: v })}
-          />
+          <div className="space-y-4">
+            <EditField
+              label="Título de sección"
+              value={page.pilaresTitle ?? ""}
+              onChange={(v) => patchPage({ pilaresTitle: v })}
+            />
+            <button
+              type="button"
+              onClick={addPilar}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir tarjeta
+            </button>
+          </div>
         </EditPanelChrome>
       ) : null}
 
       {selectedId === "__circulo-beneficios__" ? (
         <EditPanelChrome
-          title="Beneficios — textos"
+          title="Beneficios"
           dirty={dirty}
           busy={busy}
           status={status}
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <EditField
-            label="Título de sección"
-            value={page.beneficiosTitle ?? ""}
-            onChange={(v) => patchPage({ beneficiosTitle: v })}
-          />
+          <div className="space-y-4">
+            <EditField
+              label="Título de sección"
+              value={page.beneficiosTitle ?? ""}
+              onChange={(v) => patchPage({ beneficiosTitle: v })}
+            />
+            <button
+              type="button"
+              onClick={addBeneficio}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir tarjeta
+            </button>
+          </div>
         </EditPanelChrome>
       ) : null}
 
       {selectedId === "__circulo-pasos__" ? (
         <EditPanelChrome
-          title="Pasos — textos"
+          title="Pasos"
           dirty={dirty}
           busy={busy}
           status={status}
           onClose={() => setSelectedId(null)}
           onSave={() => void saveDraft()}
         >
-          <EditField
-            label="Título de sección"
-            value={page.pasosTitle ?? ""}
-            onChange={(v) => patchPage({ pasosTitle: v })}
-          />
+          <div className="space-y-4">
+            <EditField
+              label="Título de sección"
+              value={page.pasosTitle ?? ""}
+              onChange={(v) => patchPage({ pasosTitle: v })}
+            />
+            <button
+              type="button"
+              onClick={addPaso}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir paso
+            </button>
+          </div>
         </EditPanelChrome>
       ) : null}
 
@@ -397,19 +630,35 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
               value={page.recibesTitle ?? ""}
               onChange={(v) => patchPage({ recibesTitle: v })}
             />
-            {(page.recibesItems ?? []).map((item, i) => (
-              <EditField
-                key={`recibe-${i}`}
-                label={`Ítem ${i + 1}`}
-                value={item}
-                onChange={(v) => {
-                  const next = [...(page.recibesItems ?? [])];
-                  next[i] = v;
-                  patchPage({ recibesItems: next });
-                }}
-                multiline
-              />
+            {(mergeCirculoAmigosPage(page).recibesItems ?? []).map((item, i) => (
+              <div key={`recibe-${i}`} className="space-y-2">
+                <EditField
+                  label={`Ítem ${i + 1}`}
+                  value={item}
+                  onChange={(v) => {
+                    const merged = mergeCirculoAmigosPage(page);
+                    const next = [...(merged.recibesItems ?? [])];
+                    next[i] = v;
+                    patchPage({ recibesItems: next });
+                  }}
+                  multiline
+                />
+                <button
+                  type="button"
+                  onClick={() => removeRecibeItem(i)}
+                  className="text-xs font-bold uppercase text-red-600"
+                >
+                  Eliminar ítem
+                </button>
+              </div>
             ))}
+            <button
+              type="button"
+              onClick={addRecibeItem}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir ítem
+            </button>
           </div>
         </EditPanelChrome>
       ) : null}
@@ -429,19 +678,35 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
               value={page.esperamosTitle ?? ""}
               onChange={(v) => patchPage({ esperamosTitle: v })}
             />
-            {(page.esperamosItems ?? []).map((item, i) => (
-              <EditField
-                key={`espera-${i}`}
-                label={`Ítem ${i + 1}`}
-                value={item}
-                onChange={(v) => {
-                  const next = [...(page.esperamosItems ?? [])];
-                  next[i] = v;
-                  patchPage({ esperamosItems: next });
-                }}
-                multiline
-              />
+            {(mergeCirculoAmigosPage(page).esperamosItems ?? []).map((item, i) => (
+              <div key={`espera-${i}`} className="space-y-2">
+                <EditField
+                  label={`Ítem ${i + 1}`}
+                  value={item}
+                  onChange={(v) => {
+                    const merged = mergeCirculoAmigosPage(page);
+                    const next = [...(merged.esperamosItems ?? [])];
+                    next[i] = v;
+                    patchPage({ esperamosItems: next });
+                  }}
+                  multiline
+                />
+                <button
+                  type="button"
+                  onClick={() => removeEsperamosItem(i)}
+                  className="text-xs font-bold uppercase text-red-600"
+                >
+                  Eliminar ítem
+                </button>
+              </div>
             ))}
+            <button
+              type="button"
+              onClick={addEsperamosItem}
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white"
+            >
+              Añadir ítem
+            </button>
           </div>
         </EditPanelChrome>
       ) : null}
@@ -532,6 +797,31 @@ function CirculoAmigosCmsEditInner({ children }: { children: ReactNode }) {
                 else if (cardSelection?.kind === "paso") patchPaso(cardSelection.id, p);
               }}
             />
+            {cardSelection?.kind === "paso" ? (
+              <EditField
+                label="Número de paso"
+                value={String((selectedCard as CmsCirculoAmigosPaso).n ?? "")}
+                onChange={(v) => {
+                  const n = Number.parseInt(v, 10);
+                  if (cardSelection?.kind === "paso" && Number.isFinite(n)) {
+                    patchPaso(cardSelection.id, { n });
+                  }
+                }}
+              />
+            ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                if (!cardSelection) return;
+                if (cardSelection.kind === "pilar") deletePilar(cardSelection.id);
+                else if (cardSelection.kind === "beneficio")
+                  deleteBeneficio(cardSelection.id);
+                else if (cardSelection.kind === "paso") deletePaso(cardSelection.id);
+              }}
+              className="text-xs font-bold uppercase text-red-600"
+            >
+              Eliminar tarjeta
+            </button>
           </div>
         </EditPanelChrome>
       ) : null}

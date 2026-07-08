@@ -32,7 +32,7 @@ const ITEMS: NavItem[] = [
   },
   {
     id: "editorial",
-    label: "Librería Editorial Logos",
+    label: "Librería",
     href: SITE_URL,
     icon: ShoppingBag,
   },

@@ -32,14 +32,14 @@ export const CIRCULO_AMIGOS_BRAND = {
 export const CIRCULO_AMIGOS_EMAIL = "amigos_dominicana@acropolis.org";
 
 export const CIRCULO_AMIGOS_IMAGE = {
-  src: "/img/circulo-amigos/hero-conectate.jpg",
+  src: "/img/circulo-amigos/hero-conectate.webp",
   alt: "Personas conectándose en el Círculo de Amigos de Nueva Acrópolis",
 } as const;
 
 export const CIRCULO_AMIGOS_INTRO_IMAGES = {
   /** Cinta de inauguración — foto lateral de «¿Qué es?» */
   foto: {
-    src: "/img/circulo-amigos/banner-quienes.png",
+    src: "/img/circulo-amigos/banner-quienes.webp",
     alt: "Inauguración del Círculo de Amigos de Nueva Acrópolis",
   },
 } as const;
@@ -65,17 +65,17 @@ export const CIRCULO_AMIGOS_PILARES = [
   {
     title: "Fraternidad",
     text: "Promovemos un ideal de fraternidad basado en el respeto a la dignidad humana, más allá de cualquier diferencia.",
-    image: "/img/circulo-amigos/grupo-dialogo.jpg",
+    image: "/img/circulo-amigos/grupo-dialogo.webp",
   },
   {
     title: "Conocimiento",
     text: "Fomentamos el amor a la sabiduría a través del estudio ecléctico para el conocimiento del ser humano y la naturaleza.",
-    image: "/img/circulo-amigos/conecta-mundo.jpg",
+    image: "/img/circulo-amigos/conecta-mundo.webp",
   },
   {
     title: "Desarrollo",
     text: "Buscamos desarrollar lo mejor de cada ser humano promoviendo su realización individual y su rol activo en la sociedad.",
-    image: "/img/circulo-amigos/acciones-sociales.png",
+    image: "/img/circulo-amigos/acciones-sociales.webp",
   },
 ] as const;
 
@@ -83,22 +83,22 @@ export const CIRCULO_AMIGOS_BENEFICIOS = [
   {
     title: "Participar en actividades únicas",
     text: "Acceso a una programación mensual exclusiva: diálogos filosóficos, caminatas reflexivas, talleres de bienestar y jornadas de voluntariado.",
-    image: "/img/circulo-amigos/pilar-fraternidad.png",
+    image: "/img/circulo-amigos/pilar-fraternidad.webp",
   },
   {
     title: "Conectarte con el mundo",
     text: "Colaborar en proyectos internacionales de Nueva Acrópolis, como el Día de la Filosofía, el Día de la Tierra y el Día de las Artes.",
-    image: "/img/circulo-amigos/pilar-conocimiento.png",
+    image: "/img/circulo-amigos/pilar-conocimiento.webp",
   },
   {
     title: "Estar siempre informado",
     text: "Recibe novedades de encuentros, propuestas y actividades del Círculo de Amigos y de la organización.",
-    image: "/img/circulo-amigos/pilar-desarrollo.png",
+    image: "/img/circulo-amigos/pilar-desarrollo.webp",
   },
   {
     title: "Proponer tus ideas",
     text: "Colaborar en proyectos y proponer nuevas actividades para enriquecer a la comunidad.",
-    image: "/img/circulo-amigos/beneficio-informado.png",
+    image: "/img/circulo-amigos/beneficio-informado.webp",
   },
 ] as const;
 
@@ -107,19 +107,19 @@ export const CIRCULO_AMIGOS_PASOS = [
     n: 1,
     title: "Inscríbete",
     text: "Completa el formulario digital con tus datos.",
-    image: "/img/circulo-amigos/paso-inscribete.png",
+    image: "/img/circulo-amigos/paso-inscribete.webp",
   },
   {
     n: 2,
     title: "Conéctate",
     text: "Es posible que te contactemos para una entrevista breve y conocer tus intereses y motivaciones.",
-    image: "/img/circulo-amigos/paso-conecta.png",
+    image: "/img/circulo-amigos/paso-conecta.webp",
   },
   {
     n: 3,
     title: "Participa",
     text: "Una vez aceptado, recibirás la información de nuestras actividades y serás parte de la comunidad.",
-    image: "/img/circulo-amigos/paso-participa.png",
+    image: "/img/circulo-amigos/paso-participa.webp",
   },
 ] as const;
 
@@ -138,7 +138,7 @@ export const CIRCULO_AMIGOS_ESPERAMOS = [
 ] as const;
 
 export const CIRCULO_AMIGOS_NOTA_LEGAL =
-  "Nueva Acrópolis Dominicana se reserva el derecho de admisión y participación en el Círculo de Amigos. La información que nos compartes será utilizada únicamente para fines internos del Círculo de Amigos de Nueva Acrópolis Dominicana. Nos comprometemos a proteger tus datos personales y a no compartirlos con terceros sin tu consentimiento.";
+  "Nueva Acrópolis Dominicana se reserva el derecho de admisión y participación en el Círculo de Amigos. La información que nos compartes será utilizada únicamente para fines internos del Círculo de Amigos de Nueva Acrópolis Dominicana. Sin embargo, nos comprometemos a proteger tus datos personales y a no compartirlos con terceros sin tu consentimiento.";
 
 export const CIRCULO_AMIGOS_HIGHLIGHTS = [
   {
