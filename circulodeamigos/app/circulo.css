@@ -1,5 +1,6 @@
 /* Landing Círculo de Amigos — paleta submarca */
-.circulo-amigos-shell {
+.circulo-amigos-shell,
+.circulo-inscription-theme {
   --ca-brand-light: #7ec8f0;
   --ca-brand: #53a3da;
   --ca-brand-dark: #3a9ad4;
@@ -11,6 +12,9 @@
   --ca-surface: #ffffff;
   --ca-panel: #f0f8fd;
   --ca-header-brand: #53a3da;
+}
+
+.circulo-amigos-shell {
   background: transparent;
   min-height: 100%;
 }

@@ -95,7 +95,7 @@ export function CirculoAmigosInscriptionForm({
     ? "w-full rounded-xl border border-[var(--ca-brand)]/20 bg-white px-3 py-2.5 text-sm text-[var(--ca-ink)] outline-none transition placeholder:text-[var(--ca-muted)]/60 focus:border-[var(--ca-brand)] focus:ring-2 focus:ring-[var(--ca-brand)]/20"
     : "w-full rounded-xl border border-na-heket/20 bg-white px-3 py-2.5 text-sm text-na-ink outline-none transition placeholder:text-na-muted/60 focus:border-na-heket focus:ring-2 focus:ring-na-heket/20";
   const submitClass = isLanding
-    ? "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-[var(--ca-brand)]/30 transition hover:bg-[var(--ca-brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+    ? "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#53a3da] px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-[#53a3da]/30 transition hover:bg-[#3a9ad4] disabled:cursor-not-allowed disabled:opacity-60"
     : "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-na-heket px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-na-heket/25 transition hover:bg-na-kefer disabled:cursor-not-allowed disabled:opacity-60";
 
   const close = useCallback(() => setOpen(false), [setOpen]);
@@ -570,7 +570,7 @@ export function CirculoAmigosInscriptionForm({
             onClick={closeForm}
           >
             <div
-              className="relative my-6 w-full max-w-2xl overflow-hidden rounded-[1.5rem] bg-na-surface shadow-na-card sm:my-10"
+              className="circulo-inscription-theme relative my-6 w-full max-w-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-[0_10px_30px_rgba(58,154,212,0.15)] sm:my-10"
               onClick={(e) => e.stopPropagation()}
             >
               <button
