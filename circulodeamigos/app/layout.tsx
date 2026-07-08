@@ -7,6 +7,7 @@ import { CirculoSiteChrome } from "@/components/CirculoSiteChrome";
 import { CirculoFooter } from "@/components/CirculoFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SITE_URL } from "@/lib/site-config";
+import { assetUrl } from "@/lib/asset-url";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -32,6 +33,10 @@ export const metadata: Metadata = {
     siteName: "Círculo de Amigos OINADOM",
     locale: "es_DO",
     type: "website",
+  },
+  icons: {
+    icon: [{ url: assetUrl("/brand/icon-na.webp"), type: "image/webp" }],
+    shortcut: assetUrl("/brand/icon-na.webp"),
   },
 };
 
