@@ -4,7 +4,7 @@ declare(strict_types=1);
 function cms_analytics_collect(array $body, string $dataRoot, ?string $remoteIp): array
 {
     $site = trim((string) ($body['site'] ?? ''));
-    $allowed = ['acropolis', 'civis', 'editorial', 'biblioteca'];
+    $allowed = ['acropolis', 'civis', 'editorial', 'circulodeamigos', 'biblioteca'];
     if (!in_array($site, $allowed, true)) {
         return ['ok' => false, 'error' => 'Sitio no válido.'];
     }
@@ -81,7 +81,7 @@ function cms_analytics_collect(array $body, string $dataRoot, ?string $remoteIp)
 
 function cms_analytics_summary(string $site, string $dataRoot, int $year, int $month): array
 {
-    $allowed = ['acropolis', 'civis', 'editorial', 'biblioteca'];
+    $allowed = ['acropolis', 'civis', 'editorial', 'circulodeamigos', 'biblioteca'];
     if (!in_array($site, $allowed, true)) {
         return ['ok' => false, 'error' => 'Sitio no válido.'];
     }

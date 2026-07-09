@@ -1,22 +1,82 @@
-import Image from "next/image";
-import { CirculoAmigosInquiryButton } from "@/components/CirculoAmigosInquiryButton";
-import {
-  CIRCULO_AMIGOS_BENEFICIOS,
-  CIRCULO_AMIGOS_EMAIL,
-  CIRCULO_AMIGOS_ESPERAMOS,
-  CIRCULO_AMIGOS_HERO,
-  CIRCULO_AMIGOS_IMAGE,
-  CIRCULO_AMIGOS_INTRO,
-  CIRCULO_AMIGOS_INTRO_IMAGES,
-  CIRCULO_AMIGOS_NOTA_LEGAL,
-  CIRCULO_AMIGOS_PASOS,
-  CIRCULO_AMIGOS_PILARES,
-  CIRCULO_AMIGOS_RECIBES,
-} from "@/lib/circulo-amigos-content";
+"use client";
 
-const PASO_IDS = ["inscribe", "conecta", "participa"] as const;
+import Image from "next/image";
+import { Pencil, Plus } from "lucide-react";
+import { CirculoAmigosInquiryButton } from "@/components/CirculoAmigosInquiryButton";
+import { useCirculoAmigosCmsEdit } from "@/components/cms/CirculoAmigosCmsEditContext";
+import {
+  CIRCULO_BENEFICIOS_SECTION_ID,
+  CIRCULO_CTA_SECTION_ID,
+  CIRCULO_ESPERAMOS_SECTION_ID,
+  CIRCULO_INTRO_SECTION_ID,
+  CIRCULO_PASOS_SECTION_ID,
+  CIRCULO_PILARES_SECTION_ID,
+  CIRCULO_RECIBES_SECTION_ID,
+  circuloCardSelectedId,
+} from "@/lib/cms/circulo-amigos-page-edit";
+import { useCirculoAmigosPageDisplay } from "@/lib/cms/circulo-amigos-page-display";
+
+function SectionEditButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-[11px] font-bold uppercase text-white shadow"
+    >
+      <Pencil className="h-3.5 w-3.5" aria-hidden />
+      {label}
+    </button>
+  );
+}
+
+function AddCardButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase text-white shadow"
+    >
+      <Plus className="h-4 w-4" aria-hidden />
+      {label}
+    </button>
+  );
+}
+
+function CardEditButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[10px] font-bold uppercase text-white shadow"
+    >
+      <Pencil className="h-3 w-3" aria-hidden />
+      {label}
+    </button>
+  );
+}
 
 export function CirculoAmigosLanding() {
+  const page = useCirculoAmigosPageDisplay();
+  const edit = useCirculoAmigosCmsEdit();
+
   return (
     <div className="font-sans text-[var(--ca-ink)]">
       <section className="ca-sec-hero relative overflow-hidden">
@@ -25,8 +85,8 @@ export function CirculoAmigosLanding() {
             <div className="order-first pt-3 pb-8 sm:pt-4 lg:order-last lg:flex lg:w-full lg:justify-center lg:pb-10 lg:pt-5">
               <div className="ca-hero-photo relative mx-auto aspect-[1024/478] w-full max-w-[28rem] overflow-hidden rounded-2xl sm:max-w-[36rem] lg:max-w-none lg:w-full lg:rounded-[1.25rem]">
                 <Image
-                  src={CIRCULO_AMIGOS_IMAGE.src}
-                  alt={CIRCULO_AMIGOS_IMAGE.alt}
+                  src={page.heroImageSrc ?? ""}
+                  alt={page.heroImageAlt ?? ""}
                   fill
                   unoptimized
                   priority
@@ -37,15 +97,21 @@ export function CirculoAmigosLanding() {
             </div>
 
             <div className="relative flex flex-col justify-center pb-10 sm:pb-14 lg:py-10">
-              <p className="ca-eyebrow">{CIRCULO_AMIGOS_HERO.eyebrow}</p>
+              {edit?.ready ? (
+                <SectionEditButton
+                  label="Editar encabezado"
+                  onClick={() => edit.setSelectedId("__hero__")}
+                />
+              ) : null}
+              <p className="ca-eyebrow">{page.heroEyebrow}</p>
               <h1 className="ca-title mt-3 max-w-3xl text-balance text-[2rem] font-black leading-[1.08] tracking-tight sm:text-[2.65rem] lg:text-[3rem]">
-                {CIRCULO_AMIGOS_HERO.title}
+                {page.heroTitle}
               </h1>
               <h2 className="ca-title--deep mt-4 max-w-2xl text-balance text-xl font-bold leading-snug sm:text-2xl">
-                {CIRCULO_AMIGOS_HERO.subtitle}
+                {page.heroSubtitle}
               </h2>
               <h3 className="mt-5 max-w-2xl text-base font-normal leading-relaxed text-[var(--ca-muted)] sm:text-lg">
-                {CIRCULO_AMIGOS_HERO.lede}
+                {page.heroLede}
               </h3>
               <div className="mt-8 flex flex-wrap gap-3" id="inscripcion">
                 <CirculoAmigosInquiryButton
@@ -54,7 +120,7 @@ export function CirculoAmigosLanding() {
                   triggerClassName="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[rgba(58,154,212,0.28)] transition hover:bg-[var(--ca-brand-dark)]"
                 />
                 <a
-                  href={`mailto:${CIRCULO_AMIGOS_EMAIL}?subject=${encodeURIComponent("Consulta — Círculo de Amigos")}`}
+                  href={`mailto:${page.ctaEmail}?subject=${encodeURIComponent("Consulta — Círculo de Amigos")}`}
                   className="inline-flex items-center justify-center rounded-full border-2 border-[var(--ca-brand)]/35 bg-white px-6 py-3 text-sm font-bold text-[var(--ca-brand-dark)] transition hover:bg-[var(--ca-panel)]"
                 >
                   Más información
@@ -66,12 +132,18 @@ export function CirculoAmigosLanding() {
       </section>
 
       <section className="ca-sec-mist px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-5xl">
+        <div className="relative mx-auto max-w-5xl">
+          {edit?.ready ? (
+            <SectionEditButton
+              label="Editar sección"
+              onClick={() => edit.setSelectedId(CIRCULO_INTRO_SECTION_ID)}
+            />
+          ) : null}
           <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1fr]">
-            <div className="relative aspect-[655/511] overflow-hidden rounded-2xl border border-[var(--ca-brand)]/10 bg-[var(--ca-panel)] shadow-[0_10px_30px_rgba(58,154,212,0.1)]">
+            <div className="relative aspect-[655/511] overflow-hidden rounded-2xl bg-[var(--ca-panel)] shadow-[0_10px_30px_rgba(58,154,212,0.12)]">
               <Image
-                src={CIRCULO_AMIGOS_INTRO_IMAGES.foto.src}
-                alt={CIRCULO_AMIGOS_INTRO_IMAGES.foto.alt}
+                src={page.introBannerSrc ?? ""}
+                alt={page.introBannerAlt ?? ""}
                 fill
                 unoptimized
                 className="object-cover"
@@ -81,10 +153,10 @@ export function CirculoAmigosLanding() {
             <div className="text-center lg:text-left">
               <p className="ca-eyebrow">Conoce el programa</p>
               <h2 className="ca-title--deep mt-3 text-2xl font-black sm:text-3xl">
-                ¿Qué es el Círculo de Amigos?
+                {page.introEyebrow}
               </h2>
               <div className="mt-5 space-y-4 text-base leading-relaxed text-[var(--ca-muted)]">
-                {CIRCULO_AMIGOS_INTRO.map((p) => (
+                {(page.introParagraphs ?? []).map((p: string) => (
                   <p key={p.slice(0, 40)}>{p}</p>
                 ))}
               </div>
@@ -94,26 +166,54 @@ export function CirculoAmigosLanding() {
       </section>
 
       <section className="ca-sec-panel px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-        <p className="ca-eyebrow text-center">Fundamentos</p>
-        <h2 className="ca-title--deep mt-3 text-center text-2xl font-black sm:text-3xl">
-          Nuestros tres pilares
-        </h2>
+        <div className="relative text-center">
+          {edit?.ready ? (
+            <SectionEditButton
+              label="Editar sección"
+              onClick={() => edit.setSelectedId(CIRCULO_PILARES_SECTION_ID)}
+            />
+          ) : null}
+          <p className="ca-eyebrow">Fundamentos</p>
+          <h2 className="ca-title--deep mt-3 text-2xl font-black sm:text-3xl">
+            {page.pilaresTitle}
+          </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton label="Añadir tarjeta" onClick={() => edit.addPilar()} />
+            </div>
+          ) : null}
+        </div>
         <ul className="mt-10 grid gap-5 sm:grid-cols-3">
-          {CIRCULO_AMIGOS_PILARES.map((item) => (
-            <li key={item.title} className="ca-pilar-card overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgba(58,154,212,0.1)]">
-              <div className="relative aspect-[4/3] bg-[var(--ca-panel)]">
+          {(page.pilares ?? []).map((item) => (
+            <li
+              key={item.id}
+              className="ca-pilar-card relative overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgba(58,154,212,0.12)]"
+            >
+              {edit?.ready ? (
+                <CardEditButton
+                  label="Editar"
+                  onClick={() =>
+                    edit.setSelectedId(circuloCardSelectedId("pilar", item.id))
+                  }
+                />
+              ) : null}
+              <div className="relative aspect-[4/3] w-full bg-[var(--ca-panel)]">
                 <Image
-                  src={item.image}
-                  alt={item.title}
+                  src={item.imageSrc}
+                  alt={item.imageAlt}
                   fill
                   unoptimized
                   className="object-cover"
-                  sizes="320px"
+                  sizes="(max-width: 640px) 100vw, 320px"
                 />
               </div>
-              <div className="p-6 text-center">
-                <h3 className="ca-title--dark text-lg font-black">{item.title}</h3>
-                <p className="mt-2 text-sm text-[var(--ca-muted)]">{item.text}</p>
+              <div className="p-6 pt-4 text-center">
+                <h3 className="ca-title--dark text-lg font-black">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--ca-muted)]">
+                  {item.text}
+                </p>
               </div>
             </li>
           ))}
@@ -121,20 +221,44 @@ export function CirculoAmigosLanding() {
       </section>
 
       <section className="ca-sec-sky px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-        <p className="ca-eyebrow text-center">Ventajas</p>
-        <h2 className="ca-title mt-3 text-center text-2xl font-black sm:text-3xl">
-          Beneficios exclusivos para ti
-        </h2>
+        <div className="relative text-center">
+          {edit?.ready ? (
+            <SectionEditButton
+              label="Editar sección"
+              onClick={() => edit.setSelectedId(CIRCULO_BENEFICIOS_SECTION_ID)}
+            />
+          ) : null}
+          <p className="ca-eyebrow">Ventajas</p>
+          <h2 className="ca-title mt-3 text-2xl font-black sm:text-3xl">
+            {page.beneficiosTitle}
+          </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton
+                label="Añadir tarjeta"
+                onClick={() => edit.addBeneficio()}
+              />
+            </div>
+          ) : null}
+        </div>
         <ul className="mt-10 grid gap-6 sm:grid-cols-2">
-          {CIRCULO_AMIGOS_BENEFICIOS.map((item) => (
+          {(page.beneficios ?? []).map((item) => (
             <li
-              key={item.title}
-              className="ca-benefit-card flex flex-col items-center rounded-2xl p-6 text-center sm:p-8"
+              key={item.id}
+              className="ca-benefit-card relative flex flex-col items-center rounded-2xl p-6 text-center sm:p-8"
             >
-              <div className="relative h-36 w-36 overflow-hidden rounded-full bg-white sm:h-40 sm:w-40">
+              {edit?.ready ? (
+                <CardEditButton
+                  label="Editar"
+                  onClick={() =>
+                    edit.setSelectedId(circuloCardSelectedId("beneficio", item.id))
+                  }
+                />
+              ) : null}
+              <div className="relative h-36 w-36 overflow-hidden rounded-full bg-white shadow-[0_8px_24px_rgba(58,154,212,0.15)] sm:h-40 sm:w-40">
                 <Image
-                  src={item.image}
-                  alt={item.title}
+                  src={item.imageSrc}
+                  alt={item.imageAlt}
                   fill
                   unoptimized
                   className="object-cover"
@@ -142,59 +266,94 @@ export function CirculoAmigosLanding() {
                 />
               </div>
               <h3 className="ca-title--dark mt-5 font-black">{item.title}</h3>
-              <p className="mt-2 text-sm text-[var(--ca-muted)]">{item.text}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--ca-muted)]">
+                {item.text}
+              </p>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="ca-sec-steps px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-        <p className="ca-eyebrow text-center">Proceso</p>
-        <h2 className="ca-title--deep mt-3 text-center text-2xl font-black sm:text-3xl">
-          Cómo unirte en tres pasos sencillos
-        </h2>
+        <div className="relative text-center">
+          {edit?.ready ? (
+            <SectionEditButton
+              label="Editar sección"
+              onClick={() => edit.setSelectedId(CIRCULO_PASOS_SECTION_ID)}
+            />
+          ) : null}
+          <p className="ca-eyebrow">Proceso</p>
+          <h2 className="ca-title--deep mt-3 text-2xl font-black sm:text-3xl">
+            {page.pasosTitle}
+          </h2>
+          {edit?.ready ? (
+            <div className="mt-6 flex justify-center">
+              <AddCardButton label="Añadir paso" onClick={() => edit.addPaso()} />
+            </div>
+          ) : null}
+        </div>
         <ol className="mt-10 grid gap-5 sm:grid-cols-3">
-          {CIRCULO_AMIGOS_PASOS.map((step, i) => (
+          {(page.pasos ?? []).map((step, i) => (
             <li
-              key={step.n}
-              className="ca-step-card rounded-2xl p-6 text-center"
+              key={step.id}
+              className="ca-step-card relative overflow-hidden rounded-2xl"
             >
+              {edit?.ready ? (
+                <CardEditButton
+                  label="Editar"
+                  onClick={() =>
+                    edit.setSelectedId(circuloCardSelectedId("paso", step.id))
+                  }
+                />
+              ) : null}
               <div
                 className={
-                  PASO_IDS[i] === "conecta"
-                    ? "relative mx-auto aspect-square w-32 rounded-xl bg-[var(--ca-panel)] ring-1 ring-[var(--ca-brand)]/15"
-                    : "relative mx-auto aspect-square w-32 overflow-hidden rounded-full bg-[var(--ca-panel)] ring-1 ring-[var(--ca-brand)]/15"
+                  step.id === "conecta"
+                    ? "relative mx-auto mt-6 aspect-square w-32 rounded-xl bg-[var(--ca-panel)] ring-1 ring-[var(--ca-brand)]/15"
+                    : "relative mx-auto mt-6 aspect-square w-32 overflow-hidden rounded-full bg-[var(--ca-panel)] ring-1 ring-[var(--ca-brand)]/15"
                 }
               >
                 <Image
-                  src={step.image}
-                  alt={step.title}
+                  src={step.imageSrc}
+                  alt={step.imageAlt}
                   fill
                   unoptimized
                   className={
-                    PASO_IDS[i] === "conecta" ? "object-contain p-2" : "object-cover"
+                    step.id === "conecta" ? "object-contain p-2" : "object-cover"
                   }
                   sizes="128px"
                 />
               </div>
-              <span
-                className={`mt-4 inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-black ca-step-num--${i}`}
-              >
-                {step.n}
-              </span>
-              <h3 className="ca-title--dark mt-4 text-lg font-black">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--ca-muted)]">{step.text}</p>
+              <div className="p-6 pt-4 text-center">
+                <span
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-black ca-step-num--${i}`}
+                >
+                  {step.n}
+                </span>
+                <h3 className="ca-title--dark mt-4 text-lg font-black">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--ca-muted)]">
+                  {step.text}
+                </p>
+              </div>
             </li>
           ))}
         </ol>
       </section>
 
       <section className="ca-sec-snow px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
-          <div className="ca-card-recibes rounded-2xl bg-[var(--ca-panel)] p-6 sm:p-8">
-            <h2 className="ca-title--dark text-xl font-black">Lo que recibirás al unirte</h2>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="ca-card-recibes relative rounded-2xl bg-[var(--ca-panel)] p-6 sm:p-8">
+            {edit?.ready ? (
+              <SectionEditButton
+                label="Editar"
+                onClick={() => edit.setSelectedId(CIRCULO_RECIBES_SECTION_ID)}
+              />
+            ) : null}
+            <h2 className="ca-title--dark text-xl font-black">
+              {page.recibesTitle}
+            </h2>
             <ul className="mt-5 space-y-3">
-              {CIRCULO_AMIGOS_RECIBES.map((item) => (
+              {(page.recibesItems ?? []).map((item) => (
                 <li
                   key={item}
                   className="flex gap-3 text-sm leading-relaxed text-[var(--ca-muted)]"
@@ -205,10 +364,18 @@ export function CirculoAmigosLanding() {
               ))}
             </ul>
           </div>
-          <div className="ca-card-esperamos rounded-2xl border border-[var(--ca-brand)]/15 bg-white p-6 sm:p-8">
-            <h2 className="ca-title--deep text-xl font-black">Lo que esperamos de ti</h2>
+          <div className="ca-card-esperamos relative rounded-2xl border border-[var(--ca-brand)]/15 bg-white p-6 sm:p-8">
+            {edit?.ready ? (
+              <SectionEditButton
+                label="Editar"
+                onClick={() => edit.setSelectedId(CIRCULO_ESPERAMOS_SECTION_ID)}
+              />
+            ) : null}
+            <h2 className="ca-title--deep text-xl font-black">
+              {page.esperamosTitle}
+            </h2>
             <ul className="mt-5 space-y-3">
-              {CIRCULO_AMIGOS_ESPERAMOS.map((item) => (
+              {(page.esperamosItems ?? []).map((item) => (
                 <li
                   key={item}
                   className="flex gap-3 text-sm leading-relaxed text-[var(--ca-muted)]"
@@ -224,25 +391,39 @@ export function CirculoAmigosLanding() {
 
       <section
         id="inscribete"
-        className="ca-sec-cta scroll-mt-28 px-4 py-16 text-center sm:px-6 lg:px-8"
+        className="ca-sec-cta relative scroll-mt-28 px-4 py-16 text-center sm:px-6 lg:px-8"
       >
+        {edit?.ready ? (
+          <SectionEditButton
+            label="Editar CTA"
+            onClick={() => edit.setSelectedId(CIRCULO_CTA_SECTION_ID)}
+          />
+        ) : null}
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-[var(--ca-brand-light)] sm:text-sm">
           Únete hoy
         </p>
-        <h2 className="mt-3 text-2xl font-black sm:text-3xl">¿Listo para dar el paso?</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-white/90">
-          Únete a nosotros y forma parte de un movimiento que busca un mundo mejor.
+        <h2 className="mt-3 text-2xl font-black sm:text-3xl">{page.ctaTitle}</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/90">
+          {page.ctaText}
         </p>
         <p className="mx-auto mt-4 max-w-2xl text-sm text-white/85">
           Si deseas más información puedes escribirnos a:{" "}
-          <a href={`mailto:${CIRCULO_AMIGOS_EMAIL}`} className="font-semibold underline">
-            {CIRCULO_AMIGOS_EMAIL}
+          <a
+            href={`mailto:${page.ctaEmail}`}
+            className="font-semibold underline underline-offset-2"
+          >
+            {page.ctaEmail}
           </a>
         </p>
-        <div className="mt-8 flex justify-center">
-          <CirculoAmigosInquiryButton triggerLabel="Paso 1 — Inscríbete" variant="landing" />
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <CirculoAmigosInquiryButton
+            triggerLabel="Paso 1 — Inscríbete"
+            variant="landing"
+          />
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-xs text-white/75">{CIRCULO_AMIGOS_NOTA_LEGAL}</p>
+        <p className="mx-auto mt-6 max-w-2xl text-xs leading-relaxed text-white/75">
+          {page.notaLegal}
+        </p>
       </section>
     </div>
   );

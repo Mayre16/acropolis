@@ -5,11 +5,13 @@ import { getSession } from "./auth-service.mjs";
 import {
   clearUserTotp,
   createUser,
+  defaultPermissionsForRole,
   deleteUser,
   findUserById,
   findUserByUsername,
   listUsers,
   publicUserView,
+  sanitizePermissions,
   setUserDisabled,
   setUserPassword,
   updateUserProfile,
@@ -29,10 +31,10 @@ export function isValidEmail(value) {
 export function requireAdminSession(token) {
   const sess = getSession(token);
   if (!sess) return { ok: false, error: "No autorizado", status: 401 };
-  if (sess.role !== "admin") {
-    return { ok: false, error: "Solo administradores", status: 403 };
-  }
-  return { ok: true, session: sess };
+  if (sess.role === "admin") return { ok: true, session: sess };
+  const perms = Array.isArray(sess.permissions) ? sess.permissions : [];
+  if (perms.includes("admin:users")) return { ok: true, session: sess };
+  return { ok: false, error: "Solo administradores", status: 403 };
 }
 
 export function adminListUsers(token) {
@@ -64,11 +66,17 @@ export function adminCreateUser(token, body) {
     return { ok: false, error: policy.errors.join(". "), status: 400 };
   }
 
+  const permissions =
+    body?.permissions != null
+      ? sanitizePermissions(body.permissions)
+      : defaultPermissionsForRole(role);
+
   const user = createUser({
     email,
     passwordHash: hashPassword(password),
     role,
     label,
+    permissions,
   });
   return { ok: true, user: publicUserView(user) };
 }
@@ -93,6 +101,12 @@ export function adminUpdateUser(token, userId, body) {
       return { ok: false, error: "Debe quedar al menos un administrador", status: 400 };
     }
     patch.role = role;
+    if (body?.permissions == null) {
+      patch.permissions = defaultPermissionsForRole(role);
+    }
+  }
+  if (body?.permissions != null) {
+    patch.permissions = sanitizePermissions(body.permissions);
   }
   if (body?.disabled != null) {
     if (user.username === gate.session.username && body.disabled) {

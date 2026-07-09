@@ -24,6 +24,7 @@ type AuthJson = {
   token?: string;
   role?: string;
   label?: string;
+  permissions?: string[];
   secret?: string;
   uri?: string;
   message?: string;
@@ -100,6 +101,7 @@ export async function fetchAuthMe(token: string) {
     role: string;
     label: string;
     username: string;
+    permissions?: string[];
     totpEnabled?: boolean;
   }>;
 }
@@ -190,7 +192,7 @@ export async function uploadImage(
   const data = await res.json();
   const url = data.url as string;
   if (url.startsWith("/uploads/")) return url;
-  const rel = url.match(/(\/uploads\/(?:acropolis|civis|editorial)\/[^\s"?#]+)/)?.[1];
+  const rel = url.match(/(\/uploads\/(?:acropolis|civis|editorial|circulodeamigos)\/[^\s"?#]+)/)?.[1];
   if (rel) return rel;
   return url;
 }
@@ -273,6 +275,7 @@ export type CmsUser = {
   email: string;
   role: string;
   label: string;
+  permissions?: string[];
   totpEnabled: boolean;
   disabled: boolean;
   invitePending?: boolean;
@@ -322,7 +325,12 @@ export async function createCmsUser(
 export async function updateCmsUser(
   token: string,
   userId: string,
-  body: { label?: string; role?: string; disabled?: boolean },
+  body: {
+    label?: string;
+    role?: string;
+    disabled?: boolean;
+    permissions?: string[];
+  },
 ): Promise<CmsUser> {
   const res = await fetch(`${API_URL}/auth/users/${userId}`, {
     method: "PUT",
@@ -429,6 +437,7 @@ export async function inviteCmsUser(
     email: string;
     role: string;
     label: string;
+    permissions?: string[];
   },
 ): Promise<{ user: CmsUser; message?: string }> {
   const res = await fetch(`${API_URL}/auth/users/invite`, {

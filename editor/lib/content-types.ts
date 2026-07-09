@@ -1,6 +1,6 @@
 /** Tipos CMS compartidos (editor ↔ sitios). */
 
-export type SiteId = "acropolis" | "civis" | "editorial";
+export type SiteId = "acropolis" | "civis" | "editorial" | "circulodeamigos";
 
 export type CmsMedia = {
   src: string;
@@ -1275,6 +1275,8 @@ export type CmsSections = {
   platformNav?: CmsPlatformNav;
   salones?: CmsSalon[];
   salonesHidden?: string[];
+  /** Sedes de alquiler ocultas (p. ej. "Naco", "Santiago"). */
+  salonesSedesHidden?: string[];
   salonesPage?: CmsSalonesPage;
   quienesSomosPage?: CmsQuienesSomosPage;
   relacionesPage?: CmsRelacionesPage;
@@ -1341,6 +1343,7 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
   relaciones: "Relaciones institucionales (visual)",
   esfera: "Esfera — entrenamientos (visual)",
   circuloAmigos: "Círculo de Amigos (visual)",
+  circuloHome: "Círculo — inicio (visual)",
   editorialHome: "Inicio — tienda (visual)",
   editorialLibros: "Libros impresos (visual)",
   editorialDigitales: "Libros digitales (visual)",
@@ -1355,6 +1358,7 @@ export const SITE_LABELS: Record<SiteId, string> = {
   acropolis: "Acropolis (principal)",
   civis: "Civis Consulting",
   editorial: "Librería Editorial Logos",
+  circulodeamigos: "Círculo de Amigos OINADOM",
 };
 
 export const ACROPOLIS_TABS = [
@@ -1377,7 +1381,6 @@ export const ACROPOLIS_TABS = [
   "quienesSomos",
   "relaciones",
   "esfera",
-  "circuloAmigos",
 ] as const;
 
 export const CIVIS_TABS = [

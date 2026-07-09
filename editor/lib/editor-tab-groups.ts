@@ -1,5 +1,6 @@
 import type { SiteId } from "./content-types";
 import { TAB_LABELS, tabsForRole, type EditorRole } from "./editor-roles";
+import { tabsForPermissions } from "./editor-permissions";
 
 export type TabGroup = {
   label: string;
@@ -9,7 +10,7 @@ export type TabGroup = {
 
 const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
   { label: "Inicio y ubicación", tabs: ["home", "sedes"] },
-  { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia", "circuloAmigos"] },
+  { label: "Programas y formación", tabs: ["cursos", "diplomado", "filosofia"] },
   {
     label: "Actividades",
     tabs: [
@@ -62,15 +63,28 @@ const EDITORIAL_TAB_GROUPS: TabGroup[] = [
   },
 ];
 
-export function tabGroupsForRole(site: SiteId, role: EditorRole): TabGroup[] {
-  const allowed = tabsForRole(site, role);
+const CIRCULO_TAB_GROUPS: TabGroup[] = [
+  {
+    label: "Páginas del sitio",
+    tabs: ["circuloHome"],
+  },
+  {
+    label: "Administración",
+    tabs: ["estadisticas", "archivos"],
+    hint: "Visitas e inventario de imágenes",
+  },
+];
+
+function buildTabGroups(site: SiteId, allowed: string[]): TabGroup[] {
   const allowedSet = new Set(allowed);
   const templates =
     site === "acropolis"
       ? ACROPOLIS_TAB_GROUPS
       : site === "civis"
         ? CIVIS_TAB_GROUPS
-        : EDITORIAL_TAB_GROUPS;
+        : site === "circulodeamigos"
+          ? CIRCULO_TAB_GROUPS
+          : EDITORIAL_TAB_GROUPS;
 
   const grouped = templates
     .map((group) => ({
@@ -86,6 +100,18 @@ export function tabGroupsForRole(site: SiteId, role: EditorRole): TabGroup[] {
   }
 
   return grouped;
+}
+
+export function tabGroupsForRole(site: SiteId, role: EditorRole): TabGroup[] {
+  return buildTabGroups(site, tabsForRole(site, role));
+}
+
+export function tabGroupsForPermissions(
+  site: SiteId,
+  permissions: string[] | null | undefined,
+  role?: string,
+): TabGroup[] {
+  return buildTabGroups(site, tabsForPermissions(site, permissions, role));
 }
 
 export function tabLabel(id: string): string {

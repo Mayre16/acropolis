@@ -53,6 +53,11 @@ type SalonesCmsEditContextValue = {
   patchItem: (id: string, patch: Partial<CmsSalon>) => void;
   addSalon: (options?: import("@/lib/cms/salones-edit").AddSalonOptions) => void;
   hideSalon: (id: string) => void;
+  restoreSalon?: (id: string) => void;
+  hideSalonSede?: (sede: SalonSede) => void;
+  restoreSalonSede?: (sede: SalonSede) => void;
+  salonesSedesHidden?: string[];
+  salonesHidden?: string[];
   patchPage: (patch: Partial<CmsSalonesPage>) => void;
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
@@ -77,6 +82,11 @@ export function useSalonesCmsEdit() {
       patchItem: cursos.patchSalon,
       addSalon: cursos.addSalon,
       hideSalon: cursos.hideSalon,
+      restoreSalon: cursos.restoreSalon,
+      hideSalonSede: cursos.hideSalonSede,
+      restoreSalonSede: cursos.restoreSalonSede,
+      salonesSedesHidden: cursos.salonesSedesHidden,
+      salonesHidden: cursos.salonesHidden,
       patchPage: cursos.patchSalonesPage,
       saveDraft: cursos.saveDraft,
       publish: cursos.publish,
@@ -93,6 +103,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [items, setItems] = useState<CmsSalon[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
+  const [sedesHidden, setSedesHidden] = useState<string[]>([]);
   const [page, setPage] = useState<CmsSalonesPage>(DEFAULT_SALONES_PAGE);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -111,6 +122,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     const salonesLoaded = getSalonesForEdit(draft, SALONES);
     setItems(salonesLoaded.items);
     setHidden(salonesLoaded.hidden);
+    setSedesHidden(salonesLoaded.sedesHidden);
     setPage({ ...DEFAULT_SALONES_PAGE, ...draft.sections.salonesPage });
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
@@ -123,7 +135,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     try {
       const latest = await fetchCmsDraft("acropolis");
       const next = mergeHeroCarouselsIntoDoc(
-        buildDocWithSalones(latest, items, page, hidden),
+        buildDocWithSalones(latest, items, page, hidden, sedesHidden),
       );
       await saveCmsDraft("acropolis", token, next);
       setDoc(next);
@@ -138,7 +150,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     } finally {
       setBusy(false);
     }
-  }, [token, items, page, hidden]);
+  }, [token, items, page, hidden, sedesHidden]);
 
   const publish = useCallback(async () => {
     await runCoordinatedCmsPublish();
@@ -247,6 +259,49 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const restoreSalon = useCallback(
+    (id: string) => {
+      setHidden((h) => h.filter((x) => x !== id));
+      setItems((list) => {
+        if (list.some((s) => s.id === id)) return list;
+        const seed = SALONES.find((s) => s.id === id);
+        if (!seed) return list;
+        return [
+          ...list,
+          {
+            id: seed.id,
+            name: seed.name,
+            sede: seed.sede,
+            city: seed.city,
+            summary: seed.summary,
+            featuredLayout: seed.featuredLayout,
+            capacities: { ...seed.capacities },
+            image: { src: seed.image.src, alt: seed.image.alt },
+          },
+        ];
+      });
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const hideSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSedesHidden((h) => (h.includes(sede) ? h : [...h, sede]));
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const restoreSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSedesHidden((h) => h.filter((x) => x !== sede));
+      markDirty();
+    },
+    [markDirty],
+  );
+
   const selected = items.find((s) => s.id === selectedId) ?? null;
 
   const value = useMemo(
@@ -259,6 +314,11 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
       patchItem,
       addSalon,
       hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
+      salonesSedesHidden: sedesHidden,
+      salonesHidden: hidden,
       patchPage,
       saveDraft,
       publish,
@@ -274,6 +334,11 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
       patchItem,
       addSalon,
       hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
+      sedesHidden,
+      hidden,
       patchPage,
       saveDraft,
       publish,
@@ -325,6 +390,85 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
               onChange={(v) => patchPage({ intro: v })}
               multiline
             />
+            <div className="rounded-lg border border-slate-200 p-3">
+              <p className="text-sm font-semibold text-slate-700">
+                Sedes visibles en alquiler
+              </p>
+              <ul className="mt-3 space-y-2">
+                {(["Naco", "Los Prados", "Santiago"] as SalonSede[]).map(
+                  (sede) => {
+                    const isHidden = sedesHidden.includes(sede);
+                    return (
+                      <li
+                        key={sede}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>
+                          Sede {sede}
+                          {isHidden ? (
+                            <span className="ml-2 text-xs font-semibold text-amber-800">
+                              (oculta)
+                            </span>
+                          ) : null}
+                        </span>
+                        {isHidden ? (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                            onClick={() => restoreSalonSede(sede)}
+                          >
+                            Mostrar
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-xs font-semibold text-red-700"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `¿Ocultar la sede ${sede} del catálogo de salones?`,
+                                )
+                              ) {
+                                hideSalonSede(sede);
+                              }
+                            }}
+                          >
+                            Ocultar
+                          </button>
+                        )}
+                      </li>
+                    );
+                  },
+                )}
+              </ul>
+            </div>
+            {hidden.length > 0 ? (
+              <div className="rounded-lg border border-slate-200 p-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Salones ocultos
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {hidden.map((id) => {
+                    const salon = SALONES.find((s) => s.id === id);
+                    return (
+                      <li
+                        key={id}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>{salon?.name ?? id}</span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                          onClick={() => restoreSalon(id)}
+                        >
+                          Mostrar de nuevo
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </EditPanelChrome>
       ) : null}

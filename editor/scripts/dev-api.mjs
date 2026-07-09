@@ -82,6 +82,8 @@ function cors(res, origin) {
     "https://civis.acropolis.org.do",
     "https://tienda.acropolis.org.do",
     "https://editorial.acropolis.org.do",
+    "https://circulodeamigos.acropolis.adesa.com.do",
+    "https://circulodeamigos.acropolis.org.do",
     "https://biblioteca-oina.adesa.com.do",
     "https://biblioteca.acropolis.org.do",
   ];
@@ -460,6 +462,7 @@ const server = http.createServer(async (req, res) => {
           role: sess.role ?? "admin",
           label: sess.label ?? "Editor",
           username: sess.username ?? "",
+          permissions: Array.isArray(sess.permissions) ? sess.permissions : [],
           totpEnabled: sessionTotpEnabled(token),
         },
         origin,
@@ -563,7 +566,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    const contentMatch = /^\/content\/(acropolis|civis|editorial)\/(draft|published)$/.exec(pathname);
+    const contentMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/(draft|published)$/.exec(pathname);
     if (contentMatch) {
       const [, site, kind] = contentMatch;
       ensureSite(site);
@@ -582,7 +585,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    const publishMatch = /^\/content\/(acropolis|civis|editorial)\/publish$/.exec(pathname);
+    const publishMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/publish$/.exec(pathname);
     if (publishMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = publishMatch[1];
@@ -639,7 +642,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const backupsMatch = /^\/content\/(acropolis|civis|editorial)\/backups$/.exec(pathname);
+    const backupsMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/backups$/.exec(pathname);
     if (backupsMatch && req.method === "GET") {
       if (!requireAuth(req, res, origin)) return;
       const site = backupsMatch[1];
@@ -653,7 +656,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const rollbackMatch = /^\/content\/(acropolis|civis|editorial)\/rollback$/.exec(pathname);
+    const rollbackMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/rollback$/.exec(pathname);
     if (rollbackMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = rollbackMatch[1];
@@ -668,7 +671,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const inventoryMatch = /^\/uploads\/(acropolis|civis|editorial)\/inventory$/.exec(pathname);
+    const inventoryMatch = /^\/uploads\/(acropolis|civis|editorial|circulodeamigos)\/inventory$/.exec(pathname);
     if (inventoryMatch && req.method === "GET") {
       if (!requireAuth(req, res, origin)) return;
       const site = inventoryMatch[1];
@@ -678,7 +681,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const uploadMatch = /^\/upload\/(acropolis|civis|editorial)$/.exec(pathname);
+    const uploadMatch = /^\/upload\/(acropolis|civis|editorial|circulodeamigos)$/.exec(pathname);
     if (uploadMatch && req.method === "POST") {
       if (!requireAuth(req, res, origin)) return;
       const site = uploadMatch[1];
@@ -705,7 +708,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const staticUpload = /^\/uploads\/(acropolis|civis|editorial)\/(.+)$/.exec(pathname);
+    const staticUpload = /^\/uploads\/(acropolis|civis|editorial|circulodeamigos)\/(.+)$/.exec(pathname);
     if (staticUpload && req.method === "GET") {
       const [, site, file] = staticUpload;
       const fp = path.join(uploadsDir(site), path.basename(file));
@@ -737,7 +740,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const summaryMatch = /^\/analytics\/summary\/(acropolis|civis|editorial|biblioteca)$/.exec(
+    const summaryMatch = /^\/analytics\/summary\/(acropolis|civis|editorial|circulodeamigos|biblioteca)$/.exec(
       pathname,
     );
     if (summaryMatch && req.method === "GET") {

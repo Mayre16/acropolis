@@ -13,6 +13,13 @@ import {
 } from "@/lib/api";
 import { getToken } from "@/lib/auth-storage";
 import { EDITOR_ROLE_META, type EditorRole } from "@/lib/editor-roles";
+import {
+  defaultPermissionsForRole,
+  effectivePermissions,
+  permissionsSummary,
+  type EditorPermission,
+} from "@/lib/editor-permissions";
+import { PermissionsChecklist } from "@/components/PermissionsChecklist";
 
 const PASSWORD_HINT =
   "Mínimo 12 caracteres, mayúscula, minúscula, número y símbolo.";
@@ -25,10 +32,14 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [status, setStatus] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPerms, setEditPerms] = useState<EditorPermission[]>([]);
+  const [savingPerms, setSavingPerms] = useState(false);
   const [form, setForm] = useState({
     email: "",
     label: "",
     role: "editorial" as EditorRole,
+    permissions: defaultPermissionsForRole("editorial") as EditorPermission[],
   });
 
   async function reload() {
@@ -55,8 +66,18 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
     setCreating(true);
     setStatus("");
     try {
-      const result = await inviteCmsUser(token, form);
-      setForm({ email: "", label: "", role: "editorial" });
+      const result = await inviteCmsUser(token, {
+        email: form.email,
+        label: form.label,
+        role: form.role,
+        permissions: form.permissions,
+      });
+      setForm({
+        email: "",
+        label: "",
+        role: "editorial",
+        permissions: defaultPermissionsForRole("editorial"),
+      });
       setOpen(false);
       setStatus(result.message || "Invitación enviada.");
       await reload();
@@ -96,10 +117,37 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
     if (!token) return;
     setStatus("");
     try {
-      await updateCmsUser(token, user.id, { role });
+      const permissions = defaultPermissionsForRole(role);
+      await updateCmsUser(token, user.id, { role, permissions });
+      if (editingId === user.id) setEditPerms(permissions);
       await reload();
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Error al cambiar rol");
+    }
+  }
+
+  function openPermissions(user: CmsUser) {
+    setEditingId(user.id);
+    setEditPerms(
+      effectivePermissions(user.role, user.permissions ?? []),
+    );
+    setStatus("");
+  }
+
+  async function savePermissions(user: CmsUser) {
+    const token = getToken();
+    if (!token) return;
+    setSavingPerms(true);
+    setStatus("");
+    try {
+      await updateCmsUser(token, user.id, { permissions: editPerms });
+      setStatus(`Permisos actualizados para ${user.email}.`);
+      setEditingId(null);
+      await reload();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Error al guardar permisos");
+    } finally {
+      setSavingPerms(false);
     }
   }
 
@@ -182,14 +230,13 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
             <>
               <h2 className="text-sm font-bold text-slate-800">Usuarios del CMS</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Invita editores por correo. Recibirán un enlace para crear su
-                contraseña y entrar al editor.
+                Invita editores y marca qué sitios y secciones pueden editar
+                (Civis, Editorial, Círculo, Cursos, etc.).
               </p>
             </>
           ) : (
             <p className="text-sm text-slate-600">
-              Invita editores por correo. Recibirán un enlace para crear su
-              contraseña y entrar al editor.
+              Invita editores y marca qué sitios y secciones pueden editar.
             </p>
           )}
         </div>
@@ -206,7 +253,10 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
       </div>
 
       {open ? (
-        <form onSubmit={onInvite} className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+        <form
+          onSubmit={onInvite}
+          className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2"
+        >
           <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
             Correo electrónico
             <input
@@ -228,13 +278,18 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Rol
+            Plantilla de rol
             <select
               className={field}
               value={form.role}
-              onChange={(e) =>
-                setForm((s) => ({ ...s, role: e.target.value as EditorRole }))
-              }
+              onChange={(e) => {
+                const role = e.target.value as EditorRole;
+                setForm((s) => ({
+                  ...s,
+                  role,
+                  permissions: defaultPermissionsForRole(role),
+                }));
+              }}
             >
               {ROLE_OPTIONS.map((r) => (
                 <option key={r.role} value={r.role}>
@@ -242,7 +297,21 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
                 </option>
               ))}
             </select>
+            <span className="mt-1 block text-xs text-slate-500">
+              El rol solo carga una plantilla; ajusta los checkmarks abajo.
+            </span>
           </label>
+          <div className="sm:col-span-2">
+            <p className="mb-2 text-sm font-medium text-slate-700">
+              Permisos (qué puede editar)
+            </p>
+            <PermissionsChecklist
+              value={form.permissions}
+              onChange={(permissions) =>
+                setForm((s) => ({ ...s, permissions }))
+              }
+            />
+          </div>
           <div className="sm:col-span-2">
             <button
               type="submit"
@@ -256,12 +325,12 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
       ) : null}
 
       <div className="mt-5 overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
               <th className="py-2 pr-3">Correo</th>
               <th className="py-2 pr-3">Nombre</th>
-              <th className="py-2 pr-3">Rol</th>
+              <th className="py-2 pr-3">Rol / permisos</th>
               <th className="py-2 pr-3">2FA</th>
               <th className="py-2 pr-3">Estado</th>
               <th className="py-2">Acciones</th>
@@ -286,6 +355,48 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
                       </option>
                     ))}
                   </select>
+                  <p className="mt-1 max-w-[220px] text-xs text-slate-500">
+                    {permissionsSummary(user.role, user.permissions)}
+                  </p>
+                  {editingId === user.id ? (
+                    <div className="mt-3 max-w-xl rounded-lg border border-brand-teal/30 bg-white p-3">
+                      <PermissionsChecklist
+                        value={editPerms}
+                        onChange={setEditPerms}
+                        disabled={user.role === "admin"}
+                      />
+                      {user.role === "admin" ? (
+                        <p className="mt-2 text-xs text-slate-500">
+                          El administrador siempre tiene acceso completo.
+                        </p>
+                      ) : null}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={savingPerms || user.role === "admin"}
+                          onClick={() => void savePermissions(user)}
+                          className="rounded bg-brand-teal px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                        >
+                          {savingPerms ? "Guardando…" : "Guardar permisos"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingId(null)}
+                          className="rounded border border-slate-300 px-3 py-1.5 text-xs"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openPermissions(user)}
+                      className="mt-1 text-xs font-semibold text-brand-teal hover:underline"
+                    >
+                      Editar permisos…
+                    </button>
+                  )}
                 </td>
                 <td className="py-3 pr-3">
                   {user.totpEnabled ? (

@@ -50,6 +50,8 @@ type VenuesCmsEditContextValue = {
   patchContact: (patch: Partial<CmsVenuesContact>) => void;
   addItem: (kind: CmsVenue["kind"]) => void;
   hideItem: (id: string) => void;
+  restoreItem: (id: string) => void;
+  hidden: string[];
   saveDraft: () => Promise<void>;
   publish: () => Promise<void>;
   dirty: boolean;
@@ -190,6 +192,38 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const restoreItem = useCallback(
+    (id: string) => {
+      setHidden((h) => h.filter((x) => x !== id));
+      setItems((list) => {
+        if (list.some((v) => v.id === id)) return list;
+        const seed = VENUE_LOCATIONS.find((v) => v.id === id);
+        if (!seed) return list;
+        return [
+          ...list,
+          {
+            id: seed.id,
+            name: seed.name,
+            kind: seed.kind,
+            city: seed.city,
+            zone: seed.zone,
+            address: seed.address,
+            reference: seed.reference,
+            phone: seed.phone,
+            email: seed.email,
+            mapsQuery: seed.mapsQuery,
+            note: seed.note,
+            mapX: seed.mapX,
+            mapY: seed.mapY,
+            mapHideLabel: seed.mapHideLabel,
+          },
+        ];
+      });
+      markDirty();
+    },
+    [markDirty],
+  );
+
   const value = useMemo(
     (): VenuesCmsEditContextValue => ({
       ready,
@@ -202,6 +236,8 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
       patchContact,
       addItem,
       hideItem,
+      restoreItem,
+      hidden,
       saveDraft,
       publish,
       dirty,
@@ -218,6 +254,8 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
       patchContact,
       addItem,
       hideItem,
+      restoreItem,
+      hidden,
       saveDraft,
       publish,
       dirty,
@@ -274,6 +312,33 @@ function VenuesCmsEditInner({ children }: { children: ReactNode }) {
             }}
           />
         </EditPanelChrome>
+      ) : null}
+      {ready && hidden.length > 0 ? (
+        <div className="border-t border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-semibold text-amber-950">
+            Sedes / puntos ocultos
+          </p>
+          <ul className="mt-2 space-y-2">
+            {hidden.map((id) => {
+              const venue = VENUE_LOCATIONS.find((v) => v.id === id);
+              return (
+                <li
+                  key={id}
+                  className="flex items-center justify-between gap-2 text-sm text-amber-950"
+                >
+                  <span>{venue?.name ?? id}</span>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-full border border-emerald-400 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                    onClick={() => restoreItem(id)}
+                  >
+                    Mostrar de nuevo
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ) : null}
       {contactPanelOpen ? (
         <EditPanelChrome

@@ -200,13 +200,14 @@ export function SalonesAlquiler({
   const staticGroups = useMergedSalonesBySede();
   const staticPageCopy = useCmsSalonesPage();
 
+  const sedesHidden = new Set(edit?.salonesSedesHidden ?? []);
   const groups = edit?.ready
     ? SALON_SEDES.map((sede) => ({
         sede,
         salones: edit.items
           .filter((s) => s.sede === sede)
           .map(cmsToSalon),
-      }))
+      })).filter((group) => !sedesHidden.has(group.sede))
     : staticGroups;
 
   const pageCopy = edit?.ready ? edit.page : staticPageCopy;
@@ -291,9 +292,26 @@ export function SalonesAlquiler({
 
         return (
         <div key={group.sede} className={embedded ? "mt-10" : "mt-12"}>
-          <div className={`flex items-center gap-2 ${styles.sede}`}>
+          <div className={`flex flex-wrap items-center gap-2 ${styles.sede}`}>
             <MapPin className="h-4 w-4" aria-hidden />
             <h3 className="text-lg font-black">Sede {group.sede}</h3>
+            {inEdit && edit?.hideSalonSede ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `¿Ocultar la sede ${group.sede} del catálogo de salones?`,
+                    )
+                  ) {
+                    edit.hideSalonSede!(group.sede);
+                  }
+                }}
+                className="ml-auto rounded-full border border-red-200 bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-red-700"
+              >
+                Ocultar sede
+              </button>
+            ) : null}
           </div>
           <ul
             className={`mt-6 ${

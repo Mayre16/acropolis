@@ -5,7 +5,7 @@ import { UsersAdminPanel } from "@/components/UsersAdminPanel";
 
 export default function DashboardUsuariosPage() {
   return (
-    <DashboardShell title="Usuarios del CMS" requireAdmin>
+    <DashboardShell title="Usuarios del CMS" requireAdmin="users">
       <UsersAdminPanel embedded />
     </DashboardShell>
   );

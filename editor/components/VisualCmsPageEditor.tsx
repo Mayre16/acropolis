@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getToken } from "@/lib/auth-storage";
 import type { CmsEditMessage } from "@/lib/edit-bridge";
 import {
+  previewCirculodeamigosUrl,
   previewCivisUrl,
   previewPrincipalUrl,
   previewTiendaUrl,
@@ -15,9 +16,9 @@ type VisualCmsPageEditorProps = {
   path: string;
   query?: string;
   hint: React.ReactNode;
-  site?: "acropolis" | "civis" | "editorial";
+  site?: "acropolis" | "civis" | "editorial" | "circulodeamigos";
   previewOnly?: boolean;
-  /** Dentro del panel del editor (con pestañas Guardar/Publicar visibles). */
+  /** Dentro del panel del editor (con pestaÃ±as Guardar/Publicar visibles). */
   embedded?: boolean;
 };
 
@@ -35,7 +36,9 @@ export function VisualCmsPageEditor({
       ? previewCivisUrl()
       : site === "editorial"
         ? previewTiendaUrl()
-        : previewPrincipalUrl();
+        : site === "circulodeamigos"
+          ? previewCirculodeamigosUrl()
+          : previewPrincipalUrl();
   const previewOrigin = useMemo(() => {
     try {
       return new URL(siteUrl).origin;
@@ -44,7 +47,7 @@ export function VisualCmsPageEditor({
     }
   }, [siteUrl]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [status, setStatus] = useState(`Cargando ${title}…`);
+  const [status, setStatus] = useState(`Cargando ${title}â¦`);
   const [ready, setReady] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -55,7 +58,7 @@ export function VisualCmsPageEditor({
   useEffect(() => {
     setIframeLoaded(false);
     setReady(false);
-    setStatus(`Cargando ${title}…`);
+    setStatus(`Cargando ${title}â¦`);
   }, [iframeSrc, title]);
 
   const handleIframeLoad = useCallback(() => {
@@ -80,7 +83,7 @@ export function VisualCmsPageEditor({
       if (!msg || typeof msg !== "object") return;
       if (msg.type === "cms-ready") {
         setReady(true);
-        setStatus("Listo — clic en una tarjeta para editar.");
+        setStatus("Listo â clic en una tarjeta para editar.");
       }
       if (msg.type === "cms-request-init") sendInit();
       if (msg.type === "cms-status") setStatus(msg.text);
@@ -93,7 +96,7 @@ export function VisualCmsPageEditor({
   useEffect(() => {
     if (!iframeLoaded) return;
     setReady(false);
-    setStatus(`Conectando con ${title}…`);
+    setStatus(`Conectando con ${title}â¦`);
     sendInit();
     const timers = [100, 250, 500, 1000, 2000, 4000].map((ms) =>
       window.setTimeout(() => sendInit(), ms),
@@ -121,7 +124,7 @@ export function VisualCmsPageEditor({
           href="/dashboard/"
           className="text-xs font-semibold text-brand-teal hover:underline"
         >
-          ← Cambiar sección
+          â Cambiar secciÃ³n
         </Link>
         <div className="flex items-center gap-2">
           {dirty ? (
@@ -135,7 +138,7 @@ export function VisualCmsPageEditor({
             type="button"
             onClick={() => setShowHint((v) => !v)}
             className="rounded-md px-2 py-1 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
-            title="Ayuda de edición"
+            title="Ayuda de ediciÃ³n"
           >
             ?
           </button>
@@ -161,16 +164,16 @@ export function VisualCmsPageEditor({
           ) : (
             <span className="text-xs font-medium text-slate-500">
               {embedded
-                ? "Vista previa — edita en las pestañas «Contenido» arriba"
-                : "Vista previa — edita en las pestañas de formulario y usa Guardar arriba"}
+                ? "Vista previa â edita en las pestaÃ±as Â«ContenidoÂ» arriba"
+                : "Vista previa â edita en las pestaÃ±as de formulario y usa Guardar arriba"}
             </span>
           )}
         </div>
       </div>
       ) : embedded && previewOnly ? (
         <p className="shrink-0 border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
-          Vista previa en vivo. Los formularios de edición están en las pestañas{" "}
-          <strong>Contenido (editar aquí)</strong> del editor.
+          Vista previa en vivo. Los formularios de ediciÃ³n estÃ¡n en las pestaÃ±as{" "}
+          <strong>Contenido (editar aquÃ­)</strong> del editor.
         </p>
       ) : null}
 
@@ -191,7 +194,7 @@ export function VisualCmsPageEditor({
         ) : null}
         <iframe
           ref={iframeRef}
-          title={`${title} — edición visual`}
+          title={`${title} â ediciÃ³n visual`}
           src={iframeSrc}
           className="h-full w-full border-0"
           onLoad={handleIframeLoad}
@@ -204,16 +207,16 @@ export function VisualCmsPageEditor({
 export function VisualFilosofiaEditor() {
   return (
     <VisualCmsPageEditor
-      title="Filosofía"
+      title="FilosofÃ­a"
       path="/filosofia"
       hint={
         <>
           Puedes editar: <strong>encabezado</strong>, <strong>programa de estudios</strong>,{" "}
           <strong>curso introductorio</strong>, <strong>temario</strong>,{" "}
-          <strong>cursos avanzados</strong>, <strong>¿Es para ti?</strong>,{" "}
-          <strong>inscripción</strong>, <strong>badge del diplomado</strong>,{" "}
-          <strong>próximas sesiones</strong>. Las actividades del carrusel del home se
-          editan en la página de inicio.
+          <strong>cursos avanzados</strong>, <strong>Â¿Es para ti?</strong>,{" "}
+          <strong>inscripciÃ³n</strong>, <strong>badge del diplomado</strong>,{" "}
+          <strong>prÃ³ximas sesiones</strong>. Las actividades del carrusel del home se
+          editan en la pÃ¡gina de inicio.
           Pulsa <strong>Guardar</strong> al terminar.
         </>
       }
@@ -229,9 +232,9 @@ export function VisualContenidoEditor() {
       hint={
         <>
           Hub de <strong>contenido digital</strong>: acceso al blog, eventos, agenda,
-          Revista Esfinge, biblioteca y librería. Para editar actividades concretas usa
-          las pestañas <strong>Agenda</strong>, <strong>Blog</strong>,{" "}
-          <strong>Eventos</strong> o las páginas de actividades (Inicio, Cursos, Cultura,
+          Revista Esfinge, biblioteca y librerÃ­a. Para editar actividades concretas usa
+          las pestaÃ±as <strong>Agenda</strong>, <strong>Blog</strong>,{" "}
+          <strong>Eventos</strong> o las pÃ¡ginas de actividades (Inicio, Cursos, Cultura,
           Voluntariado).
         </>
       }
@@ -246,8 +249,8 @@ export function VisualAgendaEditor() {
       path="/agenda/"
       hint={
         <>
-          Vista de la página <strong>/agenda</strong>. Botón{" "}
-          <strong>✎ Editar encabezado</strong> en el hero (textos y carrusel de
+          Vista de la pÃ¡gina <strong>/agenda</strong>. BotÃ³n{" "}
+          <strong>â Editar encabezado</strong> en el hero (textos y carrusel de
           fotos). Las actividades del listado se editan en{" "}
           <strong>Inicio</strong>, <strong>Cursos</strong>, <strong>Cultura</strong>,{" "}
           <strong>Voluntariado</strong>, <strong>Eventos</strong> y{" "}
@@ -265,9 +268,9 @@ export function VisualArticulosEditor() {
       path="/articulos"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero.{" "}
-          <strong>Entrada del blog</strong> — páginas propias abajo.{" "}
-          <strong>Enlace externo</strong> — «Nuestra voz fuera de la sede» o pestaña{" "}
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero.{" "}
+          <strong>Entrada del blog</strong> â pÃ¡ginas propias abajo.{" "}
+          <strong>Enlace externo</strong> â Â«Nuestra voz fuera de la sedeÂ» o pestaÃ±a{" "}
           <strong>Voz fuera de la sede</strong>.
         </>
       }
@@ -284,7 +287,7 @@ export function VisualMediosEditor() {
       hint={
         <>
           Apariciones en medios externos: <strong>enlace</strong>,{" "}
-          <strong>descripción breve</strong> y <strong>foto</strong>. La tarjeta
+          <strong>descripciÃ³n breve</strong> y <strong>foto</strong>. La tarjeta
           abre el medio fuera del sitio. Pulsa <strong>Guardar borrador</strong> al
           terminar.
         </>
@@ -300,9 +303,9 @@ export function VisualEventosEditor() {
       path="/eventos"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero. Se muestran{" "}
-          <strong>todos los eventos del sitio</strong> (código + CMS). Clic en una tarjeta
-          para editar crónica y fotos.
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero. Se muestran{" "}
+          <strong>todos los eventos del sitio</strong> (cÃ³digo + CMS). Clic en una tarjeta
+          para editar crÃ³nica y fotos.
         </>
       }
     />
@@ -316,8 +319,8 @@ export function VisualViajesLocalesEditor() {
       path="/cultura/viajes/locales"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero. Destinos fijos (Tres Ojos,
-          Pomier…): asigna <strong>próxima fecha</strong>, cambia la <strong>foto</strong> o el{" "}
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero. Destinos fijos (Tres Ojos,
+          Pomierâ¦): asigna <strong>prÃ³xima fecha</strong>, cambia la <strong>foto</strong> o el{" "}
           <strong>enlace</strong>.
         </>
       }
@@ -332,8 +335,8 @@ export function VisualViajesInternacionalesEditor() {
       path="/cultura/viajes/internacionales"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero. Expedición fija (Egipto,
-          Machu Picchu…): actualiza <strong>próxima fecha</strong>, <strong>foto</strong> y{" "}
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero. ExpediciÃ³n fija (Egipto,
+          Machu Picchuâ¦): actualiza <strong>prÃ³xima fecha</strong>, <strong>foto</strong> y{" "}
           <strong>enlace</strong>.
         </>
       }
@@ -341,20 +344,25 @@ export function VisualViajesInternacionalesEditor() {
   );
 }
 
+/** @deprecated Usar VisualCirculoHomeEditor (sitio circulodeamigos). */
 export function VisualCirculoAmigosEditor() {
+  return <VisualCirculoHomeEditor />;
+}
+
+export function VisualCirculoHomeEditor() {
   return (
     <VisualCmsPageEditor
-      title="Círculo de Amigos"
-      path="/circulo-de-amigos"
+      site="circulodeamigos"
+      title="Círculo de Amigos — Inicio"
+      path="/"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero (textos, carrusel y
-          foto lateral). En <strong>¿Qué es?</strong>, <strong>pilares</strong>,{" "}
-          <strong>beneficios</strong> y <strong>pasos</strong>: ✎ en la sección o en
-          cada tarjeta (texto e imagen). También puedes editar{" "}
-          <strong>lo que recibirás</strong>, <strong>lo que esperamos</strong> y el{" "}
-          <strong>llamado final</strong> con el correo de contacto. Al final de la
-          página puedes <strong>añadir bloques</strong> (galerías, texto, botones).
+          Botón <strong>✎ Editar encabezado</strong> en el hero (textos y foto
+          lateral). En <strong>¿Qué es?</strong>, <strong>pilares</strong>,{" "}
+          <strong>beneficios</strong> y <strong>pasos</strong>: ✎ en la sección o
+          en cada tarjeta (texto e imagen). También puedes editar{" "}
+          <strong>lo que recibirás</strong>, <strong>lo que esperamos</strong> y
+          el <strong>llamado final</strong> con el correo de contacto.
         </>
       }
     />
@@ -368,9 +376,9 @@ export function VisualDiplomadoEditor() {
       path="/diplomado"
       hint={
         <>
-          Edita con los botones <strong>✎</strong> en la página o las pestañas arriba:{" "}
+          Edita con los botones <strong>â</strong> en la pÃ¡gina o las pestaÃ±as arriba:{" "}
           <strong>Texto hero</strong>, <strong>Badge y fechas</strong>,{" "}
-          <strong>Inscripción y precios</strong> («¿Quieres unirte a esta aventura?»),{" "}
+          <strong>InscripciÃ³n y precios</strong> (Â«Â¿Quieres unirte a esta aventura?Â»),{" "}
           <strong>Otras sesiones</strong> (carrusel). Pulsa{" "}
           <strong>Guardar borrador</strong> y luego <strong>Publicar</strong>.
         </>
@@ -386,10 +394,10 @@ export function VisualCulturaEditor() {
       path="/cultura"
       hint={
         <>
-          Botón <strong>✎</strong> en el hero, en cada <strong>taller</strong>, en{" "}
-          <strong>Eventos</strong> (añadir evento, fecha y sede por tarjeta), en{" "}
-          <strong>Círculo de Amigos</strong> y en la agenda de{" "}
-          <strong>Próximas actividades</strong>. Pulsa <strong>Guardar borrador</strong> al
+          BotÃ³n <strong>â</strong> en el hero, en cada <strong>taller</strong>, en{" "}
+          <strong>Eventos</strong> (aÃ±adir evento, fecha y sede por tarjeta), en{" "}
+          <strong>CÃ­rculo de Amigos</strong> y en la agenda de{" "}
+          <strong>PrÃ³ximas actividades</strong>. Pulsa <strong>Guardar borrador</strong> al
           terminar.
         </>
       }
@@ -400,15 +408,15 @@ export function VisualCulturaEditor() {
 export function VisualSedesEditor() {
   return (
     <VisualCmsPageEditor
-      title="Dónde estamos"
+      title="DÃ³nde estamos"
       path="/donde-estamos/"
       hint={
         <>
           Edita nombres, direcciones y contacto de cada sede o centro cultural en{" "}
-          <strong>Dónde estamos</strong>. Usa <strong>Añadir sede</strong> o{" "}
-          <strong>Añadir punto cultural</strong> para espacios nuevos. El bloque{" "}
-          <strong>¿Necesitas más información?</strong> y el <strong>pie de página</strong>{" "}
-          tienen lápiz propio. Los cambios se ven también en Esfera y Voluntariado.
+          <strong>DÃ³nde estamos</strong>. Usa <strong>AÃ±adir sede</strong> o{" "}
+          <strong>AÃ±adir punto cultural</strong> para espacios nuevos. El bloque{" "}
+          <strong>Â¿Necesitas mÃ¡s informaciÃ³n?</strong> y el <strong>pie de pÃ¡gina</strong>{" "}
+          tienen lÃ¡piz propio. Los cambios se ven tambiÃ©n en Esfera y Voluntariado.
         </>
       }
     />
@@ -422,15 +430,15 @@ export function VisualHomeEditor() {
       path="/"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero.{" "}
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero.{" "}
           <strong>Cambiar foto de fondo</strong> para la imagen del landing. Baja al{" "}
-          <strong>carrusel de próximas actividades</strong> — botón <strong>Editar</strong> o{" "}
-          <strong>Añadir al carrusel</strong>. Más abajo,           <strong>Fotos de nuestras actividades</strong>:
-          lápiz en cada foto. También puedes editar <strong>Qué es NA</strong>, los{" "}
-          <strong>tres pilares</strong> (filosofía, cultura, voluntariado), la banda{" "}
-          <strong>Filosofía para Vivir</strong> y el bloque{" "}
-          <strong>Círculo de Amigos</strong> (✎ en la sección). También el bloque{" "}
-          <strong>Esfera</strong> (✎): mismo contenido que en la pestaña Esfera.
+          <strong>carrusel de prÃ³ximas actividades</strong> â botÃ³n <strong>Editar</strong> o{" "}
+          <strong>AÃ±adir al carrusel</strong>. MÃ¡s abajo,           <strong>Fotos de nuestras actividades</strong>:
+          lÃ¡piz en cada foto. TambiÃ©n puedes editar <strong>QuÃ© es NA</strong>, los{" "}
+          <strong>tres pilares</strong> (filosofÃ­a, cultura, voluntariado), la banda{" "}
+          <strong>FilosofÃ­a para Vivir</strong> y el bloque{" "}
+          <strong>CÃ­rculo de Amigos</strong> (â en la secciÃ³n). TambiÃ©n el bloque{" "}
+          <strong>Esfera</strong> (â): mismo contenido que en la pestaÃ±a Esfera.
         </>
       }
     />
@@ -444,13 +452,13 @@ export function VisualVoluntariadoEditor() {
       path="/voluntariado"
       hint={
         <>
-          <strong>Hero</strong>: ✎ Editar encabezado. <strong>Qué hacemos</strong>: ✎
-          Editar sección y cada tarjeta. <strong>Próximas actividades</strong>: textos,
-          añadir actividad y ✎ por tarjeta. <strong>Esfera</strong>,{" "}
-          <strong>Todos somos voluntarios</strong> (donación) y{" "}
-          <strong>Quiero ser voluntario/a</strong>: ✎ Editar sección.{" "}
-          <strong>Actividades recientes</strong>: textos, añadir actividad, ✎ por
-          tarjeta (más de 4 → carrusel). En <strong>Colabora junto a nosotros</strong>: ✎ sección y pestañas Donar /
+          <strong>Hero</strong>: â Editar encabezado. <strong>QuÃ© hacemos</strong>: â
+          Editar secciÃ³n y cada tarjeta. <strong>PrÃ³ximas actividades</strong>: textos,
+          aÃ±adir actividad y â por tarjeta. <strong>Esfera</strong>,{" "}
+          <strong>Todos somos voluntarios</strong> (donaciÃ³n) y{" "}
+          <strong>Quiero ser voluntario/a</strong>: â Editar secciÃ³n.{" "}
+          <strong>Actividades recientes</strong>: textos, aÃ±adir actividad, â por
+          tarjeta (mÃ¡s de 4 â carrusel). En <strong>Colabora junto a nosotros</strong>: â secciÃ³n y pestaÃ±as Donar /
           Voluntario / Alianzas.
         </>
       }
@@ -465,12 +473,12 @@ export function VisualCursosEditor() {
       path="/cursos"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero. Edita{" "}
-          <strong>próximas convocatorias</strong>, el catálogo de cursos, la sección{" "}
-          <strong>Círculo de Amigos</strong> (✎ en el bloque) y, en{" "}
-          <strong>Alquiler de salones</strong>, ✎ en textos o en cada salón.
-          Las sedes y centros culturales se editan en la pestaña{" "}
-          <strong>Dónde estamos</strong>.
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero. Edita{" "}
+          <strong>prÃ³ximas convocatorias</strong>, el catÃ¡logo de cursos, la secciÃ³n{" "}
+          <strong>CÃ­rculo de Amigos</strong> (â en el bloque) y, en{" "}
+          <strong>Alquiler de salones</strong>, â en textos o en cada salÃ³n.
+          Las sedes y centros culturales se editan en la pestaÃ±a{" "}
+          <strong>DÃ³nde estamos</strong>.
         </>
       }
     />
@@ -481,16 +489,16 @@ export function VisualCivisHomeEditor() {
   return (
     <VisualCmsPageEditor
       site="civis"
-      title="Civis — Inicio"
+      title="Civis â Inicio"
       path="/"
       hint={
         <>
           En el recuadro de fotos del hero, pulsa{" "}
-          <strong>Editar carrusel</strong> para añadir, quitar o cambiar las imágenes de fondo.
-          Usa <strong>✎ Editar encabezado</strong> para los textos. En{" "}
-          <strong>Nuestros principios</strong>, ✎ para título, tarjetas y enlace a quiénes somos.
-          En <strong>Actividades recientes</strong>, ✎ en cada tarjeta o{" "}
-          <strong>Añadir al carrusel</strong>. También puedes editar la oferta y los entrenadores.
+          <strong>Editar carrusel</strong> para aÃ±adir, quitar o cambiar las imÃ¡genes de fondo.
+          Usa <strong>â Editar encabezado</strong> para los textos. En{" "}
+          <strong>Nuestros principios</strong>, â para tÃ­tulo, tarjetas y enlace a quiÃ©nes somos.
+          En <strong>Actividades recientes</strong>, â en cada tarjeta o{" "}
+          <strong>AÃ±adir al carrusel</strong>. TambiÃ©n puedes editar la oferta y los entrenadores.
           Pulsa <strong>Guardar</strong> al terminar.
         </>
       }
@@ -502,13 +510,13 @@ export function VisualCivisTalleresEditor() {
   return (
     <VisualCmsPageEditor
       site="civis"
-      title="Civis — Talleres y oferta"
+      title="Civis â Talleres y oferta"
       path="/talleres"
       hint={
         <>
           Edita la <strong>oferta formativa</strong> completa (texto, foto y temas de cada
-          línea) y las <strong>próximas actividades</strong> con el botón{" "}
-          <strong>✎</strong> en cada tarjeta (fecha de inicio, hora y sede).
+          lÃ­nea) y las <strong>prÃ³ximas actividades</strong> con el botÃ³n{" "}
+          <strong>â</strong> en cada tarjeta (fecha de inicio, hora y sede).
         </>
       }
     />
@@ -519,15 +527,15 @@ export function VisualCivisSalonesEditor() {
   return (
     <VisualCmsPageEditor
       site="civis"
-      title="Civis — Salones"
+      title="Civis â Salones"
       path="/salones/"
       query="cmsEdit=1"
       hint={
         <>
-          Pulsa <strong>Editar textos</strong> en el encabezado o en el catálogo. Clic en{" "}
-          <strong>✎</strong> en cada tarjeta de salón (foto, nombre, sede, resumen,
-          capacidades). Los datos del salón se comparten con Acrópolis; los textos de
-          página son solo de Civis. <strong>Guardar</strong> al terminar.
+          Pulsa <strong>Editar textos</strong> en el encabezado o en el catÃ¡logo. Clic en{" "}
+          <strong>â</strong> en cada tarjeta de salÃ³n (foto, nombre, sede, resumen,
+          capacidades). Los datos del salÃ³n se comparten con AcrÃ³polis; los textos de
+          pÃ¡gina son solo de Civis. <strong>Guardar</strong> al terminar.
         </>
       }
     />
@@ -538,16 +546,16 @@ export function VisualCivisQuienesSomosEditor() {
   return (
     <VisualCmsPageEditor
       site="civis"
-      title="Civis — Quiénes somos / Equipo"
+      title="Civis â QuiÃ©nes somos / Equipo"
       path="/quienes-somos"
       query="cmsEdit=1"
       hint={
         <>
-          Pestaña <strong>Civis</strong>: ✎ en el texto, propósito, imagen lateral y metodología.
-          Pestaña <strong>Qué es Nueva Acrópolis</strong>: ✎ en imagen, textos, principios y enlace a acropolis.org.do.
-          En <strong>Nuestros clientes</strong>: ✎ en la sección o en cada tarjeta.
-          En <strong>Equipo</strong>: ✎ en entrenadores; <strong>+ Añadir entrenador</strong> desde la sección.
-          En <strong>Oferta formativa</strong> (inicio o Talleres): ✎ en cada línea o <strong>+ Añadir taller</strong>.
+          PestaÃ±a <strong>Civis</strong>: â en el texto, propÃ³sito, imagen lateral y metodologÃ­a.
+          PestaÃ±a <strong>QuÃ© es Nueva AcrÃ³polis</strong>: â en imagen, textos, principios y enlace a acropolis.org.do.
+          En <strong>Nuestros clientes</strong>: â en la secciÃ³n o en cada tarjeta.
+          En <strong>Equipo</strong>: â en entrenadores; <strong>+ AÃ±adir entrenador</strong> desde la secciÃ³n.
+          En <strong>Oferta formativa</strong> (inicio o Talleres): â en cada lÃ­nea o <strong>+ AÃ±adir taller</strong>.
         </>
       }
     />
@@ -557,14 +565,14 @@ export function VisualCivisQuienesSomosEditor() {
 export function VisualQuienesSomosEditor() {
   return (
     <VisualCmsPageEditor
-      title="Quiénes somos"
+      title="QuiÃ©nes somos"
       path="/quienes-somos"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero y{" "}
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero y{" "}
           <strong>Carrusel de fotos</strong>. Edita los textos de{" "}
-          <strong>Qué es NA</strong>, la sección de <strong>presidencia</strong>{" "}
-          (cada persona con foto) y la <strong>dirección nacional</strong>.
+          <strong>QuÃ© es NA</strong>, la secciÃ³n de <strong>presidencia</strong>{" "}
+          (cada persona con foto) y la <strong>direcciÃ³n nacional</strong>.
         </>
       }
     />
@@ -578,10 +586,10 @@ export function VisualRelacionesEditor() {
       path="/relaciones-institucionales"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero. Edita la{" "}
-          <strong>introducción</strong>, las <strong>cifras</strong>, cada{" "}
-          <strong>área de colaboración</strong>, el bloque de{" "}
-          <strong>República Dominicana</strong> y el <strong>llamado a la acción</strong>.
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero. Edita la{" "}
+          <strong>introducciÃ³n</strong>, las <strong>cifras</strong>, cada{" "}
+          <strong>Ã¡rea de colaboraciÃ³n</strong>, el bloque de{" "}
+          <strong>RepÃºblica Dominicana</strong> y el <strong>llamado a la acciÃ³n</strong>.
         </>
       }
     />
@@ -595,39 +603,39 @@ export function VisualEsferaEditor() {
       path="/esfera"
       hint={
         <>
-          Botón <strong>✎ Editar encabezado</strong> en el hero: logo Esfera
+          BotÃ³n <strong>â Editar encabezado</strong> en el hero: logo Esfera
           (color y blanco), textos y <strong>carrusel de fotos</strong>. El bloque{" "}
-          <strong>Esfera en el inicio</strong> se edita con ✎ en la página{" "}
-          <strong>Inicio</strong> (mismos datos aquí en el CMS). En{" "}
-          <strong>Quiénes somos / Qué hacemos</strong>:{" "}
-          <strong>Editar sección</strong> para títulos; ✎ en cada pestaña para
-          texto y foto; ✎ en cada tarjeta para título y descripción. En{" "}
-          <strong>Estándares Esfera</strong>: <strong>Editar textos</strong> para
-          títulos y párrafos; lápiz en el cuadro lateral para portada del manual y
-          pies de foto (el logo también se edita desde el encabezado). En la sección de{" "}
-          <strong>estándares</strong>, las tres tarjetas de principios: ✎ en cada
-          una para texto y foto; <strong>Añadir tarjeta</strong> para crear nuevas.
-          En <strong>Modalidades disponibles</strong>: <strong>Editar sección</strong>{" "}
-          o ✎ en cada taller para texto, foto y temas; <strong>Añadir taller</strong>{" "}
-          para crear nuevos. El botón de <strong>descarga del brochure</strong> tiene
-          ✎ para cambiar el PDF; también puedes subir una nueva versión en{" "}
+          <strong>Esfera en el inicio</strong> se edita con â en la pÃ¡gina{" "}
+          <strong>Inicio</strong> (mismos datos aquÃ­ en el CMS). En{" "}
+          <strong>QuiÃ©nes somos / QuÃ© hacemos</strong>:{" "}
+          <strong>Editar secciÃ³n</strong> para tÃ­tulos; â en cada pestaÃ±a para
+          texto y foto; â en cada tarjeta para tÃ­tulo y descripciÃ³n. En{" "}
+          <strong>EstÃ¡ndares Esfera</strong>: <strong>Editar textos</strong> para
+          tÃ­tulos y pÃ¡rrafos; lÃ¡piz en el cuadro lateral para portada del manual y
+          pies de foto (el logo tambiÃ©n se edita desde el encabezado). En la secciÃ³n de{" "}
+          <strong>estÃ¡ndares</strong>, las tres tarjetas de principios: â en cada
+          una para texto y foto; <strong>AÃ±adir tarjeta</strong> para crear nuevas.
+          En <strong>Modalidades disponibles</strong>: <strong>Editar secciÃ³n</strong>{" "}
+          o â en cada taller para texto, foto y temas; <strong>AÃ±adir taller</strong>{" "}
+          para crear nuevos. El botÃ³n de <strong>descarga del brochure</strong> tiene
+          â para cambiar el PDF; tambiÃ©n puedes subir una nueva versiÃ³n en{" "}
           <strong>Archivos</strong> del panel de sitios. En{" "}
-          <strong>Actividades y próximos entrenamientos</strong>: ✎ en cada
-          tarjeta para cambiar título, fecha, texto y foto;{" "}
-          <strong>Añadir entrenamiento</strong> para crear nuevos. En cada
+          <strong>Actividades y prÃ³ximos entrenamientos</strong>: â en cada
+          tarjeta para cambiar tÃ­tulo, fecha, texto y foto;{" "}
+          <strong>AÃ±adir entrenamiento</strong> para crear nuevos. En cada
           entrenamiento puedes indicar <strong>fecha de inicio</strong>,{" "}
-          <strong>hora</strong> y <strong>ubicación</strong>. En{" "}
-          <strong>Colabora junto a nosotros</strong>: <strong>Editar sección</strong>{" "}
-          o ✎ en cada pestaña. En <strong>Hemos trabajado con</strong> y{" "}
-          <strong>Líneas complementarias de formación</strong>: ✎ en cada tarjeta.
-          En <strong>Perfil de los participantes</strong>: <strong>Editar sección</strong>{" "}
-          para textos; ✎ en cada tarjeta para foto, sector y lista de perfiles.
-          En <strong>Por qué invertir en esta formación</strong>:{" "}
-          <strong>Editar sección</strong> para textos y cita; ✎ en cada tarjeta.
+          <strong>hora</strong> y <strong>ubicaciÃ³n</strong>. En{" "}
+          <strong>Colabora junto a nosotros</strong>: <strong>Editar secciÃ³n</strong>{" "}
+          o â en cada pestaÃ±a. En <strong>Hemos trabajado con</strong> y{" "}
+          <strong>LÃ­neas complementarias de formaciÃ³n</strong>: â en cada tarjeta.
+          En <strong>Perfil de los participantes</strong>: <strong>Editar secciÃ³n</strong>{" "}
+          para textos; â en cada tarjeta para foto, sector y lista de perfiles.
+          En <strong>Por quÃ© invertir en esta formaciÃ³n</strong>:{" "}
+          <strong>Editar secciÃ³n</strong> para textos y cita; â en cada tarjeta.
           En <strong>Impacto</strong>: <strong>Editar impacto</strong> para textos;
-          ✎ en cada cifra para cambiar números; <strong>Añadir foto</strong> y ✎ en
+          â en cada cifra para cambiar nÃºmeros; <strong>AÃ±adir foto</strong> y â en
           el carrusel de <strong>Momentos de los talleres</strong>.
-          En <strong>Contacto</strong>: lápiz para editar sede.
+          En <strong>Contacto</strong>: lÃ¡piz para editar sede.
         </>
       }
     />
@@ -638,14 +646,14 @@ export function VisualEditorialHomeEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Inicio"
+      title="LibrerÃ­a â Inicio"
       path="/"
       hint={
         <>
-          ✎ en el <strong>texto de bienvenida</strong>, en cada{" "}
-          <strong>tarjeta del catálogo</strong> y en las{" "}
+          â en el <strong>texto de bienvenida</strong>, en cada{" "}
+          <strong>tarjeta del catÃ¡logo</strong> y en las{" "}
           <strong>fotos del carrusel</strong>. Los libros impresos en venta vienen
-          del catálogo en línea; aquí editas textos, imágenes y enlaces de la tienda.
+          del catÃ¡logo en lÃ­nea; aquÃ­ editas textos, imÃ¡genes y enlaces de la tienda.
         </>
       }
     />
@@ -656,13 +664,13 @@ export function VisualEditorialLibrosEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Libros impresos"
+      title="LibrerÃ­a â Libros impresos"
       path="/libros/"
       hint={
         <>
-          ✎ en los <strong>filtros y categorías</strong> de la sección. El listado de
-          libros y precios viene del catálogo; aquí editas etiquetas y textos de la
-          página.
+          â en los <strong>filtros y categorÃ­as</strong> de la secciÃ³n. El listado de
+          libros y precios viene del catÃ¡logo; aquÃ­ editas etiquetas y textos de la
+          pÃ¡gina.
         </>
       }
     />
@@ -673,12 +681,12 @@ export function VisualEditorialDigitalesEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Libros digitales"
+      title="LibrerÃ­a â Libros digitales"
       path="/libros/digitales/"
       hint={
         <>
-          ✎ en cada <strong>grupo</strong> y en cada <strong>libro digital</strong>{" "}
-          (título, autor, enlace de descarga, portada).
+          â en cada <strong>grupo</strong> y en cada <strong>libro digital</strong>{" "}
+          (tÃ­tulo, autor, enlace de descarga, portada).
         </>
       }
     />
@@ -689,12 +697,12 @@ export function VisualEditorialRevistasEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Revistas"
+      title="LibrerÃ­a â Revistas"
       path="/revistas/"
       hint={
         <>
-          ✎ en cada <strong>tarjeta de revista</strong>: título, descripción, imagen,
-          enlace y textos del botón.
+          â en cada <strong>tarjeta de revista</strong>: tÃ­tulo, descripciÃ³n, imagen,
+          enlace y textos del botÃ³n.
         </>
       }
     />
@@ -705,12 +713,12 @@ export function VisualEditorialRegalosEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Regalos"
+      title="LibrerÃ­a â Regalos"
       path="/regalos/"
       hint={
         <>
-          ✎ en cada <strong>regalo</strong>: título, descripción, cita, fotos y
-          precio. También puedes editar las <strong>categorías</strong> de la sección.
+          â en cada <strong>regalo</strong>: tÃ­tulo, descripciÃ³n, cita, fotos y
+          precio. TambiÃ©n puedes editar las <strong>categorÃ­as</strong> de la secciÃ³n.
         </>
       }
     />
@@ -721,12 +729,12 @@ export function VisualEditorialDondeEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Dónde estamos"
+      title="LibrerÃ­a â DÃ³nde estamos"
       path="/donde-estamos/"
       hint={
         <>
-          ✎ en la banda de <strong>visítanos</strong>, la foto de la librería y cada{" "}
-          <strong>sede</strong> (dirección, horario, nota).
+          â en la banda de <strong>visÃ­tanos</strong>, la foto de la librerÃ­a y cada{" "}
+          <strong>sede</strong> (direcciÃ³n, horario, nota).
         </>
       }
     />
@@ -737,12 +745,12 @@ export function VisualEditorialQuienesSomosEditor() {
   return (
     <VisualCmsPageEditor
       site="editorial"
-      title="Librería — Quiénes somos"
+      title="LibrerÃ­a â QuiÃ©nes somos"
       path="/conoce-nueva-acropolis/"
       hint={
         <>
-          ✎ en el bloque de <strong>Editorial Logos</strong> y en{" "}
-          <strong>Qué es Nueva Acrópolis</strong> (textos, imagen y botón).
+          â en el bloque de <strong>Editorial Logos</strong> y en{" "}
+          <strong>QuÃ© es Nueva AcrÃ³polis</strong> (textos, imagen y botÃ³n).
         </>
       }
     />

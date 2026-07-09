@@ -554,7 +554,7 @@ export function SolicitudPropuestaForm({
           <p className="mb-3 text-xs text-na-muted">
             Indique horas, días y/o meses según aplique (puede usar más de uno).
           </p>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
               <label className={fieldLabel} htmlFor="duracionHoras">
                 Horas

@@ -4,16 +4,27 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkAuth } from "@/lib/api";
-import { clearToken, getEditorLabel, getEditorRole, getToken } from "@/lib/auth-storage";
+import {
+  clearToken,
+  getEditorLabel,
+  getEditorPermissions,
+  getEditorRole,
+  getToken,
+} from "@/lib/auth-storage";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { DashboardAdminBar } from "@/components/DashboardAdminBar";
 import type { EditorRole } from "@/lib/editor-roles";
+import {
+  canAccessSmtpAdmin,
+  canAccessUsersAdmin,
+} from "@/lib/editor-permissions";
 
 type DashboardShellProps = {
   children: React.ReactNode;
   title?: string;
   backHref?: string;
-  requireAdmin?: boolean;
+  /** Acceso a panel de usuarios o SMTP (además de admin). */
+  requireAdmin?: boolean | "users" | "smtp";
 };
 
 export function DashboardShell({
@@ -45,9 +56,16 @@ export function DashboardShell({
         return;
       }
       const currentRole = getEditorRole();
-      if (requireAdmin && currentRole !== "admin") {
-        router.replace("/dashboard/");
-        return;
+      const permissions = getEditorPermissions();
+      if (requireAdmin) {
+        const need =
+          requireAdmin === "smtp"
+            ? canAccessSmtpAdmin(currentRole, permissions)
+            : canAccessUsersAdmin(currentRole, permissions);
+        if (!need) {
+          router.replace("/dashboard/");
+          return;
+        }
       }
       setReady(true);
     });

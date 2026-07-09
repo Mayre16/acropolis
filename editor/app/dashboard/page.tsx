@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkAuth, fetchAuthMe } from "@/lib/api";
-import { clearToken, getEditorLabel, getEditorRole, getToken } from "@/lib/auth-storage";
+import {
+  clearToken,
+  getEditorLabel,
+  getEditorPermissions,
+  getEditorRole,
+  getToken,
+  setSession,
+} from "@/lib/auth-storage";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { CmsTabNav } from "@/components/CmsTabNav";
 import { DashboardAdminBar } from "@/components/DashboardAdminBar";
@@ -16,20 +23,18 @@ import {
   dashboardSiteAnchor,
   type DashboardSiteKey,
 } from "@/lib/dashboard-sites";
-import { defaultTabForRole, type EditorRole } from "@/lib/editor-roles";
+import type { EditorRole } from "@/lib/editor-roles";
+import {
+  defaultTabForPermissions,
+  sitesForPermissions,
+} from "@/lib/editor-permissions";
 
-function sitesForRole(role: EditorRole): SiteId[] {
-  if (role === "admin") {
-    return ["acropolis", "civis", "editorial"];
-  }
-  if (role === "editorial") {
-    return ["editorial"];
-  }
-  return ["acropolis"];
-}
-
-function canEditSite(role: EditorRole, site: DashboardSiteKey): boolean {
-  return sitesForRole(role).includes(site);
+function canEditSite(
+  role: EditorRole,
+  permissions: string[],
+  site: DashboardSiteKey,
+): boolean {
+  return sitesForPermissions(permissions, role).includes(site);
 }
 
 export default function DashboardPage() {
@@ -39,10 +44,12 @@ export default function DashboardPage() {
   const [authError, setAuthError] = useState("");
   const [role, setRole] = useState<EditorRole>("admin");
   const [editorLabel, setEditorLabel] = useState("Editor");
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   useEffect(() => {
     setRole(getEditorRole() as EditorRole);
     setEditorLabel(getEditorLabel());
+    setPermissions(getEditorPermissions());
   }, []);
 
   useEffect(() => {
@@ -66,6 +73,18 @@ export default function DashboardPage() {
       }
       const me = await fetchAuthMe(token);
       setTotpEnabled(!!me?.totpEnabled);
+      if (me?.role) {
+        const nextRole = me.role as EditorRole;
+        const nextPerms = Array.isArray(me.permissions) ? me.permissions : [];
+        setRole(nextRole);
+        setPermissions(nextPerms);
+        setSession({
+          token,
+          role: nextRole,
+          label: me.label || getEditorLabel(),
+          permissions: nextPerms,
+        });
+      }
       setReady(true);
     });
   }, [router]);
@@ -102,8 +121,10 @@ export default function DashboardPage() {
 
       <div className="mt-8 space-y-6 scroll-mt-6">
         {DASHBOARD_SITES.map((site) => {
-          const hasAccess = canEditSite(role, site.id);
-          const firstTab = hasAccess ? defaultTabForRole(site.id, role) : null;
+          const hasAccess = canEditSite(role, permissions, site.id);
+          const firstTab = hasAccess
+            ? defaultTabForPermissions(site.id, permissions, role)
+            : null;
 
           return (
             <section
@@ -130,7 +151,12 @@ export default function DashboardPage() {
 
               {hasAccess ? (
                 <div className="mt-4">
-                  <CmsTabNav site={site.id} role={role} mode="links" />
+                  <CmsTabNav
+                    site={site.id}
+                    role={role}
+                    permissions={permissions}
+                    mode="links"
+                  />
                 </div>
               ) : (
                 <p className="mt-4 text-sm text-slate-500">

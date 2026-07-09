@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { pickHomeHeroBackground } from "@/lib/cms/home-hero-display";
-import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
+import {
+  isCmsEnabled,
+  useCmsDocument,
+  useCmsMediaReady,
+} from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { assetUrl } from "@/lib/asset-url";
 import {
@@ -35,27 +39,32 @@ const HERO_CTA =
 export function HomeHeroCms() {
   const cmsEditMode = useCmsEditMode();
   const cms = useCmsDocument();
+  const mediaReady = useCmsMediaReady();
   const edit = useHomeCmsEdit();
   const published = cms?.sections.homeHero;
   const draft = edit?.homeHero;
+  const [imageLoadedSrc, setImageLoadedSrc] = useState<string | null>(null);
 
   const inHomeEdit =
     cmsEditMode === "1" ||
     (typeof window !== "undefined" && isHomeCmsEditActive());
 
   const awaitingDraft = inHomeEdit && !edit?.ready;
+  const awaitingPublished = isCmsEnabled() && !mediaReady && !inHomeEdit;
 
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
 
-  const heroBackground = awaitingDraft
-    ? null
-    : inHomeEdit && edit?.ready
-      ? pickHomeHeroBackground(draft?.background)
-      : pickHomeHeroBackground(
-          isCmsEnabled() ? published?.background : undefined,
-        );
+  const heroBackground =
+    awaitingDraft || awaitingPublished
+      ? null
+      : inHomeEdit && edit?.ready
+        ? pickHomeHeroBackground(draft?.background)
+        : pickHomeHeroBackground(
+            isCmsEnabled() ? published?.background : undefined,
+            { allowRepoFallback: mediaReady || !isCmsEnabled() },
+          );
 
   const resolvedBackgroundSrc = heroBackground
     ? assetUrl(
@@ -63,18 +72,21 @@ export function HomeHeroCms() {
       )
     : null;
 
+  const showPhoto =
+    Boolean(resolvedBackgroundSrc) && imageLoadedSrc === resolvedBackgroundSrc;
+
   useLayoutEffect(() => {
     const root = document.documentElement;
     if (!inHomeEdit) {
       root.classList.remove(CMS_EDIT_HERO_PENDING_CLASS, CMS_EDIT_HERO_READY_CLASS);
       return;
     }
-    if (edit?.ready && resolvedBackgroundSrc) {
+    if (edit?.ready && showPhoto) {
       root.classList.add(CMS_EDIT_HERO_READY_CLASS);
     } else {
       root.classList.remove(CMS_EDIT_HERO_READY_CLASS);
     }
-  }, [inHomeEdit, edit?.ready, resolvedBackgroundSrc]);
+  }, [inHomeEdit, edit?.ready, showPhoto]);
 
   return (
     <section
@@ -82,6 +94,10 @@ export function HomeHeroCms() {
       className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24"
     >
       <div className="absolute inset-0" data-hero-bg aria-hidden>
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer"
+          aria-label={showPhoto ? undefined : "Cargando foto del encabezado…"}
+        />
         {resolvedBackgroundSrc ? (
           <Image
             key={resolvedBackgroundSrc}
@@ -90,18 +106,18 @@ export function HomeHeroCms() {
             fill
             priority
             unoptimized
-            className="object-cover object-center"
+            className={`object-cover object-center transition-opacity duration-300 ${
+              showPhoto ? "opacity-100" : "opacity-0"
+            }`}
             sizes="100vw"
+            onLoad={() => setImageLoadedSrc(resolvedBackgroundSrc)}
           />
-        ) : (
-          <div
-            className="absolute inset-0 bg-na-heket/15"
-            aria-label="Cargando foto del encabezado…"
-          />
-        )}
+        ) : null}
       </div>
       <div
-        className={`pointer-events-none absolute inset-0 ${HERO_OVERLAY}`}
+        className={`pointer-events-none absolute inset-0 ${
+          showPhoto ? HERO_OVERLAY : "bg-na-heketDark/35"
+        }`}
         aria-hidden
       />
 
@@ -116,7 +132,7 @@ export function HomeHeroCms() {
         </button>
       ) : null}
 
-      <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-12 pt-[150px] text-center md:px-12 md:pb-[50px] md:pt-[100px]">
+      <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-10 pt-24 text-center sm:pt-28 md:px-12 md:pb-[50px] md:pt-[100px]">
         <HeroOinadomLogo
           priority
           align="center"

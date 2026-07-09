@@ -56,6 +56,9 @@ function InviteAcceptForm() {
         token: result.token,
         role: result.role || "editorial",
         label: result.label || email,
+        permissions: Array.isArray(result.permissions)
+          ? result.permissions
+          : undefined,
       });
       router.push("/dashboard/");
     } catch (err) {

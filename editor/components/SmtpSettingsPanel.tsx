@@ -5,7 +5,7 @@ import { fetchSmtpSettings, saveSmtpSettings, type SmtpSettings } from "@/lib/ap
 import { getToken } from "@/lib/auth-storage";
 
 const empty: SmtpSettings = {
-  host: "mail.acropolis.adesa.com.do",
+  host: "editor.acropolis.adesa.com.do",
   port: 465,
   secure: "ssl",
   user: "formularios@editor.acropolis.adesa.com.do",

@@ -43,6 +43,12 @@ const tiendaUrl =
   process.env.NEXT_PUBLIC_TIENDA_URL?.trim() ||
   (githubPagesPreview ? `${ghBase}/tienda` : "https://tienda.acropolis.adesa.com.do");
 
+const circuloUrl =
+  process.env.NEXT_PUBLIC_CIRCULO_URL?.trim() ||
+  (githubPagesPreview
+    ? `${ghBase}/circulodeamigos`
+    : "https://circulodeamigos.acropolis.adesa.com.do");
+
 const env = {
   ...process.env,
   NODE_ENV: "production",
@@ -51,6 +57,7 @@ const env = {
   NEXT_PUBLIC_PRINCIPAL_URL: principalUrl.replace(/\/$/, ""),
   NEXT_PUBLIC_CIVIS_URL: civisUrl.replace(/\/$/, ""),
   NEXT_PUBLIC_TIENDA_URL: tiendaUrl.replace(/\/$/, ""),
+  NEXT_PUBLIC_CIRCULO_URL: circuloUrl.replace(/\/$/, ""),
 };
 
 console.log("Build cPanel Editor —", env.NEXT_PUBLIC_SITE_URL);
@@ -58,6 +65,7 @@ console.log("  CMS API:", env.NEXT_PUBLIC_CMS_API_URL);
 console.log("  Principal:", env.NEXT_PUBLIC_PRINCIPAL_URL);
 console.log("  Civis:", env.NEXT_PUBLIC_CIVIS_URL);
 console.log("  Tienda:", env.NEXT_PUBLIC_TIENDA_URL);
+console.log("  Círculo:", env.NEXT_PUBLIC_CIRCULO_URL);
 
 for (const dir of [OUT, NEXT]) {
   if (existsSync(dir)) {

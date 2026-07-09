@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import type { SiteId } from "@/lib/content-types";
-import { tabGroupsForRole, tabLabel, type TabGroup } from "@/lib/editor-tab-groups";
+import {
+  tabGroupsForPermissions,
+  tabGroupsForRole,
+  tabLabel,
+  type TabGroup,
+} from "@/lib/editor-tab-groups";
 import type { EditorRole } from "@/lib/editor-roles";
 
 type CmsTabNavProps = {
   site: SiteId;
   role: EditorRole;
+  permissions?: string[];
   activeTab?: string;
   mode: "nav" | "links";
   onSelect?: (tabId: string) => void;
@@ -97,12 +103,16 @@ function GroupBlock({
 export function CmsTabNav({
   site,
   role,
+  permissions,
   activeTab,
   mode,
   onSelect,
   linkPrefix = `/edit/${site}/`,
 }: CmsTabNavProps) {
-  const groups = tabGroupsForRole(site, role);
+  const groups =
+    permissions != null
+      ? tabGroupsForPermissions(site, permissions, role)
+      : tabGroupsForRole(site, role);
 
   return (
     <div className="space-y-3">

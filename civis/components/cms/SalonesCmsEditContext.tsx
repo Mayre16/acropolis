@@ -161,7 +161,7 @@ function SalonesCmsEditInner({ children }: { children: ReactNode }) {
     (acro: CmsDocument, civis: CmsDocument) => {
       setAcropolisDoc(acro);
       setCivisDoc(civis);
-      setItems(getSalonesForEdit(acro, SALONES));
+      setItems(getSalonesForEdit(acro, SALONES).items);
       setPage({
         ...DEFAULT_CIVIS_SALONES_PAGE,
         ...civis.sections.civisSalonesPage,

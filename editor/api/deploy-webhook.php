@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 function cms_trigger_deploy_webhook(array $config, string $site): array
 {
-    if (!preg_match('/^(acropolis|civis|tienda)$/', $site)) {
+    if (!preg_match('/^(acropolis|civis|tienda|circulodeamigos)$/', $site)) {
         return ['queued' => false, 'reason' => 'invalid_site'];
     }
 

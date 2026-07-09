@@ -290,7 +290,7 @@ export type Platform = {
 export const PLATAFORMAS: Platform[] = [
   {
     id: "circulo",
-    label: "Círculo de Amigos",
+    label: "Amigos",
     href: "https://circulodeamigos.acropolis.org.do",
     devHref: "http://localhost:3100/circulo-de-amigos",
   },

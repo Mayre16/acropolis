@@ -35,29 +35,63 @@ export function cmsToSalon(s: CmsSalon): Salon {
 export function getSalonesForEdit(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
-): CmsSalon[] {
+): { items: CmsSalon[]; hidden: string[]; sedesHidden: string[] } {
+  const hidden = [
+    ...(((doc?.sections as { salonesHidden?: string[] } | undefined)
+      ?.salonesHidden ?? []) as string[]),
+  ];
+  const sedesHidden = [
+    ...(((doc?.sections as { salonesSedesHidden?: string[] } | undefined)
+      ?.salonesSedesHidden ?? []) as string[]),
+  ];
+  const hiddenSet = new Set(hidden);
   const cmsById = new Map(
     (doc?.sections.salones ?? []).map((s) => [s.id, s]),
   );
-  return fallback.map((s) => cmsById.get(s.id) ?? salonToCms(s));
+  const items: CmsSalon[] = [];
+  const seen = new Set<string>();
+
+  for (const s of fallback) {
+    if (hiddenSet.has(s.id)) continue;
+    items.push(cmsById.get(s.id) ?? salonToCms(s));
+    seen.add(s.id);
+  }
+  for (const s of doc?.sections.salones ?? []) {
+    if (!seen.has(s.id) && !hiddenSet.has(s.id)) {
+      items.push(s);
+    }
+  }
+  return { items, hidden, sedesHidden };
 }
 
 export function mergeSalones(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
 ): Salon[] {
-  return getSalonesForEdit(doc, fallback).map(cmsToSalon);
+  const { items, sedesHidden } = getSalonesForEdit(doc, fallback);
+  const sedesHiddenSet = new Set(sedesHidden);
+  return items
+    .map(cmsToSalon)
+    .filter((s) => !sedesHiddenSet.has(s.sede));
 }
 
 export function buildAcropolisDocWithSalones(
   base: CmsDocument,
   items: CmsSalon[],
+  hidden?: string[],
+  sedesHidden?: string[],
 ): CmsDocument {
+  const sections = base.sections as CmsDocument["sections"] & {
+    salonesHidden?: string[];
+    salonesSedesHidden?: string[];
+  };
   return {
     ...base,
     sections: {
-      ...base.sections,
+      ...sections,
       salones: items,
+      salonesHidden: hidden ?? sections.salonesHidden ?? [],
+      salonesSedesHidden: sedesHidden ?? sections.salonesSedesHidden ?? [],
     },
   };
 }
@@ -91,13 +125,13 @@ export function resolveCivisSalonesPage(
   return { ...DEFAULT_CIVIS_SALONES_PAGE, ...doc?.sections.civisSalonesPage };
 }
 
+export function patchSalonImage(salon: CmsSalon, image: CmsMedia): CmsSalon {
+  return { ...salon, image };
+}
+
 export function patchSalonLayout(
   salon: CmsSalon,
   featuredLayout: LayoutKind,
 ): CmsSalon {
   return { ...salon, featuredLayout };
-}
-
-export function patchSalonImage(salon: CmsSalon, image: CmsMedia): CmsSalon {
-  return { ...salon, image };
 }

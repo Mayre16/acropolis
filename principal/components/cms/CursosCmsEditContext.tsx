@@ -119,6 +119,11 @@ type CursosCmsEditContextValue = {
   patchSalon: (id: string, patch: Partial<CmsSalon>) => void;
   addSalon: (options?: AddSalonOptions) => void;
   hideSalon: (id: string) => void;
+  restoreSalon: (id: string) => void;
+  hideSalonSede: (sede: SalonSede) => void;
+  restoreSalonSede: (sede: SalonSede) => void;
+  salonesSedesHidden: string[];
+  salonesHidden: string[];
   patchSalonesPage: (patch: Partial<CmsSalonesPage>) => void;
   patchCirculoAmigos: (patch: Partial<CmsCirculoAmigosPromo>) => void;
   getOfertaCards: (kind: "cursos" | "conf") => CmsCursosCard[];
@@ -148,6 +153,7 @@ function buildDoc(
   salonesItems: CmsSalon[],
   salonesPage: CmsSalonesPage,
   salonesHidden: string[],
+  salonesSedesHidden: string[],
   circuloAmigos: CmsCirculoAmigosPromo,
 ): CmsDocument {
   const withAgenda = mergeCursosAgendaIntoDoc(base, agendaItems);
@@ -156,6 +162,7 @@ function buildDoc(
     salonesItems,
     salonesPage,
     salonesHidden,
+    salonesSedesHidden,
   );
   return mergeHeroCarouselsIntoDoc({
     ...withSalones,
@@ -184,6 +191,7 @@ function CursosCmsEditInner({
   const [agendaHidden, setAgendaHidden] = useState<string[]>([]);
   const [salonesItems, setSalonesItems] = useState<CmsSalon[]>([]);
   const [salonesHidden, setSalonesHidden] = useState<string[]>([]);
+  const [salonesSedesHidden, setSalonesSedesHidden] = useState<string[]>([]);
   const [salonesPage, setSalonesPage] =
     useState<CmsSalonesPage>(DEFAULT_SALONES_PAGE);
   const [circuloAmigos, setCirculoAmigos] = useState<CmsCirculoAmigosPromo>(
@@ -201,6 +209,7 @@ function CursosCmsEditInner({
   const salonesItemsRef = useRef(salonesItems);
   const salonesPageRef = useRef(salonesPage);
   const salonesHiddenRef = useRef(salonesHidden);
+  const salonesSedesHiddenRef = useRef(salonesSedesHidden);
   const circuloAmigosRef = useRef(circuloAmigos);
 
   useEffect(() => {
@@ -221,6 +230,9 @@ function CursosCmsEditInner({
   useEffect(() => {
     salonesHiddenRef.current = salonesHidden;
   }, [salonesHidden]);
+  useEffect(() => {
+    salonesSedesHiddenRef.current = salonesSedesHidden;
+  }, [salonesSedesHidden]);
   useEffect(() => {
     circuloAmigosRef.current = circuloAmigos;
   }, [circuloAmigos]);
@@ -245,6 +257,7 @@ function CursosCmsEditInner({
     const salonesLoaded = getSalonesForEdit(draft, SALONES);
     setSalonesItems(salonesLoaded.items);
     setSalonesHidden(salonesLoaded.hidden);
+    setSalonesSedesHidden(salonesLoaded.sedesHidden);
     setSalonesPage({ ...DEFAULT_SALONES_PAGE, ...draft.sections.salonesPage });
     setCirculoAmigos(
       mergeCirculoAmigos(draft.sections.culturaPage?.circuloAmigos),
@@ -267,6 +280,7 @@ function CursosCmsEditInner({
         salonesItemsRef.current,
         salonesPageRef.current,
         salonesHiddenRef.current,
+        salonesSedesHiddenRef.current,
         circuloAmigosRef.current,
       );
       await saveCmsDraft("acropolis", token, next);
@@ -576,6 +590,63 @@ function CursosCmsEditInner({
     [markDirty, queueSave],
   );
 
+  const restoreSalon = useCallback(
+    (id: string) => {
+      setSalonesHidden((h) => {
+        const next = h.filter((x) => x !== id);
+        salonesHiddenRef.current = next;
+        return next;
+      });
+      setSalonesItems((list) => {
+        if (list.some((s) => s.id === id)) return list;
+        const seed = SALONES.find((s) => s.id === id);
+        if (!seed) return list;
+        const next = [...list, {
+          id: seed.id,
+          name: seed.name,
+          sede: seed.sede,
+          city: seed.city,
+          summary: seed.summary,
+          featuredLayout: seed.featuredLayout,
+          capacities: { ...seed.capacities },
+          image: { src: seed.image.src, alt: seed.image.alt },
+        }];
+        salonesItemsRef.current = next;
+        return next;
+      });
+      markDirty();
+      queueSave();
+    },
+    [markDirty, queueSave],
+  );
+
+  const hideSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSalonesSedesHidden((h) => {
+        const next = h.includes(sede) ? h : [...h, sede];
+        salonesSedesHiddenRef.current = next;
+        return next;
+      });
+      setSelectedId(null);
+      markDirty();
+      queueSave();
+    },
+    [markDirty, queueSave],
+  );
+
+  const restoreSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSalonesSedesHidden((h) => {
+        const next = h.filter((x) => x !== sede);
+        salonesSedesHiddenRef.current = next;
+        return next;
+      });
+      markDirty();
+      queueSave();
+    },
+    [markDirty, queueSave],
+  );
+
   const patchSalonesPage = useCallback(
     (patch: Partial<CmsSalonesPage>) => {
       setSalonesPage((p) => ({ ...p, ...patch }));
@@ -612,6 +683,11 @@ function CursosCmsEditInner({
       patchSalon,
       addSalon,
       hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
+      salonesSedesHidden,
+      salonesHidden,
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
@@ -630,6 +706,8 @@ function CursosCmsEditInner({
       agendaItems,
       salonesItems,
       salonesPage,
+      salonesSedesHidden,
+      salonesHidden,
       circuloAmigos,
       selectedId,
       patchPage,
@@ -642,6 +720,9 @@ function CursosCmsEditInner({
       patchSalon,
       addSalon,
       hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
       patchSalonesPage,
       patchCirculoAmigos,
       getOfertaCards,
@@ -971,6 +1052,91 @@ function CursosCmsEditInner({
               onChange={(v) => patchSalonesPage({ intro: v })}
               multiline
             />
+            <div className="rounded-lg border border-slate-200 p-3">
+              <p className="text-sm font-semibold text-slate-700">
+                Sedes visibles en alquiler
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Oculta Naco o Santiago si aún no ofreces salones ahí. Los
+                salones de esa sede dejan de verse en el sitio.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {(["Naco", "Los Prados", "Santiago"] as SalonSede[]).map(
+                  (sede) => {
+                    const isHidden = salonesSedesHidden.includes(sede);
+                    return (
+                      <li
+                        key={sede}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>
+                          Sede {sede}
+                          {isHidden ? (
+                            <span className="ml-2 text-xs font-semibold text-amber-800">
+                              (oculta)
+                            </span>
+                          ) : null}
+                        </span>
+                        {isHidden ? (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                            onClick={() => restoreSalonSede(sede)}
+                          >
+                            Mostrar
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-xs font-semibold text-red-700"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `¿Ocultar la sede ${sede} del catálogo de salones?`,
+                                )
+                              ) {
+                                hideSalonSede(sede);
+                              }
+                            }}
+                          >
+                            Ocultar
+                          </button>
+                        )}
+                      </li>
+                    );
+                  },
+                )}
+              </ul>
+            </div>
+            {salonesHidden.length > 0 ? (
+              <div className="rounded-lg border border-slate-200 p-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Salones ocultos
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {salonesHidden.map((id) => {
+                    const salon =
+                      SALONES.find((s) => s.id === id) ??
+                      salonesItems.find((s) => s.id === id);
+                    return (
+                      <li
+                        key={id}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>{salon?.name ?? id}</span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                          onClick={() => restoreSalon(id)}
+                        >
+                          Mostrar de nuevo
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </EditPanelChrome>
       ) : null}

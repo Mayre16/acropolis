@@ -2,6 +2,7 @@ export type AnalyticsSiteId =
   | "acropolis"
   | "civis"
   | "editorial"
+  | "circulodeamigos"
   | "biblioteca";
 
 export type AnalyticsDailyPoint = {
@@ -48,5 +49,6 @@ export const ANALYTICS_SITE_LABELS: Record<AnalyticsSiteId, string> = {
   acropolis: "Acrópolis (sitio principal)",
   civis: "Civis Consulting",
   editorial: "Librería Editorial Logos",
+  circulodeamigos: "Círculo de Amigos OINADOM",
   biblioteca: "Biblioteca Sophia",
 };

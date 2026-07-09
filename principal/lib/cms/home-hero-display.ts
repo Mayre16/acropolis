@@ -18,11 +18,15 @@ export function isRepoHomeHeroSrc(src?: string | null): boolean {
 /**
  * Prioridad de visualización:
  * 1. Foto del CMS (borrador/publicado) si tiene `src` distinto del default del repo
- * 2. Foto fija del repo (`/img/home/hero-voluntarios-chalecos.webp`)
+ * 2. Foto fija del repo — solo si `allowRepoFallback` (tras cargar CMS o sin CMS)
+ *
+ * Con CMS activo y aún cargando, pasar `allowRepoFallback: false` para no
+ * mostrar la foto vieja del repo antes de la publicada.
  */
 export function pickHomeHeroBackground(
   cms?: { src?: string; alt?: string } | null,
-): HomeHeroBackground {
+  options?: { allowRepoFallback?: boolean },
+): HomeHeroBackground | null {
   const cmsSrc = cms?.src?.trim();
   if (cmsSrc && !isRepoHomeHeroSrc(cmsSrc)) {
     return {
@@ -30,6 +34,7 @@ export function pickHomeHeroBackground(
       alt: cms?.alt?.trim() || HOME_HERO_BACKGROUND.alt,
     };
   }
+  if (options?.allowRepoFallback === false) return null;
   return {
     src: HOME_HERO_BACKGROUND.src,
     alt: HOME_HERO_BACKGROUND.alt,

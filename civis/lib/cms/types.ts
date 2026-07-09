@@ -412,6 +412,8 @@ export type CmsDocument = {
 
     /** Salones compartidos (se leen del CMS de Acrópolis). */
     salones?: CmsSalon[];
+    salonesHidden?: string[];
+    salonesSedesHidden?: string[];
 
     civisSalonesPage?: CmsCivisSalonesPage;
 

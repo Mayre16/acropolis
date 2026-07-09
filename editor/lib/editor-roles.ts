@@ -140,13 +140,13 @@ export const VISUAL_TAB_IDS = new Set([
 
   "civisSalones",
 
+  "circuloHome",
+
   "quienesSomos",
 
   "relaciones",
 
   "esfera",
-
-  "circuloAmigos",
 
   "editorialHome",
 
@@ -220,6 +220,8 @@ export const TAB_LABELS: Record<string, string> = {
 
   circuloAmigos: "Círculo de Amigos",
 
+  circuloHome: "Círculo — inicio",
+
   editorialHome: "Inicio — tienda",
 
   editorialLibros: "Libros impresos",
@@ -253,8 +255,6 @@ const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
     "diplomado",
 
     "filosofia",
-
-    "circuloAmigos",
 
     "voluntariado",
 
@@ -382,21 +382,41 @@ const EDITORIAL_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
 
 
 
+const CIRCULO_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
+
+  admin: ["circuloHome", "archivos", "estadisticas"],
+
+  voluntariado: [],
+
+  editorial: [],
+
+  filosofia: [],
+
+  viajes: [],
+
+  esfera: ["archivos"],
+
+};
+
+
+
 export function tabsForRole(site: SiteId, role: EditorRole): EditorTabId[] {
   const map =
     site === "acropolis"
       ? ACROPOLIS_BY_ROLE
       : site === "civis"
         ? CIVIS_BY_ROLE
-        : EDITORIAL_BY_ROLE;
+        : site === "circulodeamigos"
+          ? CIRCULO_BY_ROLE
+          : EDITORIAL_BY_ROLE;
   return map[role] ?? map.admin;
 }
 
-
-
+/** Preferir `tabsForPermissions` cuando el usuario tenga permisos custom. */
 export function defaultTabForRole(site: SiteId, role: EditorRole): EditorTabId {
   const tabs = tabsForRole(site, role);
   if (site === "editorial") return tabs[0] ?? "editorialHome";
+  if (site === "circulodeamigos") return tabs[0] ?? "circuloHome";
   return tabs[0] ?? (site === "acropolis" ? "home" : "civisHome");
 }
 

@@ -33,7 +33,7 @@ export function DiplomadoInscriptionSchedule() {
           Editar fechas de inscripción
         </button>
       ) : null}
-      <ul className="grid grid-cols-2 gap-3">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {schedule.map(({ label, value }) => {
           const Icon =
             SCHEDULE_ICONS[label as keyof typeof SCHEDULE_ICONS] ?? Calendar;

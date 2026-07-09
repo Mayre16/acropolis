@@ -57,11 +57,15 @@ export function useMergedSalones(): Salon[] {
 }
 
 export function useMergedSalonesBySede() {
+  const acropolis = useAcropolisSalonesCms();
   const salones = useMergedSalones();
+  const sedesHidden = new Set(acropolis?.sections.salonesSedesHidden ?? []);
   return SALON_SEDES.map((sede) => ({
     sede,
     salones: salones.filter((s) => s.sede === sede),
-  })).filter((group) => group.salones.length > 0);
+  })).filter(
+    (group) => group.salones.length > 0 && !sedesHidden.has(group.sede),
+  );
 }
 
 export function useCivisSalonesPage(): CmsCivisSalonesPage {

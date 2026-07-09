@@ -203,12 +203,111 @@ function cms_auth_append_user(string $dataRoot, array $user): array
     return $user;
 }
 
+function cms_auth_permission_catalog(): array
+{
+    static $catalog = null;
+    if ($catalog !== null) {
+        return $catalog;
+    }
+    $tabs = [
+        'home', 'sedes', 'cursos', 'diplomado', 'filosofia',
+        'voluntariado', 'eventos', 'agenda', 'articulos', 'medios', 'cultura',
+        'viajesLocales', 'viajesInternacionales', 'esfera', 'quienesSomos',
+        'relaciones', 'contenido', 'archivos', 'estadisticas',
+        'civisHome', 'civisTalleres', 'civisQuienesSomos', 'civisSalones',
+        'circuloHome',
+        'editorialHome', 'editorialLibros', 'editorialDigitales', 'editorialRevistas',
+        'editorialRegalos', 'editorialDonde', 'editorialQuienesSomos',
+    ];
+    $catalog = [
+        'site:acropolis', 'site:civis', 'site:editorial', 'site:circulodeamigos',
+        'admin:users', 'admin:smtp',
+    ];
+    foreach ($tabs as $tab) {
+        $catalog[] = 'tab:' . $tab;
+    }
+    return $catalog;
+}
+
+function cms_auth_sanitize_permissions($raw): array
+{
+    if (!is_array($raw)) {
+        return [];
+    }
+    $allowed = array_flip(cms_auth_permission_catalog());
+    $out = [];
+    $seen = [];
+    foreach ($raw as $item) {
+        if (!is_string($item)) {
+            continue;
+        }
+        $key = trim($item);
+        if ($key === '' || !isset($allowed[$key]) || isset($seen[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+        $out[] = $key;
+    }
+    return $out;
+}
+
+function cms_auth_default_permissions_for_role(string $role): array
+{
+    $all = cms_auth_permission_catalog();
+    $map = [
+        'admin' => $all,
+        'voluntariado' => ['site:acropolis', 'tab:voluntariado', 'tab:agenda'],
+        'esfera' => [
+            'site:acropolis', 'tab:sedes', 'tab:esfera', 'tab:agenda',
+            'tab:archivos', 'tab:home',
+        ],
+        'editorial' => [
+            'site:editorial',
+            'tab:editorialHome', 'tab:editorialLibros', 'tab:editorialDigitales',
+            'tab:editorialRevistas', 'tab:editorialRegalos', 'tab:editorialDonde',
+            'tab:editorialQuienesSomos', 'tab:archivos', 'tab:estadisticas',
+        ],
+        'viajes' => [
+            'site:acropolis', 'tab:viajesLocales', 'tab:viajesInternacionales',
+        ],
+        'filosofia' => [
+            'site:acropolis', 'tab:diplomado', 'tab:filosofia', 'tab:eventos',
+            'tab:contenido', 'tab:agenda',
+        ],
+    ];
+    return $map[$role] ?? [];
+}
+
+function cms_auth_effective_permissions(array $user): array
+{
+    $role = (string) ($user['role'] ?? '');
+    if ($role === 'admin') {
+        return cms_auth_permission_catalog();
+    }
+    $custom = cms_auth_sanitize_permissions($user['permissions'] ?? null);
+    if ($custom !== []) {
+        return $custom;
+    }
+    return cms_auth_default_permissions_for_role($role);
+}
+
+function cms_auth_user_has_permission(array $user, string $permission): bool
+{
+    if (($user['role'] ?? '') === 'admin') {
+        return true;
+    }
+    return in_array($permission, cms_auth_effective_permissions($user), true);
+}
+
 function cms_auth_admin_create_user(string $dataRoot, array $body): array
 {
     $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
     $role = trim((string) ($body['role'] ?? ''));
     $label = trim((string) ($body['label'] ?? ''));
     $password = (string) ($body['password'] ?? '');
+    $permissions = array_key_exists('permissions', $body)
+        ? cms_auth_sanitize_permissions($body['permissions'])
+        : cms_auth_default_permissions_for_role($role);
 
     if ($email === '' || !cms_auth_is_valid_email($email)) {
         return ['ok' => false, 'error' => 'Correo electrónico inválido', 'status' => 400];
@@ -235,6 +334,7 @@ function cms_auth_admin_create_user(string $dataRoot, array $body): array
         'passwordHash' => cms_hash_password($password),
         'role' => $role,
         'label' => $label,
+        'permissions' => $permissions,
         'totpSecret' => null,
         'disabled' => false,
         'createdAt' => gmdate('c'),
@@ -267,6 +367,12 @@ function cms_auth_admin_update_user(string $dataRoot, string $userId, array $bod
             return ['ok' => false, 'error' => 'Debe quedar al menos un administrador', 'status' => 400];
         }
         $patch['role'] = $role;
+        if (!array_key_exists('permissions', $body)) {
+            $patch['permissions'] = cms_auth_default_permissions_for_role($role);
+        }
+    }
+    if (array_key_exists('permissions', $body)) {
+        $patch['permissions'] = cms_auth_sanitize_permissions($body['permissions']);
     }
     if (array_key_exists('disabled', $body)) {
         $disabled = !empty($body['disabled']);
@@ -373,11 +479,13 @@ function cms_auth_create_session(string $dataRoot, array $user): array
 {
     $token = bin2hex(random_bytes(16));
     $sessions = cms_auth_sessions($dataRoot);
+    $permissions = cms_auth_effective_permissions($user);
     $sessions[$token] = [
         'expires' => (int) round(microtime(true) * 1000) + CMS_SESSION_TTL_MS,
         'role' => (string) ($user['role'] ?? 'admin'),
         'label' => (string) ($user['label'] ?? 'Editor'),
         'username' => (string) ($user['username'] ?? ''),
+        'permissions' => $permissions,
     ];
     cms_auth_save_sessions($dataRoot, $sessions);
     return [
@@ -386,6 +494,7 @@ function cms_auth_create_session(string $dataRoot, array $user): array
         'expiresIn' => (int) (CMS_SESSION_TTL_MS / 1000),
         'role' => $sessions[$token]['role'],
         'label' => $sessions[$token]['label'],
+        'permissions' => $permissions,
     ];
 }
 
@@ -730,18 +839,20 @@ function cms_auth_send_invite_mail(array $config, string $email, string $label, 
 {
     require_once __DIR__ . '/mail.php';
     $inviteUrl = cms_auth_build_invite_url($config, $token);
-    $greeting = $label !== '' ? "Hola {$label}" : 'Hola';
-    $body = "{$greeting},\n\n"
+    $name = $label !== '' ? $label : $email;
+    $plain = "Bienvenido {$name}\n\n"
         . "Te han invitado al editor de contenidos de Nueva Acrópolis RD.\n\n"
-        . "Para activar tu cuenta, abre este enlace y crea tu contraseña:\n\n"
+        . "Esta invitación se envió a: {$email}\n"
+        . "(ese será tu usuario de acceso; si tienes reenvío de correo, confirma que es la cuenta correcta)\n\n"
+        . "Acepta la invitación y crea tu contraseña:\n"
         . "{$inviteUrl}\n\n"
-        . "El enlace caduca en 72 horas. Si no esperabas este mensaje, puedes ignorarlo.\n\n"
-        . "— Nueva Acrópolis RD";
+        . "El enlace caduca en 72 horas. Si no esperabas este mensaje, puedes ignorarlo.\n";
     cms_send_plain_mail(cms_load_smtp_config($config), [
         'to' => $email,
-        'toName' => $label !== '' ? $label : $email,
+        'toName' => $name,
         'subject' => 'Invitación al editor de Nueva Acrópolis RD',
-        'body' => $body,
+        'body' => $plain,
+        'htmlBody' => cms_mail_invite_html_document($label, $email, $inviteUrl, 'acropolis'),
     ]);
 }
 
@@ -814,6 +925,9 @@ function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config
     $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
     $role = trim((string) ($body['role'] ?? ''));
     $label = trim((string) ($body['label'] ?? ''));
+    $permissions = array_key_exists('permissions', $body)
+        ? cms_auth_sanitize_permissions($body['permissions'])
+        : cms_auth_default_permissions_for_role($role);
 
     if ($email === '' || !cms_auth_is_valid_email($email)) {
         return ['ok' => false, 'error' => 'Correo electrónico inválido', 'status' => 400];
@@ -835,6 +949,7 @@ function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config
         'passwordHash' => null,
         'role' => $role,
         'label' => $label,
+        'permissions' => $permissions,
         'totpSecret' => null,
         'disabled' => false,
         'invitePending' => true,
@@ -912,6 +1027,7 @@ function cms_auth_public_user(array $user): array
         'email' => $user['email'] ?? ($user['username'] ?? ''),
         'role' => $user['role'] ?? '',
         'label' => $user['label'] ?? '',
+        'permissions' => cms_auth_effective_permissions($user),
         'totpEnabled' => !empty($user['totpSecret']),
         'disabled' => !empty($user['disabled']),
         'invitePending' => cms_auth_user_invite_pending($user),
@@ -921,14 +1037,23 @@ function cms_auth_public_user(array $user): array
 
 function cms_auth_require_admin(string $dataRoot, string $token): array
 {
+    return cms_auth_require_permission($dataRoot, $token, 'admin:users');
+}
+
+function cms_auth_require_permission(string $dataRoot, string $token, string $permission): array
+{
     $sess = cms_auth_get_session($dataRoot, $token);
     if ($sess === null) {
         return ['ok' => false, 'error' => 'No autorizado', 'status' => 401];
     }
-    if (($sess['role'] ?? '') !== 'admin') {
-        return ['ok' => false, 'error' => 'Solo administradores', 'status' => 403];
+    if (($sess['role'] ?? '') === 'admin') {
+        return ['ok' => true, 'session' => $sess];
     }
-    return ['ok' => true, 'session' => $sess];
+    $perms = cms_auth_sanitize_permissions($sess['permissions'] ?? null);
+    if (in_array($permission, $perms, true)) {
+        return ['ok' => true, 'session' => $sess];
+    }
+    return ['ok' => false, 'error' => 'Sin permiso', 'status' => 403];
 }
 
 function cms_auth_handle(string $uri, string $method, array $config, string $dataRoot): ?array
@@ -974,13 +1099,22 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
             return ['status' => 401, 'body' => ['ok' => false]];
         }
         if ($sess !== null) {
+            $role = (string) ($sess['role'] ?? 'admin');
+            $perms = cms_auth_sanitize_permissions($sess['permissions'] ?? null);
+            if ($perms === []) {
+                $perms = cms_auth_default_permissions_for_role($role);
+            }
+            if ($role === 'admin') {
+                $perms = cms_auth_permission_catalog();
+            }
             return [
                 'status' => 200,
                 'body' => [
                     'ok' => true,
-                    'role' => $sess['role'] ?? 'admin',
+                    'role' => $role,
                     'label' => $sess['label'] ?? 'Editor',
                     'username' => $sess['username'] ?? '',
+                    'permissions' => $perms,
                     'totpEnabled' => cms_auth_session_totp_enabled($dataRoot, $token),
                 ],
             ];
@@ -992,6 +1126,7 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
                 'role' => 'admin',
                 'label' => 'Administrador',
                 'username' => 'admin',
+                'permissions' => cms_auth_permission_catalog(),
                 'totpEnabled' => false,
             ],
         ];

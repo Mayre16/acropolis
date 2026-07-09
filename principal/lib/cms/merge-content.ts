@@ -184,6 +184,10 @@ export function mergeVenues(
     if (!hidden.has(v.id)) map.set(v.id, v);
   }
   for (const v of publishedFallback?.sections.venues ?? []) {
+    if (hidden.has(v.id)) {
+      map.delete(v.id);
+      continue;
+    }
     map.set(v.id, cmsToVenue(v));
   }
   return Array.from(map.values());

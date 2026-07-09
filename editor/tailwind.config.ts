@@ -19,6 +19,7 @@ const config: Config = {
           civis: { DEFAULT: "#3B4BA0", dark: "#2F3D85" },
           biblioteca: { DEFAULT: "#fdcb20", dark: "#e6b800", ink: "#1a1a1a" },
           editorial: { DEFAULT: "#ee934c", dark: "#d97a32" },
+          circulodeamigos: { DEFAULT: "#3A9AD4", dark: "#2B7FB3" },
         },
       },
     },
@@ -41,6 +42,9 @@ const config: Config = {
     "bg-site-editorial",
     "hover:bg-site-editorial-dark",
     "border-site-editorial",
+    "bg-site-circulodeamigos",
+    "hover:bg-site-circulodeamigos-dark",
+    "border-site-circulodeamigos",
   ],
 };
 export default config;

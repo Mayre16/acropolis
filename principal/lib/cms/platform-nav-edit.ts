@@ -16,7 +16,7 @@ export const PLATFORM_NAV_LABELS: Record<PlatformId, string> = {
   biblioteca: "Biblioteca",
   tienda: "Librería",
   civis: "Civis",
-  circulo: "Círculo de Amigos",
+  circulo: "Amigos",
 };
 
 export const PLATFORM_NAV_ORDER: PlatformId[] = [

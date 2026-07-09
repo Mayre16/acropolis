@@ -59,7 +59,7 @@ function jsonOut(int $code, array $body): void
 
 function sitePath(string $root, string $site): string
 {
-    if (!preg_match('/^(acropolis|civis|editorial)$/', $site)) {
+    if (!preg_match('/^(acropolis|civis|editorial|circulodeamigos)$/', $site)) {
         jsonOut(400, ['error' => 'Sitio inv?lido']);
     }
     return $root . DIRECTORY_SEPARATOR . $site;
@@ -99,7 +99,7 @@ if ($authResponse !== null) {
     jsonOut($authResponse['status'], $authResponse['body']);
 }
 
-if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $uri, $m)) {
+if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/(draft|published)$#', $uri, $m)) {
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
     $file = $siteDir . DIRECTORY_SEPARATOR . $m[2] . '.json';
@@ -128,7 +128,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/(draft|published)$#', $ur
     }
 }
 
-if (preg_match('#^/content/(acropolis|civis|editorial)/backups$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/backups$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
@@ -148,7 +148,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/backups$#', $uri, $m) && 
     jsonOut(200, ['backups' => $files]);
 }
 
-if (preg_match('#^/content/(acropolis|civis|editorial)/rollback$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/rollback$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
@@ -169,12 +169,20 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/rollback$#', $uri, $m) &&
 }
 
 if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    requireAuth();
+    $token = cms_bearer_token() ?? '';
+    $gate = cms_auth_require_permission($dataRoot, $token, 'admin:smtp');
+    if (!($gate['ok'] ?? false)) {
+        jsonOut((int) ($gate['status'] ?? 403), ['error' => $gate['error'] ?? 'Sin permiso']);
+    }
     jsonOut(200, cms_public_smtp_config(cms_load_smtp_config($config)));
 }
 
 if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
-    requireAuth();
+    $token = cms_bearer_token() ?? '';
+    $gate = cms_auth_require_permission($dataRoot, $token, 'admin:smtp');
+    if (!($gate['ok'] ?? false)) {
+        jsonOut((int) ($gate['status'] ?? 403), ['error' => $gate['error'] ?? 'Sin permiso']);
+    }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['error' => 'JSON inv?lido']);
@@ -235,7 +243,7 @@ if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_M
     jsonOut(($sync['ok'] ?? false) ? 200 : 207, ['ok' => $sync['ok'] ?? false, 'bookstoreSync' => $sync]);
 }
 
-if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
@@ -272,7 +280,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial)/publish$#', $uri, $m) && 
     ]);
 }
 
-if (preg_match('#^/upload/(acropolis|civis|editorial)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (preg_match('#^/upload/(acropolis|civis|editorial|circulodeamigos)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir);
@@ -350,13 +358,13 @@ if ($uri === '/spellcheck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(200, ['issues' => $issues]);
 }
 
-if (preg_match('#^/uploads/(acropolis|civis|editorial)/inventory$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (preg_match('#^/uploads/(acropolis|civis|editorial|circulodeamigos)/inventory$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     requireAuth();
     require __DIR__ . '/upload-inventory.php';
     jsonOut(200, cms_build_upload_inventory($m[1], $dataRoot));
 }
 
-if (preg_match('#^/uploads/(acropolis|civis|editorial)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (preg_match('#^/uploads/(acropolis|civis|editorial|circulodeamigos)/(.+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $siteDir = sitePath($dataRoot, $m[1]);
     $safe = basename($m[2]);
     if ($safe === '' || $safe === '.' || $safe === '..') {
@@ -387,7 +395,7 @@ if ($uri === '/analytics/collect' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     jsonOut(200, cms_analytics_collect($body, $dataRoot, $remoteIp));
 }
 
-if (preg_match('#^/analytics/summary/(acropolis|civis|editorial|biblioteca)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (preg_match('#^/analytics/summary/(acropolis|civis|editorial|circulodeamigos|biblioteca)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     requireAuth();
     $year = (int) ($_GET['year'] ?? gmdate('Y'));
     $month = (int) ($_GET['month'] ?? gmdate('n'));

@@ -43,6 +43,17 @@ export const DASHBOARD_SITES: DashboardSiteConfig[] = [
     ctaClass: "bg-site-editorial text-white hover:bg-site-editorial-dark",
     cmsReady: true,
   },
+  {
+    id: "circulodeamigos",
+    label: "Círculo de Amigos",
+    subtitle: "Círculo de Amigos OINADOM",
+    buttonClass:
+      "bg-site-circulodeamigos text-white shadow-md hover:bg-site-circulodeamigos-dark",
+    accentClass: "border-t-4 border-site-circulodeamigos",
+    ctaClass:
+      "bg-site-circulodeamigos text-white hover:bg-site-circulodeamigos-dark",
+    cmsReady: true,
+  },
 ];
 
 export function dashboardSiteAnchor(id: DashboardSiteKey) {

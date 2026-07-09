@@ -3,7 +3,7 @@
  * Variables: CMS_GITHUB_REPO, CMS_GITHUB_DEPLOY_TOKEN
  */
 export async function triggerDeployWebhook(site) {
-  if (!/^(acropolis|civis|tienda)$/.test(site)) {
+  if (!/^(acropolis|civis|tienda|circulodeamigos)$/.test(site)) {
     return { queued: false, reason: "invalid_site" };
   }
 

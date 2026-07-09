@@ -17,6 +17,7 @@ const VALID_SITES = new Set<AnalyticsSiteId>([
   "acropolis",
   "civis",
   "editorial",
+  "circulodeamigos",
   "biblioteca",
 ]);
 

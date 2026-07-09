@@ -50,12 +50,14 @@ export default function LoginPage() {
     });
   }, [router]);
 
-  async function finishLogin(token: string, role: string, label: string) {
-
-    setSession({ token, role, label });
-
+  async function finishLogin(
+    token: string,
+    role: string,
+    label: string,
+    permissions?: string[],
+  ) {
+    setSession({ token, role, label, permissions });
     router.push("/dashboard/");
-
   }
 
 
@@ -101,6 +103,7 @@ export default function LoginPage() {
         String(res.token),
         String(res.role ?? "admin"),
         String(res.label ?? "Editor"),
+        Array.isArray(res.permissions) ? res.permissions : undefined,
       );
       return;
     }
@@ -145,13 +148,10 @@ export default function LoginPage() {
     }
 
     await finishLogin(
-
       String(res.token),
-
       String(res.role ?? "admin"),
-
       String(res.label ?? "Editor"),
-
+      Array.isArray(res.permissions) ? res.permissions : undefined,
     );
   }
 

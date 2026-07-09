@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       site:
-        description: "Sitio (all | acropolis | civis | tienda | editor)"
+        description: "Sitio (all | acropolis | civis | tienda | circulodeamigos | editor)"
         required: true
         default: all
         type: choice
@@ -15,6 +15,7 @@ on:
           - acropolis
           - civis
           - tienda
+          - circulodeamigos
           - editor
 
 permissions:
@@ -31,13 +32,13 @@ jobs:
           SITE="${{ github.event.client_payload.site || github.event.inputs.site || 'all' }}"
           case "$SITE" in
             all|both)
-              echo 'sites=["acropolis","civis","tienda"]' >> "$GITHUB_OUTPUT"
+              echo 'sites=["acropolis","civis","tienda","circulodeamigos"]' >> "$GITHUB_OUTPUT"
               ;;
-            acropolis|civis|tienda|editor)
+            acropolis|civis|tienda|circulodeamigos|editor)
               echo "sites=[\"$SITE\"]" >> "$GITHUB_OUTPUT"
               ;;
             *)
-              echo 'sites=["acropolis","civis","tienda"]' >> "$GITHUB_OUTPUT"
+              echo 'sites=["acropolis","civis","tienda","circulodeamigos"]' >> "$GITHUB_OUTPUT"
               ;;
           esac
 
@@ -63,12 +64,15 @@ jobs:
 
       - name: Sync CMS seeds for build (fallback sin API)
         run: |
-          mkdir -p editor/data/acropolis editor/data/civis
+          mkdir -p editor/data/acropolis editor/data/civis editor/data/circulodeamigos
           if [ -f principal/data/acropolis/published.json ]; then
             cp principal/data/acropolis/published.json editor/data/acropolis/published.json
           fi
           if [ -f civis/data/civis/published.json ]; then
             cp civis/data/civis/published.json editor/data/civis/published.json
+          fi
+          if [ -f circulodeamigos/data/circulodeamigos/published.json ]; then
+            cp circulodeamigos/data/circulodeamigos/published.json editor/data/circulodeamigos/published.json
           fi
 
       - name: Build principal (Acropolis)
@@ -163,6 +167,36 @@ jobs:
           server-dir: ${{ secrets.TIENDA_FTP_REMOTE_DIR }}
           dangerous-clean-slate: false
 
+      - name: Build circulodeamigos
+        if: matrix.site == 'circulodeamigos'
+        working-directory: circulodeamigos
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.CIRCULO_SITE_URL || 'https://circulodeamigos.acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_PRINCIPAL_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+        run: npm ci && npm run build:cpanel
+
+      - name: Check circulodeamigos FTP
+        id: circulo_ftp
+        if: matrix.site == 'circulodeamigos'
+        env:
+          FTP_SERVER: ${{ secrets.CIRCULO_FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"
+          else echo "ready=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Deploy circulodeamigos to cPanel (FTP)
+        if: matrix.site == 'circulodeamigos' && steps.circulo_ftp.outputs.ready == '1'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.CIRCULO_FTP_SERVER }}
+          username: ${{ secrets.CIRCULO_FTP_USERNAME }}
+          password: ${{ secrets.CIRCULO_FTP_PASSWORD }}
+          local-dir: circulodeamigos/out/
+          server-dir: ${{ secrets.CIRCULO_FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false
+
       - name: Build editor (CMS panel)
         if: matrix.site == 'editor'
         working-directory: editor
@@ -172,6 +206,7 @@ jobs:
           NEXT_PUBLIC_PRINCIPAL_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
           NEXT_PUBLIC_CIVIS_URL: ${{ secrets.CIVIS_SITE_URL || 'https://civis.acropolis.adesa.com.do' }}
           NEXT_PUBLIC_TIENDA_URL: ${{ secrets.TIENDA_SITE_URL || 'https://tienda.acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CIRCULO_URL: ${{ secrets.CIRCULO_SITE_URL || 'https://circulodeamigos.acropolis.adesa.com.do' }}
         run: npm ci && npm run build:cpanel
 
       - name: Check editor FTP
@@ -203,6 +238,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cms-${{ matrix.site }}-out
-          path: ${{ matrix.site == 'civis' && 'civis/out/' || matrix.site == 'tienda' && 'tienda/out/' || matrix.site == 'editor' && 'editor/out/' || 'principal/out/' }}
+          path: ${{ matrix.site == 'civis' && 'civis/out/' || matrix.site == 'tienda' && 'tienda/out/' || matrix.site == 'circulodeamigos' && 'circulodeamigos/out/' || matrix.site == 'editor' && 'editor/out/' || 'principal/out/' }}
           if-no-files-found: ignore
           retention-days: 7

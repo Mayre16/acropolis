@@ -29,9 +29,11 @@ export function HeroCarousel({
 }: Props) {
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [firstReady, setFirstReady] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const visibleImages = images.filter((img) => img.src?.trim());
   const n = visibleImages.length;
+  const imagesSignature = visibleImages.map((img) => img.src).join("|");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -39,6 +41,12 @@ export function HeroCarousel({
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false
     );
   }, []);
+
+  // Al sustituir el carrusel del CMS, reinicia en la primera foto nueva.
+  useEffect(() => {
+    setIndex(0);
+    setFirstReady(false);
+  }, [imagesSignature]);
 
   useEffect(() => {
     if (n <= 1 || reduceMotion) return;
@@ -72,12 +80,13 @@ export function HeroCarousel({
       {visibleImages.map((img, i) => {
         const isVideo = img.media === "video" && !reduceMotion;
         const key = `${img.media ?? "image"}-${img.src}`;
+        const slideVisible = firstReady && i === index;
 
         return (
           <div
             key={key}
             className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-            style={{ opacity: i === index ? 1 : 0 }}
+            style={{ opacity: slideVisible ? 1 : 0 }}
           >
             {isVideo ? (
               <video
@@ -92,6 +101,9 @@ export function HeroCarousel({
                 preload="metadata"
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition }}
+                onLoadedData={() => {
+                  if (i === 0) setFirstReady(true);
+                }}
               />
             ) : (
               <Image
@@ -103,6 +115,12 @@ export function HeroCarousel({
                 style={{ objectPosition }}
                 priority={priorityFirst && i === 0}
                 unoptimized
+                onLoad={() => {
+                  if (i === 0) setFirstReady(true);
+                }}
+                onError={() => {
+                  if (i === 0) setFirstReady(true);
+                }}
               />
             )}
           </div>

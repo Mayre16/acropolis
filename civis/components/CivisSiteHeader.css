@@ -5,7 +5,12 @@
   z-index: 50;
   width: 100%;
   --civis-header-brand: #3b4ba0;
-  --civis-mark-height: 4.5rem;
+  /* En móvil: altura acotada al ancho disponible (menú ~3.25rem) para no recortar el identificador. */
+  --civis-mark-height: clamp(
+    2.75rem,
+    calc((100vw - 3.25rem) / var(--civis-mark-aspect, 5.906)),
+    min(4.5rem, calc((100vw - 3.25rem) / var(--civis-mark-aspect, 5.906)))
+  );
   /* Margen transparente izquierdo del PNG (curva NA sobre blanco) */
   --civis-header-white-max: calc(
     var(--civis-mark-aspect, 5.906) * var(--civis-mark-height) * 0.115
@@ -39,7 +44,9 @@
 
 .civis-site-header__brand {
   display: block;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: calc(100% - 3.25rem);
   line-height: 0;
   text-decoration: none;
   padding: 0;

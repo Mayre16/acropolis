@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearToken } from "@/lib/auth-storage";
+import { clearToken, getEditorPermissions, getEditorRole } from "@/lib/auth-storage";
+import {
+  canAccessSmtpAdmin,
+  canAccessUsersAdmin,
+} from "@/lib/editor-permissions";
 
 type DashboardAdminBarProps = {
   role: string;
@@ -20,18 +24,22 @@ function navClass(active: boolean) {
 export function DashboardAdminBar({ role }: DashboardAdminBarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const permissions = getEditorPermissions();
+  const effectiveRole = role || getEditorRole();
+  const showUsers = canAccessUsersAdmin(effectiveRole, permissions);
+  const showSmtp = canAccessSmtpAdmin(effectiveRole, permissions);
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      {role === "admin" ? (
-        <>
-          <Link href="/dashboard/usuarios/" className={navClass(pathname.startsWith("/dashboard/usuarios"))}>
-            Usuarios
-          </Link>
-          <Link href="/dashboard/smtp/" className={navClass(pathname.startsWith("/dashboard/smtp"))}>
-            SMTP
-          </Link>
-        </>
+      {showUsers ? (
+        <Link href="/dashboard/usuarios/" className={navClass(pathname.startsWith("/dashboard/usuarios"))}>
+          Usuarios
+        </Link>
+      ) : null}
+      {showSmtp ? (
+        <Link href="/dashboard/smtp/" className={navClass(pathname.startsWith("/dashboard/smtp"))}>
+          SMTP
+        </Link>
       ) : null}
       <button
         type="button"

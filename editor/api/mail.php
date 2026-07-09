@@ -16,7 +16,7 @@ function cms_smtp_file(): string
 function cms_load_smtp_config(array $config): array
 {
     $defaults = [
-        'host' => 'mail.acropolis.adesa.com.do',
+        'host' => 'editor.acropolis.adesa.com.do',
         'port' => 465,
         'secure' => 'ssl',
         'user' => 'formularios@editor.acropolis.adesa.com.do',
@@ -49,6 +49,7 @@ function cms_load_smtp_config(array $config): array
         }
     }
 
+    // smtp.json aporta valores guardados desde el panel; config.php manda después.
     $merged = array_replace_recursive($defaults, $stored);
     foreach ([
         'smtp_host' => 'host',
@@ -62,8 +63,12 @@ function cms_load_smtp_config(array $config): array
             $merged[$smtpKey] = $config[$cfgKey];
         }
     }
-    if (empty($merged['password'])) {
-        $merged['password'] = (string) ($config['smtp_password'] ?? '');
+    $configPassword = trim((string) ($config['smtp_password'] ?? ''));
+    // Prioridad: config.php (cPanel) > smtp.json. El placeholder de ejemplo no cuenta.
+    if ($configPassword !== '' && strcasecmp($configPassword, 'CONTRASEÑA_SMTP') !== 0) {
+        $merged['password'] = $configPassword;
+    } elseif (empty($merged['password']) && $configPassword !== '') {
+        $merged['password'] = $configPassword;
     }
     return $merged;
 }
@@ -167,6 +172,378 @@ function cms_mailer(array $cfg): PHPMailer
     return $m;
 }
 
+/**
+ * Logos PNG con fondo blanco (Gmail/Outlook pintan de negro el WebP transparente).
+ * Archivos en api/mail-assets/ — subir esa carpeta junto con mail.php.
+ */
+function cms_mail_logo_url(string $filename): string
+{
+    $base = 'https://editor.acropolis.adesa.com.do/api/mail-assets';
+    return $base . '/' . ltrim($filename, '/');
+}
+
+/**
+ * Paleta + logos de firma según el sitio / formulario.
+ * - acropolis: verde institucional + logo NA
+ * - esfera: teal del logo Esfera + logos Esfera y NA
+ * - civis: azul oscuro + identificador Civis
+ * - circulo: azul claro + identificador Círculo de Amigos
+ */
+function cms_mail_brand_theme(string $brand = 'acropolis'): array
+{
+    $oinadomLogo = [
+        'src' => cms_mail_logo_url('logo-oinadom.png'),
+        'alt' => 'Nueva Acrópolis — República Dominicana',
+        'height' => 52,
+    ];
+    $esferaLogo = [
+        'src' => cms_mail_logo_url('logo-esfera.png'),
+        'alt' => 'Esfera Punto Focal',
+        'height' => 48,
+    ];
+    $civisLogo = [
+        'src' => cms_mail_logo_url('logo-civis.png'),
+        'alt' => 'Civis Consulting',
+        'height' => 52,
+    ];
+    $circuloLogo = [
+        'src' => cms_mail_logo_url('logo-circulo.png'),
+        'alt' => 'Círculo de Amigos OINADOM',
+        'height' => 40,
+    ];
+
+    $themes = [
+        'acropolis' => [
+            'label' => 'Nueva Acrópolis RD',
+            'badge' => 'Formulario web',
+            'header_from' => '#0b3d2e',
+            'header_to' => '#146b52',
+            'title' => '#0b3d2e',
+            'text' => '#1c2b26',
+            'muted' => '#5b6b64',
+            'footer_text' => '#6b7c75',
+            'page_bg' => '#eef3f0',
+            'card_border' => '#d7e3dd',
+            'footer_bg' => '#f7faf8',
+            'footer_border' => '#e3ece7',
+            'hr' => '#d7e3dd',
+            'list' => '#24352f',
+            'empty' => '#7a8b84',
+            'logos' => [$oinadomLogo],
+        ],
+        'esfera' => [
+            'label' => 'Punto Focal Esfera',
+            'badge' => 'Formulario Esfera',
+            'header_from' => '#167a66',
+            'header_to' => '#1f9078',
+            'title' => '#1f2a28',
+            'text' => '#1f2a28',
+            'muted' => '#4a6b63',
+            'footer_text' => '#5a7a72',
+            'page_bg' => '#eef7f4',
+            'card_border' => '#cfe8e1',
+            'footer_bg' => '#f4faf8',
+            'footer_border' => '#dceee8',
+            'hr' => '#cfe8e1',
+            'list' => '#24352f',
+            'empty' => '#7a9a90',
+            'logos' => [$esferaLogo, $oinadomLogo],
+        ],
+        'civis' => [
+            'label' => 'Civis Consulting',
+            'badge' => 'Formulario Civis',
+            'header_from' => '#252E65',
+            'header_to' => '#3E48A1',
+            'title' => '#252E65',
+            'text' => '#1a2238',
+            'muted' => '#5a6480',
+            'footer_text' => '#6b7390',
+            'page_bg' => '#eef0f7',
+            'card_border' => '#d5dae8',
+            'footer_bg' => '#f5f6fb',
+            'footer_border' => '#e2e6f0',
+            'hr' => '#d5dae8',
+            'list' => '#2a3348',
+            'empty' => '#8890a8',
+            'logos' => [$civisLogo],
+        ],
+        'circulo' => [
+            'label' => 'Círculo de Amigos OINADOM',
+            'badge' => 'Formulario Círculo de Amigos',
+            'header_from' => '#3a9ad4',
+            'header_to' => '#53a3da',
+            'title' => '#111631',
+            'text' => '#111631',
+            'muted' => '#4a6a82',
+            'footer_text' => '#5a7388',
+            'page_bg' => '#eef6fb',
+            'card_border' => '#cfe4f4',
+            'footer_bg' => '#f5fafd',
+            'footer_border' => '#dcecf6',
+            'hr' => '#cfe4f4',
+            'list' => '#243447',
+            'empty' => '#7a93a8',
+            'logos' => [$circuloLogo, $oinadomLogo],
+        ],
+    ];
+
+    return $themes[$brand] ?? $themes['acropolis'];
+}
+
+/** Bloque de firma con logos de identidad. */
+function cms_mail_signature_logos_html(array $theme): string
+{
+    $logos = $theme['logos'] ?? [];
+    if (!is_array($logos) || $logos === []) {
+        return '';
+    }
+
+    $cells = [];
+    foreach ($logos as $logo) {
+        if (!is_array($logo) || empty($logo['src'])) {
+            continue;
+        }
+        $src = htmlspecialchars((string) $logo['src'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $alt = htmlspecialchars((string) ($logo['alt'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $height = max(28, (int) ($logo['height'] ?? 44));
+        $cells[] = '<td style="padding:6px 14px 6px 0;vertical-align:middle;background:#ffffff;">'
+            . '<img src="' . $src . '" alt="' . $alt . '" height="' . $height . '" '
+            . 'style="display:block;height:' . $height . 'px;width:auto;max-width:240px;border:0;background:#ffffff;" />'
+            . '</td>';
+    }
+    if ($cells === []) {
+        return '';
+    }
+
+    return '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 14px;border-collapse:collapse;">'
+        . '<tr>' . implode('', $cells) . '</tr></table>';
+}
+
+/**
+ * Convierte el cuerpo de texto de los formularios en HTML legible
+ * (filas «Etiqueta: valor», listas · / -). Omite títulos ===…=== (ya van en el header).
+ */
+function cms_mail_body_to_html(string $plain, array $theme): string
+{
+    $lines = preg_split("/\r\n|\n|\r/", $plain) ?: [];
+    $parts = [];
+    $inList = false;
+    $started = false;
+
+    $closeList = static function () use (&$parts, &$inList): void {
+        if ($inList) {
+            $parts[] = '</ul>';
+            $inList = false;
+        }
+    };
+
+    foreach ($lines as $rawLine) {
+        $line = rtrim((string) $rawLine);
+        $trimmed = trim($line);
+
+        // Títulos de bloque del cuerpo (redundantes con el header del correo).
+        if (preg_match('/^===+\s*(.+?)\s*===+$/u', $trimmed)) {
+            $closeList();
+            continue;
+        }
+
+        if ($trimmed === '') {
+            if (!$started) {
+                continue;
+            }
+            $closeList();
+            $parts[] = '<div style="height:12px;line-height:12px;font-size:12px;">&nbsp;</div>';
+            continue;
+        }
+
+        if ($trimmed === '---' || preg_match('/^-{3,}$/', $trimmed)) {
+            $closeList();
+            if (!$started) {
+                continue;
+            }
+            $parts[] = '<hr style="border:none;border-top:1px solid ' . $theme['hr'] . ';margin:18px 0;">';
+            continue;
+        }
+
+        $started = true;
+
+        if (preg_match('/^(?:[·•\-]\s+|\s{2,}[·•\-]\s+)(.+)$/u', $line, $m)) {
+            if (!$inList) {
+                $parts[] = '<ul style="margin:0 0 12px;padding-left:22px;color:'
+                    . $theme['list'] . ';font-size:15px;line-height:1.55;">';
+                $inList = true;
+            }
+            $parts[] = '<li style="margin:0 0 6px;">'
+                . htmlspecialchars($m[1], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                . '</li>';
+            continue;
+        }
+
+        $closeList();
+
+        // Filas «Etiqueta: valor» de formularios. Evita partir URLs (https:) y frases largas.
+        $labelWords = [];
+        if (
+            preg_match('/^([^:\n]{2,40}):\s*(.*)$/u', $trimmed, $m)
+            && !preg_match('/^https?:\/\//i', $trimmed)
+            && !preg_match('/^https?$/i', $m[1])
+            && strpos($m[1], ',') === false
+            && preg_match_all('/\S+/u', $m[1], $labelWords) <= 5
+        ) {
+            $label = htmlspecialchars(rtrim($m[1]), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $value = trim($m[2]);
+            $valueHtml = $value === ''
+                ? '<span style="color:' . $theme['empty'] . ';">—</span>'
+                : htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $parts[] = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;border-collapse:collapse;">'
+                . '<tr>'
+                . '<td style="width:38%;padding:8px 12px 8px 0;vertical-align:top;color:'
+                . $theme['muted'] . ';font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">'
+                . $label . '</td>'
+                . '<td style="padding:8px 0;vertical-align:top;color:'
+                . $theme['text'] . ';font-size:15px;line-height:1.5;word-break:break-word;">'
+                . $valueHtml . '</td>'
+                . '</tr></table>';
+            continue;
+        }
+
+        $parts[] = '<p style="margin:0 0 12px;color:' . $theme['text'] . ';font-size:15px;line-height:1.6;">'
+            . htmlspecialchars($trimmed, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            . '</p>';
+    }
+
+    $closeList();
+    return implode("\n", $parts);
+}
+
+/** Plantilla HTML de marca para correos de formularios. */
+function cms_mail_html_document(
+    string $subject,
+    string $plainBody,
+    string $fromName = 'Nueva Acrópolis RD',
+    string $brand = 'acropolis',
+    ?string $badge = null,
+): string {
+    $theme = cms_mail_brand_theme($brand);
+    $safeSubject = htmlspecialchars($subject, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $displayName = trim($fromName) !== '' ? $fromName : $theme['label'];
+    $safeFrom = htmlspecialchars($displayName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $badgeText = trim((string) ($badge ?? '')) !== '' ? trim((string) $badge) : $theme['badge'];
+    $safeBadge = htmlspecialchars($badgeText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $content = cms_mail_body_to_html($plainBody, $theme);
+    $signature = cms_mail_signature_logos_html($theme);
+    $year = date('Y');
+
+    return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+        . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<title>' . $safeSubject . '</title></head>'
+        . '<body style="margin:0;padding:0;background:' . $theme['page_bg'] . ';">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:'
+        . $theme['page_bg'] . ';padding:24px 12px;">'
+        . '<tr><td align="center">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid '
+        . $theme['card_border'] . ';">'
+        . '<tr><td style="background:linear-gradient(135deg,'
+        . $theme['header_from'] . ' 0%,' . $theme['header_to'] . ' 100%);padding:22px 28px;">'
+        . '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:20px;line-height:1.3;color:#ffffff;font-weight:700;">'
+        . $safeFrom . '</div>'
+        . '<div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.82);">'
+        . $safeBadge . '</div>'
+        . '</td></tr>'
+        . '<tr><td style="padding:28px;font-family:Arial,Helvetica,sans-serif;">'
+        . $content
+        . '</td></tr>'
+        . '<tr><td style="padding:18px 28px 22px;background:'
+        . $theme['footer_bg'] . ';border-top:1px solid ' . $theme['footer_border']
+        . ';font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:'
+        . $theme['footer_text'] . ';">'
+        . $signature
+        . 'Este mensaje se generó automáticamente desde el sitio web. '
+        . 'Puede responder directamente a este correo para contactar al remitente.'
+        . '<br>© ' . $year . ' ' . $safeFrom
+        . '</td></tr>'
+        . '</table></td></tr></table></body></html>';
+}
+
+/**
+ * Plantilla de invitación al editor (estilo bienvenida + botón CTA).
+ * Evita el layout de filas «etiqueta: valor» de los formularios.
+ */
+function cms_mail_invite_html_document(
+    string $label,
+    string $email,
+    string $inviteUrl,
+    string $brand = 'acropolis',
+): string {
+    $theme = cms_mail_brand_theme($brand);
+    $name = trim($label);
+    if ($name === '') {
+        $name = trim($email);
+    }
+    if ($name === '') {
+        $name = 'invitado';
+    }
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeEmail = htmlspecialchars(trim($email), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeUrl = htmlspecialchars($inviteUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeBrand = htmlspecialchars($theme['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $signature = cms_mail_signature_logos_html($theme);
+    $year = date('Y');
+    $btnBg = $theme['header_from'];
+
+    return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+        . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<title>Invitación al editor</title></head>'
+        . '<body style="margin:0;padding:0;background:' . $theme['page_bg'] . ';">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:'
+        . $theme['page_bg'] . ';padding:24px 12px;">'
+        . '<tr><td align="center">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid '
+        . $theme['card_border'] . ';">'
+        . '<tr><td style="background:linear-gradient(135deg,'
+        . $theme['header_from'] . ' 0%,' . $theme['header_to'] . ' 100%);padding:18px 28px;">'
+        . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.9);font-weight:700;">'
+        . 'Invitación</div>'
+        . '</td></tr>'
+        . '<tr><td style="padding:36px 32px 28px;font-family:Arial,Helvetica,sans-serif;text-align:center;">'
+        . '<div style="font-size:28px;line-height:1.25;color:' . $theme['title'] . ';font-weight:700;margin:0 0 18px;">'
+        . '<span style="color:' . $theme['muted'] . ';font-weight:500;">Bienvenido</span> '
+        . $safeName . '</div>'
+        . '<p style="margin:0 0 12px;color:' . $theme['text'] . ';font-size:16px;line-height:1.55;">'
+        . 'Te han invitado al editor de contenidos de ' . $safeBrand . '.</p>'
+        . '<p style="margin:0 0 22px;color:' . $theme['muted'] . ';font-size:15px;line-height:1.55;">'
+        . 'Activa tu cuenta y crea tu contraseña con el botón siguiente.</p>'
+        . '<p style="margin:0 0 28px;color:' . $theme['text'] . ';font-size:14px;line-height:1.55;">'
+        . 'Esta invitación se envió a<br>'
+        . '<a href="mailto:' . $safeEmail . '" style="color:' . $theme['header_from'] . ';text-decoration:none;font-weight:700;font-size:15px;">'
+        . $safeEmail . '</a><br>'
+        . '<span style="color:' . $theme['muted'] . ';font-size:13px;">'
+        . '(ese será tu usuario de acceso; si tienes reenvío de correo, confirma que es la cuenta correcta)</span></p>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 22px;">'
+        . '<tr><td align="center" style="border-radius:10px;background:' . $btnBg . ';">'
+        . '<a href="' . $safeUrl . '" style="display:inline-block;padding:14px 28px;font-family:Arial,Helvetica,sans-serif;'
+        . 'font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#ffffff;">'
+        . 'Aceptar la invitación</a>'
+        . '</td></tr></table>'
+        . '<p style="margin:0 0 18px;color:' . $theme['muted'] . ';font-size:13px;line-height:1.5;">'
+        . 'También puedes <a href="' . $safeUrl . '" style="color:' . $theme['header_from'] . ';font-weight:700;">hacer clic aquí</a> '
+        . 'si el botón no funciona.</p>'
+        . '<p style="margin:0;color:' . $theme['muted'] . ';font-size:13px;line-height:1.5;">'
+        . 'El enlace caduca en 72 horas. Si no esperabas este mensaje, puedes ignorarlo.</p>'
+        . '</td></tr>'
+        . '<tr><td align="center" style="padding:18px 28px 22px;background:'
+        . $theme['footer_bg'] . ';border-top:1px solid ' . $theme['footer_border']
+        . ';font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:'
+        . $theme['footer_text'] . ';">'
+        . ($signature !== ''
+            ? '<div style="display:inline-block;text-align:left;margin:0 auto 10px;">' . $signature . '</div><br>'
+            : '')
+        . 'Enviado a ' . $safeEmail . '.<br>'
+        . '© ' . $year . ' ' . $safeBrand
+        . '</td></tr>'
+        . '</table></td></tr></table></body></html>';
+}
+
 function cms_send_plain_mail(array $cfg, array $opts): void
 {
     if (!cms_smtp_ready($cfg)) {
@@ -189,9 +566,26 @@ function cms_send_plain_mail(array $cfg, array $opts): void
     if (!empty($opts['replyTo'])) {
         $mail->addReplyTo((string) $opts['replyTo']);
     }
-    $mail->Subject = (string) $opts['subject'];
-    $mail->isHTML(false);
-    $mail->Body = (string) $opts['body'];
+    $subject = (string) $opts['subject'];
+    $plain = (string) $opts['body'];
+    $brand = (string) ($opts['brand'] ?? 'acropolis');
+    $theme = cms_mail_brand_theme($brand);
+    $fromName = trim((string) ($opts['brandName'] ?? ''));
+    if ($fromName === '') {
+        $fromName = $theme['label'];
+    }
+    $badge = isset($opts['badge']) ? trim((string) $opts['badge']) : null;
+    if ($badge === '') {
+        $badge = null;
+    }
+    $htmlBody = isset($opts['htmlBody']) ? trim((string) $opts['htmlBody']) : '';
+
+    $mail->Subject = $subject;
+    $mail->isHTML(true);
+    $mail->Body = $htmlBody !== ''
+        ? $htmlBody
+        : cms_mail_html_document($subject, $plain, $fromName, $brand, $badge);
+    $mail->AltBody = $plain;
     try {
         $mail->send();
     } catch (Exception $e) {
@@ -268,6 +662,8 @@ function cms_send_civis_solicitud(array $body, array $config, ?string $remoteIp 
             'replyTo' => $check['data']['email'],
             'subject' => $subject,
             'body' => $check['data']['message'],
+            'brand' => 'civis',
+            'brandName' => $toName,
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -350,6 +746,8 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
             'replyTo' => $check['data']['email'],
             'subject' => $subject,
             'body' => $check['data']['message'],
+            'brand' => 'esfera',
+            'brandName' => $toName,
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -389,13 +787,26 @@ function cms_is_preview_form_request(): bool
     return false;
 }
 
+function cms_log_mail_failure(Throwable $e): void
+{
+    try {
+        $dir = dirname(cms_smtp_file());
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $line = gmdate('c') . ' ' . str_replace(["\r", "\n"], ' ', $e->getMessage()) . "\n";
+        file_put_contents($dir . DIRECTORY_SEPARATOR . 'mail-last-error.log', $line, FILE_APPEND | LOCK_EX);
+    } catch (Throwable) {
+        // diagnóstico opcional
+    }
+}
+
 function cms_form_mail_error(Throwable $e, string $fallback = 'No se pudo enviar la solicitud. Inténtelo más tarde.'): array
 {
-    if (cms_is_preview_form_request() && $e instanceof RuntimeException) {
-        $detail = trim($e->getMessage());
-        if ($detail !== '') {
-            return ['ok' => false, 'error' => $detail];
-        }
+    cms_log_mail_failure($e);
+    $detail = trim($e->getMessage());
+    if (cms_is_preview_form_request() && $detail !== '') {
+        return ['ok' => false, 'error' => $detail];
     }
     return ['ok' => false, 'error' => $fallback];
 }
@@ -519,7 +930,8 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
 
     $ccs = [];
     $senderEmail = $contact['data']['email'];
-    if ($senderEmail !== '' && ($form['copy_to_sender'] ?? false)) {
+    // Igual que Civis/Esfera: copia al remitente por defecto si dejó correo.
+    if ($senderEmail !== '' && ($form['copy_to_sender'] ?? true) !== false) {
         $ccs[] = $senderEmail;
     }
 
@@ -531,6 +943,8 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
             'replyTo' => $senderEmail !== '' ? $senderEmail : null,
             'subject' => $subject,
             'body' => $message,
+            'brand' => 'acropolis',
+            'brandName' => $toName,
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -545,45 +959,53 @@ function cms_site_inquiry_route(string $formKey): ?array
         'curso_info' => [
             'to_email' => 'cursos.oinadom@acropolis.org',
             'to_name' => 'Cursos y Talleres',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'acropolis',
         ],
         'salon_inquiry' => [
             'to_email' => 'cursos.oinadom@acropolis.org',
             'to_name' => 'Cursos y Talleres',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'acropolis',
         ],
         'voluntariado_donacion' => [
             'to_email' => 'voluntariadord@acropolis.org',
             'to_name' => 'Voluntariado Humanitario',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'acropolis',
         ],
         'esfera_donar' => [
             'to_email' => 'esferard@acropolis.org',
             'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'esfera',
         ],
         'esfera_alianzas' => [
             'to_email' => 'esferard@acropolis.org',
             'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'esfera',
         ],
         'esfera_info' => [
             'to_email' => 'esferard@acropolis.org',
             'to_name' => 'Punto Focal Esfera',
             'cc_email' => 'Santiago.a@acropolis.org',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'esfera',
         ],
         'viaje_info' => [
             'to_email' => 'info.oinadom@acropolis.org',
             'to_name' => 'Nueva Acrópolis RD',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'acropolis',
         ],
         'circulo_amigos_inscription' => [
             'to_email' => 'amigos_dominicana@acropolis.org',
             'to_name' => 'Círculo de Amigos OINADOM',
-            'copy_to_sender' => false,
+            'copy_to_sender' => true,
+            'brand' => 'circulo',
         ],
     ];
     return $routes[$formKey] ?? null;
@@ -637,6 +1059,8 @@ function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): a
             'replyTo' => $senderEmail !== '' ? $senderEmail : null,
             'subject' => $subject,
             'body' => $message,
+            'brand' => (string) ($route['brand'] ?? 'acropolis'),
+            'brandName' => (string) ($route['to_name'] ?? ''),
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);

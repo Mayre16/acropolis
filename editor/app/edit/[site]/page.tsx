@@ -11,7 +11,13 @@ import {
   saveDraft,
   uploadImage,
 } from "@/lib/api";
-import { getToken, clearToken, getEditorRole, getEditorLabel } from "@/lib/auth-storage";
+import {
+  getToken,
+  clearToken,
+  getEditorRole,
+  getEditorLabel,
+  getEditorPermissions,
+} from "@/lib/auth-storage";
 import {
   CMS_SECTION_LABELS,
   SITE_LABELS,
@@ -20,11 +26,11 @@ import {
   type CmsDocument,
   type SiteId,
 } from "@/lib/content-types";
+import { type EditorRole } from "@/lib/editor-roles";
 import {
-  defaultTabForRole,
-  tabsForRole,
-  type EditorRole,
-} from "@/lib/editor-roles";
+  defaultTabForPermissions,
+  tabsForPermissions,
+} from "@/lib/editor-permissions";
 import {
   MediaField,
 } from "@/components/MediaFields";
@@ -38,7 +44,7 @@ import {
   VisualViajesInternacionalesEditor,
   VisualViajesLocalesEditor,
   VisualDiplomadoEditor,
-  VisualCirculoAmigosEditor,
+  VisualCirculoHomeEditor,
   VisualCulturaEditor,
   VisualSedesEditor,
   VisualHomeEditor,
@@ -103,7 +109,7 @@ const VISUAL_TABS = new Set([
   "quienesSomos",
   "relaciones",
   "esfera",
-  "circuloAmigos",
+  "circuloHome",
 ]);
 
 type TabId = keyof typeof CMS_SECTION_LABELS;
@@ -131,8 +137,8 @@ function VisualEditors({
         <VisualViajesInternacionalesEditor />
       )}
       {tab === "diplomado" && site === "acropolis" && <VisualDiplomadoEditor />}
-      {tab === "circuloAmigos" && site === "acropolis" && (
-        <VisualCirculoAmigosEditor />
+      {tab === "circuloHome" && site === "circulodeamigos" && (
+        <VisualCirculoHomeEditor />
       )}
       {tab === "cultura" && site === "acropolis" && <VisualCulturaEditor />}
       {tab === "sedes" && site === "acropolis" && <VisualSedesEditor />}
@@ -205,11 +211,15 @@ function EditSitePageInner() {
   const searchParams = useSearchParams();
   const [role, setRole] = useState<EditorRole>("admin");
   const [editorLabel, setEditorLabel] = useState("Editor");
-  const allowedTabs = useMemo(() => tabsForRole(site, role), [site, role]);
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const allowedTabs = useMemo(
+    () => tabsForPermissions(site, permissions, role),
+    [site, permissions, role],
+  );
   const [tab, setTab] = useState<TabId>(() => {
     const fromUrl = searchParams.get("tab");
     if (fromUrl && allowedTabs.includes(fromUrl)) return fromUrl as TabId;
-    return defaultTabForRole(site, role) as TabId;
+    return defaultTabForPermissions(site, permissions, role) as TabId;
   });
   const [doc, setDoc] = useState<CmsDocument | null>(null);
   const [status, setStatus] = useState("");
@@ -227,16 +237,21 @@ function EditSitePageInner() {
   );
 
   const menuTab = useMemo((): TabId => {
-    const fallback = defaultTabForRole(site, role) as TabId;
+    const fallback = defaultTabForPermissions(
+      site,
+      permissions,
+      role,
+    ) as TabId;
     const first = allowedTabs.find(
       (id) => id !== "archivos" && id !== "estadisticas",
     );
     return (first ?? fallback) as TabId;
-  }, [allowedTabs, site, role]);
+  }, [allowedTabs, site, role, permissions]);
 
   useEffect(() => {
     setRole(getEditorRole() as EditorRole);
     setEditorLabel(getEditorLabel());
+    setPermissions(getEditorPermissions());
   }, []);
 
   useEffect(() => {
@@ -252,9 +267,9 @@ function EditSitePageInner() {
       return;
     }
     if (!allowedTabs.includes(tab)) {
-      setTab(defaultTabForRole(site, role) as TabId);
+      setTab(defaultTabForPermissions(site, permissions, role) as TabId);
     }
-  }, [allowedTabs, tab, site, role, router]);
+  }, [allowedTabs, tab, site, role, permissions, router]);
 
   const load = useCallback(async () => {
     if (!token) {
@@ -484,6 +499,7 @@ function EditSitePageInner() {
         <CmsTabNav
           site={site}
           role={role}
+          permissions={permissions}
           activeTab={tab}
           mode="nav"
           onSelect={(id) => selectTab(id as TabId)}

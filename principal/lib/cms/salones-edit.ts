@@ -45,8 +45,9 @@ export function newSalonId() {
 export function getSalonesForEdit(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
-): { items: CmsSalon[]; hidden: string[] } {
+): { items: CmsSalon[]; hidden: string[]; sedesHidden: string[] } {
   const hidden = [...(doc?.sections.salonesHidden ?? [])];
+  const sedesHidden = [...(doc?.sections.salonesSedesHidden ?? [])];
   const hiddenSet = new Set(hidden);
   const cmsById = new Map((doc?.sections.salones ?? []).map((s) => [s.id, s]));
   const items: CmsSalon[] = [];
@@ -62,14 +63,18 @@ export function getSalonesForEdit(
       items.push(s);
     }
   }
-  return { items, hidden };
+  return { items, hidden, sedesHidden };
 }
 
 export function mergeSalones(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
 ): Salon[] {
-  return getSalonesForEdit(doc, fallback).items.map(cmsToSalon);
+  const { items, sedesHidden } = getSalonesForEdit(doc, fallback);
+  const sedesHiddenSet = new Set(sedesHidden);
+  return items
+    .map(cmsToSalon)
+    .filter((s) => !sedesHiddenSet.has(s.sede));
 }
 
 export function buildDocWithSalones(
@@ -77,6 +82,7 @@ export function buildDocWithSalones(
   items: CmsSalon[],
   page?: CmsSalonesPage,
   hidden?: string[],
+  sedesHidden?: string[],
 ): CmsDocument {
   return {
     ...base,
@@ -84,6 +90,8 @@ export function buildDocWithSalones(
       ...base.sections,
       salones: items,
       salonesHidden: hidden ?? base.sections.salonesHidden ?? [],
+      salonesSedesHidden:
+        sedesHidden ?? base.sections.salonesSedesHidden ?? [],
       ...(page !== undefined ? { salonesPage: page } : {}),
     },
   };

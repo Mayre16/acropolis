@@ -41,6 +41,73 @@ export function userInvitePending(user) {
   return !user.passwordHash;
 }
 
+const PERMISSION_CATALOG = (() => {
+  const tabs = [
+    "home", "sedes", "cursos", "diplomado", "filosofia",
+    "voluntariado", "eventos", "agenda", "articulos", "medios", "cultura",
+    "viajesLocales", "viajesInternacionales", "esfera", "quienesSomos",
+    "relaciones", "contenido", "archivos", "estadisticas",
+    "civisHome", "civisTalleres", "civisQuienesSomos", "civisSalones",
+    "circuloHome",
+    "editorialHome", "editorialLibros", "editorialDigitales", "editorialRevistas",
+    "editorialRegalos", "editorialDonde", "editorialQuienesSomos",
+  ];
+  return [
+    "site:acropolis", "site:civis", "site:editorial", "site:circulodeamigos",
+    "admin:users", "admin:smtp",
+    ...tabs.map((t) => `tab:${t}`),
+  ];
+})();
+
+const PERMISSION_SET = new Set(PERMISSION_CATALOG);
+
+export function sanitizePermissions(raw) {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const item of raw) {
+    if (typeof item !== "string") continue;
+    const key = item.trim();
+    if (!PERMISSION_SET.has(key) || seen.has(key)) continue;
+    seen.add(key);
+    out.push(key);
+  }
+  return out;
+}
+
+export function defaultPermissionsForRole(role) {
+  const map = {
+    admin: [...PERMISSION_CATALOG],
+    voluntariado: ["site:acropolis", "tab:voluntariado", "tab:agenda"],
+    esfera: [
+      "site:acropolis", "tab:sedes", "tab:esfera", "tab:agenda",
+      "tab:archivos", "tab:home",
+    ],
+    editorial: [
+      "site:editorial",
+      "tab:editorialHome", "tab:editorialLibros", "tab:editorialDigitales",
+      "tab:editorialRevistas", "tab:editorialRegalos", "tab:editorialDonde",
+      "tab:editorialQuienesSomos", "tab:archivos", "tab:estadisticas",
+    ],
+    viajes: [
+      "site:acropolis", "tab:viajesLocales", "tab:viajesInternacionales",
+    ],
+    filosofia: [
+      "site:acropolis", "tab:diplomado", "tab:filosofia", "tab:eventos",
+      "tab:contenido", "tab:agenda",
+    ],
+  };
+  return map[role] ? [...map[role]] : [];
+}
+
+export function effectivePermissions(user) {
+  if (!user) return [];
+  if (user.role === "admin") return [...PERMISSION_CATALOG];
+  const custom = sanitizePermissions(user.permissions);
+  if (custom.length) return custom;
+  return defaultPermissionsForRole(user.role);
+}
+
 export function publicUserView(user) {
   if (!user) return null;
   return {
@@ -49,6 +116,7 @@ export function publicUserView(user) {
     email: user.email || user.username,
     role: user.role,
     label: user.label,
+    permissions: effectivePermissions(user),
     totpEnabled: !!user.totpSecret,
     disabled: !!user.disabled,
     invitePending: userInvitePending(user),
@@ -56,7 +124,14 @@ export function publicUserView(user) {
   };
 }
 
-export function createUser({ email, passwordHash = null, role, label, invitePending = false }) {
+export function createUser({
+  email,
+  passwordHash = null,
+  role,
+  label,
+  permissions,
+  invitePending = false,
+}) {
   const username = String(email).trim().toLowerCase();
   const store = readStore();
   const user = {
@@ -66,6 +141,9 @@ export function createUser({ email, passwordHash = null, role, label, invitePend
     passwordHash,
     role,
     label,
+    permissions: Array.isArray(permissions)
+      ? sanitizePermissions(permissions)
+      : defaultPermissionsForRole(role),
     totpSecret: null,
     disabled: false,
     invitePending: invitePending || !passwordHash,

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Dispara rebuild+deploy en GitHub Actions para acropolis, civis, tienda o todos.
+ * Dispara rebuild+deploy en GitHub Actions para acropolis, civis, tienda, circulodeamigos o todos.
  *
  * Uso:
  *   CMS_GITHUB_REPO=Mayre16/acropolis CMS_GITHUB_DEPLOY_TOKEN=ghp_… node editor/scripts/trigger-cms-deploy.mjs
@@ -11,16 +11,19 @@ import { triggerDeployAfterPublish, triggerDeployWebhook } from "../lib/deploy-w
 
 const arg = (process.argv[2] || "all").trim().toLowerCase();
 const siteMap = {
-  all: ["acropolis", "civis", "tienda"],
+  all: ["acropolis", "civis", "tienda", "circulodeamigos"],
   both: ["acropolis", "civis"],
   acropolis: ["acropolis"],
   civis: ["civis"],
   tienda: ["tienda"],
+  circulodeamigos: ["circulodeamigos"],
 };
 const sites = siteMap[arg];
 
 if (!sites) {
-  console.error("Uso: node editor/scripts/trigger-cms-deploy.mjs [all|acropolis|civis|tienda|both]");
+  console.error(
+    "Uso: node editor/scripts/trigger-cms-deploy.mjs [all|acropolis|civis|tienda|circulodeamigos|both]",
+  );
   process.exit(1);
 }
 

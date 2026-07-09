@@ -1,7 +1,11 @@
 /** Mensajes iframe ↔ editor (mismos tipos que principal/lib/cms/edit-bridge.ts). */
 
 export type CmsEditMessage =
-  | { type: "cms-edit-init"; token: string; site: "acropolis" | "civis" | "editorial" }
+  | {
+      type: "cms-edit-init";
+      token: string;
+      site: "acropolis" | "civis" | "editorial" | "circulodeamigos";
+    }
   | { type: "cms-request-init" }
   | { type: "cms-save" }
   | { type: "cms-publish" }

@@ -2,7 +2,7 @@
 
 export function normalizeUploadUrl(value) {
   if (typeof value !== "string") return value;
-  const m = value.match(/\/uploads\/(acropolis|civis|editorial)\/[^\s"?#'"]+/);
+  const m = value.match(/\/uploads\/(acropolis|civis|editorial|circulodeamigos)\/[^\s"?#'"]+/);
   return m ? m[0] : value;
 }
 

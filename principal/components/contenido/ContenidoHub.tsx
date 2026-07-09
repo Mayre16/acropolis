@@ -104,7 +104,7 @@ export function ContenidoHub({ slides, lede }: ContenidoHubProps) {
         id="contenido-hero"
         className="scroll-mt-24 relative overflow-hidden rounded-b-[1.75rem] bg-na-heketDark"
       >
-        <div className="relative min-h-[34rem] sm:min-h-[40rem] lg:min-h-[44rem]">
+        <div className="relative min-h-[min(28rem,78dvh)] sm:min-h-[40rem] lg:min-h-[44rem]">
           {slides.map((s, i) => (
             <div
               key={s.href}

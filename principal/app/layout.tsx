@@ -60,9 +60,17 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        <link
+          rel="preconnect"
+          href="https://editor.acropolis.adesa.com.do"
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href="https://editor.acropolis.adesa.com.do" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var inFrame=window.parent!==window;if(inFrame){document.documentElement.classList.add("cms-edit-embedded")}var q=location.search;if(/[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q)||(inFrame&&sessionStorage.getItem("acropolis-cms-edit"))){document.documentElement.classList.add("cms-edit-pending-hero")}}catch(e){}})();`,
+            __html: `(function(){try{var inFrame=window.parent!==window;if(inFrame){document.documentElement.classList.add("cms-edit-embedded")}var q=location.search;if(/[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q)||(inFrame&&sessionStorage.getItem("acropolis-cms-edit"))){document.documentElement.classList.add("cms-edit-pending-hero")}}catch(e){}try{var api=${JSON.stringify(
+              process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "") || "",
+            )};if(!api)return;var origin=api.replace(/\\/api$/i,"");var u=api+"/content/acropolis/published";var slot=window.__acropolisCmsPublished=window.__acropolisCmsPublished||{};if(slot.promise)return;slot.promise=fetch(u,{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(d){slot.doc=d;try{var src=d&&d.sections&&d.sections.homeHero&&d.sections.homeHero.background&&d.sections.homeHero.background.src;if(src&&src.indexOf("/uploads/")!==-1){var href=src.indexOf("http")===0?src:(origin+src);var l=document.createElement("link");l.rel="preload";l.as="image";l.href=href;document.head.appendChild(l)}}catch(e){}return d}).catch(function(){return null})}catch(e){}})();`,
           }}
         />
       </head>

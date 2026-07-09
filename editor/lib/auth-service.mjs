@@ -4,6 +4,7 @@ import path from "node:path";
 import { verifyPassword } from "./password.mjs";
 import {
   AUTH_DIR,
+  effectivePermissions,
   findUserById,
   findUserByUsername,
   updateUserTotpSecret,
@@ -82,11 +83,13 @@ function getPending(token) {
 
 export function createSession(user) {
   const token = crypto.randomUUID();
+  const permissions = effectivePermissions(user);
   sessions.set(token, {
     expires: Date.now() + SESSION_TTL_MS,
     role: user.role,
     label: user.label,
     username: user.username,
+    permissions,
   });
   persistSessions();
   return {
@@ -95,6 +98,7 @@ export function createSession(user) {
     expiresIn: SESSION_TTL_MS / 1000,
     role: user.role,
     label: user.label,
+    permissions,
   };
 }
 

@@ -6,6 +6,9 @@ import "./circulo.css";
 import { CirculoSiteChrome } from "@/components/CirculoSiteChrome";
 import { CirculoFooter } from "@/components/CirculoFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
+import { CirculoAmigosCmsEditProvider } from "@/components/cms/CirculoAmigosCmsEditContext";
+import { CmsProvider } from "@/lib/cms/provider";
 import { SITE_URL } from "@/lib/site-config";
 import { assetUrl } from "@/lib/asset-url";
 
@@ -45,14 +48,28 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(window.parent!==window){document.documentElement.classList.add("cms-edit-embedded")}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${notoSans.variable} flex min-h-screen flex-col font-sans antialiased text-na-ink`}
       >
         <Suspense fallback={null}>
           <GoogleAnalytics />
+          <CmsEditModeBootstrap />
         </Suspense>
-        <CirculoSiteChrome>{children}</CirculoSiteChrome>
-        <CirculoFooter />
+        <CmsProvider>
+          <Suspense fallback={null}>
+            <CirculoAmigosCmsEditProvider>
+              <CirculoSiteChrome>{children}</CirculoSiteChrome>
+              <CirculoFooter />
+            </CirculoAmigosCmsEditProvider>
+          </Suspense>
+        </CmsProvider>
       </body>
     </html>
   );

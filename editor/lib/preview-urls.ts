@@ -51,3 +51,11 @@ export function previewCivisUrl(): string {
 export function previewTiendaUrl(): string {
   return resolveSiteUrl(process.env.NEXT_PUBLIC_TIENDA_URL, 3300, "tienda");
 }
+
+export function previewCirculodeamigosUrl(): string {
+  return resolveSiteUrl(
+    process.env.NEXT_PUBLIC_CIRCULO_URL,
+    3500,
+    "circulodeamigos",
+  );
+}

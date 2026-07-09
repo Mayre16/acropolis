@@ -1,4 +1,23 @@
+import type { CmsDocument } from "@/lib/cms/types";
+import { getCmsEditSession } from "@/lib/cms/edit-session";
+
 const DEFAULT_CMS_API = "https://editor.acropolis.adesa.com.do/api";
+
+export type CmsSiteId = "circulodeamigos";
+
+export type CmsDeployStatus = {
+  queued?: boolean;
+  site?: string;
+  reason?: string;
+  status?: number;
+  detail?: string;
+};
+
+export type CmsPublishResult = {
+  ok?: boolean;
+  deploy?: CmsDeployStatus;
+  message?: string;
+};
 
 export function cmsApiBase() {
   const fromEnv = process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "");
@@ -10,4 +29,180 @@ export function cmsApiBase() {
     }
   }
   return DEFAULT_CMS_API;
+}
+
+export function cmsEditorOrigin() {
+  return cmsApiBase().replace(/\/api$/i, "");
+}
+
+export function resolveCmsMediaUrl(src?: string): string | undefined {
+  if (!src) return undefined;
+  const uploadPath = src.match(
+    /(\/uploads\/(?:acropolis|civis|editorial|circulodeamigos)\/[^\s"?#]+)/,
+  )?.[1];
+  if (uploadPath) return `${cmsEditorOrigin()}${uploadPath}`;
+  if (src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (src.startsWith("/uploads/")) return `${cmsEditorOrigin()}${src}`;
+  return src;
+}
+
+export function cmsUploadPathExample(site: CmsSiteId = "circulodeamigos") {
+  return `/uploads/${site}/mi-foto.webp`;
+}
+
+function authHeaders(token: string): HeadersInit {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+const DRAFT_CACHE_PREFIX = "cms-draft-cache:";
+const DRAFT_CACHE_TTL_MS = 5 * 60 * 1000;
+const inflightDrafts = new Map<string, Promise<CmsDocument>>();
+
+type StoredDraft = { doc: CmsDocument; at: number };
+
+function readDraftCache(site: string): CmsDocument | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(`${DRAFT_CACHE_PREFIX}${site}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredDraft;
+    if (!parsed?.doc || Date.now() - parsed.at > DRAFT_CACHE_TTL_MS) return null;
+    return parsed.doc;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraftCache(site: string, doc: CmsDocument) {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(
+      `${DRAFT_CACHE_PREFIX}${site}`,
+      JSON.stringify({ doc, at: Date.now() } satisfies StoredDraft),
+    );
+  } catch {
+    // quota exceeded
+  }
+}
+
+export function invalidateCmsDraftCache(site?: CmsSiteId) {
+  if (site) {
+    for (const key of inflightDrafts.keys()) {
+      if (key.startsWith(`${site}:`)) inflightDrafts.delete(key);
+    }
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(`${DRAFT_CACHE_PREFIX}${site}`);
+    }
+    return;
+  }
+  inflightDrafts.clear();
+  if (typeof window === "undefined") return;
+  for (let i = sessionStorage.length - 1; i >= 0; i--) {
+    const key = sessionStorage.key(i);
+    if (key?.startsWith(DRAFT_CACHE_PREFIX)) sessionStorage.removeItem(key);
+  }
+}
+
+async function fetchCmsDraftFromNetwork(
+  site: CmsSiteId,
+  bearer?: string,
+): Promise<CmsDocument> {
+  const headers: HeadersInit = bearer
+    ? { Authorization: `Bearer ${bearer}` }
+    : {};
+  const res = await fetch(`${cmsApiBase()}/content/${site}/draft`, {
+    cache: "no-store",
+    headers,
+  });
+  if (!res.ok) throw new Error("No se pudo cargar el borrador");
+  const doc = (await res.json()) as CmsDocument;
+  writeDraftCache(site, doc);
+  return doc;
+}
+
+export async function fetchCmsDraft(
+  site: CmsSiteId = "circulodeamigos",
+  token?: string,
+  opts?: { force?: boolean },
+): Promise<CmsDocument> {
+  const bearer = token ?? getCmsEditSession()?.token;
+  const force = opts?.force ?? false;
+
+  if (!force) {
+    const cached = readDraftCache(site);
+    if (cached) {
+      if (bearer) {
+        void fetchCmsDraftFromNetwork(site, bearer).catch(() => {});
+      }
+      return cached;
+    }
+  }
+
+  const inflightKey = `${site}:${bearer ?? ""}`;
+  const existing = inflightDrafts.get(inflightKey);
+  if (existing) return existing;
+
+  const promise = fetchCmsDraftFromNetwork(site, bearer);
+  inflightDrafts.set(inflightKey, promise);
+  try {
+    return await promise;
+  } finally {
+    inflightDrafts.delete(inflightKey);
+  }
+}
+
+export async function saveCmsDraft(
+  site: CmsSiteId,
+  token: string,
+  doc: CmsDocument,
+): Promise<void> {
+  const res = await fetch(`${cmsApiBase()}/content/${site}/draft`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(doc),
+  });
+  if (!res.ok) throw new Error("Error al guardar borrador");
+  writeDraftCache(site, doc);
+}
+
+export async function publishCms(
+  site: CmsSiteId,
+  token: string,
+): Promise<CmsPublishResult> {
+  const res = await fetch(`${cmsApiBase()}/content/${site}/publish`, {
+    method: "POST",
+    headers: authHeaders(token),
+  });
+  if (!res.ok) throw new Error("Error al publicar");
+  const result = (await res.json()) as CmsPublishResult;
+  invalidateCmsDraftCache(site);
+  const { notifyCmsPublishSuccess } = await import("@/lib/cms/publish-notify");
+  notifyCmsPublishSuccess(result);
+  return result;
+}
+
+export async function uploadCmsImage(
+  site: CmsSiteId,
+  token: string,
+  file: File,
+): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${cmsApiBase()}/upload/${site}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
+  if (!res.ok) throw new Error("Error al subir imagen");
+  const data = (await res.json()) as { url: string };
+  const url = data.url;
+  if (url.startsWith("/uploads/")) return url;
+  const rel = url.match(
+    /(\/uploads\/(?:acropolis|civis|editorial|circulodeamigos)\/[^\s"?#]+)/,
+  )?.[1];
+  if (rel) return rel;
+  return url;
 }

@@ -6,6 +6,7 @@ export function generateStaticParams() {
     { site: "acropolis" },
     { site: "civis" },
     { site: "editorial" },
+    { site: "circulodeamigos" },
     { site: "biblioteca" },
   ];
 }

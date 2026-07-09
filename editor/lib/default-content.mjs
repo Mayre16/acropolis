@@ -1,6 +1,6 @@
 /** Contenido inicial del CMS (ESM — usable desde dev-api.mjs). */
 
-/** @param {"acropolis"|"civis"|"editorial"} site */
+/** @param {"acropolis"|"civis"|"editorial"|"circulodeamigos"} site */
 export function createDefaultContent(site) {
   const base = {
     version: 1,
@@ -10,6 +10,18 @@ export function createDefaultContent(site) {
   };
 
   if (site === "editorial") {
+    return base;
+  }
+
+  if (site === "circulodeamigos") {
+    base.sections = {
+      homeHero: {
+        h1: "Círculo de Amigos OINADOM",
+        h2: "",
+        lede: "",
+      },
+      circuloAmigosPage: {},
+    };
     return base;
   }
 

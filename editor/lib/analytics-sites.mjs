@@ -3,6 +3,7 @@ export const ANALYTICS_SITE_IDS = [
   "acropolis",
   "civis",
   "editorial",
+  "circulodeamigos",
   "biblioteca",
 ];
 
@@ -10,6 +11,7 @@ export const ANALYTICS_SITE_LABELS = {
   acropolis: "Acrópolis (sitio principal)",
   civis: "Civis Consulting",
   editorial: "Librería Editorial Logos",
+  circulodeamigos: "Círculo de Amigos OINADOM",
   biblioteca: "Biblioteca Sophia",
 };
 

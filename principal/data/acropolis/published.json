@@ -922,6 +922,8 @@
       }
     ],
     "venuesHidden": [],
+    "salonesHidden": [],
+    "salonesSedesHidden": [],
     "salones": [
       {
         "id": "agora",

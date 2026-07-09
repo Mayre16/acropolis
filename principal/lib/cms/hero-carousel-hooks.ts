@@ -1,6 +1,10 @@
 "use client";
 
-import { useCmsDocument } from "@/lib/cms/provider";
+import {
+  isCmsEnabled,
+  useCmsDocument,
+  useCmsMediaReady,
+} from "@/lib/cms/provider";
 import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
 import {
   HERO_CAROUSEL_DEFAULTS,
@@ -34,11 +38,17 @@ export function useHeroCarouselImages(
   fallback?: HeroImage[],
 ): HeroImage[] {
   const cms = useCmsDocument();
+  const mediaReady = useCmsMediaReady();
   const edit = useHeroCarouselCmsEdit();
 
   if (edit?.ready) {
     const images = heroImagesForKey(edit.carousels, key);
     return images.length ? images : resolveFallbackImages(key, fallback);
+  }
+
+  // Evita flash: no pintar fotos del repo mientras llega el CMS publicado.
+  if (isCmsEnabled() && !mediaReady) {
+    return [];
   }
 
   const fromCms = cms?.sections.heroCarousels?.[key];

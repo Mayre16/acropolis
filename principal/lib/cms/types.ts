@@ -977,6 +977,8 @@ export type CmsDocument = {
     platformNav?: CmsPlatformNav;
     salones?: CmsSalon[];
     salonesHidden?: string[];
+    /** Sedes de alquiler ocultas (p. ej. "Naco", "Santiago"). */
+    salonesSedesHidden?: string[];
     salonesPage?: CmsSalonesPage;
     quienesSomosPage?: CmsQuienesSomosPage;
     relacionesPage?: CmsRelacionesPage;
