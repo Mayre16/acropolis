@@ -1,0 +1,113 @@
+name: Daily content refresh (Instagram + feed internacional)
+
+on:
+  schedule:
+    # 11:00 UTC ≈ 07:00 AST (República Dominicana)
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-content-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install principal deps
+        working-directory: principal
+        run: npm ci
+
+      - name: Fetch Instagram posts
+        working-directory: principal
+        continue-on-error: true
+        run: npm run fetch:instagram
+
+      - name: Fetch international RSS (mundo)
+        working-directory: principal
+        run: npm run fetch:mundo
+
+      - name: Detect content changes
+        id: changes
+        run: |
+          git add \
+            principal/lib/home-content.ts \
+            principal/public/img/instagram \
+            principal/public/data/mundo-feed.json \
+            principal/public/img/mundo \
+            || true
+          if git diff --cached --quiet; then
+            echo "changed=0" >> "$GITHUB_OUTPUT"
+            echo "Sin cambios en Instagram ni feed internacional."
+          else
+            echo "changed=1" >> "$GITHUB_OUTPUT"
+            git status --short
+          fi
+
+      - name: Commit refreshed content
+        if: steps.changes.outputs.changed == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Actualizar Instagram y feed internacional."
+          git push origin HEAD:main
+
+      - name: Sync CMS seeds for build
+        if: steps.changes.outputs.changed == '1'
+        run: |
+          mkdir -p editor/data/acropolis
+          if [ -f principal/data/acropolis/published.json ]; then
+            cp principal/data/acropolis/published.json editor/data/acropolis/published.json
+          fi
+
+      - name: Build principal (Acropolis)
+        if: steps.changes.outputs.changed == '1'
+        working-directory: principal
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
+          NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+        run: npm run build:cpanel
+
+      - name: Check principal FTP
+        id: principal_ftp
+        if: steps.changes.outputs.changed == '1'
+        env:
+          FTP_SERVER: ${{ secrets.PRINCIPAL_FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"
+          else echo "ready=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Deploy principal to cPanel (FTP)
+        if: steps.changes.outputs.changed == '1' && steps.principal_ftp.outputs.ready == '1'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRINCIPAL_FTP_SERVER }}
+          username: ${{ secrets.PRINCIPAL_FTP_USERNAME }}
+          password: ${{ secrets.PRINCIPAL_FTP_PASSWORD }}
+          local-dir: principal/out/
+          server-dir: ${{ secrets.PRINCIPAL_FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false
+
+      - name: Refresh na-feed.php cache on production
+        if: always()
+        env:
+          SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+        run: |
+          BASE="${SITE_URL%/}"
+          curl -fsS -o /dev/null -w "na-feed refresh HTTP %{http_code}\n" \
+            "${BASE}/api/na-feed.php?refresh=1" \
+            || echo "Advertencia: no se pudo refrescar na-feed.php (el sitio puede no tener el proxy aún)."

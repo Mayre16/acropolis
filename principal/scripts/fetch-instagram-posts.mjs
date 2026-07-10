@@ -170,9 +170,10 @@ async function fetchRecentPosts() {
   return posts;
 }
 
-const posts = await fetchRecentPosts();
+try {
+  const posts = await fetchRecentPosts();
 
-const block = `/** Publicaciones recientes — @${USERNAME} (imágenes locales WebP). */
+  const block = `/** Publicaciones recientes — @${USERNAME} (imágenes locales WebP). */
 export const INSTAGRAM_POSTS: InstagramPost[] = [
 ${posts
   .map(
@@ -185,11 +186,20 @@ ${posts
   .join(",\n")}
 ];`;
 
-let text = readFileSync(HOME, "utf8");
-text = text.replace(
-  /\/\*\* Publicaciones recientes[\s\S]*?export const INSTAGRAM_POSTS: InstagramPost\[\] = \[[\s\S]*?\];/,
-  block,
-);
+  let text = readFileSync(HOME, "utf8");
+  text = text.replace(
+    /\/\*\* Publicaciones recientes[\s\S]*?export const INSTAGRAM_POSTS: InstagramPost\[\] = \[[\s\S]*?\];/,
+    block,
+  );
 
-writeFileSync(HOME, text, "utf8");
-console.log(`Actualizado lib/home-content.ts (${posts.length} publicaciones)`);
+  writeFileSync(HOME, text, "utf8");
+  console.log(`Actualizado lib/home-content.ts (${posts.length} publicaciones)`);
+} catch (err) {
+  // CI diario: no tumbar el job si Instagram bloquea; se mantienen las fotos actuales.
+  console.warn(
+    "Advertencia Instagram:",
+    err instanceof Error ? err.message : String(err),
+  );
+  console.warn("Se conservan las publicaciones ya existentes en home-content.ts.");
+  process.exitCode = 0;
+}

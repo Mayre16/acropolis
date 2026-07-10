@@ -26,7 +26,7 @@ $LIMIT = 6;
 // Evita descargar y parsear el RSS en cada visita: se guarda el resultado en
 // disco y se reutiliza mientras esté fresco. Si la fuente falla, se sirve la
 // última copia buena (stale) en vez de quedarse sin noticias.
-$CACHE_TTL = 3 * 3600;                 // 3 h de frescura
+$CACHE_TTL = 1 * 3600;                 // 1 h de frescura (alineado con Cache-Control)
 $CACHE_FILE = __DIR__ . "/cache/na-feed.json";
 
 // ?refresh=1 fuerza regenerar (útil para depurar o para un cron).
