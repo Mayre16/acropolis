@@ -126,7 +126,15 @@ export async function fetchDraft(site: SiteId, token: string) {
   const res = await fetch(`${API_URL}/content/${site}/draft`, {
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error("No se pudo cargar el borrador");
+  if (!res.ok) {
+    if (res.status === 401) throw new Error("401 No autorizado");
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(
+      body.error
+        ? `${res.status} ${body.error}`
+        : `No se pudo cargar el borrador (${res.status})`,
+    );
+  }
   return res.json() as Promise<CmsDocument>;
 }
 
@@ -431,6 +439,86 @@ export async function acceptInvite(
   return { ok: res.ok && data.ok !== false, ...data };
 }
 
+export async function changeOwnPassword(
+  token: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/change-password`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo cambiar la contraseña");
+  }
+}
+
+export async function requestPasswordReset(email: string): Promise<string> {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    message?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo enviar el correo");
+  }
+  return (
+    data.message ||
+    "Si el correo está registrado, te enviamos un enlace para restablecer la contraseña."
+  );
+}
+
+export async function fetchPasswordResetInfo(
+  token: string,
+): Promise<{ email: string; label: string }> {
+  const res = await fetch(
+    `${API_URL}/auth/reset/${encodeURIComponent(token)}`,
+  );
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    email?: string;
+    label?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok || !data.email) {
+    throw new Error(data.error || "Enlace inválido o caducado");
+  }
+  return { email: data.email, label: data.label ?? "" };
+}
+
+export async function acceptPasswordReset(
+  resetToken: string,
+  password: string,
+): Promise<string> {
+  const res = await fetch(
+    `${API_URL}/auth/reset/${encodeURIComponent(resetToken)}/accept`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    },
+  );
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    message?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo restablecer la contraseña");
+  }
+  return data.message || "Contraseña actualizada. Ya puedes iniciar sesión.";
+}
+
 export async function inviteCmsUser(
   token: string,
   body: {
@@ -490,5 +578,28 @@ export async function fetchAnalyticsSummary(
     `${API_URL}/analytics/summary/${site}?${params.toString()}`,
     { headers: authHeaders(token) },
   );
-  return (await res.json()) as AnalyticsSummary;
+  let data: AnalyticsSummary;
+  try {
+    data = (await res.json()) as AnalyticsSummary;
+  } catch {
+    return {
+      ok: false,
+      error:
+        res.status === 404
+          ? "La API del editor no reconoce este sitio. Sube el api/index.php actualizado."
+          : `No se pudieron cargar las estadísticas (${res.status}).`,
+    };
+  }
+  if (!res.ok || data.ok === false) {
+    const msg = data.error || `Error ${res.status}`;
+    if (res.status === 404 || /not found/i.test(msg)) {
+      return {
+        ok: false,
+        error:
+          "La API del editor no reconoce este sitio. Sube el api/index.php actualizado a cPanel.",
+      };
+    }
+    return { ok: false, error: msg };
+  }
+  return data;
 }

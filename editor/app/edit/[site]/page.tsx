@@ -26,6 +26,10 @@ import {
   type CmsDocument,
   type SiteId,
 } from "@/lib/content-types";
+import {
+  ANALYTICS_SITE_LABELS,
+  type AnalyticsSiteId,
+} from "@/lib/analytics-types";
 import { type EditorRole } from "@/lib/editor-roles";
 import {
   defaultTabForPermissions,
@@ -209,9 +213,12 @@ function EditSitePageInner() {
   const site = params.site as SiteId;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [role, setRole] = useState<EditorRole>("admin");
-  const [editorLabel, setEditorLabel] = useState("Editor");
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [role, setRole] = useState<EditorRole>(() => getEditorRole() as EditorRole);
+  const [editorLabel, setEditorLabel] = useState(() => getEditorLabel());
+  const [permissions, setPermissions] = useState<string[]>(() =>
+    getEditorPermissions(),
+  );
+  const [sessionReady, setSessionReady] = useState(false);
   const allowedTabs = useMemo(
     () => tabsForPermissions(site, permissions, role),
     [site, permissions, role],
@@ -225,8 +232,27 @@ function EditSitePageInner() {
   const [status, setStatus] = useState("");
   const [backups, setBackups] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  /** Sitio cuyas estadísticas se están viendo (puede diferir del site de la URL). */
+  const [analyticsSite, setAnalyticsSite] = useState<AnalyticsSiteId>(() =>
+    site === "civis" ||
+    site === "editorial" ||
+    site === "circulodeamigos"
+      ? site
+      : "acropolis",
+  );
 
   const token = getToken();
+
+  useEffect(() => {
+    if (
+      site === "acropolis" ||
+      site === "civis" ||
+      site === "editorial" ||
+      site === "circulodeamigos"
+    ) {
+      setAnalyticsSite(site);
+    }
+  }, [site]);
 
   const selectTab = useCallback(
     (id: TabId) => {
@@ -252,6 +278,7 @@ function EditSitePageInner() {
     setRole(getEditorRole() as EditorRole);
     setEditorLabel(getEditorLabel());
     setPermissions(getEditorPermissions());
+    setSessionReady(true);
   }, []);
 
   useEffect(() => {
@@ -262,38 +289,68 @@ function EditSitePageInner() {
   }, [searchParams, allowedTabs]);
 
   useEffect(() => {
+    if (!sessionReady) return;
     if (allowedTabs.length === 0) {
       router.replace("/dashboard/");
+      return;
+    }
+    // Estadísticas ya no viven en /edit — solo el panel morado del dashboard.
+    if (tab === "estadisticas") {
+      router.replace(`/analytics/${site === "editorial" ? "editorial" : site}/`);
       return;
     }
     if (!allowedTabs.includes(tab)) {
       setTab(defaultTabForPermissions(site, permissions, role) as TabId);
     }
-  }, [allowedTabs, tab, site, role, permissions, router]);
+  }, [allowedTabs, tab, site, role, permissions, router, sessionReady]);
 
   const load = useCallback(async () => {
     if (!token) {
       router.replace("/login/");
       return;
     }
-    const draft = await fetchDraft(site, token);
-    setDoc(draft);
-    const b = await listBackups(site, token);
-    setBackups(b.backups);
-  }, [site, token, router]);
-
-  useEffect(() => {
-    load().catch((e) => {
+    try {
+      const draft = await fetchDraft(site, token);
+      setDoc(draft);
+      try {
+        const b = await listBackups(site, token);
+        setBackups(b.backups);
+      } catch {
+        setBackups([]);
+      }
+    } catch (e) {
       const msg = String(e);
       if (msg.includes("Failed to fetch") || msg.includes("fetch")) {
         setStatus(
           "No se pudo conectar con el servidor (puerto 3401). Ejecuta npm run dev:editor-api.",
         );
+        setDoc({
+          version: 1,
+          site,
+          updatedAt: new Date().toISOString(),
+          sections: {},
+        } as CmsDocument);
         return;
       }
-      router.replace("/login/");
-    });
-  }, [load, router]);
+      if (/401|autoriz|token|sesión|sesion/i.test(msg)) {
+        router.replace("/login/");
+        return;
+      }
+      setStatus(
+        `No se pudo cargar el borrador de ${site}. ${msg}. Revisa que la API acepte este sitio.`,
+      );
+      setDoc({
+        version: 1,
+        site,
+        updatedAt: new Date().toISOString(),
+        sections: {},
+      } as CmsDocument);
+    }
+  }, [site, token, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   async function handleSave() {
     if (!doc || !token) return;
@@ -386,13 +443,15 @@ function EditSitePageInner() {
               >
                 ← Sitios
               </Link>
-              <button
-                type="button"
-                onClick={() => selectTab(menuTab)}
-                className="shrink-0 text-sm font-semibold text-slate-600 hover:text-brand-teal hover:underline"
-              >
-                Otras secciones
-              </button>
+              {!isEstadisticasView ? (
+                <button
+                  type="button"
+                  onClick={() => selectTab(menuTab)}
+                  className="shrink-0 text-sm font-semibold text-slate-600 hover:text-brand-teal hover:underline"
+                >
+                  Otras secciones
+                </button>
+              ) : null}
               <span
                 className="hidden h-4 w-px bg-slate-200 sm:block"
                 aria-hidden
@@ -401,7 +460,9 @@ function EditSitePageInner() {
                 {panelTitle}
               </h1>
               <span className="shrink-0 rounded-full bg-brand-teal px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-                {SITE_LABELS[site]}
+                {isEstadisticasView
+                  ? ANALYTICS_SITE_LABELS[analyticsSite]
+                  : SITE_LABELS[site]}
               </span>
             </div>
             {!isEstadisticasView ? (
@@ -434,7 +495,10 @@ function EditSitePageInner() {
 
         <main className="mx-auto w-full max-w-6xl flex-1 overflow-auto px-4 py-4">
           {isEstadisticasView ? (
-            <AnalyticsPanel site={site} />
+            <AnalyticsPanel
+              site={analyticsSite}
+              onSiteChange={setAnalyticsSite}
+            />
           ) : (
             <>
               <ArchivosDocumentsPanel

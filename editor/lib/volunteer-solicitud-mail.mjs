@@ -67,7 +67,7 @@ export async function sendVolunteerSolicitudMail(body, remoteIp, referer) {
     form.to_email ?? "voluntariadord@acropolis.org",
   ).trim();
   const toName = String(form.to_name ?? "Voluntariado Humanitario").trim();
-  const subject = `[Nueva Acrópolis RD] Solicitud de voluntariado — ${check.data.nombre}`;
+  const subject = `Voluntariado — Solicitud de inscripción — ${check.data.nombre}`;
 
   const cc = [];
   const senderEmail = check.data.email;

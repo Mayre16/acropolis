@@ -11,9 +11,14 @@ import {
   updateCmsUser,
   type CmsUser,
 } from "@/lib/api";
-import { getToken } from "@/lib/auth-storage";
-import { EDITOR_ROLE_META, type EditorRole } from "@/lib/editor-roles";
+import { getEditorRole, getToken } from "@/lib/auth-storage";
 import {
+  USER_TYPE_OPTIONS,
+  uiUserType,
+  type EditorRole,
+} from "@/lib/editor-roles";
+import {
+  canManageOtherUsers,
   defaultPermissionsForRole,
   effectivePermissions,
   permissionsSummary,
@@ -24,8 +29,6 @@ import { PermissionsChecklist } from "@/components/PermissionsChecklist";
 const PASSWORD_HINT =
   "Mínimo 12 caracteres, mayúscula, minúscula, número y símbolo.";
 
-const ROLE_OPTIONS = Object.values(EDITOR_ROLE_META);
-
 export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   const [users, setUsers] = useState<CmsUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,19 +38,30 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editPerms, setEditPerms] = useState<EditorPermission[]>([]);
   const [savingPerms, setSavingPerms] = useState(false);
+  const [canManage, setCanManage] = useState(false);
   const [form, setForm] = useState({
     email: "",
     label: "",
-    role: "editorial" as EditorRole,
-    permissions: defaultPermissionsForRole("editorial") as EditorPermission[],
+    role: "editor" as EditorRole,
+    permissions: [] as EditorPermission[],
   });
+
+  const inviteRoleOptions = canManage
+    ? USER_TYPE_OPTIONS
+    : USER_TYPE_OPTIONS.filter((r) => r.role === "editor");
 
   async function reload() {
     const token = getToken();
     if (!token) return;
+    const manage = canManageOtherUsers(getEditorRole());
+    setCanManage(manage);
     setLoading(true);
     try {
-      setUsers(await fetchCmsUsers(token));
+      if (manage) {
+        setUsers(await fetchCmsUsers(token));
+      } else {
+        setUsers([]);
+      }
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Error al cargar usuarios");
     } finally {
@@ -75,8 +89,8 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
       setForm({
         email: "",
         label: "",
-        role: "editorial",
-        permissions: defaultPermissionsForRole("editorial"),
+        role: "editor",
+        permissions: [],
       });
       setOpen(false);
       setStatus(result.message || "Invitación enviada.");
@@ -117,12 +131,16 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
     if (!token) return;
     setStatus("");
     try {
-      const permissions = defaultPermissionsForRole(role);
+      // Al pasar a Editor se conservan los permisos actuales; admin = acceso total.
+      const permissions =
+        role === "admin"
+          ? defaultPermissionsForRole("admin")
+          : effectivePermissions(user.role, user.permissions ?? []);
       await updateCmsUser(token, user.id, { role, permissions });
       if (editingId === user.id) setEditPerms(permissions);
       await reload();
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Error al cambiar rol");
+      setStatus(err instanceof Error ? err.message : "Error al cambiar tipo");
     }
   }
 
@@ -230,13 +248,16 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
             <>
               <h2 className="text-sm font-bold text-slate-800">Usuarios del CMS</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Invita editores y marca qué sitios y secciones pueden editar
-                (Civis, Editorial, Círculo, Cursos, etc.).
+                {canManage
+                  ? "Invita editores y gestiona permisos, contraseñas y acceso."
+                  : "Puedes invitar a otros editores. No puedes modificar cuentas ajenas."}
               </p>
             </>
           ) : (
             <p className="text-sm text-slate-600">
-              Invita editores y marca qué sitios y secciones pueden editar.
+              {canManage
+                ? "Invita editores y marca qué sitios y secciones pueden editar."
+                : "Invita a otro editor y marca qué puede editar. No verás ni gestionarás otras cuentas."}
             </p>
           )}
         </div>
@@ -278,7 +299,7 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Plantilla de rol
+            Tipo de usuario
             <select
               className={field}
               value={form.role}
@@ -287,18 +308,23 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
                 setForm((s) => ({
                   ...s,
                   role,
-                  permissions: defaultPermissionsForRole(role),
+                  permissions:
+                    role === "admin"
+                      ? defaultPermissionsForRole("admin")
+                      : s.permissions,
                 }));
               }}
             >
-              {ROLE_OPTIONS.map((r) => (
+              {inviteRoleOptions.map((r) => (
                 <option key={r.role} value={r.role}>
                   {r.label}
                 </option>
               ))}
             </select>
             <span className="mt-1 block text-xs text-slate-500">
-              El rol solo carga una plantilla; ajusta los checkmarks abajo.
+              {canManage
+                ? "Administrador tiene acceso total. Editor usa los permisos de abajo."
+                : "Solo puedes invitar editores; marca qué sitios y secciones podrán editar."}
             </span>
           </label>
           <div className="sm:col-span-2">
@@ -307,8 +333,16 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
             </p>
             <PermissionsChecklist
               value={form.permissions}
+              hideAdmin={!canManage}
               onChange={(permissions) =>
-                setForm((s) => ({ ...s, permissions }))
+                setForm((s) => ({
+                  ...s,
+                  permissions: canManage
+                    ? permissions
+                    : permissions.filter(
+                        (p) => p !== "admin:users" && p !== "admin:smtp",
+                      ),
+                }))
               }
             />
           </div>
@@ -324,13 +358,14 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
         </form>
       ) : null}
 
+      {canManage ? (
       <div className="mt-5 overflow-x-auto">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
               <th className="py-2 pr-3">Correo</th>
               <th className="py-2 pr-3">Nombre</th>
-              <th className="py-2 pr-3">Rol / permisos</th>
+              <th className="py-2 pr-3">Tipo / permisos</th>
               <th className="py-2 pr-3">2FA</th>
               <th className="py-2 pr-3">Estado</th>
               <th className="py-2">Acciones</th>
@@ -346,10 +381,10 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
                 <td className="py-3 pr-3">
                   <select
                     className="rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={user.role}
+                    value={uiUserType(user.role)}
                     onChange={(e) => void changeRole(user, e.target.value)}
                   >
-                    {ROLE_OPTIONS.map((r) => (
+                    {USER_TYPE_OPTIONS.map((r) => (
                       <option key={r.role} value={r.role}>
                         {r.label}
                       </option>
@@ -462,6 +497,13 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
           </tbody>
         </table>
       </div>
+      ) : (
+        <p className="mt-5 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          Para cambiar tu propia contraseña usa el botón <strong>Contraseña</strong>{" "}
+          en la barra superior. Si olvidas la contraseña, usa «¿Olvidaste tu
+          contraseña?» en el inicio de sesión.
+        </p>
+      )}
 
       {status ? (
         <p

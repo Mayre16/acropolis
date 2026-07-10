@@ -20,14 +20,14 @@ const DEFAULTS = {
     civis_solicitud: {
       to_email: "civis@acropolis.org",
       to_name: "Civis Consulting",
-      subject_prefix: "[CIVIS] Solicitud de propuesta",
+      subject_prefix: "Civis — Solicitud de propuesta",
       copy_to_sender: true,
     },
     esfera_solicitud: {
       to_email: "esferard@acropolis.org",
       to_name: "Punto Focal Esfera",
       cc_email: "Santiago.a@acropolis.org",
-      subject_prefix: "[Esfera] Solicitud taller",
+      subject_prefix: "Esfera — Solicitud de taller",
       copy_to_sender: true,
     },
     voluntariado_solicitud: {

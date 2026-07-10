@@ -16,8 +16,8 @@ type CivisBrandMarkProps = {
   size?: "sm" | "md" | "lg";
 };
 
-const MD_HEIGHT_REM = 3.25;
-const SM_HEIGHT_REM = 2.35;
+const MD_HEIGHT_REM = 3;
+const SM_HEIGHT_REM = 2.25;
 const MD_WIDTH_REM = CIVIS_MARK_ASPECT * MD_HEIGHT_REM;
 const SM_WIDTH_REM = CIVIS_MARK_ASPECT * SM_HEIGHT_REM;
 

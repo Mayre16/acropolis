@@ -6,6 +6,7 @@ import { PhilosophyWheel } from "@/components/home/PhilosophyWheel";
 import { HomeActivityPhotosSection } from "@/components/cms/HomeCmsEditContext";
 import { HomePageShell } from "@/components/cms/HomePageShell";
 import { EsferaHomeSection } from "@/components/home/EsferaHomeSection";
+import { CirculoAmigosPromoCms } from "@/components/cms/CirculoAmigosPromoCms";
 import { UpcomingActivitiesHome } from "@/components/home/UpcomingActivitiesHome";
 import { HomeTalleresYCursosSection } from "@/components/home/HomeTalleresYCursosSection";
 import { HomeSalonesCarousel } from "@/components/home/HomeSalonesCarousel";
@@ -43,6 +44,7 @@ export default function Home() {
       <PhilosophyLivingBandCms />
       <PhilosophyWheel />
       <EsferaHomeSection />
+      <CirculoAmigosPromoCms />
       <UpcomingActivitiesHome />
       <HomeTalleresYCursosSection />
       <HomeActivityPhotosSection />

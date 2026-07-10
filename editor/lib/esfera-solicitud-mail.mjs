@@ -85,7 +85,7 @@ export async function sendEsferaSolicitudMail(body, remoteIp, referer) {
     form.to_email ?? "esferard@acropolis.org",
   ).trim();
   const toName = String(form.to_name ?? "Punto Focal Esfera").trim();
-  const prefix = String(form.subject_prefix ?? "[Esfera] Solicitud taller").trim();
+  const prefix = String(form.subject_prefix ?? "Esfera — Solicitud de taller").trim();
   const subject = `${prefix} — ${check.data.empresa}`;
   const copyToSender = form.copy_to_sender !== false;
   const internalCc = String(form.cc_email ?? "Santiago.a@acropolis.org").trim();

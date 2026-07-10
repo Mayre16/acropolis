@@ -81,7 +81,7 @@ export async function sendCivisSolicitudMail(body, remoteIp, referer) {
 
   const toEmail = String(form.to_email ?? "civis@acropolis.org").trim();
   const toName = String(form.to_name ?? "Civis Consulting").trim();
-  const prefix = String(form.subject_prefix ?? "[CIVIS] Solicitud de propuesta").trim();
+  const prefix = String(form.subject_prefix ?? "Civis — Solicitud de propuesta").trim();
   const subject = `${prefix} — ${check.data.empresa}`;
   const copyToSender = form.copy_to_sender !== false;
 

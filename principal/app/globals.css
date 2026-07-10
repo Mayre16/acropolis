@@ -11,10 +11,18 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Modo edición CMS: oculta el hero pre-renderizado hasta que el borrador esté listo. */
+/* Modo edición CMS: oculta el hero pre-renderizado hasta que el borrador esté listo.
+   Fondo oscuro mientras tanto — evita el flash verde pastel del body. */
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero {
+  background-color: #0a3d36;
+}
 html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero [data-hero-bg],
 html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero > img {
   visibility: hidden;
+}
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero > [aria-hidden]:not([data-hero-bg]) {
+  /* Overlay verde encima de nada = mancha pastel; debajo oscuro basta. */
+  opacity: 0.35;
 }
 
 /* Iframe del editor: la barra ámbar del sitio queda oculta (Guardar/Publicar van arriba en el editor). */

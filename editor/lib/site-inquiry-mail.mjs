@@ -9,46 +9,73 @@ const ROUTES = {
     to_email: "cursos.oinadom@acropolis.org",
     to_name: "Cursos y Talleres",
     copy_to_sender: false,
+    subject_label: "Cursos — Solicitud de información",
   },
   salon_inquiry: {
     to_email: "cursos.oinadom@acropolis.org",
     to_name: "Cursos y Talleres",
     copy_to_sender: false,
+    subject_label: "Salones — Solicitud de información",
   },
   voluntariado_donacion: {
     to_email: "voluntariadord@acropolis.org",
     to_name: "Voluntariado Humanitario",
     copy_to_sender: false,
+    subject_label: "Voluntariado — Solicitud de donación",
   },
   esfera_donar: {
     to_email: "esferard@acropolis.org",
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    subject_label: "Esfera — Solicitud de donación",
   },
   esfera_alianzas: {
     to_email: "esferard@acropolis.org",
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    subject_label: "Esfera — Solicitud de alianza",
   },
   esfera_info: {
     to_email: "esferard@acropolis.org",
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    subject_label: "Esfera — Solicitud de información",
   },
   viaje_info: {
     to_email: "info.oinadom@acropolis.org",
     to_name: "Nueva Acrópolis RD",
     copy_to_sender: false,
+    subject_label: "Viajes — Solicitud de información",
   },
   circulo_amigos_inscription: {
     to_email: "amigos_dominicana@acropolis.org",
     to_name: "Círculo de Amigos OINADOM",
     copy_to_sender: false,
+    subject_label: "Círculo de Amigos — Solicitud de inscripción",
   },
 };
+
+function buildSiteInquirySubject(formKey, route, body, contact) {
+  const label = String(route.subject_label ?? "Solicitud de información").trim();
+  const clientSubject = String(body?.subject ?? "").trim();
+  const nombre = String(contact?.nombre ?? "").trim();
+  if (clientSubject && clientSubject.startsWith(label)) {
+    return clientSubject.slice(0, 200);
+  }
+  let detail = "";
+  if (clientSubject) {
+    detail = clientSubject
+      .replace(/^(\[?Nueva Acr[oó]polis RD\]?\s*[—\-:.]?\s*|Consulta\s*[—\-:.]?\s*)/iu, "")
+      .trim();
+    if (detail === label || detail.startsWith(label)) detail = "";
+  }
+  if (!detail && nombre) detail = nombre;
+  const subject = detail ? `${label} — ${detail}` : label;
+  return subject.slice(0, 200);
+}
 
 export function validateSiteInquiryPayload(body) {
   const formKey = String(body?.formKey ?? "").trim();
@@ -96,11 +123,18 @@ export async function sendSiteInquiryMail(body, remoteIp, referer) {
   const senderEmail = check.data.email;
   if (senderEmail && route.copy_to_sender) cc.push(senderEmail);
 
+  const subject = buildSiteInquirySubject(
+    check.data.formKey,
+    route,
+    body,
+    check.data,
+  );
+
   return sendFormMailOrDev({
     formId: `site-inquiry-${check.data.formKey}`,
     toEmail: route.to_email,
     toName: route.to_name,
-    subject: check.data.subject,
+    subject,
     body: check.data.message,
     replyTo: senderEmail || undefined,
     cc,

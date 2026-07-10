@@ -27,14 +27,14 @@ function cms_load_smtp_config(array $config): array
             'civis_solicitud' => [
                 'to_email' => 'civis@acropolis.org',
                 'to_name' => 'Civis Consulting',
-                'subject_prefix' => '[CIVIS] Solicitud de propuesta',
+                'subject_prefix' => 'Civis — Solicitud de propuesta',
                 'copy_to_sender' => true,
             ],
             'esfera_solicitud' => [
                 'to_email' => 'esferard@acropolis.org',
                 'to_name' => 'Punto Focal Esfera',
                 'cc_email' => 'Santiago.a@acropolis.org',
-                'subject_prefix' => '[Esfera] Solicitud taller',
+                'subject_prefix' => 'Esfera — Solicitud de taller',
                 'copy_to_sender' => true,
             ],
         ],
@@ -426,8 +426,11 @@ function cms_mail_html_document(
 ): string {
     $theme = cms_mail_brand_theme($brand);
     $safeSubject = htmlspecialchars($subject, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $displayName = trim($fromName) !== '' ? $fromName : $theme['label'];
-    $safeFrom = htmlspecialchars($displayName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $brandLabel = trim($fromName) !== '' ? $fromName : $theme['label'];
+    $safeBrand = htmlspecialchars($brandLabel, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    // Título visible = asunto del formulario (no el nombre genérico del remitente SMTP).
+    $headerTitle = trim($subject) !== '' ? $subject : $brandLabel;
+    $safeHeader = htmlspecialchars($headerTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $badgeText = trim((string) ($badge ?? '')) !== '' ? trim((string) $badge) : $theme['badge'];
     $safeBadge = htmlspecialchars($badgeText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $content = cms_mail_body_to_html($plainBody, $theme);
@@ -445,9 +448,9 @@ function cms_mail_html_document(
         . $theme['card_border'] . ';">'
         . '<tr><td style="background:linear-gradient(135deg,'
         . $theme['header_from'] . ' 0%,' . $theme['header_to'] . ' 100%);padding:22px 28px;">'
-        . '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:20px;line-height:1.3;color:#ffffff;font-weight:700;">'
-        . $safeFrom . '</div>'
-        . '<div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.82);">'
+        . '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:18px;line-height:1.35;color:#ffffff;font-weight:700;">'
+        . $safeHeader . '</div>'
+        . '<div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.82);">'
         . $safeBadge . '</div>'
         . '</td></tr>'
         . '<tr><td style="padding:28px;font-family:Arial,Helvetica,sans-serif;">'
@@ -460,7 +463,7 @@ function cms_mail_html_document(
         . $signature
         . 'Este mensaje se generó automáticamente desde el sitio web. '
         . 'Puede responder directamente a este correo para contactar al remitente.'
-        . '<br>© ' . $year . ' ' . $safeFrom
+        . '<br>© ' . $year . ' ' . $safeBrand
         . '</td></tr>'
         . '</table></td></tr></table></body></html>';
 }
@@ -493,7 +496,7 @@ function cms_mail_invite_html_document(
 
     return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
         . '<meta name="viewport" content="width=device-width,initial-scale=1">'
-        . '<title>Invitación al editor</title></head>'
+        . '<title>Invitación al editor de OINADOM</title></head>'
         . '<body style="margin:0;padding:0;background:' . $theme['page_bg'] . ';">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:'
         . $theme['page_bg'] . ';padding:24px 12px;">'
@@ -502,15 +505,17 @@ function cms_mail_invite_html_document(
         . $theme['card_border'] . ';">'
         . '<tr><td style="background:linear-gradient(135deg,'
         . $theme['header_from'] . ' 0%,' . $theme['header_to'] . ' 100%);padding:18px 28px;">'
-        . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.9);font-weight:700;">'
-        . 'Invitación</div>'
+        . '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:18px;line-height:1.35;color:#ffffff;font-weight:700;">'
+        . 'Invitación al editor de OINADOM</div>'
+        . '<div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.9);font-weight:700;">'
+        . 'Editor web</div>'
         . '</td></tr>'
         . '<tr><td style="padding:36px 32px 28px;font-family:Arial,Helvetica,sans-serif;text-align:center;">'
         . '<div style="font-size:28px;line-height:1.25;color:' . $theme['title'] . ';font-weight:700;margin:0 0 18px;">'
         . '<span style="color:' . $theme['muted'] . ';font-weight:500;">Bienvenido</span> '
         . $safeName . '</div>'
         . '<p style="margin:0 0 12px;color:' . $theme['text'] . ';font-size:16px;line-height:1.55;">'
-        . 'Te han invitado al editor de contenidos de ' . $safeBrand . '.</p>'
+        . 'Te han invitado al editor de contenidos de OINADOM (' . $safeBrand . ').</p>'
         . '<p style="margin:0 0 22px;color:' . $theme['muted'] . ';font-size:15px;line-height:1.55;">'
         . 'Activa tu cuenta y crea tu contraseña con el botón siguiente.</p>'
         . '<p style="margin:0 0 28px;color:' . $theme['text'] . ';font-size:14px;line-height:1.55;">'
@@ -650,7 +655,7 @@ function cms_send_civis_solicitud(array $body, array $config, ?string $remoteIp 
     $form = $cfg['forms']['civis_solicitud'] ?? [];
     $toEmail = trim((string) ($form['to_email'] ?? 'civis@acropolis.org'));
     $toName = trim((string) ($form['to_name'] ?? 'Civis Consulting'));
-    $prefix = trim((string) ($form['subject_prefix'] ?? '[CIVIS] Solicitud de propuesta'));
+    $prefix = trim((string) ($form['subject_prefix'] ?? 'Civis — Solicitud de propuesta'));
     $subject = $prefix . ' — ' . $check['data']['empresa'];
     $copyToSender = ($form['copy_to_sender'] ?? true) !== false;
 
@@ -664,6 +669,7 @@ function cms_send_civis_solicitud(array $body, array $config, ?string $remoteIp 
             'body' => $check['data']['message'],
             'brand' => 'civis',
             'brandName' => $toName,
+            'badge' => 'Solicitud de propuesta',
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -725,7 +731,7 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
     $form = $cfg['forms']['esfera_solicitud'] ?? [];
     $toEmail = trim((string) ($form['to_email'] ?? 'esferard@acropolis.org'));
     $toName = trim((string) ($form['to_name'] ?? 'Punto Focal Esfera'));
-    $prefix = trim((string) ($form['subject_prefix'] ?? '[Esfera] Solicitud taller'));
+    $prefix = trim((string) ($form['subject_prefix'] ?? 'Esfera — Solicitud de taller'));
     $subject = $prefix . ' — ' . $check['data']['empresa'];
     $copyToSender = ($form['copy_to_sender'] ?? true) !== false;
     $internalCc = trim((string) ($form['cc_email'] ?? 'Santiago.a@acropolis.org'));
@@ -748,6 +754,7 @@ function cms_send_esfera_solicitud(array $body, array $config, ?string $remoteIp
             'body' => $check['data']['message'],
             'brand' => 'esfera',
             'brandName' => $toName,
+            'badge' => 'Solicitud de taller',
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -926,7 +933,7 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
     $form = $cfg['forms']['voluntariado_solicitud'] ?? [];
     $toEmail = trim((string) ($form['to_email'] ?? 'voluntariadord@acropolis.org'));
     $toName = trim((string) ($form['to_name'] ?? 'Voluntariado Humanitario'));
-    $subject = '[Nueva Acrópolis RD] Solicitud de voluntariado — ' . $contact['data']['nombre'];
+    $subject = 'Voluntariado — Solicitud de inscripción — ' . $contact['data']['nombre'];
 
     $ccs = [];
     $senderEmail = $contact['data']['email'];
@@ -945,6 +952,7 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
             'body' => $message,
             'brand' => 'acropolis',
             'brandName' => $toName,
+            'badge' => 'Solicitud de voluntariado',
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);
@@ -961,18 +969,24 @@ function cms_site_inquiry_route(string $formKey): ?array
             'to_name' => 'Cursos y Talleres',
             'copy_to_sender' => true,
             'brand' => 'acropolis',
+            'badge' => 'Solicitud de curso',
+            'subject_label' => 'Cursos — Solicitud de información',
         ],
         'salon_inquiry' => [
             'to_email' => 'cursos.oinadom@acropolis.org',
             'to_name' => 'Cursos y Talleres',
             'copy_to_sender' => true,
             'brand' => 'acropolis',
+            'badge' => 'Solicitud de información',
+            'subject_label' => 'Salones — Solicitud de información',
         ],
         'voluntariado_donacion' => [
             'to_email' => 'voluntariadord@acropolis.org',
             'to_name' => 'Voluntariado Humanitario',
             'copy_to_sender' => true,
             'brand' => 'acropolis',
+            'badge' => 'Solicitud de donación',
+            'subject_label' => 'Voluntariado — Solicitud de donación',
         ],
         'esfera_donar' => [
             'to_email' => 'esferard@acropolis.org',
@@ -980,6 +994,8 @@ function cms_site_inquiry_route(string $formKey): ?array
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => true,
             'brand' => 'esfera',
+            'badge' => 'Solicitud de donación',
+            'subject_label' => 'Esfera — Solicitud de donación',
         ],
         'esfera_alianzas' => [
             'to_email' => 'esferard@acropolis.org',
@@ -987,6 +1003,8 @@ function cms_site_inquiry_route(string $formKey): ?array
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => true,
             'brand' => 'esfera',
+            'badge' => 'Solicitud de alianza',
+            'subject_label' => 'Esfera — Solicitud de alianza',
         ],
         'esfera_info' => [
             'to_email' => 'esferard@acropolis.org',
@@ -994,21 +1012,60 @@ function cms_site_inquiry_route(string $formKey): ?array
             'cc_email' => 'Santiago.a@acropolis.org',
             'copy_to_sender' => true,
             'brand' => 'esfera',
+            'badge' => 'Solicitud de información',
+            'subject_label' => 'Esfera — Solicitud de información',
         ],
         'viaje_info' => [
             'to_email' => 'info.oinadom@acropolis.org',
             'to_name' => 'Nueva Acrópolis RD',
             'copy_to_sender' => true,
             'brand' => 'acropolis',
+            'badge' => 'Solicitud de información',
+            'subject_label' => 'Viajes — Solicitud de información',
         ],
         'circulo_amigos_inscription' => [
             'to_email' => 'amigos_dominicana@acropolis.org',
             'to_name' => 'Círculo de Amigos OINADOM',
             'copy_to_sender' => true,
             'brand' => 'circulo',
+            'badge' => 'Solicitud de inscripción',
+            'subject_label' => 'Círculo de Amigos — Solicitud de inscripción',
         ],
     ];
     return $routes[$formKey] ?? null;
+}
+
+/** Asunto canónico por tipo de formulario (el del cliente solo aporta el detalle). */
+function cms_site_inquiry_subject(string $formKey, array $route, array $body, array $contact): string
+{
+    $label = trim((string) ($route['subject_label'] ?? 'Solicitud de información'));
+    $clientSubject = trim((string) ($body['subject'] ?? ''));
+    $nombre = trim((string) ($contact['nombre'] ?? ''));
+
+    // Si el cliente ya envía un asunto con el prefijo correcto, respetarlo.
+    if ($clientSubject !== '' && strncmp($clientSubject, $label, strlen($label)) === 0) {
+        return substr($clientSubject, 0, 200);
+    }
+
+    $detail = '';
+    if ($clientSubject !== '') {
+        // Quitar prefijos genéricos antiguos.
+        $detail = preg_replace(
+            '/^(\[?Nueva Acr[oó]polis RD\]?\s*[—\-:]?\s*|Consulta\s*[—\-:]?\s*)/iu',
+            '',
+            $clientSubject,
+        ) ?? $clientSubject;
+        $detail = trim($detail);
+        if ($detail === $label || strncmp($detail, $label, strlen($label)) === 0) {
+            $detail = '';
+        }
+    }
+    if ($detail === '' && $nombre !== '') {
+        $detail = $nombre;
+    }
+
+    $subject = $detail !== '' ? ($label . ' — ' . $detail) : $label;
+    return substr($subject, 0, 200);
 }
 
 function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): array
@@ -1029,9 +1086,9 @@ function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): a
         return $contact;
     }
 
-    $subject = trim((string) ($body['subject'] ?? ''));
     $message = trim((string) ($body['message'] ?? ''));
-    if ($subject === '' || strlen($subject) > 200) {
+    $subject = cms_site_inquiry_subject($formKey, $route, $body, $contact['data']);
+    if ($subject === '') {
         return ['ok' => false, 'error' => 'Asunto de solicitud no válido.'];
     }
     if (strlen($message) < 40) {
@@ -1061,6 +1118,7 @@ function cms_send_site_inquiry(array $body, array $config, ?string $remoteIp): a
             'body' => $message,
             'brand' => (string) ($route['brand'] ?? 'acropolis'),
             'brandName' => (string) ($route['to_name'] ?? ''),
+            'badge' => (string) ($route['badge'] ?? 'Formulario web'),
         ]);
     } catch (Throwable $e) {
         return cms_form_mail_error($e);

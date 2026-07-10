@@ -108,8 +108,8 @@ export const SUBMARCA_LOGOS = {
   editorial: {
     src: "/brand/identificadores/editorial-identificador.webp",
     alt: "Librería Editorial Logos — Nueva Acrópolis",
-    width: 1078,
-    height: 359,
+    width: 2404,
+    height: 414,
   },
   cultura: {
     src: "/brand/identificadores/cultura-identificador.webp",
@@ -152,7 +152,6 @@ export const FOOTER_NAV_PRIMARY: NavLink[] = [
 /** Navegación del pie de página — segunda fila. */
 export const FOOTER_NAV_SECONDARY: NavLink[] = [
   { href: DIPLOMADO_PATH, label: "Diplomado" },
-  { href: CIRCULO_AMIGOS_PATH, label: "Círculo de Amigos" },
   { href: "/cursos", label: "Cursos" },
   { href: "/donde-estamos", label: "Dónde estamos" },
 ];
@@ -292,7 +291,7 @@ export const PLATAFORMAS: Platform[] = [
     id: "circulo",
     label: "Amigos",
     href: "https://circulodeamigos.acropolis.org.do",
-    devHref: "http://localhost:3100/circulo-de-amigos",
+    devHref: "http://localhost:3500",
   },
   {
     id: "biblioteca",

@@ -26,8 +26,8 @@ const ACROPOLIS_TAB_GROUPS: TabGroup[] = [
   { label: "Blog", tabs: ["articulos", "medios"] },
   {
     label: "Administración",
-    tabs: ["estadisticas", "archivos"],
-    hint: "Visitas e inventario de imágenes",
+    tabs: ["archivos"],
+    hint: "Inventario de imágenes y documentos",
   },
 ];
 
@@ -38,8 +38,8 @@ const CIVIS_TAB_GROUPS: TabGroup[] = [
   },
   {
     label: "Administración",
-    tabs: ["estadisticas", "archivos"],
-    hint: "Visitas e inventario de imágenes",
+    tabs: ["archivos"],
+    hint: "Inventario de imágenes y documentos",
   },
 ];
 
@@ -58,8 +58,8 @@ const EDITORIAL_TAB_GROUPS: TabGroup[] = [
   },
   {
     label: "Administración",
-    tabs: ["estadisticas", "archivos"],
-    hint: "Visitas e inventario de imágenes",
+    tabs: ["archivos"],
+    hint: "Inventario de imágenes y documentos",
   },
 ];
 
@@ -70,13 +70,15 @@ const CIRCULO_TAB_GROUPS: TabGroup[] = [
   },
   {
     label: "Administración",
-    tabs: ["estadisticas", "archivos"],
-    hint: "Visitas e inventario de imágenes",
+    tabs: ["archivos"],
+    hint: "Inventario de imágenes y documentos",
   },
 ];
 
 function buildTabGroups(site: SiteId, allowed: string[]): TabGroup[] {
-  const allowedSet = new Set(allowed);
+  // Estadísticas viven solo en el panel morado del dashboard (/analytics).
+  const navTabs = allowed.filter((tab) => tab !== "estadisticas");
+  const allowedSet = new Set(navTabs);
   const templates =
     site === "acropolis"
       ? ACROPOLIS_TAB_GROUPS
@@ -94,7 +96,7 @@ function buildTabGroups(site: SiteId, allowed: string[]): TabGroup[] {
     .filter((group) => group.tabs.length > 0);
 
   const used = new Set(grouped.flatMap((g) => g.tabs));
-  const rest = allowed.filter((tab) => !used.has(tab));
+  const rest = navTabs.filter((tab) => !used.has(tab));
   if (rest.length > 0) {
     grouped.push({ label: "Más opciones", tabs: rest });
   }

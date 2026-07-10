@@ -54,7 +54,7 @@ function InviteAcceptForm() {
       }
       setSession({
         token: result.token,
-        role: result.role || "editorial",
+        role: result.role || "editor",
         label: result.label || email,
         permissions: Array.isArray(result.permissions)
           ? result.permissions

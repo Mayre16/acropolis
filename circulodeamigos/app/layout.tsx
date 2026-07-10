@@ -6,6 +6,7 @@ import "./circulo.css";
 import { CirculoSiteChrome } from "@/components/CirculoSiteChrome";
 import { CirculoFooter } from "@/components/CirculoFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { CirculoAmigosCmsEditProvider } from "@/components/cms/CirculoAmigosCmsEditContext";
 import { CmsProvider } from "@/lib/cms/provider";
@@ -62,6 +63,7 @@ export default function RootLayout({
           <GoogleAnalytics />
           <CmsEditModeBootstrap />
         </Suspense>
+        <SiteAnalytics site="circulodeamigos" />
         <CmsProvider>
           <Suspense fallback={null}>
             <CirculoAmigosCmsEditProvider>

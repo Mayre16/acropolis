@@ -9,10 +9,20 @@ type Props = {
   value: EditorPermission[];
   onChange: (next: EditorPermission[]) => void;
   disabled?: boolean;
+  /** Oculta permisos de administración (invitar / SMTP). */
+  hideAdmin?: boolean;
 };
 
-export function PermissionsChecklist({ value, onChange, disabled }: Props) {
+export function PermissionsChecklist({
+  value,
+  onChange,
+  disabled,
+  hideAdmin = false,
+}: Props) {
   const selected = new Set(value);
+  const groups = hideAdmin
+    ? PERMISSION_GROUPS.filter((g) => g.id !== "admin")
+    : PERMISSION_GROUPS;
 
   function toggle(key: EditorPermission) {
     if (disabled) return;
@@ -34,7 +44,7 @@ export function PermissionsChecklist({ value, onChange, disabled }: Props) {
 
   return (
     <div className="space-y-4">
-      {PERMISSION_GROUPS.map((group) => {
+      {groups.map((group) => {
         const keys = group.items.map((i) => i.key);
         const onCount = keys.filter((k) => selected.has(k)).length;
         const allOn = onCount === keys.length;

@@ -126,7 +126,7 @@ export function buildVolunteerMailto(
   const recipients = resolveVolunteerRecipients(values.areas);
   const body = buildVolunteerMessage(values);
   const subject = encodeURIComponent(
-    `[Nueva Acrópolis RD] Solicitud de voluntariado — ${values.nombre.trim()}`,
+    `Voluntariado — Solicitud de inscripción — ${values.nombre.trim()}`,
   );
   const bodyEnc = encodeURIComponent(body);
   const href = `mailto:${recipients.join(",")}?subject=${subject}&body=${bodyEnc}`;
@@ -212,8 +212,8 @@ export function buildEsferaInfoMailto(
   values: EsferaInfoFormValues,
 ): MailtoResult {
   const subject = values.taller
-    ? `[Esfera] Consulta — ${values.taller.trim()}`
-    : `[Esfera] Más información — ${values.nombre.trim()}`;
+    ? `Esfera — Solicitud de información — ${values.taller.trim()}`
+    : `Esfera — Solicitud de información — ${values.nombre.trim()}`;
   return buildEsferaMailto(subject, buildEsferaInfoMessage(values));
 }
 
@@ -250,8 +250,8 @@ export function buildEsferaCollaborateMailto(
   const body = buildEsferaCollaborateMessage(kind, v);
   const subject =
     kind === "donar"
-      ? `[Esfera] Donación — ${v.nombre.trim()}`
-      : `[Esfera] Alianza institucional — ${v.nombre.trim()}`;
+      ? `Esfera — Solicitud de donación — ${v.nombre.trim()}`
+      : `Esfera — Solicitud de alianza — ${v.nombre.trim()}`;
   return buildEsferaMailto(subject, body);
 }
 
@@ -278,7 +278,7 @@ export function buildVoluntariadoDonacionMailto(
 ): MailtoResult {
   return buildMailtoLink(
     [VOLUNTARIADO_EMAIL],
-    `[Nueva Acrópolis RD] Donación voluntariado — ${v.nombre.trim()}`,
+    `Voluntariado — Solicitud de donación — ${v.nombre.trim()}`,
     buildVoluntariadoDonacionMessage(v),
   );
 }
@@ -312,7 +312,7 @@ export function buildCourseInfoMailto(
   const body = buildCourseInfoMessage(values);
   return buildMailtoLink(
     [CURSOS_EMAIL],
-    `[Nueva Acrópolis RD] Consulta curso/taller — ${values.curso.trim()}`,
+    `Cursos — Solicitud de información — ${values.curso.trim()}`,
     body,
   );
 }
@@ -344,7 +344,7 @@ export function buildSalonInquiryMailto(
   const body = buildSalonInquiryMessage(values);
   return buildMailtoLink(
     [CURSOS_EMAIL],
-    `[Nueva Acrópolis RD] Consulta alquiler de salones — ${values.nombre.trim()}`,
+    `Salones — Solicitud de información — ${values.nombre.trim()}`,
     body,
   );
 }
@@ -383,7 +383,7 @@ export function buildViajeInfoMailto(
   const body = buildViajeInfoMessage(values);
   return buildMailtoLink(
     [INFO_EMAIL],
-    `[Nueva Acrópolis RD] Consulta viaje cultural — ${values.viaje.trim()}`,
+    `Viajes — Solicitud de información — ${values.viaje.trim()}`,
     body,
   );
 }
@@ -395,7 +395,7 @@ export function buildCirculoAmigosMailto(): {
 } {
   return buildMailtoLink(
     [INFO_EMAIL],
-    "Consulta — Círculo de Amigos Nueva Acrópolis RD",
+    "Círculo de Amigos — Solicitud de información",
     CIRCULO_AMIGOS_MAIL_BODY,
   );
 }
@@ -447,7 +447,7 @@ export function buildCirculoAmigosInscriptionMailto(
 ): MailtoResult {
   return buildMailtoLink(
     [CIRCULO_AMIGOS_EMAIL],
-    `[Círculo de Amigos] Inscripción — ${values.nombre.trim()}`,
+    `Círculo de Amigos — Solicitud de inscripción — ${values.nombre.trim()}`,
     buildCirculoAmigosInscriptionMessage(values),
   );
 }

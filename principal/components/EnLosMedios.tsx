@@ -193,25 +193,23 @@ function MediaCard({
 
 
   if (onEdit) {
-
+    // div + role=button: el botón Eliminar no puede ir dentro de otro <button>
     return (
-
-      <button
-
-        type="button"
-
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onEdit}
-
-        className={`${base} text-left transition hover:-translate-y-1 hover:shadow-na-card hover:ring-2 hover:ring-amber-400/60`}
-
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onEdit();
+          }
+        }}
+        className={`${base} cursor-pointer text-left transition hover:-translate-y-1 hover:shadow-na-card hover:ring-2 hover:ring-amber-400/60`}
       >
-
         {inner}
-
-      </button>
-
+      </div>
     );
-
   }
 
 

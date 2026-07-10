@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
@@ -44,27 +44,32 @@ export function HomeHeroCms() {
   const published = cms?.sections.homeHero;
   const draft = edit?.homeHero;
   const [imageLoadedSrc, setImageLoadedSrc] = useState<string | null>(null);
+  // Foto del repo en SSR + primer paint; CMS solo tras montar (sin flash verde).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const inHomeEdit =
     cmsEditMode === "1" ||
     (typeof window !== "undefined" && isHomeCmsEditActive());
 
   const awaitingDraft = inHomeEdit && !edit?.ready;
-  const awaitingPublished = isCmsEnabled() && !mediaReady && !inHomeEdit;
 
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
 
-  const heroBackground =
-    awaitingDraft || awaitingPublished
-      ? null
-      : inHomeEdit && edit?.ready
-        ? pickHomeHeroBackground(draft?.background)
-        : pickHomeHeroBackground(
-            isCmsEnabled() ? published?.background : undefined,
-            { allowRepoFallback: mediaReady || !isCmsEnabled() },
-          );
+  const heroBackground = awaitingDraft
+    ? null
+    : inHomeEdit && edit?.ready
+      ? pickHomeHeroBackground(draft?.background)
+      : pickHomeHeroBackground(
+          mounted && isCmsEnabled() && mediaReady
+            ? published?.background
+            : undefined,
+          { allowRepoFallback: true },
+        );
 
   const resolvedBackgroundSrc = heroBackground
     ? assetUrl(
@@ -91,13 +96,11 @@ export function HomeHeroCms() {
   return (
     <section
       id="home-hero"
-      className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24"
+      className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24 bg-na-heketDark"
     >
       <div className="absolute inset-0" data-hero-bg aria-hidden>
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer"
-          aria-label={showPhoto ? undefined : "Cargando foto del encabezado…"}
-        />
+        {/* Fondo oscuro (no degradado pastel) mientras llega la foto. */}
+        <div className="absolute inset-0 bg-na-heketDark" />
         {resolvedBackgroundSrc ? (
           <Image
             key={resolvedBackgroundSrc}
@@ -115,9 +118,7 @@ export function HomeHeroCms() {
         ) : null}
       </div>
       <div
-        className={`pointer-events-none absolute inset-0 ${
-          showPhoto ? HERO_OVERLAY : "bg-na-heketDark/35"
-        }`}
+        className={`pointer-events-none absolute inset-0 ${HERO_OVERLAY}`}
         aria-hidden
       />
 

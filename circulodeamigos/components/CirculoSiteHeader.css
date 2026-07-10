@@ -7,10 +7,11 @@
   overflow-x: clip;
   overflow-y: visible;
   --circulo-header-brand: #53a3da;
+  /* Misma escala de altura que Civis. */
   --circulo-mark-height: clamp(
-    2.65rem,
+    2.5rem,
     calc((100vw - 3.25rem) / var(--circulo-mark-aspect, 7.607)),
-    min(4.5rem, calc((100vw - 3.25rem) / var(--circulo-mark-aspect, 7.607)))
+    min(3.75rem, calc((100vw - 3.25rem) / var(--circulo-mark-aspect, 7.607)))
   );
   /* Margen transparente izquierdo del PNG (curva NA sobre blanco) */
   --circulo-header-white-max: calc(
@@ -213,7 +214,7 @@
 
 @media (min-width: 640px) {
   .circulo-site-header {
-    --circulo-mark-height: 5.25rem;
+    --circulo-mark-height: 4.25rem;
   }
 
   .circulo-site-header__row,
@@ -229,7 +230,7 @@
 
 @media (min-width: 1024px) {
   .circulo-site-header {
-    --circulo-mark-height: 6.25rem;
+    --circulo-mark-height: 4.75rem;
   }
 
   .circulo-site-header__row,
@@ -279,7 +280,7 @@
 
 @media (min-width: 1280px) {
   .circulo-site-header {
-    --circulo-mark-height: 6.75rem;
+    --circulo-mark-height: 5.25rem;
   }
 
   .circulo-site-header__row,

@@ -16,7 +16,7 @@ const empty: SmtpSettings = {
     civis_solicitud: {
       to_email: "civis@acropolis.org",
       to_name: "Civis Consulting",
-      subject_prefix: "[CIVIS] Solicitud de propuesta",
+      subject_prefix: "Civis — Solicitud de propuesta",
       copy_to_sender: true,
     },
   },

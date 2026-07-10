@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkAuth } from "@/lib/api";
+import { checkAuth, fetchAuthMe } from "@/lib/api";
 import {
   clearToken,
   getEditorLabel,
@@ -13,6 +13,7 @@ import {
 } from "@/lib/auth-storage";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { DashboardAdminBar } from "@/components/DashboardAdminBar";
+import { TwoFactorReminderModal } from "@/components/TwoFactorReminderModal";
 import type { EditorRole } from "@/lib/editor-roles";
 import {
   canAccessSmtpAdmin,
@@ -37,6 +38,7 @@ export function DashboardShell({
   const [ready, setReady] = useState(false);
   const [role, setRole] = useState<EditorRole>("admin");
   const [editorLabel, setEditorLabel] = useState("Editor");
+  const [totpEnabled, setTotpEnabled] = useState(false);
 
   useEffect(() => {
     setRole(getEditorRole() as EditorRole);
@@ -49,7 +51,7 @@ export function DashboardShell({
       router.replace("/login/");
       return;
     }
-    checkAuth(token).then((result) => {
+    checkAuth(token).then(async (result) => {
       if (result === "invalid") {
         clearToken();
         router.replace("/login/");
@@ -67,6 +69,8 @@ export function DashboardShell({
           return;
         }
       }
+      const me = await fetchAuthMe(token);
+      setTotpEnabled(!!me?.totpEnabled);
       setReady(true);
     });
   }, [router, requireAdmin]);
@@ -80,21 +84,28 @@ export function DashboardShell({
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-4xl px-4 py-8">
-      <header className="border-b border-slate-200 pb-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <CmsBrandHeader subtitle={`Panel de edición · ${editorLabel}`} />
-          <DashboardAdminBar role={role} />
+    <div className="mx-auto min-h-screen max-w-4xl px-4 py-6">
+      <TwoFactorReminderModal
+        totpEnabled={totpEnabled}
+        onEnabled={() => setTotpEnabled(true)}
+      />
+      <header className="border-b border-slate-200 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CmsBrandHeader
+            compact
+            subtitle={`Panel de edición · ${editorLabel}`}
+          />
+          <DashboardAdminBar role={role} totpEnabled={totpEnabled} />
         </div>
         {title ? (
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-lg font-bold text-brand-ink">{title}</h1>
             <Link
               href={backHref}
               className="text-sm text-slate-600 hover:text-brand-ink hover:underline"
             >
               ← Volver al panel
             </Link>
-            <h1 className="text-lg font-bold text-brand-ink">{title}</h1>
           </div>
         ) : null}
       </header>

@@ -8,10 +8,10 @@ export const ANALYTICS_SITE_IDS = [
 ];
 
 export const ANALYTICS_SITE_LABELS = {
-  acropolis: "Acrópolis (sitio principal)",
+  acropolis: "Acrópolis",
   civis: "Civis Consulting",
   editorial: "Librería Editorial Logos",
-  circulodeamigos: "Círculo de Amigos OINADOM",
+  circulodeamigos: "Círculo de Amigos",
   biblioteca: "Biblioteca Sophia",
 };
 

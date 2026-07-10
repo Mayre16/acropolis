@@ -5,10 +5,15 @@
   z-index: 50;
   width: 100%;
   --editorial-header-brand: #ed7e2a;
-  --editorial-mark-height: 4.5rem;
+  /* Misma escala de altura que Civis. */
+  --editorial-mark-height: clamp(
+    2.5rem,
+    calc((100vw - 3.25rem) / var(--editorial-mark-aspect, 5.845)),
+    min(3.75rem, calc((100vw - 3.25rem) / var(--editorial-mark-aspect, 5.845)))
+  );
   /* Margen transparente izquierdo del PNG (curva NA sobre blanco) */
   --editorial-header-white-max: calc(
-    var(--editorial-mark-aspect, 5.795) * var(--editorial-mark-height) * 0.115
+    var(--editorial-mark-aspect, 5.845) * var(--editorial-mark-height) * 0.115
   );
   background: var(--editorial-header-brand);
 }
@@ -239,7 +244,7 @@
 
 @media (min-width: 640px) {
   .editorial-site-header {
-    --editorial-mark-height: 5.25rem;
+    --editorial-mark-height: 4.25rem;
   }
 
   .editorial-site-header__row,
@@ -255,7 +260,7 @@
 
 @media (min-width: 1024px) {
   .editorial-site-header {
-    --editorial-mark-height: 6.25rem;
+    --editorial-mark-height: 4.75rem;
   }
 
   .editorial-site-header__row,
@@ -276,7 +281,7 @@
 
 @media (min-width: 1280px) {
   .editorial-site-header {
-    --editorial-mark-height: 6.75rem;
+    --editorial-mark-height: 5.25rem;
   }
 
   .editorial-site-header__row,

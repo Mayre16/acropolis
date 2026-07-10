@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   isCmsEnabled,
   useCmsDocument,
@@ -40,14 +41,19 @@ export function useHeroCarouselImages(
   const cms = useCmsDocument();
   const mediaReady = useCmsMediaReady();
   const edit = useHeroCarouselCmsEdit();
+  // SSR y primer paint del cliente deben coincidir (sin early-CMS en el HTML).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (edit?.ready) {
     const images = heroImagesForKey(edit.carousels, key);
     return images.length ? images : resolveFallbackImages(key, fallback);
   }
 
-  // Evita flash: no pintar fotos del repo mientras llega el CMS publicado.
-  if (isCmsEnabled() && !mediaReady) {
+  // Vacío hasta montar + CMS listo: evita hydration mismatch y flash del repo.
+  if (!mounted || (isCmsEnabled() && !mediaReady)) {
     return [];
   }
 

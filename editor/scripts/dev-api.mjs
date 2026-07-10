@@ -34,6 +34,12 @@ import {
   adminResendInvite,
   getInviteInfo,
 } from "../lib/auth-invites-service.mjs";
+import {
+  acceptPasswordReset,
+  changeOwnPassword,
+  getPasswordResetInfo,
+  requestPasswordReset,
+} from "../lib/auth-password-self.mjs";
 import { sendCivisSolicitudMail } from "../lib/civis-solicitud-mail.mjs";
 import { sendEsferaSolicitudMail } from "../lib/esfera-solicitud-mail.mjs";
 import { sendVolunteerSolicitudMail } from "../lib/volunteer-solicitud-mail.mjs";
@@ -136,7 +142,10 @@ function ensureSite(site) {
 }
 
 function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
+  let text = fs.readFileSync(file, "utf8");
+  // PowerShell / editores a veces guardan UTF-8 con BOM
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  return JSON.parse(text);
 }
 
 function getToken(req) {
@@ -474,6 +483,42 @@ const server = http.createServer(async (req, res) => {
       destroySession(getToken(req));
       json(res, 200, { ok: true }, origin);
       return;
+    }
+
+    if (pathname === "/auth/change-password" && req.method === "POST") {
+      if (!requireAuth(req, res, origin)) return;
+      const body = await readBody(req);
+      const result = changeOwnPassword(
+        getToken(req),
+        body?.currentPassword ?? "",
+        body?.newPassword ?? "",
+      );
+      json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+      return;
+    }
+
+    if (pathname === "/auth/forgot-password" && req.method === "POST") {
+      const body = await readBody(req);
+      const result = await requestPasswordReset(body?.email ?? "");
+      json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+      return;
+    }
+
+    const resetMatch = /^\/auth\/reset\/([^/]+)(\/accept)?$/.exec(pathname);
+    if (resetMatch) {
+      const resetToken = resetMatch[1];
+      const isAccept = resetMatch[2] === "/accept";
+      if (!isAccept && req.method === "GET") {
+        const result = getPasswordResetInfo(resetToken);
+        json(res, result.status ?? (result.ok ? 200 : 404), result, origin);
+        return;
+      }
+      if (isAccept && req.method === "POST") {
+        const body = await readBody(req);
+        const result = acceptPasswordReset(resetToken, body?.password ?? "");
+        json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
+        return;
+      }
     }
 
     const usersListMatch =

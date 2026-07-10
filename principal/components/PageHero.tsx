@@ -127,14 +127,10 @@ export function PageHero({
     );
   }
 
+  // Misma clase de fondo siempre: evita hydration mismatch cuando el CMS
+  // carga fotos en el cliente y hasImages pasa de false → true.
   return (
-    <section
-      className={`relative overflow-hidden rounded-b-[1.75rem] ${
-        hasImages
-          ? "bg-na-heketDark"
-          : "bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer"
-      }`}
-    >
+    <section className="relative overflow-hidden rounded-b-[1.75rem] bg-gradient-to-br from-na-heketDark via-na-heket to-na-kefer">
       {hasImages ? (
         <>
           <HeroCarousel

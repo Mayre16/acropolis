@@ -126,4 +126,23 @@
   window.addEventListener("pagehide", function () {
     flush(activeSection);
   });
+
+  document.addEventListener(
+    "click",
+    function (ev) {
+      var target = ev.target;
+      if (!target || !target.closest) return;
+      var anchor = target.closest("a[href]");
+      if (!anchor || !anchor.href) return;
+      var href = String(anchor.href);
+      if (!/wa\.me|whatsapp\.com/i.test(href)) return;
+      send({
+        site: site,
+        event: "whatsapp",
+        path: currentPath,
+        visitorId: visitorId(),
+      });
+    },
+    true,
+  );
 })();

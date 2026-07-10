@@ -256,6 +256,7 @@ function cms_auth_default_permissions_for_role(string $role): array
     $all = cms_auth_permission_catalog();
     $map = [
         'admin' => $all,
+        'editor' => [],
         'voluntariado' => ['site:acropolis', 'tab:voluntariado', 'tab:agenda'],
         'esfera' => [
             'site:acropolis', 'tab:sedes', 'tab:esfera', 'tab:agenda',
@@ -841,7 +842,7 @@ function cms_auth_send_invite_mail(array $config, string $email, string $label, 
     $inviteUrl = cms_auth_build_invite_url($config, $token);
     $name = $label !== '' ? $label : $email;
     $plain = "Bienvenido {$name}\n\n"
-        . "Te han invitado al editor de contenidos de Nueva Acrópolis RD.\n\n"
+        . "Te han invitado al editor de contenidos de OINADOM (Nueva Acrópolis RD).\n\n"
         . "Esta invitación se envió a: {$email}\n"
         . "(ese será tu usuario de acceso; si tienes reenvío de correo, confirma que es la cuenta correcta)\n\n"
         . "Acepta la invitación y crea tu contraseña:\n"
@@ -850,10 +851,241 @@ function cms_auth_send_invite_mail(array $config, string $email, string $label, 
     cms_send_plain_mail(cms_load_smtp_config($config), [
         'to' => $email,
         'toName' => $name,
-        'subject' => 'Invitación al editor de Nueva Acrópolis RD',
+        'subject' => 'Invitación al editor de OINADOM',
         'body' => $plain,
         'htmlBody' => cms_mail_invite_html_document($label, $email, $inviteUrl, 'acropolis'),
+        'badge' => 'Editor web',
     ]);
+}
+
+function cms_auth_password_resets(string $dataRoot): array
+{
+    $data = cms_auth_read_json(cms_auth_json_file($dataRoot, 'password-resets.json'));
+    $resets = $data['resets'] ?? [];
+    return is_array($resets) ? $resets : [];
+}
+
+function cms_auth_save_password_resets(string $dataRoot, array $resets): void
+{
+    cms_auth_write_json(cms_auth_json_file($dataRoot, 'password-resets.json'), ['resets' => $resets]);
+}
+
+function cms_auth_revoke_password_resets_for_user(string $dataRoot, string $userId): void
+{
+    $resets = array_values(array_filter(
+        cms_auth_password_resets($dataRoot),
+        static fn ($entry) => !is_array($entry)
+            || ($entry['userId'] ?? '') !== $userId
+            || !empty($entry['usedAt']),
+    ));
+    cms_auth_save_password_resets($dataRoot, $resets);
+}
+
+function cms_auth_password_reset_expired(array $entry): bool
+{
+    $expiresAt = strtotime((string) ($entry['expiresAt'] ?? ''));
+    return $expiresAt === false || $expiresAt <= time();
+}
+
+function cms_auth_create_password_reset(string $dataRoot, string $userId, string $email): array
+{
+    cms_auth_revoke_password_resets_for_user($dataRoot, $userId);
+    $entry = [
+        'token' => bin2hex(random_bytes(32)),
+        'userId' => $userId,
+        'email' => strtolower(trim($email)),
+        'createdAt' => gmdate('c'),
+        'expiresAt' => gmdate('c', time() + 3600),
+        'usedAt' => null,
+    ];
+    $resets = cms_auth_password_resets($dataRoot);
+    $resets[] = $entry;
+    cms_auth_save_password_resets($dataRoot, $resets);
+    return $entry;
+}
+
+function cms_auth_find_valid_password_reset(string $dataRoot, string $token): ?array
+{
+    $normalized = trim($token);
+    if ($normalized === '') {
+        return null;
+    }
+    foreach (cms_auth_password_resets($dataRoot) as $entry) {
+        if (!is_array($entry) || ($entry['token'] ?? '') !== $normalized) {
+            continue;
+        }
+        if (!empty($entry['usedAt']) || cms_auth_password_reset_expired($entry)) {
+            return null;
+        }
+        return $entry;
+    }
+    return null;
+}
+
+function cms_auth_mark_password_reset_used(string $dataRoot, string $token): void
+{
+    $resets = cms_auth_password_resets($dataRoot);
+    foreach ($resets as $i => $entry) {
+        if (!is_array($entry) || ($entry['token'] ?? '') !== $token) {
+            continue;
+        }
+        $resets[$i]['usedAt'] = gmdate('c');
+        cms_auth_save_password_resets($dataRoot, $resets);
+        return;
+    }
+}
+
+function cms_auth_build_password_reset_url(array $config, string $token): string
+{
+    return cms_auth_editor_public_url($config)
+        . '/restablecer/?token='
+        . rawurlencode($token);
+}
+
+function cms_auth_send_password_reset_mail(array $config, string $email, string $label, string $token): void
+{
+    require_once __DIR__ . '/mail.php';
+    $resetUrl = cms_auth_build_password_reset_url($config, $token);
+    $name = $label !== '' ? $label : $email;
+    $plain = "Hola {$name}\n\n"
+        . "Recibimos una solicitud para restablecer la contraseña de tu acceso al editor de contenidos de OINADOM.\n\n"
+        . "Restablece tu contraseña aquí:\n"
+        . "{$resetUrl}\n\n"
+        . "El enlace caduca en 1 hora. Si no pediste este cambio, ignora este mensaje; tu contraseña no se modificará.\n";
+    cms_send_plain_mail(cms_load_smtp_config($config), [
+        'to' => $email,
+        'toName' => $name,
+        'subject' => 'Restablecer contraseña — editor OINADOM',
+        'body' => $plain,
+        'badge' => 'Editor web',
+    ]);
+}
+
+function cms_auth_change_own_password(string $dataRoot, string $token, string $currentPassword, string $newPassword): array
+{
+    $sess = cms_auth_get_session($dataRoot, $token);
+    if ($sess === null) {
+        return ['ok' => false, 'error' => 'No autorizado', 'status' => 401];
+    }
+    $user = cms_auth_find_user($dataRoot, (string) ($sess['username'] ?? ''));
+    if ($user === null || !empty($user['disabled'])) {
+        return ['ok' => false, 'error' => 'No autorizado', 'status' => 401];
+    }
+    if (empty($user['passwordHash']) || cms_auth_user_invite_pending($user)) {
+        return [
+            'ok' => false,
+            'error' => 'Tu cuenta aún no tiene contraseña. Usa el enlace de invitación.',
+            'status' => 400,
+        ];
+    }
+    if (!cms_verify_password($currentPassword, (string) $user['passwordHash'])) {
+        return ['ok' => false, 'error' => 'La contraseña actual no es correcta', 'status' => 400];
+    }
+    $policy = cms_validate_password($newPassword);
+    if (!$policy['ok']) {
+        return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
+    }
+    if ($currentPassword === $newPassword) {
+        return [
+            'ok' => false,
+            'error' => 'La nueva contraseña debe ser distinta a la actual',
+            'status' => 400,
+        ];
+    }
+    cms_auth_update_user($dataRoot, (string) $user['id'], [
+        'passwordHash' => cms_hash_password($newPassword),
+        'invitePending' => false,
+    ]);
+    return ['ok' => true, 'message' => 'Contraseña actualizada'];
+}
+
+function cms_auth_request_password_reset(string $dataRoot, array $config, string $emailRaw): array
+{
+    $okMsg = 'Si el correo está registrado, te enviamos un enlace para restablecer la contraseña.';
+    $email = cms_auth_normalize_login($emailRaw);
+    if ($email === '' || !cms_auth_is_valid_email($email)) {
+        return ['ok' => true, 'message' => $okMsg];
+    }
+    $user = cms_auth_find_user($dataRoot, $email);
+    if (
+        $user === null
+        || !empty($user['disabled'])
+        || cms_auth_user_invite_pending($user)
+        || empty($user['passwordHash'])
+    ) {
+        return ['ok' => true, 'message' => $okMsg];
+    }
+    require_once __DIR__ . '/mail.php';
+    $smtpCfg = cms_load_smtp_config($config);
+    if (!cms_smtp_ready($smtpCfg)) {
+        return [
+            'ok' => false,
+            'error' => 'El correo del sistema no está configurado. Contacta al administrador.',
+            'status' => 503,
+        ];
+    }
+    try {
+        $reset = cms_auth_create_password_reset(
+            $dataRoot,
+            (string) $user['id'],
+            (string) ($user['email'] ?? $email),
+        );
+        cms_auth_send_password_reset_mail(
+            $config,
+            (string) ($user['email'] ?? $email),
+            (string) ($user['label'] ?? ''),
+            (string) $reset['token'],
+        );
+    } catch (Throwable $e) {
+        return [
+            'ok' => false,
+            'error' => 'No se pudo enviar el correo. Inténtalo más tarde.',
+            'status' => 502,
+        ];
+    }
+    return ['ok' => true, 'message' => $okMsg];
+}
+
+function cms_auth_get_password_reset_info(string $dataRoot, string $token): array
+{
+    $reset = cms_auth_find_valid_password_reset($dataRoot, $token);
+    if ($reset === null) {
+        return ['ok' => false, 'error' => 'Enlace inválido o caducado', 'status' => 404];
+    }
+    $user = cms_auth_find_user_by_id($dataRoot, (string) ($reset['userId'] ?? ''));
+    if ($user === null || !empty($user['disabled'])) {
+        return ['ok' => false, 'error' => 'Enlace inválido o caducado', 'status' => 404];
+    }
+    return [
+        'ok' => true,
+        'email' => (string) ($reset['email'] ?? ''),
+        'label' => (string) ($user['label'] ?? ''),
+    ];
+}
+
+function cms_auth_accept_password_reset(string $dataRoot, string $token, string $password): array
+{
+    $reset = cms_auth_find_valid_password_reset($dataRoot, $token);
+    if ($reset === null) {
+        return ['ok' => false, 'error' => 'Enlace inválido o caducado', 'status' => 404];
+    }
+    $user = cms_auth_find_user_by_id($dataRoot, (string) ($reset['userId'] ?? ''));
+    if ($user === null || !empty($user['disabled'])) {
+        return ['ok' => false, 'error' => 'Enlace inválido o caducado', 'status' => 404];
+    }
+    $policy = cms_validate_password($password);
+    if (!$policy['ok']) {
+        return ['ok' => false, 'error' => implode('. ', $policy['errors']), 'status' => 400];
+    }
+    cms_auth_update_user($dataRoot, (string) $user['id'], [
+        'passwordHash' => cms_hash_password($password),
+        'invitePending' => false,
+    ]);
+    cms_auth_mark_password_reset_used($dataRoot, $token);
+    return [
+        'ok' => true,
+        'message' => 'Contraseña actualizada. Ya puedes iniciar sesión.',
+    ];
 }
 
 function cms_auth_get_invite_info(string $dataRoot, string $token): array
@@ -910,7 +1142,7 @@ function cms_auth_accept_invite(string $dataRoot, string $token, string $passwor
     return cms_auth_create_session($dataRoot, $updated ?? $user);
 }
 
-function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config): array
+function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config, array $session = []): array
 {
     require_once __DIR__ . '/mail.php';
     $smtpCfg = cms_load_smtp_config($config);
@@ -923,11 +1155,10 @@ function cms_auth_admin_invite_user(string $dataRoot, array $body, array $config
     }
 
     $email = cms_auth_normalize_login((string) ($body['email'] ?? $body['username'] ?? ''));
-    $role = trim((string) ($body['role'] ?? ''));
     $label = trim((string) ($body['label'] ?? ''));
-    $permissions = array_key_exists('permissions', $body)
-        ? cms_auth_sanitize_permissions($body['permissions'])
-        : cms_auth_default_permissions_for_role($role);
+    $sanitized = cms_auth_sanitize_invite_payload($session, $body);
+    $role = $sanitized['role'];
+    $permissions = $sanitized['permissions'];
 
     if ($email === '' || !cms_auth_is_valid_email($email)) {
         return ['ok' => false, 'error' => 'Correo electrónico inválido', 'status' => 400];
@@ -1040,6 +1271,23 @@ function cms_auth_require_admin(string $dataRoot, string $token): array
     return cms_auth_require_permission($dataRoot, $token, 'admin:users');
 }
 
+/** Solo administrador: gestionar cuentas ajenas. */
+function cms_auth_require_users_manage(string $dataRoot, string $token): array
+{
+    $sess = cms_auth_get_session($dataRoot, $token);
+    if ($sess === null) {
+        return ['ok' => false, 'error' => 'No autorizado', 'status' => 401];
+    }
+    if (($sess['role'] ?? '') === 'admin') {
+        return ['ok' => true, 'session' => $sess];
+    }
+    return [
+        'ok' => false,
+        'error' => 'Solo el administrador puede gestionar otros usuarios',
+        'status' => 403,
+    ];
+}
+
 function cms_auth_require_permission(string $dataRoot, string $token, string $permission): array
 {
     $sess = cms_auth_get_session($dataRoot, $token);
@@ -1054,6 +1302,26 @@ function cms_auth_require_permission(string $dataRoot, string $token, string $pe
         return ['ok' => true, 'session' => $sess];
     }
     return ['ok' => false, 'error' => 'Sin permiso', 'status' => 403];
+}
+
+function cms_auth_sanitize_invite_payload(array $session, array $body): array
+{
+    $isAdmin = ($session['role'] ?? '') === 'admin';
+    $role = trim((string) ($body['role'] ?? 'editor'));
+    if ($role === '') {
+        $role = 'editor';
+    }
+    $permissions = array_key_exists('permissions', $body)
+        ? cms_auth_sanitize_permissions($body['permissions'])
+        : cms_auth_default_permissions_for_role($role);
+    if (!$isAdmin) {
+        $role = 'editor';
+        $permissions = array_values(array_filter(
+            $permissions,
+            static fn ($p) => $p !== 'admin:users' && $p !== 'admin:smtp',
+        ));
+    }
+    return ['role' => $role, 'permissions' => $permissions];
 }
 
 function cms_auth_handle(string $uri, string $method, array $config, string $dataRoot): ?array
@@ -1138,8 +1406,52 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
         return ['status' => 200, 'body' => ['ok' => true]];
     }
 
+    if ($uri === '/auth/change-password' && $method === 'POST') {
+        $result = cms_auth_change_own_password(
+            $dataRoot,
+            $token,
+            (string) ($body['currentPassword'] ?? ''),
+            (string) ($body['newPassword'] ?? ''),
+        );
+        $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+        unset($result['status']);
+        return ['status' => $status, 'body' => $result];
+    }
+
+    if ($uri === '/auth/forgot-password' && $method === 'POST') {
+        $result = cms_auth_request_password_reset(
+            $dataRoot,
+            $config,
+            (string) ($body['email'] ?? ''),
+        );
+        $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+        unset($result['status']);
+        return ['status' => $status, 'body' => $result];
+    }
+
+    if (preg_match('#^/auth/reset/([^/]+)(/accept)?$#', $uri, $rm)) {
+        $resetToken = $rm[1];
+        $isAccept = ($rm[2] ?? '') === '/accept';
+        if (!$isAccept && $method === 'GET') {
+            $result = cms_auth_get_password_reset_info($dataRoot, $resetToken);
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 404));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+        if ($isAccept && $method === 'POST') {
+            $result = cms_auth_accept_password_reset(
+                $dataRoot,
+                $resetToken,
+                (string) ($body['password'] ?? ''),
+            );
+            $status = (int) ($result['status'] ?? ($result['ok'] ? 200 : 400));
+            unset($result['status']);
+            return ['status' => $status, 'body' => $result];
+        }
+    }
+
     if ($uri === '/auth/users' && $method === 'GET') {
-        $gate = cms_auth_require_admin($dataRoot, $token);
+        $gate = cms_auth_require_users_manage($dataRoot, $token);
         if (!$gate['ok']) {
             return [
                 'status' => (int) ($gate['status'] ?? 401),
@@ -1151,7 +1463,7 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
     }
 
     if ($uri === '/auth/users' && $method === 'POST') {
-        $gate = cms_auth_require_admin($dataRoot, $token);
+        $gate = cms_auth_require_users_manage($dataRoot, $token);
         if (!$gate['ok']) {
             return [
                 'status' => (int) ($gate['status'] ?? 401),
@@ -1172,7 +1484,12 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
                 'body' => ['ok' => false, 'error' => $gate['error'] ?? 'No autorizado'],
             ];
         }
-        $result = cms_auth_admin_invite_user($dataRoot, $body, $config);
+        $result = cms_auth_admin_invite_user(
+            $dataRoot,
+            $body,
+            $config,
+            $gate['session'] ?? [],
+        );
         $status = (int) ($result['status'] ?? ($result['ok'] ? 201 : 400));
         unset($result['status']);
         return ['status' => $status, 'body' => $result];
@@ -1200,7 +1517,7 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
     }
 
     if (preg_match('#^/auth/users/([^/]+)(/reset-password|/totp|/resend-invite)?$#', $uri, $m)) {
-        $gate = cms_auth_require_admin($dataRoot, $token);
+        $gate = cms_auth_require_users_manage($dataRoot, $token);
         if (!$gate['ok']) {
             return [
                 'status' => (int) ($gate['status'] ?? 401),

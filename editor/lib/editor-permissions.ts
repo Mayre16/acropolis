@@ -84,10 +84,10 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
     id: "sites",
     label: "Sitios",
     items: [
-      { key: "site:acropolis", label: "Acropolis (principal)" },
+      { key: "site:acropolis", label: "Acrópolis" },
       { key: "site:civis", label: "Civis Consulting" },
       { key: "site:editorial", label: "Librería Editorial Logos" },
-      { key: "site:circulodeamigos", label: "Círculo de Amigos OINADOM" },
+      { key: "site:circulodeamigos", label: "Círculo de Amigos" },
     ],
   },
   {
@@ -126,7 +126,10 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
     id: "admin",
     label: "Administración",
     items: [
-      { key: "admin:users", label: "Gestionar usuarios e invitaciones" },
+      {
+        key: "admin:users",
+        label: "Invitar usuarios (sin gestionar a otros)",
+      },
       { key: "admin:smtp", label: "Configuración SMTP / correo" },
     ],
   },
@@ -141,6 +144,8 @@ const ALL_PERMISSION_SET = new Set<string>(ALL_PERMISSIONS);
 /** Plantillas por rol (punto de partida de los checkmarks). */
 export const ROLE_DEFAULT_PERMISSIONS: Record<EditorRole, EditorPermission[]> = {
   admin: [...ALL_PERMISSIONS],
+  /** Editor: sin plantilla; se definen con los checkmarks. */
+  editor: [],
   voluntariado: [
     "site:acropolis",
     ...tabsToPerms(["voluntariado", "agenda"]),
@@ -245,7 +250,15 @@ export function tabsForPermissions(
         : site === "circulodeamigos"
           ? CIRCULO_TABS
           : EDITORIAL_TABS;
-  return catalog.filter((tab) => perms.includes(tabPerm(tab)));
+  const matched = catalog.filter(
+    (tab) => tab !== "estadisticas" && perms.includes(tabPerm(tab)),
+  );
+  // Si tiene acceso al sitio pero faltan tabs (sesión vieja / invitación incompleta),
+  // abrir al menos las secciones del catálogo (sin estadísticas).
+  if (matched.length === 0) {
+    return catalog.filter((tab) => tab !== "estadisticas");
+  }
+  return matched;
 }
 
 export function defaultTabForPermissions(
@@ -265,6 +278,11 @@ export function canAccessUsersAdmin(
 ): boolean {
   if (role === "admin") return true;
   return effectivePermissions(role, permissions).includes("admin:users");
+}
+
+/** Solo administradores gestionan cuentas ajenas (permisos, reset, borrar…). */
+export function canManageOtherUsers(role: string): boolean {
+  return role === "admin";
 }
 
 export function canAccessSmtpAdmin(

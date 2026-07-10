@@ -1,14 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, MessageCircle, Pencil, Users } from "lucide-react";
+import { ArrowRight, Pencil, Users } from "lucide-react";
+import { CIRCULO_AMIGOS_HIGHLIGHTS } from "@/lib/circulo-amigos-content";
 import {
-  CIRCULO_AMIGOS_HIGHLIGHTS,
-  CIRCULO_AMIGOS_WHATSAPP_MESSAGE,
-} from "@/lib/circulo-amigos-content";
-import { buildCirculoAmigosMailto } from "@/lib/contact-routing";
-import { useWhatsAppUrls } from "@/lib/cms/hooks";
-import { INFO_EMAIL } from "@/lib/site-config";
+  platformEffectiveUrl,
+  platformIsExternal,
+} from "@/lib/site-config";
 import {
   CIRCULO_AMIGOS_SELECTED_ID,
   useCirculoAmigosCmsEdit,
@@ -23,9 +21,8 @@ type Props = {
 export function CirculoAmigosPromoCms({ variant = "home" }: Props) {
   const edit = useCirculoAmigosCmsEdit();
   const promo = useCirculoAmigosDisplay();
-  const whatsapp = useWhatsAppUrls();
-  const whatsappHref = `${whatsapp.diplomado}?text=${encodeURIComponent(CIRCULO_AMIGOS_WHATSAPP_MESSAGE)}`;
-  const mailtoHref = buildCirculoAmigosMailto().href;
+  const circuloHref = platformEffectiveUrl("circulo");
+  const circuloExternal = platformIsExternal(circuloHref);
 
   const editButton = edit?.ready ? (
     <button
@@ -58,19 +55,14 @@ export function CirculoAmigosPromoCms({ variant = "home" }: Props) {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={circuloHref}
+                {...(circuloExternal
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-heket/20 transition hover:bg-na-kefer"
               >
-                <MessageCircle className="h-4 w-4" aria-hidden />
-                Quiero saber más
-              </a>
-              <a
-                href={mailtoHref}
-                className="inline-flex items-center gap-2 rounded-full border border-na-heket/25 px-5 py-2.5 text-sm font-semibold text-na-heket transition hover:bg-na-heket/5"
-              >
-                {INFO_EMAIL}
+                Conocer el Círculo de Amigos
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </a>
             </div>
           </div>
@@ -138,19 +130,14 @@ export function CirculoAmigosPromoCms({ variant = "home" }: Props) {
 
             <div className="mt-5 flex flex-wrap gap-2.5">
               <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={circuloHref}
+                {...(circuloExternal
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-na-heket/20 transition hover:bg-na-kefer"
               >
-                Unirme al Círculo de Amigos
+                Ir al Círculo de Amigos
                 <ArrowRight className="h-4 w-4" aria-hidden />
-              </a>
-              <a
-                href={mailtoHref}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-na-heket/20 px-5 py-2.5 text-sm font-semibold text-na-heket transition hover:border-na-heket/40"
-              >
-                Escribir por correo
               </a>
             </div>
           </div>

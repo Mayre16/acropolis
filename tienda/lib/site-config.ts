@@ -69,8 +69,8 @@ export const EDITORIAL_SITE_URL = (
 export const SUBMARCA_LOGO = {
   src: "/brand/identificadores/editorial-identificador.webp",
   alt: "Librería Editorial Logos — Nueva Acrópolis",
-  width: 1073,
-  height: 185,
+  width: 2404,
+  height: 414,
 };
 
 export const LEGAL_DOMICILE =

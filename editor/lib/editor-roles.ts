@@ -3,100 +3,75 @@ import type { SiteId } from "./content-types";
 
 
 export type EditorRole =
-
   | "admin"
-
+  | "editor"
+  /** @deprecated plantillas antiguas; se muestran como Editor */
   | "voluntariado"
-
   | "esfera"
-
   | "editorial"
-
   | "viajes"
-
   | "filosofia";
-
-
 
 export type EditorTabId = string;
 
-
-
 export type EditorRoleMeta = {
-
   role: EditorRole;
-
   label: string;
-
   description: string;
-
 };
 
-
+/** Tipos de usuario en la UI (invitar / cambiar). */
+export const USER_TYPE_OPTIONS: EditorRoleMeta[] = [
+  {
+    role: "admin",
+    label: "Administrador",
+    description: "Acceso completo al CMS",
+  },
+  {
+    role: "editor",
+    label: "Editor",
+    description: "Acceso según los permisos que marques",
+  },
+];
 
 export const EDITOR_ROLE_META: Record<EditorRole, EditorRoleMeta> = {
-
-  admin: {
-
-    role: "admin",
-
-    label: "Administrador",
-
-    description: "Acceso completo al CMS",
-
-  },
-
+  admin: USER_TYPE_OPTIONS[0],
+  editor: USER_TYPE_OPTIONS[1],
   voluntariado: {
-
     role: "voluntariado",
-
-    label: "Voluntariado",
-
-    description: "Actividades de voluntariado y agenda",
-
+    label: "Editor",
+    description: "Plantilla antigua — usa permisos",
   },
-
   esfera: {
-
     role: "esfera",
-
-    label: "Esfera y Sedes",
-
-    description: "Sedes, agenda general, archivos e inicio",
-
+    label: "Editor",
+    description: "Plantilla antigua — usa permisos",
   },
-
   editorial: {
-
     role: "editorial",
-
-    label: "Librería Editorial Logos",
-
-    description: "Tienda editorial — libros, revistas, regalos y textos",
-
+    label: "Editor",
+    description: "Plantilla antigua — usa permisos",
   },
-
   viajes: {
-
     role: "viajes",
-
-    label: "Viajes",
-
-    description: "Destinos locales e internacionales",
-
+    label: "Editor",
+    description: "Plantilla antigua — usa permisos",
   },
-
   filosofia: {
-
     role: "filosofia",
-
-    label: "Diplomado y Filosofía",
-
-    description: "Diplomado, sesiones, filosofía y eventos realizados",
-
+    label: "Editor",
+    description: "Plantilla antigua — usa permisos",
   },
-
 };
+
+/** Normaliza roles antiguos a admin | editor para la UI. */
+export function uiUserType(role: string): "admin" | "editor" {
+  return role === "admin" ? "admin" : "editor";
+}
+
+export function userTypeLabel(role: string): string {
+  return role === "admin" ? "Administrador" : "Editor";
+}
 
 
 
@@ -200,17 +175,17 @@ export const TAB_LABELS: Record<string, string> = {
 
   eventos: "Eventos",
 
-  civisTalleresRealizados: "Civis — talleres",
+  civisTalleresRealizados: "Talleres",
 
-  civisProximasActividades: "Civis — actividades",
+  civisProximasActividades: "Actividades",
 
-  civisHome: "Civis — inicio",
+  civisHome: "Inicio",
 
-  civisTalleres: "Civis — oferta",
+  civisTalleres: "Oferta",
 
-  civisQuienesSomos: "Civis — equipo",
+  civisQuienesSomos: "Equipo",
 
-  civisSalones: "Civis — salones",
+  civisSalones: "Salones",
 
   quienesSomos: "Quiénes somos",
 
@@ -220,7 +195,7 @@ export const TAB_LABELS: Record<string, string> = {
 
   circuloAmigos: "Círculo de Amigos",
 
-  circuloHome: "Círculo — inicio",
+  circuloHome: "Inicio",
 
   editorialHome: "Inicio — tienda",
 
@@ -243,159 +218,86 @@ export const TAB_LABELS: Record<string, string> = {
 
 
 const ACROPOLIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
-
   admin: [
-
     "home",
-
     "sedes",
-
     "cursos",
-
     "diplomado",
-
     "filosofia",
-
     "voluntariado",
-
     "eventos",
-
     "agenda",
-
     "articulos",
-
     "medios",
-
     "cultura",
-
     "viajesLocales",
-
     "viajesInternacionales",
-
     "archivos",
-
     "esfera",
-
   ],
-
+  editor: [],
   voluntariado: ["voluntariado", "agenda"],
-
   editorial: [],
-
   filosofia: ["diplomado", "filosofia", "eventos", "contenido", "agenda"],
-
   viajes: ["viajesLocales", "viajesInternacionales"],
-
   esfera: ["sedes", "esfera", "agenda", "archivos", "home"],
-
 };
-
-
 
 const CIVIS_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
-
   admin: [
-
     "civisHome",
-
     "civisTalleres",
-
     "civisQuienesSomos",
-
     "civisSalones",
-
     "archivos",
-
     "estadisticas",
-
   ],
-
+  editor: [],
   voluntariado: [],
-
   editorial: [],
-
   filosofia: [],
-
   viajes: [],
-
   esfera: ["archivos"],
-
 };
-
-
 
 const EDITORIAL_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
-
   admin: [
-
     "editorialHome",
-
     "editorialLibros",
-
     "editorialDigitales",
-
     "editorialRevistas",
-
     "editorialRegalos",
-
     "editorialDonde",
-
     "editorialQuienesSomos",
-
     "archivos",
-
     "estadisticas",
-
   ],
-
+  editor: [],
   voluntariado: [],
-
   editorial: [
-
     "editorialHome",
-
     "editorialLibros",
-
     "editorialDigitales",
-
     "editorialRevistas",
-
     "editorialRegalos",
-
     "editorialDonde",
-
     "editorialQuienesSomos",
-
     "archivos",
-
     "estadisticas",
-
   ],
-
   filosofia: [],
-
   viajes: [],
-
   esfera: [],
-
 };
 
-
-
 const CIRCULO_BY_ROLE: Record<EditorRole, EditorTabId[]> = {
-
   admin: ["circuloHome", "archivos", "estadisticas"],
-
+  editor: [],
   voluntariado: [],
-
   editorial: [],
-
   filosofia: [],
-
   viajes: [],
-
   esfera: ["archivos"],
-
 };
 
 

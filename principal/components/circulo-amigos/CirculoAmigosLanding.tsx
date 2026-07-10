@@ -80,6 +80,12 @@ export function CirculoAmigosLanding() {
   return (
     <div className="font-sans text-[var(--ca-ink)]">
       <section className="ca-sec-hero relative overflow-hidden">
+        {edit?.ready ? (
+          <SectionEditButton
+            label="Editar encabezado"
+            onClick={() => edit.setSelectedId("__hero__")}
+          />
+        ) : null}
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <div className="lg:grid lg:min-h-[min(32rem,82vh)] lg:grid-cols-2 lg:items-center lg:gap-x-8 xl:gap-x-12">
             <div className="order-first pt-3 pb-8 sm:pt-4 lg:order-last lg:flex lg:w-full lg:justify-center lg:pb-10 lg:pt-5">
@@ -97,12 +103,6 @@ export function CirculoAmigosLanding() {
             </div>
 
             <div className="relative flex flex-col justify-center pb-10 sm:pb-14 lg:py-10">
-              {edit?.ready ? (
-                <SectionEditButton
-                  label="Editar encabezado"
-                  onClick={() => edit.setSelectedId("__hero__")}
-                />
-              ) : null}
               <p className="ca-eyebrow">{page.heroEyebrow}</p>
               <h1 className="ca-title mt-3 max-w-3xl text-balance text-[2rem] font-black leading-[1.08] tracking-tight sm:text-[2.65rem] lg:text-[3rem]">
                 {page.heroTitle}
@@ -120,7 +120,7 @@ export function CirculoAmigosLanding() {
                   triggerClassName="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ca-brand)] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[rgba(58,154,212,0.28)] transition hover:bg-[var(--ca-brand-dark)]"
                 />
                 <a
-                  href={`mailto:${page.ctaEmail}?subject=${encodeURIComponent("Consulta — Círculo de Amigos")}`}
+                  href={`mailto:${page.ctaEmail}?subject=${encodeURIComponent("Círculo de Amigos — Solicitud de información")}`}
                   className="inline-flex items-center justify-center rounded-full border-2 border-[var(--ca-brand)]/35 bg-white px-6 py-3 text-sm font-bold text-[var(--ca-brand-dark)] transition hover:bg-[var(--ca-panel)]"
                 >
                   Más información

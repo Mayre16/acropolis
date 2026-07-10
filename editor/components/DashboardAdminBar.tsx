@@ -7,9 +7,12 @@ import {
   canAccessSmtpAdmin,
   canAccessUsersAdmin,
 } from "@/lib/editor-permissions";
+import { TwoFactorSetup } from "@/components/TwoFactorSetup";
+import { ChangePasswordPanel } from "@/components/ChangePasswordPanel";
 
 type DashboardAdminBarProps = {
   role: string;
+  totpEnabled?: boolean;
 };
 
 const linkBase =
@@ -21,7 +24,10 @@ function navClass(active: boolean) {
     : `${linkBase} text-slate-600 hover:bg-slate-50 hover:text-brand-ink`;
 }
 
-export function DashboardAdminBar({ role }: DashboardAdminBarProps) {
+export function DashboardAdminBar({
+  role,
+  totpEnabled = false,
+}: DashboardAdminBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const permissions = getEditorPermissions();
@@ -36,6 +42,8 @@ export function DashboardAdminBar({ role }: DashboardAdminBarProps) {
           Usuarios
         </Link>
       ) : null}
+      <ChangePasswordPanel compact />
+      <TwoFactorSetup enabled={totpEnabled} compact />
       {showSmtp ? (
         <Link href="/dashboard/smtp/" className={navClass(pathname.startsWith("/dashboard/smtp"))}>
           SMTP

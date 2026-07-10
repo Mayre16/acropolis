@@ -6,7 +6,7 @@ export async function sendInviteMail({ email, label, token }) {
   const name = label || email || "invitado";
   const body = `Bienvenido ${name}
 
-Te han invitado al editor de contenidos de Nueva Acrópolis RD.
+Te han invitado al editor de contenidos de OINADOM (Nueva Acrópolis RD).
 
 Esta invitación se envió a: ${email}
 (ese será tu usuario de acceso; si tienes reenvío de correo, confirma que es la cuenta correcta)
@@ -20,7 +20,7 @@ El enlace caduca en 72 horas. Si no esperabas este mensaje, puedes ignorarlo.
   await sendPlainMail({
     to: email,
     toName: name,
-    subject: "Invitación al editor de Nueva Acrópolis RD",
+    subject: "Invitación al editor de OINADOM",
     body,
   });
 }

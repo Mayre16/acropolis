@@ -31,13 +31,16 @@ fs.mkdirSync(OUT, { recursive: true });
 const bannerPng = path.join(OUT, "civis-identificador.png");
 const bannerWebp = path.join(OUT, "civis-identificador.webp");
 
-const pipeline = sharp(source).resize(BANNER_W, BANNER_H, {
-  fit: "contain",
-  background: { r: 37, g: 46, b: 101, alpha: 1 },
-});
+// Fondo blanco sólido (sin alpha): evita orilla pixelada en la curva NA.
+const pipeline = sharp(source)
+  .flatten({ background: { r: 255, g: 255, b: 255 } })
+  .resize(BANNER_W, BANNER_H, {
+    fit: "contain",
+    background: { r: 255, g: 255, b: 255, alpha: 1 },
+  });
 
-await pipeline.clone().png().toFile(bannerPng);
-await pipeline.clone().webp({ quality: 92 }).toFile(bannerWebp);
+await pipeline.clone().removeAlpha().png().toFile(bannerPng);
+await pipeline.clone().removeAlpha().webp({ quality: 92 }).toFile(bannerWebp);
 
 const meta = await sharp(bannerWebp).metadata();
 console.log("Identificador oficial exportado desde:", source);

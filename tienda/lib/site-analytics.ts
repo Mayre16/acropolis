@@ -2,6 +2,7 @@ export type AnalyticsSiteId =
   | "acropolis"
   | "civis"
   | "editorial"
+  | "circulodeamigos"
   | "biblioteca";
 
 const VISITOR_STORAGE_KEY = "oina-analytics-vid";
@@ -85,6 +86,46 @@ export function trackEngagement(
   });
 }
 
+export function trackFormSubmit(
+  site: AnalyticsSiteId,
+  formKey: string,
+  path?: string,
+) {
+  if (!shouldTrack()) return;
+  void sendEvent({
+    site,
+    event: "form",
+    formKey,
+    path: path || (typeof window !== "undefined" ? window.location.pathname : "/"),
+    visitorId: getVisitorId(),
+  });
+}
+
+export function trackWhatsAppClick(site: AnalyticsSiteId, path?: string) {
+  if (!shouldTrack()) return;
+  void sendEvent({
+    site,
+    event: "whatsapp",
+    path: path || (typeof window !== "undefined" ? window.location.pathname : "/"),
+    visitorId: getVisitorId(),
+  });
+}
+
+function isWhatsAppHref(href: string): boolean {
+  try {
+    const u = new URL(href, window.location.href);
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    return (
+      host === "wa.me" ||
+      host === "api.whatsapp.com" ||
+      host === "web.whatsapp.com" ||
+      host === "chat.whatsapp.com"
+    );
+  } catch {
+    return /wa\.me|whatsapp\.com/i.test(href);
+  }
+}
+
 export function startAnalyticsSession(site: AnalyticsSiteId, path: string) {
   if (!shouldTrack()) return () => {};
 
@@ -146,8 +187,17 @@ export function startAnalyticsSession(site: AnalyticsSiteId, path: string) {
 
   const onPageHide = () => flush(activeSection);
 
+  const onClick = (ev: MouseEvent) => {
+    const target = ev.target as HTMLElement | null;
+    const anchor = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+    if (!anchor?.href) return;
+    if (!isWhatsAppHref(anchor.href)) return;
+    trackWhatsAppClick(site, path);
+  };
+
   document.addEventListener("visibilitychange", onVisibility);
   window.addEventListener("pagehide", onPageHide);
+  document.addEventListener("click", onClick, true);
 
   return () => {
     flush(activeSection);
@@ -155,5 +205,6 @@ export function startAnalyticsSession(site: AnalyticsSiteId, path: string) {
     observer.disconnect();
     document.removeEventListener("visibilitychange", onVisibility);
     window.removeEventListener("pagehide", onPageHide);
+    document.removeEventListener("click", onClick, true);
   };
 }

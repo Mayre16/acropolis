@@ -1,8 +1,17 @@
 import { cmsApiBase } from "@/lib/cms/api-client";
+import { trackFormSubmit } from "@/lib/site-analytics";
 
 export type FormSubmitResult =
   | { ok: true; dev?: boolean; message?: string }
   | { ok: false; error: string };
+
+function formKeyFromPath(path: string, payload: Record<string, unknown>): string {
+  if (typeof payload.formKey === "string" && payload.formKey.trim()) {
+    return payload.formKey.trim();
+  }
+  const leaf = path.split("/").filter(Boolean).pop() || "form";
+  return leaf.replace(/-/g, "_");
+}
 
 export async function postForm(
   path: string,
@@ -28,6 +37,7 @@ export async function postForm(
           "No se pudo enviar la solicitud. Inténtelo de nuevo en unos minutos.",
       };
     }
+    trackFormSubmit("circulodeamigos", formKeyFromPath(path, payload));
     return {
       ok: true,
       dev: data.dev === true,

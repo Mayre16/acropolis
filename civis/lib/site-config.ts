@@ -32,8 +32,8 @@ export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 export const SUBMARCA_LOGO = {
   src: "/brand/identificadores/civis-identificador.webp",
   alt: "Civis Consulting — Nueva Acrópolis",
-  width: 954,
-  height: 165,
+  width: 2400,
+  height: 408,
 };
 
 /** Azul oscuro Civis (submarca OINA — bandeja superior y header integrado). */
@@ -46,8 +46,8 @@ export const CIVIS_BRAND = {
 export const HEADER_SUBMARCA_LOGO = {
   src: "/brand/identificadores/civis-identificador-header.webp",
   alt: SUBMARCA_LOGO.alt,
-  width: 951,
-  height: 161,
+  width: 2398,
+  height: 405,
 } as const;
 
 /** Logo OINA en pestaña «Qué es Nueva Acrópolis». */

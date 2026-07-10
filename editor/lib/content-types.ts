@@ -1333,17 +1333,17 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
   archivos: "Archivos e imágenes",
   diplomado: "Diplomado (visual)",
   eventos: "Eventos realizados (visual)",
-  civisTalleresRealizados: "Civis — talleres realizados (visual)",
-  civisProximasActividades: "Civis — próximas actividades (visual)",
-  civisHome: "Civis — inicio (visual)",
-  civisTalleres: "Civis — oferta y talleres (visual)",
-  civisQuienesSomos: "Civis — equipo (visual)",
-  civisSalones: "Civis — salones (visual)",
+  civisTalleresRealizados: "Talleres realizados (visual)",
+  civisProximasActividades: "Próximas actividades (visual)",
+  civisHome: "Inicio (visual)",
+  civisTalleres: "Oferta y talleres (visual)",
+  civisQuienesSomos: "Equipo (visual)",
+  civisSalones: "Salones (visual)",
   quienesSomos: "Quiénes somos (visual)",
   relaciones: "Relaciones institucionales (visual)",
   esfera: "Esfera — entrenamientos (visual)",
   circuloAmigos: "Círculo de Amigos (visual)",
-  circuloHome: "Círculo — inicio (visual)",
+  circuloHome: "Inicio (visual)",
   editorialHome: "Inicio — tienda (visual)",
   editorialLibros: "Libros impresos (visual)",
   editorialDigitales: "Libros digitales (visual)",
@@ -1355,10 +1355,10 @@ export const CMS_SECTION_LABELS: Record<string, string> = {
 };
 
 export const SITE_LABELS: Record<SiteId, string> = {
-  acropolis: "Acropolis (principal)",
+  acropolis: "Acrópolis",
   civis: "Civis Consulting",
   editorial: "Librería Editorial Logos",
-  circulodeamigos: "Círculo de Amigos OINADOM",
+  circulodeamigos: "Círculo de Amigos",
 };
 
 export const ACROPOLIS_TABS = [

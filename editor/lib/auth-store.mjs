@@ -78,6 +78,7 @@ export function sanitizePermissions(raw) {
 export function defaultPermissionsForRole(role) {
   const map = {
     admin: [...PERMISSION_CATALOG],
+    editor: [],
     voluntariado: ["site:acropolis", "tab:voluntariado", "tab:agenda"],
     esfera: [
       "site:acropolis", "tab:sedes", "tab:esfera", "tab:agenda",

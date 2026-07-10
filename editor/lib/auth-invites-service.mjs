@@ -22,12 +22,12 @@ import {
   isValidEmail,
   normalizeLoginId,
   requireAdminSession,
+  requireUsersManageSession,
+  sanitizeInvitePayload,
 } from "./auth-users-admin.mjs";
 import {
   createUser,
-  defaultPermissionsForRole,
   deleteUser,
-  sanitizePermissions,
 } from "./auth-store.mjs";
 import { revokeInvitesForUser } from "./auth-invites.mjs";
 
@@ -95,12 +95,8 @@ export async function adminInviteUser(token, body) {
   }
 
   const email = normalizeLoginId(body?.email ?? body?.username);
-  const role = String(body?.role ?? "").trim();
   const label = String(body?.label ?? "").trim();
-  const permissions =
-    body?.permissions != null
-      ? sanitizePermissions(body.permissions)
-      : defaultPermissionsForRole(role);
+  const { role, permissions } = sanitizeInvitePayload(gate.session, body);
 
   if (!email || !isValidEmail(email)) {
     return { ok: false, error: "Correo electrónico inválido", status: 400 };
@@ -142,7 +138,7 @@ export async function adminInviteUser(token, body) {
 }
 
 export async function adminResendInvite(token, userId) {
-  const gate = requireAdminSession(token);
+  const gate = requireUsersManageSession(token);
   if (!gate.ok) return gate;
 
   if (!smtpReady(loadSmtpConfig())) {

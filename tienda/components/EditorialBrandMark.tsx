@@ -8,8 +8,8 @@ export const EDITORIAL_SUBMARCA_LOGO = {
   src: "/brand/identificadores/editorial-identificador.webp",
   fallback: "/brand/identificadores/editorial-identificador.png",
   alt: "Librería Editorial Logos — Nueva Acrópolis",
-  width: 1073,
-  height: 185,
+  width: 2404,
+  height: 414,
 } as const;
 
 /** Identificador integrado para header (banner recortado en editorial-logos.png). */
@@ -17,8 +17,8 @@ export const EDITORIAL_HEADER_SUBMARCA_LOGO = {
   src: "/brand/identificadores/editorial-identificador-header.webp",
   fallback: "/brand/identificadores/editorial-identificador-header.png",
   alt: EDITORIAL_SUBMARCA_LOGO.alt,
-  width: 1073,
-  height: 185,
+  width: 2402,
+  height: 411,
 } as const;
 
 export const EDITORIAL_MARK_ASPECT =

@@ -57,6 +57,20 @@ function jsonOut(int $code, array $body): void
     exit;
 }
 
+/** Lee JSON de disco tolerando BOM UTF-8 (p. ej. guardado desde PowerShell). */
+function cms_read_json_file(string $path): ?array
+{
+    if (!is_file($path)) {
+        return null;
+    }
+    $raw = (string) file_get_contents($path);
+    if ($raw !== '' && strncmp($raw, "\xEF\xBB\xBF", 3) === 0) {
+        $raw = substr($raw, 3);
+    }
+    $decoded = json_decode($raw, true);
+    return is_array($decoded) ? $decoded : null;
+}
+
 function sitePath(string $root, string $site): string
 {
     if (!preg_match('/^(acropolis|civis|editorial|circulodeamigos)$/', $site)) {
@@ -65,7 +79,50 @@ function sitePath(string $root, string $site): string
     return $root . DIRECTORY_SEPARATOR . $site;
 }
 
-function ensureSite(string $dir): void
+function cms_default_content(string $site): array
+{
+    $base = [
+        'version' => 1,
+        'site' => $site,
+        'updatedAt' => gmdate('c'),
+        'sections' => [],
+    ];
+    if ($site === 'circulodeamigos') {
+        $base['sections'] = [
+            'homeHero' => [
+                'h1' => 'Círculo de Amigos',
+                'h2' => '',
+                'lede' => '',
+            ],
+            'circuloAmigosPage' => new stdClass(),
+        ];
+        return $base;
+    }
+    if ($site === 'editorial') {
+        return $base;
+    }
+    if ($site === 'civis') {
+        $base['sections'] = [
+            'homeHero' => [
+                'h1' => 'Civis Consulting',
+                'h2' => 'Talleres para empresas y equipos',
+                'lede' => 'Comunicación, convivencia y liderazgo al servicio de las organizaciones.',
+            ],
+            'agenda' => [],
+        ];
+        return $base;
+    }
+    $base['sections'] = [
+        'homeHero' => [
+            'h1' => 'Nueva Acrópolis República Dominicana',
+            'h2' => '',
+            'lede' => '',
+        ],
+    ];
+    return $base;
+}
+
+function ensureSite(string $dir, string $site = ''): void
 {
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
@@ -75,6 +132,21 @@ function ensureSite(string $dir): void
         if (!is_dir($p)) {
             mkdir($p, 0755, true);
         }
+    }
+    if ($site === '') {
+        return;
+    }
+    $published = $dir . DIRECTORY_SEPARATOR . 'published.json';
+    $draft = $dir . DIRECTORY_SEPARATOR . 'draft.json';
+    if (!is_file($published)) {
+        $doc = cms_default_content($site);
+        $json = json_encode($doc, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        file_put_contents($published, $json . "\n");
+        if (!is_file($draft)) {
+            file_put_contents($draft, $json . "\n");
+        }
+    } elseif (!is_file($draft)) {
+        copy($published, $draft);
     }
 }
 
@@ -101,24 +173,25 @@ if ($authResponse !== null) {
 
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/(draft|published)$#', $uri, $m)) {
     $siteDir = sitePath($dataRoot, $m[1]);
-    ensureSite($siteDir);
+    ensureSite($siteDir, $m[1]);
     $file = $siteDir . DIRECTORY_SEPARATOR . $m[2] . '.json';
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($m[2] === 'draft') {
             requireAuth();
         }
-        if (!is_file($file)) {
-            if ($m[2] === 'draft') {
-                $published = $siteDir . DIRECTORY_SEPARATOR . 'published.json';
-                if (is_file($published)) {
-                    readfile($published);
-                    exit;
-                }
-            }
+        $doc = cms_read_json_file($file);
+        if ($doc === null && $m[2] === 'draft') {
+            $doc = cms_read_json_file($siteDir . DIRECTORY_SEPARATOR . 'published.json');
+        }
+        if ($doc === null) {
+            // Último recurso: crear contenido inicial del sitio
+            ensureSite($siteDir, $m[1]);
+            $doc = cms_read_json_file($file);
+        }
+        if ($doc === null) {
             jsonOut(404, ['error' => 'Sin contenido']);
         }
-        readfile($file);
-        exit;
+        jsonOut(200, $doc);
     }
     if ($m[2] === 'draft' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
         requireAuth();
@@ -131,7 +204,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/(draft|pu
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/backups$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
-    ensureSite($siteDir);
+    ensureSite($siteDir, $m[1]);
     $backupDir = $siteDir . DIRECTORY_SEPARATOR . 'backups';
     $files = [];
     if (is_dir($backupDir)) {
@@ -151,7 +224,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/backups$#
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/rollback$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
-    ensureSite($siteDir);
+    ensureSite($siteDir, $m[1]);
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['error' => 'JSON inv?lido']);
@@ -234,7 +307,7 @@ if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, 'editorial');
-    ensureSite($siteDir);
+    ensureSite($siteDir, 'editorial');
     $draft = $siteDir . '/draft.json';
     if (!is_file($draft)) {
         jsonOut(400, ['error' => 'Sin borrador']);
@@ -246,7 +319,7 @@ if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_M
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
-    ensureSite($siteDir);
+    ensureSite($siteDir, $m[1]);
     $published = $siteDir . '/published.json';
     $draft = $siteDir . '/draft.json';
     if (is_file($published)) {
@@ -256,8 +329,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
     if (!is_file($draft)) {
         jsonOut(400, ['error' => 'Sin borrador']);
     }
-    $draftJson = file_get_contents($draft);
-    $draftDoc = json_decode($draftJson ?: '{}', true);
+    $draftDoc = cms_read_json_file($draft);
     if (!is_array($draftDoc)) {
         jsonOut(400, ['error' => 'Borrador inv?lido']);
     }
@@ -283,7 +355,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
 if (preg_match('#^/upload/(acropolis|civis|editorial|circulodeamigos)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireAuth();
     $siteDir = sitePath($dataRoot, $m[1]);
-    ensureSite($siteDir);
+    ensureSite($siteDir, $m[1]);
     if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'] ?? '')) {
         jsonOut(400, ['error' => 'Archivo requerido']);
     }
