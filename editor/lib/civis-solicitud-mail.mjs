@@ -93,6 +93,7 @@ export async function sendCivisSolicitudMail(body, remoteIp, referer) {
     replyTo: check.data.email,
     subject,
     body: check.data.message,
+    brand: "civis",
   });
 
   return { ok: true };

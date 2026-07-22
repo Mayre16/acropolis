@@ -38,6 +38,8 @@ export async function sendFormMailOrDev({
   body,
   replyTo,
   cc,
+  brand,
+  fromName,
 }) {
   const cfg = loadSmtpConfig();
 
@@ -53,6 +55,8 @@ export async function sendFormMailOrDev({
         body,
         replyTo,
         cc,
+        brand,
+        fromName,
       });
       console.log(`[${formId}] SMTP sin configurar — guardado en ${savedTo}`);
       return {
@@ -77,6 +81,8 @@ export async function sendFormMailOrDev({
     replyTo,
     subject,
     body,
+    brand,
+    fromName,
   });
 
   return { ok: true };

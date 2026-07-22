@@ -1055,8 +1055,12 @@ export function EsferaExtraCmsPanels({
         >
           <div className="space-y-4">
             <p className="text-sm text-slate-600">
-              El PDF actual no es definitivo. Puede cambiar textos y subir una
-              nueva versión cuando esté lista.
+              Si deja la URL vacía, se usa el PDF por defecto en{" "}
+              <code className="text-xs">
+                /docs/brochure-talleres-charlas-oinadom-esfera.pdf
+              </code>
+              . Puede subir otra versión o pegar una URL de{" "}
+              <code className="text-xs">/uploads/…</code>.
             </p>
             <EditField
               label="Etiqueta superior"

@@ -9,18 +9,21 @@ const ROUTES = {
     to_email: "cursos.oinadom@acropolis.org",
     to_name: "Cursos y Talleres",
     copy_to_sender: false,
+    brand: "acropolis",
     subject_label: "Cursos — Solicitud de información",
   },
   salon_inquiry: {
     to_email: "cursos.oinadom@acropolis.org",
     to_name: "Cursos y Talleres",
     copy_to_sender: false,
+    brand: "acropolis",
     subject_label: "Salones — Solicitud de información",
   },
   voluntariado_donacion: {
     to_email: "voluntariadord@acropolis.org",
     to_name: "Voluntariado Humanitario",
     copy_to_sender: false,
+    brand: "acropolis",
     subject_label: "Voluntariado — Solicitud de donación",
   },
   esfera_donar: {
@@ -28,6 +31,7 @@ const ROUTES = {
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    brand: "esfera",
     subject_label: "Esfera — Solicitud de donación",
   },
   esfera_alianzas: {
@@ -35,6 +39,7 @@ const ROUTES = {
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    brand: "esfera",
     subject_label: "Esfera — Solicitud de alianza",
   },
   esfera_info: {
@@ -42,18 +47,21 @@ const ROUTES = {
     to_name: "Punto Focal Esfera",
     cc_email: "Santiago.a@acropolis.org",
     copy_to_sender: false,
+    brand: "esfera",
     subject_label: "Esfera — Solicitud de información",
   },
   viaje_info: {
     to_email: "info.oinadom@acropolis.org",
     to_name: "Nueva Acrópolis RD",
     copy_to_sender: false,
+    brand: "acropolis",
     subject_label: "Viajes — Solicitud de información",
   },
   circulo_amigos_inscription: {
     to_email: "amigos_dominicana@acropolis.org",
-    to_name: "Círculo de Amigos OINADOM",
+    to_name: "Círculo de Amigos",
     copy_to_sender: false,
+    brand: "circulo",
     subject_label: "Círculo de Amigos — Solicitud de inscripción",
   },
 };
@@ -138,5 +146,6 @@ export async function sendSiteInquiryMail(body, remoteIp, referer) {
     body: check.data.message,
     replyTo: senderEmail || undefined,
     cc,
+    brand: route.brand || "acropolis",
   });
 }

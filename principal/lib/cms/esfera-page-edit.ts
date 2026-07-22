@@ -448,9 +448,16 @@ export function mergeEsferaPage(
 ): CmsEsferaPage {
   if (!overrides) return DEFAULT_ESFERA_PAGE;
   const hidden = overrides.hidden;
+  // brochureHref vacío en published oculta el botón; recuperar el PDF por defecto.
+  const brochureHref =
+    typeof overrides.brochureHref === "string" &&
+    overrides.brochureHref.trim() !== ""
+      ? overrides.brochureHref.trim()
+      : DEFAULT_ESFERA_PAGE.brochureHref;
   return {
     ...DEFAULT_ESFERA_PAGE,
     ...overrides,
+    brochureHref,
     hidden,
     trainings: mergeById(
       DEFAULT_ESFERA_PAGE.trainings ?? [],

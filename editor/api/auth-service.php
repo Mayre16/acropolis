@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/auth-totp.php';
+require_once __DIR__ . '/rate-limit.php';
 
 const CMS_LOGIN_ERROR = 'No se pudo iniciar sesión. Verifica tus datos e inténtalo de nuevo.';
 const CMS_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
@@ -360,6 +361,13 @@ function cms_auth_admin_update_user(string $dataRoot, string $userId, array $bod
         $patch['label'] = $label;
     }
     if (array_key_exists('role', $body)) {
+        if (($user['username'] ?? '') === ($session['username'] ?? '')) {
+            return [
+                'ok' => false,
+                'error' => 'No puedes cambiar tu propio tipo de usuario',
+                'status' => 400,
+            ];
+        }
         $role = trim((string) $body['role']);
         if ($role === '') {
             return ['ok' => false, 'error' => 'Rol requerido', 'status' => 400];
@@ -481,20 +489,25 @@ function cms_auth_create_session(string $dataRoot, array $user): array
     $token = bin2hex(random_bytes(16));
     $sessions = cms_auth_sessions($dataRoot);
     $permissions = cms_auth_effective_permissions($user);
-    $sessions[$token] = [
+    $entry = [
         'expires' => (int) round(microtime(true) * 1000) + CMS_SESSION_TTL_MS,
-        'role' => (string) ($user['role'] ?? 'admin'),
+        'role' => (string) ($user['role'] ?? 'editor'),
         'label' => (string) ($user['label'] ?? 'Editor'),
         'username' => (string) ($user['username'] ?? ''),
         'permissions' => $permissions,
     ];
+    // Admin de config.php (sin fila en users.json).
+    if (($user['id'] ?? '') === 'legacy-admin') {
+        $entry['legacy'] = true;
+    }
+    $sessions[$token] = $entry;
     cms_auth_save_sessions($dataRoot, $sessions);
     return [
         'ok' => true,
         'token' => $token,
         'expiresIn' => (int) (CMS_SESSION_TTL_MS / 1000),
-        'role' => $sessions[$token]['role'],
-        'label' => $sessions[$token]['label'],
+        'role' => $entry['role'],
+        'label' => $entry['label'],
         'permissions' => $permissions,
     ];
 }
@@ -513,6 +526,38 @@ function cms_auth_get_session(string $dataRoot, string $token): ?array
         unset($sessions[$token]);
         cms_auth_save_sessions($dataRoot, $sessions);
         return null;
+    }
+
+    // Admin legacy (config.php): no hay fila en users.json.
+    if (!empty($sess['legacy'])) {
+        return $sess;
+    }
+
+    // Rol/permisos vivos desde users.json (no confiar en snapshot del login).
+    $username = strtolower(trim((string) ($sess['username'] ?? '')));
+    if ($username === '') {
+        return $sess;
+    }
+    $user = cms_auth_find_user($dataRoot, $username);
+    if ($user === null || !empty($user['disabled'])) {
+        unset($sessions[$token]);
+        cms_auth_save_sessions($dataRoot, $sessions);
+        return null;
+    }
+    $permissions = cms_auth_effective_permissions($user);
+    $role = (string) ($user['role'] ?? 'editor');
+    $label = (string) ($user['label'] ?? 'Editor');
+    $prevPerms = $sess['permissions'] ?? [];
+    $changed = ($sess['role'] ?? '') !== $role
+        || ($sess['label'] ?? '') !== $label
+        || json_encode($prevPerms) !== json_encode($permissions);
+    $sess['role'] = $role;
+    $sess['label'] = $label;
+    $sess['username'] = (string) ($user['username'] ?? $username);
+    $sess['permissions'] = $permissions;
+    if ($changed) {
+        $sessions[$token] = $sess;
+        cms_auth_save_sessions($dataRoot, $sessions);
     }
     return $sess;
 }
@@ -593,13 +638,26 @@ function cms_auth_session_totp_enabled(string $dataRoot, string $token): bool
     return is_array($user) && !empty($user['totpSecret']);
 }
 
+function cms_auth_legacy_admin_enabled(array $config): bool
+{
+    // Por defecto activo (acceso temporal admin/contraseña de config.php).
+    // Desactivar en config.php: 'allow_legacy_admin' => false
+    if (array_key_exists('allow_legacy_admin', $config)) {
+        return (bool) $config['allow_legacy_admin'];
+    }
+    return true;
+}
+
 function cms_auth_legacy_user(array $config, string $username, string $password): ?array
 {
+    if (!cms_auth_legacy_admin_enabled($config)) {
+        return null;
+    }
     $adminPassword = (string) ($config['admin_password'] ?? '');
     if ($adminPassword === '') {
         return null;
     }
-    if (strtolower(trim($username)) !== 'admin' && trim($username) !== '') {
+    if (strtolower(trim($username)) !== 'admin') {
         return null;
     }
     if (!hash_equals($adminPassword, $password)) {
@@ -614,32 +672,51 @@ function cms_auth_legacy_user(array $config, string $username, string $password)
     ];
 }
 
+function cms_auth_login_rate_key(string $username): string
+{
+    return 'login:' . cms_client_ip() . ':' . strtolower(trim($username));
+}
+
 function cms_auth_login(array $body, array $config, string $dataRoot): array
 {
     $username = (string) ($body['username'] ?? '');
     $password = (string) ($body['password'] ?? '');
+    $rateKey = cms_auth_login_rate_key($username);
+
+    if (cms_rate_limit_is_blocked($dataRoot, $rateKey, CMS_RATE_LOGIN_MAX, CMS_RATE_LOGIN_WINDOW)) {
+        return cms_rate_limit_blocked_response();
+    }
+
+    // Acceso temporal admin (config.php). Tiene prioridad y no pide 2FA.
+    $legacy = cms_auth_legacy_user($config, $username, $password);
+    if ($legacy !== null) {
+        cms_rate_limit_clear($dataRoot, $rateKey);
+        return cms_auth_create_session($dataRoot, $legacy);
+    }
 
     $user = cms_auth_find_user($dataRoot, $username);
-    if ($user !== null) {
-        if (!empty($user['disabled'])) {
-            return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
-        }
-        if (empty($user['passwordHash'])) {
-            return [
-                'ok' => false,
-                'error' => 'Tu cuenta aún no está activa. Revisa tu correo y usa el enlace de invitación para crear tu contraseña.',
-                'status' => 401,
-            ];
-        }
-        if (!cms_verify_password($password, (string) ($user['passwordHash'] ?? ''))) {
-            return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
-        }
-    } else {
-        $user = cms_auth_legacy_user($config, $username, $password);
-        if ($user === null) {
-            return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
-        }
+    if ($user === null) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_LOGIN_WINDOW);
+        return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
     }
+    if (!empty($user['disabled'])) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_LOGIN_WINDOW);
+        return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
+    }
+    if (empty($user['passwordHash'])) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_LOGIN_WINDOW);
+        return [
+            'ok' => false,
+            'error' => 'Tu cuenta aún no está activa. Revisa tu correo y usa el enlace de invitación para crear tu contraseña.',
+            'status' => 401,
+        ];
+    }
+    if (!cms_verify_password($password, (string) ($user['passwordHash'] ?? ''))) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_LOGIN_WINDOW);
+        return ['ok' => false, 'error' => CMS_LOGIN_ERROR, 'status' => 401];
+    }
+
+    cms_rate_limit_clear($dataRoot, $rateKey);
 
     if (!empty($user['totpSecret'])) {
         $pendingToken = cms_auth_create_pending($dataRoot, (string) $user['id'], 'verify');
@@ -686,8 +763,13 @@ function cms_auth_verify_2fa(array $body, string $dataRoot): array
 {
     $pendingToken = (string) ($body['pendingToken'] ?? '');
     $code = (string) ($body['code'] ?? '');
+    $rateKey = '2fa:' . cms_client_ip() . ':' . substr(hash('sha256', $pendingToken), 0, 16);
+    if (cms_rate_limit_is_blocked($dataRoot, $rateKey, CMS_RATE_2FA_MAX, CMS_RATE_2FA_WINDOW)) {
+        return cms_rate_limit_blocked_response();
+    }
     $entry = cms_auth_get_pending($dataRoot, $pendingToken, 'verify');
     if ($entry === null) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_2FA_WINDOW);
         return ['ok' => false, 'error' => 'Sesión inválida. Inicia sesión de nuevo.', 'status' => 401];
     }
     $user = cms_auth_find_user_by_id($dataRoot, (string) $entry['userId']);
@@ -695,8 +777,10 @@ function cms_auth_verify_2fa(array $body, string $dataRoot): array
         return ['ok' => false, 'error' => 'Configura 2FA primero', 'status' => 400];
     }
     if (!cms_totp_verify((string) $user['totpSecret'], $code)) {
+        cms_rate_limit_record($dataRoot, $rateKey, CMS_RATE_2FA_WINDOW);
         return ['ok' => false, 'error' => 'Código incorrecto', 'status' => 401];
     }
+    cms_rate_limit_clear($dataRoot, $rateKey);
     cms_auth_delete_pending($dataRoot, $pendingToken);
     return cms_auth_create_session($dataRoot, $user);
 }
@@ -1001,10 +1085,11 @@ function cms_auth_change_own_password(string $dataRoot, string $token, string $c
 
 function cms_auth_request_password_reset(string $dataRoot, array $config, string $emailRaw): array
 {
-    $okMsg = 'Si el correo está registrado, te enviamos un enlace para restablecer la contraseña.';
+    $sentMsg = 'Te enviamos un correo con el enlace para restablecer la contraseña.';
+    $notFoundMsg = 'No se encontró el usuario.';
     $email = cms_auth_normalize_login($emailRaw);
     if ($email === '' || !cms_auth_is_valid_email($email)) {
-        return ['ok' => true, 'message' => $okMsg];
+        return ['ok' => false, 'error' => $notFoundMsg, 'status' => 404];
     }
     $user = cms_auth_find_user($dataRoot, $email);
     if (
@@ -1013,7 +1098,7 @@ function cms_auth_request_password_reset(string $dataRoot, array $config, string
         || cms_auth_user_invite_pending($user)
         || empty($user['passwordHash'])
     ) {
-        return ['ok' => true, 'message' => $okMsg];
+        return ['ok' => false, 'error' => $notFoundMsg, 'status' => 404];
     }
     require_once __DIR__ . '/mail.php';
     $smtpCfg = cms_load_smtp_config($config);
@@ -1043,7 +1128,7 @@ function cms_auth_request_password_reset(string $dataRoot, array $config, string
             'status' => 502,
         ];
     }
-    return ['ok' => true, 'message' => $okMsg];
+    return ['ok' => true, 'message' => $sentMsg];
 }
 
 function cms_auth_get_password_reset_info(string $dataRoot, string $token): array
@@ -1367,7 +1452,7 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
             return ['status' => 401, 'body' => ['ok' => false]];
         }
         if ($sess !== null) {
-            $role = (string) ($sess['role'] ?? 'admin');
+            $role = (string) ($sess['role'] ?? 'editor');
             $perms = cms_auth_sanitize_permissions($sess['permissions'] ?? null);
             if ($perms === []) {
                 $perms = cms_auth_default_permissions_for_role($role);
@@ -1419,6 +1504,18 @@ function cms_auth_handle(string $uri, string $method, array $config, string $dat
     }
 
     if ($uri === '/auth/forgot-password' && $method === 'POST') {
+        $limit = cms_rate_limit_consume(
+            $dataRoot,
+            'forgot:' . cms_client_ip(),
+            CMS_RATE_FORGOT_MAX,
+            CMS_RATE_FORGOT_WINDOW,
+        );
+        if (!($limit['ok'] ?? false)) {
+            return [
+                'status' => 429,
+                'body' => ['ok' => false, 'error' => $limit['error'] ?? 'Demasiados intentos'],
+            ];
+        }
         $result = cms_auth_request_password_reset(
             $dataRoot,
             $config,

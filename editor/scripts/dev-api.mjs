@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import { createDefaultContent } from "../lib/default-content.mjs";
 import { buildUploadInventory } from "../lib/upload-inventory.mjs";
+import { validateUploadPart } from "../lib/upload-validate.mjs";
 import { normalizeCmsDocument } from "../lib/cms-url-normalize.mjs";
 import { ensureAuthUsersSeeded } from "../lib/auth-seed.mjs";
 import {
@@ -27,6 +28,8 @@ import {
   adminListUsers,
   adminResetPassword,
   adminUpdateUser,
+  requirePermissionSession,
+  requireSiteSession,
 } from "../lib/auth-users-admin.mjs";
 import {
   acceptInvite,
@@ -48,6 +51,13 @@ import {
   triggerDeployAfterPublish,
   cmsPublishUserMessage,
 } from "../lib/deploy-webhook.mjs";
+import {
+  consumeRateLimit,
+  RATE_FORGOT_MAX,
+  RATE_FORGOT_WINDOW_MS,
+  RATE_FORMS_MAX,
+  RATE_FORMS_WINDOW_MS,
+} from "../lib/rate-limit.mjs";
 import { syncEditorialPrintedBooks } from "../lib/bookstore-sync.mjs";
 import {
   recordAnalyticsEvent,
@@ -123,6 +133,24 @@ function backupsDir(site) {
   return path.join(siteDir(site), "backups");
 }
 
+/** Conserva solo los N backups .json más recientes. */
+function pruneSiteBackups(site, keep = 2) {
+  const dir = backupsDir(site);
+  if (!fs.existsSync(dir) || keep < 1) return;
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".json"))
+    .sort()
+    .reverse();
+  for (const old of files.slice(keep)) {
+    try {
+      fs.unlinkSync(path.join(dir, old));
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 function uploadsDir(site) {
   return path.join(siteDir(site), "uploads");
 }
@@ -167,6 +195,24 @@ function requireAuth(req, res, origin) {
   const sess = getSession(token);
   if (!sess) {
     json(res, 401, { error: "No autorizado" }, origin);
+    return false;
+  }
+  return true;
+}
+
+function requireSite(req, res, origin, site) {
+  const gate = requireSiteSession(getToken(req), site);
+  if (!gate.ok) {
+    json(res, gate.status ?? 403, { error: gate.error ?? "Sin permiso" }, origin);
+    return false;
+  }
+  return true;
+}
+
+function requirePerm(req, res, origin, permission) {
+  const gate = requirePermissionSession(getToken(req), permission);
+  if (!gate.ok) {
+    json(res, gate.status ?? 403, { error: gate.error ?? "Sin permiso" }, origin);
     return false;
   }
   return true;
@@ -222,13 +268,13 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (pathname === "/settings/smtp" && req.method === "GET") {
-      if (!requireAuth(req, res, origin)) return;
+      if (!requirePerm(req, res, origin, "admin:smtp")) return;
       json(res, 200, publicSmtpConfig(loadSmtpConfig()), origin);
       return;
     }
 
     if (pathname === "/settings/smtp" && req.method === "PUT") {
-      if (!requireAuth(req, res, origin)) return;
+      if (!requirePerm(req, res, origin, "admin:smtp")) return;
       const body = await readBody(req);
       saveSmtpConfig(body ?? {});
       json(res, 200, { ok: true, ...publicSmtpConfig(loadSmtpConfig()) }, origin);
@@ -236,8 +282,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/forms/civis-solicitud" && req.method === "POST") {
+      const remoteIp = clientIp(req);
+      const limit = consumeRateLimit(
+        "forms:civis",
+        remoteIp,
+        RATE_FORMS_MAX,
+        RATE_FORMS_WINDOW_MS,
+      );
+      if (!limit.ok) {
+        json(res, 429, { ok: false, error: limit.error }, origin);
+        return;
+      }
       const body = await readBody(req);
-      const remoteIp = req.socket?.remoteAddress ?? null;
       try {
         const result = await sendCivisSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
@@ -265,8 +321,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/forms/esfera-solicitud" && req.method === "POST") {
+      const remoteIp = clientIp(req);
+      const limit = consumeRateLimit(
+        "forms:esfera",
+        remoteIp,
+        RATE_FORMS_MAX,
+        RATE_FORMS_WINDOW_MS,
+      );
+      if (!limit.ok) {
+        json(res, 429, { ok: false, error: limit.error }, origin);
+        return;
+      }
       const body = await readBody(req);
-      const remoteIp = req.socket?.remoteAddress ?? null;
       try {
         const result = await sendEsferaSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
@@ -294,8 +360,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/forms/voluntariado-solicitud" && req.method === "POST") {
+      const remoteIp = clientIp(req);
+      const limit = consumeRateLimit(
+        "forms:voluntariado",
+        remoteIp,
+        RATE_FORMS_MAX,
+        RATE_FORMS_WINDOW_MS,
+      );
+      if (!limit.ok) {
+        json(res, 429, { ok: false, error: limit.error }, origin);
+        return;
+      }
       const body = await readBody(req);
-      const remoteIp = req.socket?.remoteAddress ?? null;
       try {
         const result = await sendVolunteerSolicitudMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
@@ -320,8 +396,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/forms/site-inquiry" && req.method === "POST") {
+      const remoteIp = clientIp(req);
+      const limit = consumeRateLimit(
+        "forms:inquiry",
+        remoteIp,
+        RATE_FORMS_MAX,
+        RATE_FORMS_WINDOW_MS,
+      );
+      if (!limit.ok) {
+        json(res, 429, { ok: false, error: limit.error }, origin);
+        return;
+      }
       const body = await readBody(req);
-      const remoteIp = req.socket?.remoteAddress ?? null;
       try {
         const result = await sendSiteInquiryMail(body ?? {}, remoteIp, requestReferer(req));
         if (!result.ok) {
@@ -432,7 +518,11 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/auth/verify-2fa" && req.method === "POST") {
       const body = await readBody(req);
-      const result = verifyTwoFactor(body?.pendingToken ?? "", body?.code ?? "");
+      const result = verifyTwoFactor(
+        body?.pendingToken ?? "",
+        body?.code ?? "",
+        clientIp(req),
+      );
       if (!result.ok) {
         json(res, result.status ?? 401, { ok: false, error: result.error }, origin);
         return;
@@ -498,6 +588,16 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/auth/forgot-password" && req.method === "POST") {
+      const limit = consumeRateLimit(
+        "forgot",
+        clientIp(req),
+        RATE_FORGOT_MAX,
+        RATE_FORGOT_WINDOW_MS,
+      );
+      if (!limit.ok) {
+        json(res, 429, { ok: false, error: limit.error }, origin);
+        return;
+      }
       const body = await readBody(req);
       const result = await requestPasswordReset(body?.email ?? "");
       json(res, result.status ?? (result.ok ? 200 : 400), result, origin);
@@ -616,12 +716,13 @@ const server = http.createServer(async (req, res) => {
       const [, site, kind] = contentMatch;
       ensureSite(site);
       if (req.method === "GET") {
+        if (kind === "draft" && !requireSite(req, res, origin, site)) return;
         const file = kind === "draft" ? draftPath(site) : publishedPath(site);
         json(res, 200, readJson(file), origin);
         return;
       }
       if (kind === "draft" && req.method === "PUT") {
-        if (!requireAuth(req, res, origin)) return;
+        if (!requireSite(req, res, origin, site)) return;
         const body = normalizeCmsDocument(await readBody(req));
         body.updatedAt = new Date().toISOString();
         fs.writeFileSync(draftPath(site), JSON.stringify(body, null, 2));
@@ -632,8 +733,8 @@ const server = http.createServer(async (req, res) => {
 
     const publishMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/publish$/.exec(pathname);
     if (publishMatch && req.method === "POST") {
-      if (!requireAuth(req, res, origin)) return;
       const site = publishMatch[1];
+      if (!requireSite(req, res, origin, site)) return;
       ensureSite(site);
       const published = fs.existsSync(publishedPath(site))
         ? readJson(publishedPath(site))
@@ -644,6 +745,7 @@ const server = http.createServer(async (req, res) => {
           path.join(backupsDir(site), `${stamp}.json`),
           JSON.stringify(published, null, 2),
         );
+        pruneSiteBackups(site, 2);
       }
       const draft = normalizeCmsDocument(readJson(draftPath(site)));
       let bookstoreSync = null;
@@ -672,7 +774,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === "/content/editorial/sync-books" && req.method === "POST") {
-      if (!requireAuth(req, res, origin)) return;
+      if (!requireSite(req, res, origin, "editorial")) return;
       ensureSite("editorial");
       const draft = normalizeCmsDocument(readJson(draftPath("editorial")));
       const bookstoreSync = await syncEditorialPrintedBooks(draft, STORE_SYNC_CONFIG);
@@ -689,8 +791,8 @@ const server = http.createServer(async (req, res) => {
 
     const backupsMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/backups$/.exec(pathname);
     if (backupsMatch && req.method === "GET") {
-      if (!requireAuth(req, res, origin)) return;
       const site = backupsMatch[1];
+      if (!requireSite(req, res, origin, site)) return;
       ensureSite(site);
       const files = fs
         .readdirSync(backupsDir(site))
@@ -703,8 +805,8 @@ const server = http.createServer(async (req, res) => {
 
     const rollbackMatch = /^\/content\/(acropolis|civis|editorial|circulodeamigos)\/rollback$/.exec(pathname);
     if (rollbackMatch && req.method === "POST") {
-      if (!requireAuth(req, res, origin)) return;
       const site = rollbackMatch[1];
+      if (!requireSite(req, res, origin, site)) return;
       const body = await readBody(req);
       const file = path.join(backupsDir(site), body.filename);
       if (!fs.existsSync(file)) {
@@ -718,8 +820,8 @@ const server = http.createServer(async (req, res) => {
 
     const inventoryMatch = /^\/uploads\/(acropolis|civis|editorial|circulodeamigos)\/inventory$/.exec(pathname);
     if (inventoryMatch && req.method === "GET") {
-      if (!requireAuth(req, res, origin)) return;
       const site = inventoryMatch[1];
+      if (!requireSite(req, res, origin, site)) return;
       ensureSite(site);
       const inventory = buildUploadInventory(site, DATA);
       json(res, 200, inventory, origin);
@@ -728,8 +830,8 @@ const server = http.createServer(async (req, res) => {
 
     const uploadMatch = /^\/upload\/(acropolis|civis|editorial|circulodeamigos)$/.exec(pathname);
     if (uploadMatch && req.method === "POST") {
-      if (!requireAuth(req, res, origin)) return;
       const site = uploadMatch[1];
+      if (!requireSite(req, res, origin, site)) return;
       ensureSite(site);
       const ctype = req.headers["content-type"] || "";
       const boundary = /boundary=(.+)$/.exec(ctype)?.[1];
@@ -745,11 +847,36 @@ const server = http.createServer(async (req, res) => {
         json(res, 400, { error: "Archivo requerido" }, origin);
         return;
       }
-      const ext = path.extname(filePart.filename).toLowerCase() || ".webp";
-      const safe = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+      const kindField = parts.find((p) => p.name === "kind" && !p.filename);
+      const kindFromBody = kindField
+        ? kindField.data.toString("utf8").trim()
+        : "";
+      const kind =
+        kindFromBody || url.searchParams.get("kind") || "image";
+      const check = validateUploadPart(filePart, kind);
+      if (!check.ok) {
+        json(res, check.status ?? 400, { error: check.error }, origin);
+        return;
+      }
+      const safe = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${check.ext}`;
       fs.writeFileSync(path.join(uploadsDir(site), safe), filePart.data);
       const publicPath = `/uploads/${site}/${safe}`;
-      json(res, 200, { url: publicPath, filename: safe }, origin);
+      json(
+        res,
+        200,
+        {
+          url: publicPath,
+          filename: safe,
+          mime: check.mime,
+          kind:
+            kind === "document" || kind === "pdf"
+              ? "document"
+              : kind === "video"
+                ? "video"
+                : "image",
+        },
+        origin,
+      );
       return;
     }
 

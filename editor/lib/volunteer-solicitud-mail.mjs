@@ -7,7 +7,7 @@ import { loadSmtpConfig } from "./smtp-config.mjs";
 
 const ALLOWED_AREAS = new Set([
   "Humanitario con niños",
-  "Humanitario con ancianos",
+  "Humanitario con adultos mayores",
   "Punto Focal Esfera",
   "Feria de la salud",
   "Ecológico",
@@ -83,5 +83,6 @@ export async function sendVolunteerSolicitudMail(body, remoteIp, referer) {
     body: check.data.message,
     replyTo: senderEmail || undefined,
     cc,
+    brand: "acropolis",
   });
 }

@@ -122,5 +122,20 @@ function cms_publish_user_message(array $deploy): string
         return 'Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).';
     }
 
-    return 'Publicado. El contenido ya está disponible; recarga la página si no lo ves.';
+    $reason = (string) (
+        $deploy['primary']['reason']
+        ?? $deploy['reason']
+        ?? ''
+    );
+    if ($reason === 'not_configured') {
+        return 'Publicado correctamente. (El rebuild automático no está configurado: falta github_deploy_token en api/config.php.)';
+    }
+    if ($reason === 'github_error') {
+        $status = (string) ($deploy['primary']['status'] ?? $deploy['status'] ?? '');
+        return 'Publicado correctamente. El rebuild automático falló'
+            . ($status !== '' ? " (GitHub HTTP {$status})" : '')
+            . ': revisa o renueva github_deploy_token en api/config.php.';
+    }
+
+    return 'Publicado correctamente. El contenido ya está en el CMS.';
 }

@@ -49,8 +49,9 @@ function cms_load_smtp_config(array $config): array
         }
     }
 
-    // smtp.json aporta valores guardados desde el panel; config.php manda después.
-    $merged = array_replace_recursive($defaults, $stored);
+    // 1) defaults → 2) config.php (arranque) → 3) smtp.json del panel (manda).
+    // Así Correo SMTP en el editor puede cambiar host/usuario/contraseña sin editar config.php.
+    $merged = $defaults;
     foreach ([
         'smtp_host' => 'host',
         'smtp_port' => 'port',
@@ -64,11 +65,18 @@ function cms_load_smtp_config(array $config): array
         }
     }
     $configPassword = trim((string) ($config['smtp_password'] ?? ''));
-    // Prioridad: config.php (cPanel) > smtp.json. El placeholder de ejemplo no cuenta.
-    if ($configPassword !== '' && strcasecmp($configPassword, 'CONTRASEÑA_SMTP') !== 0) {
+    $configPasswordOk = $configPassword !== ''
+        && strcasecmp($configPassword, 'CONTRASEÑA_SMTP') !== 0;
+    if ($configPasswordOk) {
         $merged['password'] = $configPassword;
-    } elseif (empty($merged['password']) && $configPassword !== '') {
-        $merged['password'] = $configPassword;
+    }
+
+    if ($stored !== []) {
+        $merged = array_replace_recursive($merged, $stored);
+        // Contraseña del panel: si viene en smtp.json (aunque sea string), manda.
+        if (array_key_exists('password', $stored) && trim((string) $stored['password']) !== '') {
+            $merged['password'] = (string) $stored['password'];
+        }
     }
     return $merged;
 }
@@ -92,12 +100,20 @@ function cms_public_smtp_config(array $cfg): array
     ];
 }
 
-function cms_save_smtp_config(array $next, bool $keepPasswordIfBlank = true): array
+/**
+ * @param array $phpConfig config.php completo (para no perder la clave si aún no hay smtp.json)
+ */
+function cms_save_smtp_config(array $next, bool $keepPasswordIfBlank = true, array $phpConfig = []): array
 {
-    $current = cms_load_smtp_config([]);
+    $current = cms_load_smtp_config($phpConfig);
     $password = trim((string) ($next['password'] ?? ''));
     if ($password === '' && $keepPasswordIfBlank) {
         $password = (string) ($current['password'] ?? '');
+    }
+    if ($password === '') {
+        throw new RuntimeException(
+            'Falta la contraseña SMTP. Escríbela en el formulario y pulsa Guardar.'
+        );
     }
 
     $doc = [
@@ -126,10 +142,21 @@ function cms_save_smtp_config(array $next, bool $keepPasswordIfBlank = true): ar
     ];
 
     $dir = dirname(cms_smtp_file());
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        throw new RuntimeException(
+            'No se pudo crear data/system/. En cPanel → File Manager, da permiso de escritura a la carpeta data/.'
+        );
     }
-    file_put_contents(cms_smtp_file(), json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    $path = cms_smtp_file();
+    $json = json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    if ($json === false) {
+        throw new RuntimeException('No se pudo serializar la configuración SMTP.');
+    }
+    if (file_put_contents($path, $json) === false) {
+        throw new RuntimeException(
+            'No se pudo guardar data/system/smtp.json. Revisa permisos de escritura en data/ (y data/system/).'
+        );
+    }
     return $doc;
 }
 
@@ -184,10 +211,13 @@ function cms_mail_logo_url(string $filename): string
 
 /**
  * Paleta + logos de firma según el sitio / formulario.
+ * El campo label es el remitente visible en la bandeja de entrada.
  * - acropolis: verde institucional + logo NA
  * - esfera: teal del logo Esfera + logos Esfera y NA
  * - civis: azul oscuro + identificador Civis
  * - circulo: azul claro + identificador Círculo de Amigos
+ * - tienda: Librería Logos
+ * - biblioteca: Biblioteca SOPHIA
  */
 function cms_mail_brand_theme(string $brand = 'acropolis'): array
 {
@@ -208,7 +238,7 @@ function cms_mail_brand_theme(string $brand = 'acropolis'): array
     ];
     $circuloLogo = [
         'src' => cms_mail_logo_url('logo-circulo.png'),
-        'alt' => 'Círculo de Amigos OINADOM',
+        'alt' => 'Círculo de Amigos',
         'height' => 40,
     ];
 
@@ -268,7 +298,7 @@ function cms_mail_brand_theme(string $brand = 'acropolis'): array
             'logos' => [$civisLogo],
         ],
         'circulo' => [
-            'label' => 'Círculo de Amigos OINADOM',
+            'label' => 'Círculo de Amigos',
             'badge' => 'Formulario Círculo de Amigos',
             'header_from' => '#3a9ad4',
             'header_to' => '#53a3da',
@@ -284,6 +314,42 @@ function cms_mail_brand_theme(string $brand = 'acropolis'): array
             'list' => '#243447',
             'empty' => '#7a93a8',
             'logos' => [$circuloLogo, $oinadomLogo],
+        ],
+        'tienda' => [
+            'label' => 'Librería Logos',
+            'badge' => 'Formulario Librería Logos',
+            'header_from' => '#5c3d2e',
+            'header_to' => '#8b5e3c',
+            'title' => '#3d291e',
+            'text' => '#2a1f18',
+            'muted' => '#6b5648',
+            'footer_text' => '#7a6658',
+            'page_bg' => '#f6f1ec',
+            'card_border' => '#e4d8cc',
+            'footer_bg' => '#faf7f4',
+            'footer_border' => '#ebe3db',
+            'hr' => '#e4d8cc',
+            'list' => '#3d291e',
+            'empty' => '#9a8678',
+            'logos' => [$oinadomLogo],
+        ],
+        'biblioteca' => [
+            'label' => 'Biblioteca SOPHIA',
+            'badge' => 'Formulario Biblioteca SOPHIA',
+            'header_from' => '#1e3a5f',
+            'header_to' => '#2d5a8a',
+            'title' => '#1e3a5f',
+            'text' => '#1a2838',
+            'muted' => '#5a6b80',
+            'footer_text' => '#6b7a90',
+            'page_bg' => '#eef2f7',
+            'card_border' => '#d5dde8',
+            'footer_bg' => '#f5f7fb',
+            'footer_border' => '#e2e8f0',
+            'hr' => '#d5dde8',
+            'list' => '#2a3348',
+            'empty' => '#8890a8',
+            'logos' => [$oinadomLogo],
         ],
     ];
 
@@ -575,9 +641,19 @@ function cms_send_plain_mail(array $cfg, array $opts): void
     $plain = (string) $opts['body'];
     $brand = (string) ($opts['brand'] ?? 'acropolis');
     $theme = cms_mail_brand_theme($brand);
-    $fromName = trim((string) ($opts['brandName'] ?? ''));
-    if ($fromName === '') {
-        $fromName = $theme['label'];
+    // Remitente en bandeja = marca del sitio (Civis, Círculo, Librería…), no el nombre SMTP global.
+    $fromDisplay = trim((string) ($opts['fromName'] ?? ''));
+    if ($fromDisplay === '') {
+        $fromDisplay = $theme['label'];
+    }
+    $fromEmail = trim((string) ($cfg['SMTP']['from_email'] ?? $cfg['from_email'] ?? ''));
+    if ($fromEmail !== '') {
+        $mail->setFrom($fromEmail, $fromDisplay);
+    }
+    // Pie / marca en el HTML: brandName del formulario, o la misma marca del sitio.
+    $brandName = trim((string) ($opts['brandName'] ?? ''));
+    if ($brandName === '') {
+        $brandName = $fromDisplay;
     }
     $badge = isset($opts['badge']) ? trim((string) $opts['badge']) : null;
     if ($badge === '') {
@@ -589,7 +665,7 @@ function cms_send_plain_mail(array $cfg, array $opts): void
     $mail->isHTML(true);
     $mail->Body = $htmlBody !== ''
         ? $htmlBody
-        : cms_mail_html_document($subject, $plain, $fromName, $brand, $badge);
+        : cms_mail_html_document($subject, $plain, $brandName, $brand, $badge);
     $mail->AltBody = $plain;
     try {
         $mail->send();
@@ -903,7 +979,7 @@ function cms_send_voluntariado_solicitud(array $body, array $config, ?string $re
 
     $allowed = [
         'Humanitario con niños',
-        'Humanitario con ancianos',
+        'Humanitario con adultos mayores',
         'Punto Focal Esfera',
         'Feria de la salud',
         'Ecológico',
@@ -1025,7 +1101,7 @@ function cms_site_inquiry_route(string $formKey): ?array
         ],
         'circulo_amigos_inscription' => [
             'to_email' => 'amigos_dominicana@acropolis.org',
-            'to_name' => 'Círculo de Amigos OINADOM',
+            'to_name' => 'Círculo de Amigos',
             'copy_to_sender' => true,
             'brand' => 'circulo',
             'badge' => 'Solicitud de inscripción',

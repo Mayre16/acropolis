@@ -2,6 +2,11 @@
 /** Copiar a config.php y editar. NO subir config.php a git público. */
 return [
     'admin_password' => 'CAMBIA_ESTA_CONTRASEÑA',
+    /**
+     * Acceso temporal usuario "admin" + admin_password (sin 2FA).
+     * Cuando ya tengas cuentas normales, pon false.
+     */
+    'allow_legacy_admin' => true,
     'data_root' => __DIR__ . '/../data',
     /** Contraseña de formularios@editor.acropolis.adesa.com.do (cPanel). */
     'smtp_password' => 'CONTRASEÑA_SMTP',

@@ -791,7 +791,7 @@
         {
           "id": "default-2",
           "src": "/img/voluntariado/cards/ancianos.webp",
-          "alt": "Visita solidaria a hogar de ancianos"
+          "alt": "Visita solidaria a hogar de adultos mayores"
         },
         {
           "id": "default-3",
@@ -1173,7 +1173,9 @@
     "esferaPage": {
       "esferaLogoSrc": "/brand/logo-esfera-punto-focal.webp",
       "esferaLogoWhiteSrc": "/brand/logo-esfera-punto-focal-white.webp",
-      "esferaLogoAlt": "Esfera Punto Focal"
+      "esferaLogoAlt": "Esfera Punto Focal",
+      "brochureHref": "/docs/brochure-talleres-charlas-oinadom-esfera.pdf",
+      "brochureButtonLabel": "Descarga nuestro brochure"
     }
   }
 }

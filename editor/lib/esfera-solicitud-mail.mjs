@@ -102,6 +102,7 @@ export async function sendEsferaSolicitudMail(body, remoteIp, referer) {
     replyTo: check.data.email,
     subject,
     body: check.data.message,
+    brand: "esfera",
   });
 
   return { ok: true };

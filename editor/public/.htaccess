@@ -29,7 +29,7 @@ Options -Indexes
   RewriteRule ^(data|backups|vendor|node_modules|\.git|scripts|deploy|\.vscode|\.idea)(/|$) - [F,L]
 
   # Imágenes CMS vía API (data/ no es accesible por HTTP)
-  RewriteRule ^uploads/(acropolis|civis|editorial)/(.+)$ api/index.php [L]
+  RewriteRule ^uploads/(acropolis|civis|editorial|circulodeamigos)/(.+)$ api/index.php [L]
 
   # API PHP
   RewriteRule ^api/ - [L]
@@ -55,9 +55,11 @@ Options -Indexes
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
   Header set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
-  <FilesMatch "^index\.html$">
+  # HTML siempre fresco (evita mezclar page-*.js viejos con na-assets nuevos)
+  <FilesMatch "\.(html)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
+    Header set Expires "0"
   </FilesMatch>
   <FilesMatch "\.(css|js)$">
     Header set Cache-Control "public, max-age=31536000, immutable"

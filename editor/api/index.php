@@ -17,11 +17,13 @@ if (!is_file($configFile)) {
 $config = require $configFile;
 require __DIR__ . '/auth-helper.php';
 require __DIR__ . '/auth-totp.php';
+require __DIR__ . '/rate-limit.php';
 require __DIR__ . '/auth-service.php';
 require __DIR__ . '/mail.php';
 require __DIR__ . '/deploy-webhook.php';
 require __DIR__ . '/bookstore-sync.php';
 require __DIR__ . '/analytics.php';
+require __DIR__ . '/upload-validate.php';
 $dataRoot = rtrim($config['data_root'] ?? (__DIR__ . '/../data'), '/\\');
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
@@ -122,6 +124,29 @@ function cms_default_content(string $site): array
     return $base;
 }
 
+/** Conserva solo los N backups .json más recientes en data/{site}/backups/. */
+function cms_prune_site_backups(string $siteDir, int $keep = 2): void
+{
+    $backupDir = $siteDir . DIRECTORY_SEPARATOR . 'backups';
+    if (!is_dir($backupDir) || $keep < 1) {
+        return;
+    }
+    $files = [];
+    foreach (scandir($backupDir) ?: [] as $f) {
+        if ($f === '.' || $f === '..') {
+            continue;
+        }
+        if (!str_ends_with($f, '.json')) {
+            continue;
+        }
+        $files[] = $f;
+    }
+    rsort($files, SORT_STRING);
+    foreach (array_slice($files, $keep) as $old) {
+        @unlink($backupDir . DIRECTORY_SEPARATOR . $old);
+    }
+}
+
 function ensureSite(string $dir, string $site = ''): void
 {
     if (!is_dir($dir)) {
@@ -158,6 +183,17 @@ function requireAuth(): void
     }
 }
 
+/** Auth + permiso site:{site} (admin siempre pasa). */
+function requireSiteAuth(string $site): void
+{
+    global $dataRoot;
+    $token = cms_bearer_token() ?? '';
+    $gate = cms_auth_require_permission($dataRoot, $token, 'site:' . $site);
+    if (!($gate['ok'] ?? false)) {
+        jsonOut((int) ($gate['status'] ?? 403), ['error' => $gate['error'] ?? 'Sin permiso']);
+    }
+}
+
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 $uri = preg_replace('#^/api#', '', $uri) ?: '/';
 
@@ -177,7 +213,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/(draft|pu
     $file = $siteDir . DIRECTORY_SEPARATOR . $m[2] . '.json';
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($m[2] === 'draft') {
-            requireAuth();
+            requireSiteAuth($m[1]);
         }
         $doc = cms_read_json_file($file);
         if ($doc === null && $m[2] === 'draft') {
@@ -194,15 +230,23 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/(draft|pu
         jsonOut(200, $doc);
     }
     if ($m[2] === 'draft' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
-        requireAuth();
+        requireSiteAuth($m[1]);
         $raw = file_get_contents('php://input');
-        file_put_contents($file, $raw);
-        jsonOut(200, ['ok' => true]);
+        $body = json_decode($raw ?: 'null', true);
+        if (!is_array($body)) {
+            jsonOut(400, ['error' => 'JSON inv?lido']);
+        }
+        $body['updatedAt'] = gmdate('c');
+        file_put_contents(
+            $file,
+            json_encode($body, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+        );
+        jsonOut(200, ['ok' => true, 'updatedAt' => $body['updatedAt']]);
     }
 }
 
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/backups$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    requireAuth();
+    requireSiteAuth($m[1]);
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir, $m[1]);
     $backupDir = $siteDir . DIRECTORY_SEPARATOR . 'backups';
@@ -222,7 +266,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/backups$#
 }
 
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/rollback$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAuth();
+    requireSiteAuth($m[1]);
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir, $m[1]);
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
@@ -258,54 +302,94 @@ if ($uri === '/settings/smtp' && $_SERVER['REQUEST_METHOD'] === 'PUT') {
     }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
-        jsonOut(400, ['error' => 'JSON inv?lido']);
+        jsonOut(400, ['error' => 'JSON inválido']);
     }
-    cms_save_smtp_config($body);
+    try {
+        cms_save_smtp_config($body, true, $config);
+    } catch (Throwable $e) {
+        jsonOut(500, ['error' => $e->getMessage()]);
+    }
     jsonOut(200, ['ok' => true, ...cms_public_smtp_config(cms_load_smtp_config($config))]);
 }
 
 if ($uri === '/forms/civis-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $remoteIp = cms_client_ip();
+    $limit = cms_rate_limit_consume(
+        $dataRoot,
+        'forms:civis:' . $remoteIp,
+        CMS_RATE_FORMS_MAX,
+        CMS_RATE_FORMS_WINDOW,
+    );
+    if (!($limit['ok'] ?? false)) {
+        jsonOut(429, ['ok' => false, 'error' => $limit['error'] ?? 'Demasiados intentos']);
+    }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
-    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
-    $result = cms_send_civis_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    $result = cms_send_civis_solicitud($body, $config, $remoteIp);
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
 if ($uri === '/forms/esfera-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $remoteIp = cms_client_ip();
+    $limit = cms_rate_limit_consume(
+        $dataRoot,
+        'forms:esfera:' . $remoteIp,
+        CMS_RATE_FORMS_MAX,
+        CMS_RATE_FORMS_WINDOW,
+    );
+    if (!($limit['ok'] ?? false)) {
+        jsonOut(429, ['ok' => false, 'error' => $limit['error'] ?? 'Demasiados intentos']);
+    }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
-    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
-    $result = cms_send_esfera_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    $result = cms_send_esfera_solicitud($body, $config, $remoteIp);
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
 if ($uri === '/forms/voluntariado-solicitud' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $remoteIp = cms_client_ip();
+    $limit = cms_rate_limit_consume(
+        $dataRoot,
+        'forms:voluntariado:' . $remoteIp,
+        CMS_RATE_FORMS_MAX,
+        CMS_RATE_FORMS_WINDOW,
+    );
+    if (!($limit['ok'] ?? false)) {
+        jsonOut(429, ['ok' => false, 'error' => $limit['error'] ?? 'Demasiados intentos']);
+    }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
-    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
-    $result = cms_send_voluntariado_solicitud($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    $result = cms_send_voluntariado_solicitud($body, $config, $remoteIp);
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
 if ($uri === '/forms/site-inquiry' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $remoteIp = cms_client_ip();
+    $limit = cms_rate_limit_consume(
+        $dataRoot,
+        'forms:inquiry:' . $remoteIp,
+        CMS_RATE_FORMS_MAX,
+        CMS_RATE_FORMS_WINDOW,
+    );
+    if (!($limit['ok'] ?? false)) {
+        jsonOut(429, ['ok' => false, 'error' => $limit['error'] ?? 'Demasiados intentos']);
+    }
     $body = json_decode(file_get_contents('php://input') ?: '{}', true);
     if (!is_array($body)) {
         jsonOut(400, ['ok' => false, 'error' => 'JSON inv?lido']);
     }
-    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? null;
-    $result = cms_send_site_inquiry($body, $config, is_string($remoteIp) ? $remoteIp : null);
+    $result = cms_send_site_inquiry($body, $config, $remoteIp);
     jsonOut(($result['ok'] ?? false) ? 200 : 400, $result);
 }
 
 if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAuth();
+    requireSiteAuth('editorial');
     $siteDir = sitePath($dataRoot, 'editorial');
     ensureSite($siteDir, 'editorial');
     $draft = $siteDir . '/draft.json';
@@ -317,7 +401,7 @@ if (preg_match('#^/content/editorial/sync-books$#', $uri) && $_SERVER['REQUEST_M
 }
 
 if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAuth();
+    requireSiteAuth($m[1]);
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir, $m[1]);
     $published = $siteDir . '/published.json';
@@ -325,6 +409,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
     if (is_file($published)) {
         $stamp = date('Y-m-d-His');
         copy($published, $siteDir . '/backups/' . $stamp . '.json');
+        cms_prune_site_backups($siteDir, 2);
     }
     if (!is_file($draft)) {
         jsonOut(400, ['error' => 'Sin borrador']);
@@ -336,9 +421,11 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
     $bookstoreSync = null;
     if ($m[1] === 'editorial') {
         $bookstoreSync = cms_sync_editorial_printed_books($draftDoc, $config);
-        file_put_contents($draft, json_encode($draftDoc, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
-    copy($draft, $published);
+    $draftDoc['updatedAt'] = gmdate('c');
+    $encoded = json_encode($draftDoc, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    file_put_contents($draft, $encoded);
+    file_put_contents($published, $encoded);
     $deploy = cms_trigger_deploy_after_publish($config, $m[1]);
     $message = cms_publish_user_message($deploy);
     if (is_array($bookstoreSync) && !empty($bookstoreSync['message'])) {
@@ -346,6 +433,7 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
     }
     jsonOut(200, [
         'ok' => true,
+        'updatedAt' => $draftDoc['updatedAt'],
         'deploy' => $deploy,
         'bookstoreSync' => $bookstoreSync,
         'message' => $message,
@@ -353,26 +441,32 @@ if (preg_match('#^/content/(acropolis|civis|editorial|circulodeamigos)/publish$#
 }
 
 if (preg_match('#^/upload/(acropolis|civis|editorial|circulodeamigos)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAuth();
+    requireSiteAuth($m[1]);
     $siteDir = sitePath($dataRoot, $m[1]);
     ensureSite($siteDir, $m[1]);
     if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'] ?? '')) {
         jsonOut(400, ['error' => 'Archivo requerido']);
     }
-    $file = $_FILES['file'];
-    $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION)) ?: 'webp';
-    $allowed = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'];
-    if (!in_array($ext, $allowed, true)) {
-        jsonOut(400, ['error' => 'Tipo de archivo no permitido']);
+    $kind = (string) ($_POST['kind'] ?? $_GET['kind'] ?? 'image');
+    $check = cms_validate_uploaded_file($_FILES['file'], $kind);
+    if (!($check['ok'] ?? false)) {
+        jsonOut((int) ($check['status'] ?? 400), ['error' => $check['error'] ?? 'Archivo no permitido']);
     }
+    $ext = (string) $check['ext'];
     $safe = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
     $dest = $siteDir . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $safe;
-    if (!move_uploaded_file((string) $file['tmp_name'], $dest)) {
+    if (!move_uploaded_file((string) $_FILES['file']['tmp_name'], $dest)) {
         jsonOut(500, ['error' => 'No se pudo guardar el archivo']);
     }
     jsonOut(200, [
         'url' => '/uploads/' . $m[1] . '/' . $safe,
         'filename' => $safe,
+        'mime' => $check['mime'] ?? null,
+        'kind' => match ($kind) {
+            'document', 'pdf' => 'document',
+            'video' => 'video',
+            default => 'image',
+        },
     ]);
 }
 
@@ -431,7 +525,7 @@ if ($uri === '/spellcheck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (preg_match('#^/uploads/(acropolis|civis|editorial|circulodeamigos)/inventory$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    requireAuth();
+    requireSiteAuth($m[1]);
     require __DIR__ . '/upload-inventory.php';
     jsonOut(200, cms_build_upload_inventory($m[1], $dataRoot));
 }
@@ -454,6 +548,8 @@ if (preg_match('#^/uploads/(acropolis|civis|editorial|circulodeamigos)/(.+)$#', 
         'png' => 'image/png',
         'gif' => 'image/gif',
         'pdf' => 'application/pdf',
+        'mp4' => 'video/mp4',
+        'webm' => 'video/webm',
     ];
     header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
     header('X-Content-Type-Options: nosniff');
