@@ -352,7 +352,7 @@ export function newEsferaAlianzaId() {
 }
 
 export function newEsferaGallerySlideId() {
-  return `esfera-galeria-${Date.now().toString(36)}`;
+  return `esfera-galeria-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export function newEsferaBeneficioId() {

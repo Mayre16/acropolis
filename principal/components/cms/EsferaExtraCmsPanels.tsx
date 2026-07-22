@@ -45,6 +45,7 @@ import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
 import { EsferaLogoEditFields } from "@/components/cms/EsferaLogoEditFields";
 import { EsferaHomeEditFields } from "@/components/cms/EsferaHomeEditFields";
 import { BrochurePdfField } from "@/components/cms/PageMediaCmsPanels";
+import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 
 type Props = {
   selectedId: string | null;
@@ -976,7 +977,7 @@ export function EsferaExtraCmsPanels({
 
       {selectedId === ESFERA_IMPACT_GALLERY_SECTION_ID ? (
         <EditPanelChrome
-          title="Galería de talleres — textos"
+          title="Galería — Momentos de los talleres"
           dirty={dirty}
           busy={busy}
           status={status}
@@ -984,6 +985,11 @@ export function EsferaExtraCmsPanels({
           onSave={onSave}
         >
           <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              Carrusel con varias fotos. Use <strong>Añadir fotos</strong> en la
+              página (puede seleccionar varias a la vez) o edite cada una desde
+              la lista.
+            </p>
             <EditField
               label="Título de la galería"
               value={merged.impactGalleryTitle ?? ""}
@@ -995,6 +1001,50 @@ export function EsferaExtraCmsPanels({
               onChange={(v) => patchPage({ impactGalleryEmptyText: v })}
               multiline
             />
+            {(merged.impactGallery ?? []).length > 0 ? (
+              <ul className="space-y-2">
+                {(merged.impactGallery ?? []).map((slide, i) => {
+                  const thumb =
+                    resolveCmsMediaUrl(slide.src) ?? slide.src ?? "";
+                  return (
+                    <li key={slide.id}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedId(`esfera-impact-gallery:${slide.id}`)
+                        }
+                        className="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left hover:border-na-heket/40"
+                      >
+                        {thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={thumb}
+                            alt=""
+                            className="h-12 w-16 rounded object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-12 w-16 items-center justify-center rounded bg-amber-50 text-[10px] font-semibold text-amber-800">
+                            Sin foto
+                          </span>
+                        )}
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-xs font-bold text-slate-500">
+                            Foto {i + 1}
+                          </span>
+                          <span className="block truncate text-sm text-slate-800">
+                            {slide.alt || "Sin texto alternativo"}
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="rounded-lg border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+                Aún no hay fotos. Cierre este panel y pulse «Añadir fotos».
+              </p>
+            )}
           </div>
         </EditPanelChrome>
       ) : null}

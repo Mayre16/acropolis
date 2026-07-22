@@ -100,6 +100,8 @@ type EsferaCmsEditContextValue = {
   addModalidad: () => void;
   addPrincipio: () => void;
   addImpactGallerySlide: () => void;
+  /** Añade varias diapositivas al carrusel (p. ej. tras subir varias fotos). */
+  appendImpactGallerySlides: (items: CmsEsferaGallerySlide[]) => void;
   deleteTraining: (id: string) => void;
   deleteWorkshopLine: (id: string) => void;
   deleteAlianza: (id: string) => void;
@@ -409,6 +411,22 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
     markDirty();
   }, [markDirty]);
 
+  const appendImpactGallerySlides = useCallback(
+    (items: CmsEsferaGallerySlide[]) => {
+      if (items.length === 0) return;
+      setPage((p) => {
+        const merged = mergeEsferaPage(p);
+        return {
+          ...merged,
+          impactGallery: [...(merged.impactGallery ?? []), ...items],
+        };
+      });
+      setSelectedId(`esfera-impact-gallery:${items[items.length - 1]!.id}`);
+      markDirty();
+    },
+    [markDirty],
+  );
+
   const deleteImpactGallerySlide = useCallback(
     (id: string) => {
       setPage((p) => {
@@ -657,6 +675,7 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
       addModalidad,
       addPrincipio,
       addImpactGallerySlide,
+      appendImpactGallerySlides,
       deleteTraining,
       deleteWorkshopLine,
       deleteAlianza,
@@ -698,6 +717,7 @@ function EsferaCmsEditInner({ children }: { children: ReactNode }) {
       addModalidad,
       addPrincipio,
       addImpactGallerySlide,
+      appendImpactGallerySlides,
       deleteTraining,
       deleteWorkshopLine,
       deleteAlianza,

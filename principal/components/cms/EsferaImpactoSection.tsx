@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pencil, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CmsSectionEditBar } from "@/components/cms/CmsEditPencil";
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
 import { EsferaImpactStats } from "@/components/EsferaImpactStats";
@@ -12,9 +12,10 @@ import {
   cmsImpactStatToDisplay,
   esferaImpactGallerySelectedId,
   esferaImpactStatSelectedId,
+  newEsferaGallerySlideId,
 } from "@/lib/cms/esfera-page-edit";
 import { useEsferaPageDisplay } from "@/lib/cms/esfera-display";
-import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { resolveCmsMediaUrl, uploadCmsImage } from "@/lib/cms/api-client";
 import type { CmsEsferaGallerySlide } from "@/lib/cms/types";
 
 function EsferaImpactGalleryCarousel({
@@ -26,7 +27,8 @@ function EsferaImpactGalleryCarousel({
   editing?: boolean;
   onEditSlide?: (id: string) => void;
 }) {
-  const visible = slides.filter((s) => s.src?.trim());
+  // En edición también mostramos diapositivas sin imagen (placeholder).
+  const visible = editing ? slides : slides.filter((s) => s.src?.trim());
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const n = visible.length;
@@ -39,10 +41,10 @@ function EsferaImpactGalleryCarousel({
   }, []);
 
   useEffect(() => {
-    if (n <= 1 || reduceMotion) return;
+    if (n <= 1 || reduceMotion || editing) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % n), 6500);
     return () => clearInterval(t);
-  }, [n, reduceMotion]);
+  }, [n, reduceMotion, editing]);
 
   useEffect(() => {
     if (index >= n) setIndex(0);
@@ -163,7 +165,11 @@ function EsferaImpactGalleryCarousel({
                         sizes="112px"
                         unoptimized
                       />
-                    ) : null}
+                    ) : (
+                      <span className="flex h-full items-center justify-center bg-amber-50 text-[10px] font-semibold text-amber-800">
+                        Vacía
+                      </span>
+                    )}
                   </button>
                 </li>
               );
@@ -183,6 +189,33 @@ export function EsferaImpactoSection() {
   const displayStats = stats.map(cmsImpactStatToDisplay);
   const statIds = stats.map((s) => s.id);
   const hasGallery = gallery.some((s) => s.src?.trim());
+  const showCarousel =
+    hasGallery || (!!edit?.ready && gallery.length > 0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingMany, setUploadingMany] = useState(false);
+
+  async function uploadManyPhotos(files: FileList | null) {
+    if (!files?.length || !edit?.token) return;
+    setUploadingMany(true);
+    try {
+      const items: CmsEsferaGallerySlide[] = [];
+      for (const file of Array.from(files)) {
+        const url = await uploadCmsImage("acropolis", edit.token, file);
+        items.push({
+          id: newEsferaGallerySlideId(),
+          src: url,
+          alt: "Momento de taller Esfera",
+          caption: "",
+        });
+      }
+      edit.appendImpactGallerySlides(items);
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploadingMany(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   return (
     <section className="relative border-t border-na-heket/10 bg-na-heket/[0.04] py-14 sm:py-16">
@@ -220,9 +253,9 @@ export function EsferaImpactoSection() {
           {page.impactTestimonial}
         </p>
 
-        {hasGallery || edit?.ready ? (
+        {showCarousel || edit?.ready ? (
         <div className="relative mt-10">
-          {hasGallery && page.impactGalleryTitle ? (
+          {(hasGallery || edit?.ready) && page.impactGalleryTitle ? (
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-na-kefer">
               {page.impactGalleryTitle}
             </p>
@@ -238,19 +271,43 @@ export function EsferaImpactoSection() {
                 className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 bg-na-surface px-4 py-2 text-xs font-bold uppercase text-na-heketDark shadow-sm"
               >
                 Editar galería
+                {gallery.length > 0 ? (
+                  <span className="rounded-full bg-na-heket/10 px-2 py-0.5 text-[10px] tabular-nums">
+                    {gallery.length}
+                  </span>
+                ) : null}
               </button>
-              <button
-                type="button"
-                onClick={() => edit.addImpactGallerySlide()}
-                className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow"
-              >
-                <Plus className="h-4 w-4" />
-                Añadir foto
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
+                  multiple
+                  className="sr-only"
+                  disabled={uploadingMany}
+                  onChange={(e) => void uploadManyPhotos(e.target.files)}
+                />
+                <button
+                  type="button"
+                  disabled={uploadingMany || !edit.token}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow disabled:opacity-60"
+                >
+                  <Plus className="h-4 w-4" />
+                  {uploadingMany ? "Subiendo…" : "Añadir fotos"}
+                </button>
+              </div>
             </div>
           ) : null}
 
-          {hasGallery ? (
+          {edit?.ready ? (
+            <p className="mb-3 text-xs text-na-muted">
+              Puede elegir <strong>varias fotos a la vez</strong>. Con 2 o más se
+              muestra el carrusel (flechas y miniaturas).
+            </p>
+          ) : null}
+
+          {showCarousel ? (
             <EsferaImpactGalleryCarousel
               slides={gallery}
               editing={edit?.ready}
@@ -267,7 +324,8 @@ export function EsferaImpactoSection() {
                 {page.impactGalleryEmptyText}
               </p>
               <p className="mt-2 text-xs font-semibold text-amber-800">
-                Usa <strong>Añadir foto</strong> para crear el carrusel.
+                Usa <strong>Añadir fotos</strong> y selecciona varias imágenes
+                para el carrusel.
               </p>
             </div>
           ) : null}
