@@ -97,12 +97,16 @@ export function VisualCmsPageEditor({
     if (!iframeLoaded) return;
     setReady(false);
     setStatus(`Conectando con ${title}…`);
+  }, [iframeLoaded, loadGeneration, title]);
+
+  useEffect(() => {
+    if (!iframeLoaded || ready) return;
     sendInit();
-    const timers = [100, 250, 500, 1000, 2000, 4000].map((ms) =>
+    const timers = [100, 250, 500, 1000, 2000, 4000, 8000].map((ms) =>
       window.setTimeout(() => sendInit(), ms),
     );
     return () => timers.forEach((id) => window.clearTimeout(id));
-  }, [sendInit, iframeLoaded, loadGeneration, title]);
+  }, [sendInit, iframeLoaded, loadGeneration, title, ready]);
 
   function postToIframe(message: CmsEditMessage) {
     const win = iframeRef.current?.contentWindow;
@@ -133,7 +137,6 @@ export function VisualCmsPageEditor({
               title="Cambios sin guardar"
             />
           ) : null}
-          <span className="sr-only">{status}</span>
           <button
             type="button"
             onClick={() => setShowHint((v) => !v)}
@@ -147,7 +150,10 @@ export function VisualCmsPageEditor({
               <button
                 type="button"
                 disabled={!ready}
-                onClick={() => postToIframe({ type: "cms-save" })}
+                onClick={() => {
+                  setStatus("Guardando borrador…");
+                  postToIframe({ type: "cms-save" });
+                }}
                 className="rounded-md bg-brand-teal px-3 py-1.5 text-xs font-bold text-white hover:bg-teal-800 disabled:opacity-50"
               >
                 Guardar
@@ -155,7 +161,10 @@ export function VisualCmsPageEditor({
               <button
                 type="button"
                 disabled={!ready}
-                onClick={() => postToIframe({ type: "cms-publish" })}
+                onClick={() => {
+                  setStatus("Publicando… confirma en el diálogo si aparece.");
+                  postToIframe({ type: "cms-publish" });
+                }}
                 className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 disabled:opacity-50"
               >
                 Publicar
@@ -174,6 +183,15 @@ export function VisualCmsPageEditor({
         <p className="shrink-0 border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
           Vista previa en vivo. Los formularios de edición están en las pestañas{" "}
           <strong>Contenido (editar aquí)</strong> del editor.
+        </p>
+      ) : null}
+
+      {status ? (
+        <p
+          className="shrink-0 border-b border-slate-100 bg-slate-50 px-3 py-2 text-sm text-slate-800"
+          role="status"
+        >
+          {status}
         </p>
       ) : null}
 

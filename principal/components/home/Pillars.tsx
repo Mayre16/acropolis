@@ -31,7 +31,7 @@ const PILLARS = [
     tagline: "¡Voluntariado para unir!",
     img: "/img/eventos/feria-salud.webp",
     imgAlt: "Voluntarios de Nueva Acrópolis en una actividad comunitaria",
-    text: "Acción social y ecológica: jornadas de plantación, acompañamiento a hogares de ancianos y labores con niños.",
+    text: "Acción social y ecológica: jornadas de plantación, acompañamiento a hogares de adultos mayores y labores con niños.",
     href: "/voluntariado",
     cta: "Súmate",
   },

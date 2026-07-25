@@ -41,8 +41,15 @@ export default function LoginPage() {
     role: string,
     label: string,
     permissions?: string[],
+    username?: string,
   ) {
-    setSession({ token, role, label, permissions });
+    setSession({
+      token,
+      role: role || "editor",
+      label,
+      username: username || "",
+      permissions,
+    });
     router.push("/dashboard/");
   }
 
@@ -74,9 +81,10 @@ export default function LoginPage() {
     if (res.token) {
       await finishLogin(
         String(res.token),
-        String(res.role ?? "admin"),
+        String(res.role ?? "editor"),
         String(res.label ?? "Editor"),
         Array.isArray(res.permissions) ? res.permissions : undefined,
+        username.trim().toLowerCase(),
       );
       return;
     }
@@ -105,9 +113,10 @@ export default function LoginPage() {
     }
     await finishLogin(
       String(res.token),
-      String(res.role ?? "admin"),
+      String(res.role ?? "editor"),
       String(res.label ?? "Editor"),
       Array.isArray(res.permissions) ? res.permissions : undefined,
+      username.trim().toLowerCase(),
     );
   }
 
@@ -120,13 +129,15 @@ export default function LoginPage() {
           {step === STEPS.login && (
             <form onSubmit={handleLogin} className="space-y-4">
               <label className="block text-sm font-medium">
-                Correo electrónico
+                Usuario
                 <input
-                  type="email"
+                  type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
                   autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
                 />
               </label>
 

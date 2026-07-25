@@ -93,7 +93,7 @@ function AcropolisSalonImageField({
       />
       <input
         type="file"
-        accept="image/*"
+        accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
         disabled={!token || uploading}
         onChange={(e) => {
           const f = e.target.files?.[0];

@@ -247,7 +247,10 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     return registerCmsEditInit((initToken) => {
-      if (draftLoadTokenRef.current === initToken) return;
+      if (draftLoadTokenRef.current === initToken) {
+        postToEditor({ type: "cms-ready" });
+        return;
+      }
       draftLoadTokenRef.current = initToken;
       setToken(initToken);
       fetchCmsDraft("acropolis")
@@ -256,7 +259,11 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
           setDraftLoaded(true);
           postToEditor({ type: "cms-ready" });
         })
-        .catch(() => setStatus("No se pudo cargar el borrador."));
+        .catch((e) => {
+          const text = `No se pudo cargar el borrador. ${String(e)}`;
+          setStatus(text);
+          postToEditor({ type: "cms-status", text, ok: false });
+        });
     }, "acropolis");
   }, [applyLoadedDoc]);
 

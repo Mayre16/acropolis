@@ -81,7 +81,7 @@ export function AgendaEntryImageField({
         <span className="font-semibold text-slate-700">Subir foto</span>
         <input
           type="file"
-          accept="image/webp,image/*,.webp"
+          accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
           disabled={!token || uploading}
           onChange={(e) => {
             const f = e.target.files?.[0];

@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkAuth, fetchAuthMe } from "@/lib/api";
+import { checkAuth } from "@/lib/api";
+import { syncEditorSession } from "@/lib/sync-editor-session";
 import {
   clearToken,
   getEditorLabel,
-  getEditorPermissions,
   getEditorRole,
   getToken,
 } from "@/lib/auth-storage";
@@ -36,14 +36,10 @@ export function DashboardShell({
 }: DashboardShellProps) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
-  const [role, setRole] = useState<EditorRole>("admin");
+  const [role, setRole] = useState<EditorRole>("editor");
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [editorLabel, setEditorLabel] = useState("Editor");
   const [totpEnabled, setTotpEnabled] = useState(false);
-
-  useEffect(() => {
-    setRole(getEditorRole() as EditorRole);
-    setEditorLabel(getEditorLabel());
-  }, []);
 
   useEffect(() => {
     const token = getToken();
@@ -57,8 +53,24 @@ export function DashboardShell({
         router.replace("/login/");
         return;
       }
-      const currentRole = getEditorRole();
-      const permissions = getEditorPermissions();
+      const me = await syncEditorSession(token);
+      if (!me) {
+        if (result === "offline") {
+          setRole((getEditorRole() as EditorRole) || "editor");
+          setEditorLabel(getEditorLabel());
+          setReady(true);
+          return;
+        }
+        clearToken();
+        router.replace("/login/");
+        return;
+      }
+      const currentRole = me.role;
+      const permissions = Array.isArray(me.permissions) ? me.permissions : [];
+      setRole(currentRole as EditorRole);
+      setPermissions(permissions);
+      setEditorLabel(me.label || "Editor");
+      setTotpEnabled(!!me.totpEnabled);
       if (requireAdmin) {
         const need =
           requireAdmin === "smtp"
@@ -69,8 +81,6 @@ export function DashboardShell({
           return;
         }
       }
-      const me = await fetchAuthMe(token);
-      setTotpEnabled(!!me?.totpEnabled);
       setReady(true);
     });
   }, [router, requireAdmin]);
@@ -95,7 +105,11 @@ export function DashboardShell({
             compact
             subtitle={`Panel de edición · ${editorLabel}`}
           />
-          <DashboardAdminBar role={role} totpEnabled={totpEnabled} />
+          <DashboardAdminBar
+            role={role}
+            permissions={permissions}
+            totpEnabled={totpEnabled}
+          />
         </div>
         {title ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">

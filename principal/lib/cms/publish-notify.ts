@@ -5,11 +5,14 @@ export const CMS_PUBLISH_DEPLOY_MSG =
   "Publicado. Los cambios estarán visibles en el sitio en 3–5 minutos (actualización automática en curso).";
 
 export const CMS_PUBLISH_LIVE_MSG =
-  "Publicado. El contenido ya está disponible; recarga la página si no lo ves.";
+  "Publicado. El contenido ya está en el CMS; si el sitio público no cambia, el deploy FTP/GitHub no se ejecutó.";
 
 export function cmsPublishUserMessage(result: CmsPublishResult): string {
   if (result.message) return result.message;
-  if (result.deploy?.queued) return CMS_PUBLISH_DEPLOY_MSG;
+  const deploy = result.deploy as
+    | { queued?: boolean; reason?: string; primary?: { queued?: boolean; reason?: string } }
+    | undefined;
+  if (deploy?.queued || deploy?.primary?.queued) return CMS_PUBLISH_DEPLOY_MSG;
   return CMS_PUBLISH_LIVE_MSG;
 }
 

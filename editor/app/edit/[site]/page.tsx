@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import {
+  checkAuth,
   fetchDraft,
   listBackups,
   publish,
@@ -11,6 +12,7 @@ import {
   saveDraft,
   uploadImage,
 } from "@/lib/api";
+import { syncEditorSession } from "@/lib/sync-editor-session";
 import {
   getToken,
   clearToken,
@@ -213,11 +215,9 @@ function EditSitePageInner() {
   const site = params.site as SiteId;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [role, setRole] = useState<EditorRole>(() => getEditorRole() as EditorRole);
-  const [editorLabel, setEditorLabel] = useState(() => getEditorLabel());
-  const [permissions, setPermissions] = useState<string[]>(() =>
-    getEditorPermissions(),
-  );
+  const [role, setRole] = useState<EditorRole>("editor");
+  const [editorLabel, setEditorLabel] = useState("Editor");
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [sessionReady, setSessionReady] = useState(false);
   const allowedTabs = useMemo(
     () => tabsForPermissions(site, permissions, role),
@@ -275,11 +275,36 @@ function EditSitePageInner() {
   }, [allowedTabs, site, role, permissions]);
 
   useEffect(() => {
-    setRole(getEditorRole() as EditorRole);
-    setEditorLabel(getEditorLabel());
-    setPermissions(getEditorPermissions());
-    setSessionReady(true);
-  }, []);
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/");
+      return;
+    }
+    checkAuth(token).then(async (result) => {
+      if (result === "invalid") {
+        clearToken();
+        router.replace("/login/");
+        return;
+      }
+      const me = await syncEditorSession(token);
+      if (!me) {
+        if (result === "offline") {
+          setRole((getEditorRole() as EditorRole) || "editor");
+          setEditorLabel(getEditorLabel());
+          setPermissions(getEditorPermissions());
+          setSessionReady(true);
+          return;
+        }
+        clearToken();
+        router.replace("/login/");
+        return;
+      }
+      setRole(me.role as EditorRole);
+      setEditorLabel(me.label || "Editor");
+      setPermissions(Array.isArray(me.permissions) ? me.permissions : []);
+      setSessionReady(true);
+    });
+  }, [router]);
 
   useEffect(() => {
     const fromUrl = searchParams.get("tab");
@@ -311,7 +336,10 @@ function EditSitePageInner() {
     }
     try {
       const draft = await fetchDraft(site, token);
-      setDoc(draft);
+      setDoc({
+        ...draft,
+        sections: draft.sections ?? {},
+      });
       try {
         const b = await listBackups(site, token);
         setBackups(b.backups);
@@ -402,9 +430,13 @@ function EditSitePageInner() {
   ) {
     if (!token) return;
     setStatus("Subiendo imagen…");
-    const url = await uploadImage(site, token, file);
-    onUrl(url);
-    setStatus("Imagen subida.");
+    try {
+      const url = await uploadImage(site, token, file, "image");
+      onUrl(url);
+      setStatus("Imagen subida.");
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : String(e));
+    }
   }
 
   if (!doc) {
@@ -696,11 +728,20 @@ function EditSitePageInner() {
         )}
       </div>
 
-      {backups.length > 0 && (
-        <aside className="mt-10 rounded-xl border bg-white p-4">
-          <h2 className="font-semibold">Respaldos (antes de publicar)</h2>
-          <ul className="mt-2 max-h-40 overflow-y-auto text-sm">
-            {backups.slice(0, 10).map((f) => (
+      <aside className="mt-10 rounded-xl border bg-white p-4">
+        <h2 className="font-semibold">Respaldos del sitio</h2>
+        <p className="mt-1 text-xs leading-relaxed text-slate-600">
+          Al publicar se guarda una copia completa del contenido publicado de{" "}
+          {SITE_LABELS[site] ?? site} (todas las páginas). Se conservan las 2
+          más recientes. Restaurar vuelve a cargar ese contenido en el borrador.
+        </p>
+        {backups.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-500">
+            Aún no hay respaldos. Se crean automáticamente al publicar.
+          </p>
+        ) : (
+          <ul className="mt-3 max-h-40 overflow-y-auto text-sm">
+            {backups.slice(0, 2).map((f) => (
               <li key={f} className="flex justify-between gap-2 py-1">
                 <span className="truncate font-mono text-xs">{f}</span>
                 <button
@@ -713,8 +754,8 @@ function EditSitePageInner() {
               </li>
             ))}
           </ul>
-        </aside>
-      )}
+        )}
+      </aside>
     </div>
   );
 }

@@ -25,10 +25,10 @@ export const VOLUNTARIADO_QUE_HACEMOS_DEFAULTS: CmsVoluntariadoCard[] = [
   {
     id: "accion-social",
     src: "/img/voluntariado/cards/ancianos.webp",
-    alt: "Voluntarios de Nueva Acrópolis compartiendo con residentes de un hogar de ancianos",
+    alt: "Voluntarios de Nueva Acrópolis compartiendo con residentes de un hogar de adultos mayores",
     area: "Acción Social",
     title: "Acción Social y Comunitaria",
-    text: "Desarrollamos actividades destinadas a fortalecer el tejido social mediante visitas a hogares de ancianos, centros comunitarios y otras instituciones, promoviendo la compañía, la integración y el apoyo a quienes más lo necesitan.",
+    text: "Desarrollamos actividades destinadas a fortalecer el tejido social mediante visitas a hogares de adultos mayores, centros comunitarios y otras instituciones, promoviendo la compañía, la integración y el apoyo a quienes más lo necesitan.",
   },
   {
     id: "educacion-ninez",

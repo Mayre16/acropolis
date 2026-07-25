@@ -182,23 +182,47 @@ export async function publishCms(
   return result;
 }
 
-export async function uploadCmsImage(
+export async function uploadCmsFile(
   site: "acropolis" | "civis",
   token: string,
   file: File,
+  kind: "image" | "document" | "video" = "image",
 ): Promise<string> {
+  const { assertCmsUploadFile } = await import("@/lib/cms/upload-file-validate");
+  await assertCmsUploadFile(file, kind);
   const fd = new FormData();
   fd.append("file", file);
+  fd.append("kind", kind);
   const res = await fetch(`${cmsApiBase()}/upload/${site}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
-  if (!res.ok) throw new Error("Error al subir imagen");
-  const data = (await res.json()) as { url: string };
-  const url = data.url;
+  const data = (await res.json().catch(() => ({}))) as {
+    url?: string;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new Error(
+      data.error ||
+        (kind === "document"
+          ? "Error al subir PDF"
+          : kind === "video"
+            ? "Error al subir video"
+            : "Error al subir imagen"),
+    );
+  }
+  const url = data.url as string;
   if (url.startsWith("/uploads/")) return url;
   const rel = url.match(/(\/uploads\/(?:acropolis|civis)\/[^\s"?#]+)/)?.[1];
   if (rel) return rel;
   return url;
+}
+
+export async function uploadCmsImage(
+  site: "acropolis" | "civis",
+  token: string,
+  file: File,
+): Promise<string> {
+  return uploadCmsFile(site, token, file, "image");
 }

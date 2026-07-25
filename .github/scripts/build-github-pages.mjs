@@ -23,8 +23,7 @@ const sites = [
     env: {
       NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/principal`,
       NEXT_PUBLIC_CIVIS_URL: `${ORIGIN}${PAGES_BASE}/civis`,
-      // Librería: producción adesa (no preview Pages de tienda)
-      NEXT_PUBLIC_TIENDA_URL: "https://tienda.acropolis.adesa.com.do",
+      NEXT_PUBLIC_TIENDA_URL: `${ORIGIN}${PAGES_BASE}/tienda`,
       NEXT_PUBLIC_CIRCULO_URL: `${ORIGIN}${PAGES_BASE}/circulodeamigos`,
       NEXT_PUBLIC_CMS_URL: CMS_API,
     },
@@ -44,7 +43,7 @@ const sites = [
     env: {
       NEXT_PUBLIC_SITE_URL: `${ORIGIN}${PAGES_BASE}/civis`,
       NEXT_PUBLIC_PRINCIPAL_URL: `${ORIGIN}${PAGES_BASE}/principal`,
-      NEXT_PUBLIC_TIENDA_URL: "https://tienda.acropolis.adesa.com.do",
+      NEXT_PUBLIC_TIENDA_URL: `${ORIGIN}${PAGES_BASE}/tienda`,
       NEXT_PUBLIC_CMS_URL: CMS_API,
     },
   },

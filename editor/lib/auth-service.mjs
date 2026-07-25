@@ -15,6 +15,13 @@ import {
   isLoginBlocked,
   recordLoginFailure,
 } from "./login-rate-limit.mjs";
+import {
+  clearRateLimit,
+  isRateLimited,
+  RATE_2FA_MAX,
+  RATE_2FA_WINDOW_MS,
+  recordRateLimitHit,
+} from "./rate-limit.mjs";
 
 export const LOGIN_ERROR =
   "No se pudo iniciar sesión. Verifica tus datos e inténtalo de nuevo.";
@@ -111,7 +118,35 @@ export function getSession(token) {
     }
     return null;
   }
-  return sess;
+
+  // Rol/permisos vivos desde users.json (no confiar en snapshot del login).
+  const username = String(sess.username ?? "").trim().toLowerCase();
+  if (!username) return sess;
+
+  const user = findUserByUsername(username);
+  if (!user || user.disabled) {
+    sessions.delete(token);
+    persistSessions();
+    return null;
+  }
+
+  const permissions = effectivePermissions(user);
+  const next = {
+    ...sess,
+    role: user.role,
+    label: user.label,
+    username: user.username,
+    permissions,
+  };
+  const same =
+    sess.role === next.role &&
+    sess.label === next.label &&
+    JSON.stringify(sess.permissions ?? []) === JSON.stringify(permissions);
+  if (!same) {
+    sessions.set(token, next);
+    persistSessions();
+  }
+  return next;
 }
 
 export function destroySession(token) {
@@ -185,9 +220,18 @@ export function setupTwoFactor(pendingToken, sessionToken = "") {
   return { ok: true, secret, uri };
 }
 
-export function verifyTwoFactor(pendingToken, code) {
+export function verifyTwoFactor(pendingToken, code, clientIp = "") {
+  const identity = `${clientIp || "unknown"}:${String(pendingToken ?? "").slice(0, 12)}`;
+  if (isRateLimited("2fa", identity, RATE_2FA_MAX, RATE_2FA_WINDOW_MS)) {
+    return {
+      ok: false,
+      error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.",
+      status: 429,
+    };
+  }
   const entry = getPending(pendingToken);
   if (!entry || entry.mode !== "verify") {
+    recordRateLimitHit("2fa", identity, RATE_2FA_WINDOW_MS);
     return { ok: false, error: "Sesión inválida. Inicia sesión de nuevo.", status: 401 };
   }
   const user = findUserById(entry.userId);
@@ -196,8 +240,10 @@ export function verifyTwoFactor(pendingToken, code) {
   }
   const digits = String(code ?? "").replace(/\D/g, "");
   if (!totpVerify(user.totpSecret, digits)) {
+    recordRateLimitHit("2fa", identity, RATE_2FA_WINDOW_MS);
     return { ok: false, error: "Código incorrecto", status: 401 };
   }
+  clearRateLimit("2fa", identity);
   pending.delete(pendingToken);
   const session = createSession(user);
   return { ok: true, ...session };

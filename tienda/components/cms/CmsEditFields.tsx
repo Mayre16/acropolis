@@ -6,6 +6,7 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
+import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
 import type { CmsMedia } from "@/lib/cms/types";
 
 const fieldClass =
@@ -142,7 +143,7 @@ export function ImageField({
         <span className="font-semibold text-slate-700">Subir foto</span>
         <input
           type="file"
-          accept="image/webp,image/*,.webp"
+          accept={CMS_IMAGE_ACCEPT}
           disabled={!token || uploading}
           className="mt-1 block text-sm"
           onChange={(e) => {
@@ -212,7 +213,7 @@ export function UrlImageField({
         <span className="font-semibold text-slate-700">Subir foto</span>
         <input
           type="file"
-          accept="image/webp,image/*,.webp"
+          accept={CMS_IMAGE_ACCEPT}
           disabled={!token || uploading}
           className="mt-1 block text-sm"
           onChange={(e) => {

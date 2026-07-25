@@ -79,7 +79,11 @@ function PlatformNavCmsEditInner({ children }: { children: ReactNode }) {
   }, []);
 
   const applyLoadedDoc = useCallback((draft: CmsDocument) => {
-    setPlatformNav({ ...DEFAULT_PLATFORM_NAV, ...draft.sections.platformNav });
+    const sections =
+      draft?.sections && typeof draft.sections === "object"
+        ? draft.sections
+        : {};
+    setPlatformNav({ ...DEFAULT_PLATFORM_NAV, ...sections.platformNav });
     setDirty(false);
     postToEditor({ type: "cms-dirty", dirty: false });
   }, []);
@@ -121,7 +125,11 @@ function PlatformNavCmsEditInner({ children }: { children: ReactNode }) {
           applyLoadedDoc(draft);
           postToEditor({ type: "cms-ready" });
         })
-        .catch(() => setStatus("No se pudo cargar el borrador."));
+        .catch((e) => {
+          const text = `No se pudo cargar el borrador. ${String(e)}`;
+          setStatus(text);
+          postToEditor({ type: "cms-status", text, ok: false });
+        });
     }, "acropolis");
   }, [applyLoadedDoc]);
 
@@ -190,17 +198,16 @@ function PlatformNavCmsEditInner({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-950">
               Activa o desactiva los accesos a Biblioteca, Librería Editorial
-              Logos y Civis en la franja verde de arriba. Puedes cambiar la URL
-              de cada enlace (por ejemplo a GitHub Pages ahora y al dominio
-              oficial después). Los cambios aplican en <strong>todo</strong> el
-              sitio principal.
+              Logos y Civis en la franja verde de arriba. La URL que pongas es
+              exactamente a donde lleva el botón (sin redirecciones). Los
+              cambios aplican en <strong>todo</strong> el sitio principal.
             </p>
             <button
               type="button"
               onClick={applyGithubUrls}
               className="w-full rounded-lg border border-sky-200 bg-white px-3 py-2 text-xs font-semibold text-sky-900 transition hover:bg-sky-50"
             >
-              Rellenar URLs de GitHub Pages (Civis y Tienda)
+              Rellenar URLs de GitHub Pages (Civis, Librería y Círculo)
             </button>
             <ul className="space-y-3">
               {PLATFORM_NAV_ORDER.map((id) => {

@@ -50,6 +50,19 @@ export function requireUsersManageSession(token) {
   };
 }
 
+export function requirePermissionSession(token, permission) {
+  const sess = getSession(token);
+  if (!sess) return { ok: false, error: "No autorizado", status: 401 };
+  if (sess.role === "admin") return { ok: true, session: sess };
+  const perms = Array.isArray(sess.permissions) ? sess.permissions : [];
+  if (perms.includes(permission)) return { ok: true, session: sess };
+  return { ok: false, error: "Sin permiso", status: 403 };
+}
+
+export function requireSiteSession(token, site) {
+  return requirePermissionSession(token, `site:${site}`);
+}
+
 export function canManageOtherUsers(session) {
   return session?.role === "admin";
 }
@@ -128,6 +141,13 @@ export function adminUpdateUser(token, userId, body) {
     patch.label = label;
   }
   if (body?.role != null) {
+    if (user.username === gate.session.username) {
+      return {
+        ok: false,
+        error: "No puedes cambiar tu propio tipo de usuario",
+        status: 400,
+      };
+    }
     const role = String(body.role).trim();
     if (!role) return { ok: false, error: "Rol requerido", status: 400 };
     if (user.role === "admin" && role !== "admin" && countAdmins() <= 1) {

@@ -43,7 +43,7 @@ export const CIRCULO_AMIGOS_MAIL_BODY = [
 /** Líneas del formulario «Quiero ser voluntario/a» (solo voluntariado humanitario). */
 export const VOLUNTEER_AREAS = [
   "Humanitario con niños",
-  "Humanitario con ancianos",
+  "Humanitario con adultos mayores",
   "Punto Focal Esfera",
   "Feria de la salud",
   "Ecológico",

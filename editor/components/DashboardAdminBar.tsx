@@ -12,6 +12,7 @@ import { ChangePasswordPanel } from "@/components/ChangePasswordPanel";
 
 type DashboardAdminBarProps = {
   role: string;
+  permissions?: string[];
   totpEnabled?: boolean;
 };
 
@@ -26,11 +27,12 @@ function navClass(active: boolean) {
 
 export function DashboardAdminBar({
   role,
+  permissions: permissionsProp,
   totpEnabled = false,
 }: DashboardAdminBarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const permissions = getEditorPermissions();
+  const permissions = permissionsProp ?? getEditorPermissions();
   const effectiveRole = role || getEditorRole();
   const showUsers = canAccessUsersAdmin(effectiveRole, permissions);
   const showSmtp = canAccessSmtpAdmin(effectiveRole, permissions);

@@ -106,9 +106,10 @@ export function filterValidHeroSlides(
 }
 
 export function sanitizeHeroCarousels(
-  carousels: CmsHeroCarousels,
+  carousels: CmsHeroCarousels | null | undefined,
 ): CmsHeroCarousels {
   const out: CmsHeroCarousels = {};
+  if (!carousels || typeof carousels !== "object") return out;
   for (const key of Object.keys(carousels) as CmsHeroCarouselKey[]) {
     const slides = filterValidHeroSlides(carousels[key] ?? []);
     if (slides.length) out[key] = slides;

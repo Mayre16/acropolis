@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { CmsDocument, SiteId } from "@/lib/content-types";
 import { getApiUrl, uploadImage } from "@/lib/api";
+import { CMS_PDF_ACCEPT } from "@/lib/upload-file-validate";
 import { previewPrincipalUrl } from "@/lib/preview-urls";
 
 const DEFAULT_BROCHURE_HREF =
@@ -50,8 +51,10 @@ function PdfDocumentCard({
     if (!file || !token) return;
     setUploading(true);
     try {
-      const url = await uploadImage(site, token, file);
+      const url = await uploadImage(site, token, file, "document");
       onHrefChange(url);
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : String(e));
     } finally {
       setUploading(false);
     }
@@ -94,10 +97,13 @@ function PdfDocumentCard({
           Subir PDF nuevo
           <input
             type="file"
-            accept="application/pdf,.pdf"
+            accept={CMS_PDF_ACCEPT}
             disabled={!token || uploading}
             className="mt-1 block w-full text-sm"
-            onChange={(e) => void onFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => {
+              void onFile(e.target.files?.[0] ?? null);
+              e.target.value = "";
+            }}
           />
         </label>
 

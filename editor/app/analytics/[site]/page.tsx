@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { AnalyticsPanel } from "@/components/AnalyticsPanel";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { checkAuth } from "@/lib/api";
+import { syncEditorSession } from "@/lib/sync-editor-session";
 import type { AnalyticsSiteId } from "@/lib/analytics-types";
-import { clearToken, getEditorRole, getToken } from "@/lib/auth-storage";
-import type { EditorRole } from "@/lib/editor-roles";
+import { clearToken, getToken } from "@/lib/auth-storage";
 
 const VALID_SITES = new Set<AnalyticsSiteId>([
   "acropolis",
@@ -32,11 +32,6 @@ export default function AnalyticsSitePage() {
     asAnalyticsSite(siteFromUrl),
   );
   const [ready, setReady] = useState(false);
-  const [role, setRole] = useState<EditorRole>("admin");
-
-  useEffect(() => {
-    setRole(getEditorRole() as EditorRole);
-  }, []);
 
   useEffect(() => {
     setSelectedSite(asAnalyticsSite(siteFromUrl));
@@ -52,19 +47,20 @@ export default function AnalyticsSitePage() {
       router.replace("/login/");
       return;
     }
-    checkAuth(token).then((result) => {
+    checkAuth(token).then(async (result) => {
       if (result === "invalid") {
         clearToken();
         router.replace("/login/");
         return;
       }
-      if (role !== "admin") {
+      const me = await syncEditorSession(token);
+      if (!me || me.role !== "admin") {
         router.replace("/dashboard/");
         return;
       }
       setReady(true);
     });
-  }, [router, role, siteFromUrl]);
+  }, [router, siteFromUrl]);
 
   if (!VALID_SITES.has(siteFromUrl as AnalyticsSiteId) || !ready) {
     return (
@@ -89,14 +85,16 @@ export default function AnalyticsSitePage() {
             href="/dashboard/"
             className="text-sm text-slate-600 hover:text-brand-ink hover:underline"
           >
-            ← Volver a sitios
+            ← Volver al panel
           </Link>
         </div>
       </header>
-
-      <main className="mt-8">
-        <AnalyticsPanel site={selectedSite} onSiteChange={setSelectedSite} />
-      </main>
+      <div className="mt-8">
+        <AnalyticsPanel
+          site={selectedSite}
+          onSiteChange={setSelectedSite}
+        />
+      </div>
     </div>
   );
 }

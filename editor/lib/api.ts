@@ -91,19 +91,21 @@ export async function authConfirm2fa(
   return { ok: res.ok && data.ok !== false, ...data };
 }
 
-export async function fetchAuthMe(token: string) {
+export type AuthMe = {
+  ok: boolean;
+  role: string;
+  label: string;
+  username: string;
+  permissions?: string[];
+  totpEnabled?: boolean;
+};
+
+export async function fetchAuthMe(token: string): Promise<AuthMe | null> {
   const res = await fetch(`${API_URL}/auth/me`, {
     headers: authHeaders(token),
   });
   if (!res.ok) return null;
-  return res.json() as Promise<{
-    ok: boolean;
-    role: string;
-    label: string;
-    username: string;
-    permissions?: string[];
-    totpEnabled?: boolean;
-  }>;
+  return res.json() as Promise<AuthMe>;
 }
 
 export type AuthCheckResult = "ok" | "invalid" | "offline";
@@ -122,6 +124,16 @@ export async function checkAuth(token: string): Promise<AuthCheckResult> {
   }
 }
 
+function normalizeCmsDocument(doc: CmsDocument, site: SiteId): CmsDocument {
+  return {
+    ...doc,
+    version: doc.version ?? 1,
+    site: doc.site ?? site,
+    updatedAt: doc.updatedAt ?? new Date().toISOString(),
+    sections: doc.sections && typeof doc.sections === "object" ? doc.sections : {},
+  };
+}
+
 export async function fetchDraft(site: SiteId, token: string) {
   const res = await fetch(`${API_URL}/content/${site}/draft`, {
     headers: authHeaders(token),
@@ -135,7 +147,8 @@ export async function fetchDraft(site: SiteId, token: string) {
         : `No se pudo cargar el borrador (${res.status})`,
     );
   }
-  return res.json() as Promise<CmsDocument>;
+  const doc = (await res.json()) as CmsDocument;
+  return normalizeCmsDocument(doc, site);
 }
 
 export async function saveDraft(site: SiteId, token: string, doc: CmsDocument) {
@@ -188,16 +201,33 @@ export async function uploadImage(
   site: SiteId,
   token: string,
   file: File,
+  kind: "image" | "document" | "video" = "image",
 ): Promise<string> {
+  const { assertCmsUploadFile } = await import("./upload-file-validate");
+  await assertCmsUploadFile(file, kind);
+
   const fd = new FormData();
   fd.append("file", file);
+  fd.append("kind", kind);
   const res = await fetch(`${API_URL}/upload/${site}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
-  if (!res.ok) throw new Error("Error al subir imagen");
-  const data = await res.json();
+  const data = (await res.json().catch(() => ({}))) as {
+    url?: string;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new Error(
+      data.error ||
+        (kind === "document"
+          ? "Error al subir PDF"
+          : kind === "video"
+            ? "Error al subir video"
+            : "Error al subir imagen"),
+    );
+  }
   const url = data.url as string;
   if (url.startsWith("/uploads/")) return url;
   const rel = url.match(/(\/uploads\/(?:acropolis|civis|editorial|circulodeamigos)\/[^\s"?#]+)/)?.[1];
@@ -257,7 +287,16 @@ export async function saveSmtpSettings(
     headers: authHeaders(token),
     body: JSON.stringify(settings),
   });
-  if (!res.ok) throw new Error("Error al guardar configuración SMTP");
+  if (!res.ok) {
+    let detail = "Error al guardar configuración SMTP";
+    try {
+      const body = (await res.json()) as { error?: string };
+      if (body?.error?.trim()) detail = body.error.trim();
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail);
+  }
   return res.json() as Promise<SmtpSettings & { ok?: boolean }>;
 }
 
@@ -470,11 +509,11 @@ export async function requestPasswordReset(email: string): Promise<string> {
     error?: string;
   };
   if (!res.ok || !data.ok) {
-    throw new Error(data.error || "No se pudo enviar el correo");
+    throw new Error(data.error || "No se encontró el usuario.");
   }
   return (
     data.message ||
-    "Si el correo está registrado, te enviamos un enlace para restablecer la contraseña."
+    "Te enviamos un correo con el enlace para restablecer la contraseña."
   );
 }
 

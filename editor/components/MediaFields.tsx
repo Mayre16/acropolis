@@ -1,4 +1,5 @@
 import type { CmsMedia } from "@/lib/content-types";
+import { CMS_IMAGE_ACCEPT } from "@/lib/upload-file-validate";
 
 export function MediaField({
   label,
@@ -12,62 +13,69 @@ export function MediaField({
   onUpload: (f: File, cb: (url: string) => void) => void;
   showObjectPosition?: boolean;
 }) {
+  const safe: CmsMedia & { objectPosition?: string } = {
+    src: media?.src ?? "",
+    alt: media?.alt ?? "",
+    credit: media?.credit,
+    objectPosition: media?.objectPosition,
+  };
   return (
     <fieldset className="rounded-lg border border-slate-200 p-3 space-y-2">
       <legend className="px-1 text-sm font-medium">{label}</legend>
       <label className="block text-sm">
         <span className="text-slate-600">URL imagen</span>
         <input
-          value={media.src}
-          onChange={(e) => onChange({ ...media, src: e.target.value })}
+          value={safe.src}
+          onChange={(e) => onChange({ ...safe, src: e.target.value })}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
         />
       </label>
       <label className="block text-sm">
         <span className="text-slate-600">Texto alternativo</span>
         <input
-          value={media.alt}
-          onChange={(e) => onChange({ ...media, alt: e.target.value })}
+          value={safe.alt}
+          onChange={(e) => onChange({ ...safe, alt: e.target.value })}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
         />
       </label>
       <label className="block text-sm">
         <span className="text-slate-600">Crédito (opcional)</span>
         <input
-          value={media.credit ?? ""}
-          onChange={(e) => onChange({ ...media, credit: e.target.value })}
+          value={safe.credit ?? ""}
+          onChange={(e) => onChange({ ...safe, credit: e.target.value })}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
         />
       </label>
-      {"objectPosition" in media ? (
+      {media != null && "objectPosition" in media ? (
         <label className="block text-sm">
           <span className="text-slate-600">Posición (opcional, ej. 50% 30%)</span>
           <input
-            value={media.objectPosition ?? ""}
+            value={safe.objectPosition ?? ""}
             onChange={(e) =>
-              onChange({ ...media, objectPosition: e.target.value || undefined })
+              onChange({ ...safe, objectPosition: e.target.value || undefined })
             }
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           />
         </label>
       ) : null}
       <label className="block text-sm">
-        <span className="text-slate-600">Subir archivo</span>
+        <span className="text-slate-600">Subir foto (WebP, JPG o PNG)</span>
         <input
           type="file"
-          accept="image/*"
+          accept={CMS_IMAGE_ACCEPT}
           className="mt-1 block text-sm"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) onUpload(f, (url) => onChange({ ...media, src: url }));
+            if (f) onUpload(f, (url) => onChange({ ...safe, src: url }));
+            e.target.value = "";
           }}
         />
       </label>
-      {media.src ? (
+      {safe.src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={media.src}
-          alt={media.alt || "Vista previa"}
+          src={safe.src}
+          alt={safe.alt || "Vista previa"}
           className="mt-2 max-h-32 rounded-lg object-cover"
         />
       ) : null}

@@ -7,7 +7,8 @@ import {
   ImageField,
   ParagraphsField,
 } from "@/components/cms/CmsEditFields";
-import { resolveCmsMediaUrl, uploadCmsImage } from "@/lib/cms/api-client";
+import { resolveCmsMediaUrl, uploadCmsFile } from "@/lib/cms/api-client";
+import { CMS_PDF_ACCEPT, CMS_VIDEO_ACCEPT } from "@/lib/cms/upload-file-validate";
 import {
   PAGE_MEDIA_SECTION_ID,
   blockKindLabel,
@@ -74,8 +75,9 @@ function MediaUploadField({
   token,
   siteId,
   onChange,
-  accept = "video/*,.mp4,.webm,.mov",
+  accept = CMS_VIDEO_ACCEPT,
   uploadLabel = "Subir archivo",
+  kind = "video",
 }: {
   label: string;
   href: string;
@@ -84,6 +86,7 @@ function MediaUploadField({
   onChange: (href: string) => void;
   accept?: string;
   uploadLabel?: string;
+  kind?: "image" | "document" | "video";
 }) {
   const [uploading, setUploading] = useState(false);
 
@@ -91,8 +94,10 @@ function MediaUploadField({
     if (!file || !token) return;
     setUploading(true);
     try {
-      const url = await uploadCmsImage(siteId, token, file);
+      const url = await uploadCmsFile(siteId, token, file, kind);
       onChange(url);
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : String(e));
     } finally {
       setUploading(false);
     }
@@ -817,7 +822,7 @@ export function PageMediaCmsPanels({
 
 export function BrochurePdfField({
   siteId = "editorial",
-  accept = "application/pdf,.pdf",
+  accept = CMS_PDF_ACCEPT,
   uploadLabel = "Subir PDF",
   ...props
 }: {
@@ -835,6 +840,7 @@ export function BrochurePdfField({
       siteId={siteId}
       accept={accept}
       uploadLabel={uploadLabel}
+      kind="document"
     />
   );
 }

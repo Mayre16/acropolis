@@ -61,7 +61,7 @@ export const CULTURA_HERO_IMAGES: HeroImage[] = [
 export const VOLUNTARIADO_HERO_IMAGES: HeroImage[] = [
   { src: "/img/voluntariado/cards/ecologia.webp", alt: "Voluntarios en jornada de reforestación" },
   { src: "/img/voluntariado/cards/ninos.webp", alt: "Jornada de servicio con niños" },
-  { src: "/img/voluntariado/cards/ancianos.webp", alt: "Visita solidaria a hogar de ancianos" },
+  { src: "/img/voluntariado/cards/ancianos.webp", alt: "Visita solidaria a hogar de adultos mayores" },
   { src: "/img/voluntariado/cards/playa.webp", alt: "Limpieza de playa con voluntarios" },
   { src: "/img/eventos/simulacros.webp", alt: "Capacitación en gestión de emergencias" },
   { src: "/img/actividades/unibe.webp", alt: "Nueva Acrópolis en la Feria de Voluntariado de UNIBE" },

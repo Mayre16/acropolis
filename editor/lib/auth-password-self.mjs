@@ -17,8 +17,9 @@ import { smtpReady } from "./form-mail-utils.mjs";
 import { loadSmtpConfig } from "./smtp-config.mjs";
 import { normalizeLoginId, isValidEmail } from "./auth-users-admin.mjs";
 
-const FORGOT_OK_MSG =
-  "Si el correo está registrado, te enviamos un enlace para restablecer la contraseña.";
+const FORGOT_SENT_MSG =
+  "Te enviamos un correo con el enlace para restablecer la contraseña.";
+const FORGOT_NOT_FOUND_MSG = "No se encontró el usuario.";
 
 export function changeOwnPassword(token, currentPassword, newPassword) {
   const sess = getSession(token);
@@ -56,15 +57,14 @@ export function changeOwnPassword(token, currentPassword, newPassword) {
 }
 
 export async function requestPasswordReset(emailRaw) {
-  // Respuesta genérica siempre (no revelar si el correo existe).
   const email = normalizeLoginId(emailRaw);
   if (!email || !isValidEmail(email)) {
-    return { ok: true, message: FORGOT_OK_MSG };
+    return { ok: false, error: FORGOT_NOT_FOUND_MSG, status: 404 };
   }
 
   const user = findUserByUsername(email);
   if (!user || user.disabled || userInvitePending(user) || !user.passwordHash) {
-    return { ok: true, message: FORGOT_OK_MSG };
+    return { ok: false, error: FORGOT_NOT_FOUND_MSG, status: 404 };
   }
 
   if (!smtpReady(loadSmtpConfig())) {
@@ -92,7 +92,7 @@ export async function requestPasswordReset(emailRaw) {
     };
   }
 
-  return { ok: true, message: FORGOT_OK_MSG };
+  return { ok: true, message: FORGOT_SENT_MSG };
 }
 
 export function getPasswordResetInfo(token) {

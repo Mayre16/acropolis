@@ -1063,7 +1063,7 @@ function EditPanel({
               <span className="font-semibold text-slate-700">Subir logo</span>
               <input
                 type="file"
-                accept="image/*,.svg"
+                accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
                 className="mt-1 block text-sm"
                 onChange={async (e) => {
                   const f = e.target.files?.[0];
@@ -1116,7 +1116,7 @@ function EditPanel({
           {edit.token ? (
             <label className="block text-sm">
               <span className="font-semibold text-slate-700">Subir foto</span>
-              <input type="file" accept="image/*" className="mt-1 block text-sm" onChange={async (e) => {
+              <input type="file" accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png" className="mt-1 block text-sm" onChange={async (e) => {
                 const f = e.target.files?.[0];
                 if (!f || !edit.token) return;
                 const { uploadCmsImage } = await import("@/lib/cms/api-client");

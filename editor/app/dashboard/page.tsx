@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkAuth, fetchAuthMe } from "@/lib/api";
+import { checkAuth } from "@/lib/api";
+import { syncEditorSession } from "@/lib/sync-editor-session";
 import {
   clearToken,
   getEditorLabel,
   getEditorPermissions,
   getEditorRole,
   getToken,
-  setSession,
 } from "@/lib/auth-storage";
 import { CmsBrandHeader } from "@/components/CmsBrandHeader";
 import { CmsTabNav } from "@/components/CmsTabNav";
@@ -42,15 +42,9 @@ export default function DashboardPage() {
   const [ready, setReady] = useState(false);
   const [totpEnabled, setTotpEnabled] = useState(false);
   const [authError, setAuthError] = useState("");
-  const [role, setRole] = useState<EditorRole>("admin");
+  const [role, setRole] = useState<EditorRole>("editor");
   const [editorLabel, setEditorLabel] = useState("Editor");
   const [permissions, setPermissions] = useState<string[]>([]);
-
-  useEffect(() => {
-    setRole(getEditorRole() as EditorRole);
-    setEditorLabel(getEditorLabel());
-    setPermissions(getEditorPermissions());
-  }, []);
 
   useEffect(() => {
     const token = getToken();
@@ -63,6 +57,9 @@ export default function DashboardPage() {
         setAuthError(
           "No se pudo conectar con el servidor del editor (puerto 3401). Inicia npm run dev:editor-api y recarga.",
         );
+        setRole((getEditorRole() as EditorRole) || "editor");
+        setEditorLabel(getEditorLabel());
+        setPermissions(getEditorPermissions());
         setReady(true);
         return;
       }
@@ -71,20 +68,16 @@ export default function DashboardPage() {
         router.replace("/login/");
         return;
       }
-      const me = await fetchAuthMe(token);
-      setTotpEnabled(!!me?.totpEnabled);
-      if (me?.role) {
-        const nextRole = me.role as EditorRole;
-        const nextPerms = Array.isArray(me.permissions) ? me.permissions : [];
-        setRole(nextRole);
-        setPermissions(nextPerms);
-        setSession({
-          token,
-          role: nextRole,
-          label: me.label || getEditorLabel(),
-          permissions: nextPerms,
-        });
+      const me = await syncEditorSession(token);
+      if (!me) {
+        clearToken();
+        router.replace("/login/");
+        return;
       }
+      setTotpEnabled(!!me.totpEnabled);
+      setRole(me.role as EditorRole);
+      setPermissions(Array.isArray(me.permissions) ? me.permissions : []);
+      setEditorLabel(me.label || "Editor");
       setReady(true);
     });
   }, [router]);
@@ -109,7 +102,11 @@ export default function DashboardPage() {
             compact
             subtitle={`Panel de edición · ${editorLabel}`}
           />
-          <DashboardAdminBar role={role} totpEnabled={totpEnabled} />
+          <DashboardAdminBar
+            role={role}
+            permissions={permissions}
+            totpEnabled={totpEnabled}
+          />
         </div>
       </header>
 

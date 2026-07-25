@@ -7,6 +7,7 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
+import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
 import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
 import {
   type CmsHeroCarouselKey,
@@ -129,7 +130,7 @@ export function ImageField({
         puedes pegar una ruta del sitio o de una foto ya subida.
       </p>
       <p className="text-xs text-amber-800">
-        Recomendado: formato <strong>WebP</strong>.
+        Solo fotos <strong>WebP, JPG o PNG</strong> (máx. 8 MB). Recomendado: WebP.
       </p>
       <EditField
         label="Texto alternativo"
@@ -145,7 +146,7 @@ export function ImageField({
         <span className="font-semibold text-slate-700">Subir foto</span>
         <input
           type="file"
-          accept="image/webp,image/*,.webp"
+          accept={CMS_IMAGE_ACCEPT}
           disabled={!token || uploading}
           className="mt-1 block text-sm"
           onChange={(e) => {

@@ -42,17 +42,17 @@ export const VOLUNTARIADO_PROXIMAS_ACTIVIDADES: AgendaEntry[] = [
   {
     id: "vol-ancianos-ago",
     category: "voluntariado",
-    title: "Visita al hogar de ancianos",
+    title: "Visita al hogar de adultos mayores",
     startsAt: "2026-08-23",
     date: "Sábado 23 de agosto",
     time: "10:00 a.m.",
     sede: "Sede Los Prados",
     image: "/img/agenda/vol-ancianos-visita.webp",
-    imageAlt: "Voluntarios compartiendo con residentes de un hogar de ancianos",
+    imageAlt: "Voluntarios compartiendo con residentes de un hogar de adultos mayores",
     description:
       "Visita solidaria: acompañamiento, conversación y actividades sencillas que devuelven alegría y dignidad a personas mayores.",
     inscribeMessage:
-      "Hola, me interesa la Visita al hogar de ancianos — Sede Los Prados, sábado 23 de agosto, 10:00 a.m. ¿Me pueden dar más información?",
+      "Hola, me interesa la Visita al hogar de adultos mayores — Sede Los Prados, sábado 23 de agosto, 10:00 a.m. ¿Me pueden dar más información?",
     showOnHome: false,
   },
 ];

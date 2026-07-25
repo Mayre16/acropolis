@@ -34,34 +34,21 @@ export const PLATFORM_NAV_DEFAULT_URLS: Record<PlatformId, string> = {
   circulo: "https://circulodeamigos.acropolis.org.do",
 };
 
-/** Preview GitHub Pages (civis / círculo). Librería y Biblioteca → adesa. */
+/** Preview GitHub Pages (incluye Librería en Pages). */
 export const PLATFORM_NAV_GITHUB_URLS: Record<PlatformId, string> = {
   biblioteca: PLATFORM_NAV_DEFAULT_URLS.biblioteca,
   civis: "https://mayre16.github.io/acropolis/civis/",
-  tienda: PLATFORM_NAV_DEFAULT_URLS.tienda,
+  tienda: "https://mayre16.github.io/acropolis/tienda/",
   circulo: "https://mayre16.github.io/acropolis/circulodeamigos/",
 };
 
-/** Overrides CMS antiguos que apuntaban Librería al preview Pages. */
-function normalizePlatformNavOverride(
-  id: PlatformId,
-  url: string,
-): string {
-  if (
-    id === "tienda" &&
-    /mayre16\.github\.io\/acropolis\/tienda\/?/i.test(url)
-  ) {
-    return PLATFORM_NAV_DEFAULT_URLS.tienda;
-  }
-  return url;
-}
-
+/** La URL del CMS se usa tal cual; sin reescrituras. */
 export function resolvePlatformNavHref(
   id: PlatformId,
   partial: CmsPlatformNav = {},
 ): string {
   const override = partial.urls?.[id]?.trim();
-  if (override) return normalizePlatformNavOverride(id, override);
+  if (override) return override;
   return platformEffectiveUrl(id);
 }
 
@@ -137,6 +124,7 @@ export function setPlatformNavUrl(
   };
 }
 
+/** Rellena Civis, Círculo y Librería con URLs de GitHub Pages. */
 export function applyPlatformNavGithubUrls(nav: CmsPlatformNav): CmsPlatformNav {
   return {
     ...nav,

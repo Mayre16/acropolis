@@ -77,7 +77,12 @@ export function registerCmsEditInit(
 
   function apply(value: CmsEditSession) {
     if (value.site !== site) return;
-    if (appliedToken === value.token) return;
+    if (appliedToken === value.token) {
+      // El padre a veces reinicia el handshake (doble load del iframe);
+      // reenviar listo evita quedarse en «Conectando…».
+      postToEditor({ type: "cms-ready" });
+      return;
+    }
     appliedToken = value.token;
     onInit(value.token, value.site);
   }

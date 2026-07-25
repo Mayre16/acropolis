@@ -11,7 +11,8 @@ import {
   updateCmsUser,
   type CmsUser,
 } from "@/lib/api";
-import { getEditorRole, getToken } from "@/lib/auth-storage";
+import { getEditorRole, getEditorUsername, getToken } from "@/lib/auth-storage";
+import { syncEditorSession } from "@/lib/sync-editor-session";
 import {
   USER_TYPE_OPTIONS,
   uiUserType,
@@ -39,6 +40,7 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   const [editPerms, setEditPerms] = useState<EditorPermission[]>([]);
   const [savingPerms, setSavingPerms] = useState(false);
   const [canManage, setCanManage] = useState(false);
+  const [selfUsername, setSelfUsername] = useState("");
   const [form, setForm] = useState({
     email: "",
     label: "",
@@ -50,10 +52,22 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
     ? USER_TYPE_OPTIONS
     : USER_TYPE_OPTIONS.filter((r) => r.role === "editor");
 
+  function isSelfUser(user: CmsUser) {
+    const self = (selfUsername || getEditorUsername()).toLowerCase();
+    if (!self) return false;
+    return (
+      user.username?.toLowerCase() === self ||
+      user.email?.toLowerCase() === self
+    );
+  }
+
   async function reload() {
     const token = getToken();
     if (!token) return;
-    const manage = canManageOtherUsers(getEditorRole());
+    const me = await syncEditorSession(token);
+    const role = me?.role || getEditorRole();
+    if (me?.username) setSelfUsername(me.username);
+    const manage = canManageOtherUsers(role);
     setCanManage(manage);
     setLoading(true);
     try {
@@ -129,6 +143,10 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
   async function changeRole(user: CmsUser, role: string) {
     const token = getToken();
     if (!token) return;
+    if (isSelfUser(user)) {
+      setStatus("No puedes cambiar tu propio tipo de usuario.");
+      return;
+    }
     setStatus("");
     try {
       // Al pasar a Editor se conservan los permisos actuales; admin = acceso total.
@@ -380,8 +398,14 @@ export function UsersAdminPanel({ embedded = false }: { embedded?: boolean }) {
                 <td className="py-3 pr-3">{user.label}</td>
                 <td className="py-3 pr-3">
                   <select
-                    className="rounded border border-slate-300 px-2 py-1 text-xs"
+                    className="rounded border border-slate-300 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-slate-100"
                     value={uiUserType(user.role)}
+                    disabled={isSelfUser(user)}
+                    title={
+                      isSelfUser(user)
+                        ? "No puedes cambiar tu propio tipo de usuario"
+                        : undefined
+                    }
                     onChange={(e) => void changeRole(user, e.target.value)}
                   >
                     {USER_TYPE_OPTIONS.map((r) => (

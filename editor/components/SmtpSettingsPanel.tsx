@@ -74,7 +74,13 @@ export function SmtpSettingsPanel({ embedded = false }: { embedded?: boolean }) 
       setValues(merged);
       setPassword("");
       setEditing(false);
-      setStatus("Configuración guardada.");
+      if (!merged.passwordSet) {
+        setStatus(
+          "Se guardó, pero la contraseña no quedó. Revisa permisos de data/system/ o vuelve a escribir la contraseña.",
+        );
+      } else {
+        setStatus("Configuración guardada. Los cambios del panel ya mandan sobre config.php.");
+      }
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Error al guardar.");
     } finally {

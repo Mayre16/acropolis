@@ -7,6 +7,7 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
+import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
 
 export function CirculoImageField({
   image,
@@ -47,8 +48,14 @@ export function CirculoImageField({
         onChange={(v) => onChange({ image: v })}
       />
       <p className="text-xs leading-relaxed text-slate-600">
-        Al subir un archivo se guarda con una ruta como{" "}
+        Al subir, se guarda una ruta como{" "}
         <code className="rounded bg-slate-100 px-1">{pathHint}</code>.
+        Si pegas un link, usa esa misma forma (no la ruta del File Manager de
+        cPanel). Ejemplo: foto ya subida →{" "}
+        <code className="rounded bg-slate-100 px-1">
+          /uploads/circulodeamigos/1234-abcd.webp
+        </code>
+        .
       </p>
       {previewSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -58,11 +65,14 @@ export function CirculoImageField({
           className="h-28 w-full rounded-lg object-cover"
         />
       ) : null}
+      <p className="text-xs text-amber-800">
+        Solo fotos <strong>WebP, JPG o PNG</strong> (máx. 8 MB). No PDF.
+      </p>
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-700">Subir imagen</span>
+        <span className="mb-1 block text-slate-700">Subir foto</span>
         <input
           type="file"
-          accept="image/*"
+          accept={CMS_IMAGE_ACCEPT}
           disabled={!token || uploading}
           onChange={(e) => {
             const file = e.target.files?.[0];

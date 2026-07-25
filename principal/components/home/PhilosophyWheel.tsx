@@ -61,7 +61,7 @@ const FACETS: Facet[] = [
   },
   {
     area: "filosofia",
-    short: "Dar lo mejor",
+    short: "Dar lo\nmejor",
     title: "Dar lo mejor de nosotros",
     desc: "Hacer de la mejora interior un hábito y sacar a la luz nuestras mejores cualidades.",
   },
@@ -189,11 +189,11 @@ export function PhilosophyWheel({
       <div className={gridClass}>
         <div className="flex flex-col items-center">
           <div
-            className={`relative aspect-square w-full overflow-hidden ${wheelMax}`}
+            className={`relative aspect-square w-full overflow-visible ${wheelMax}`}
           >
             <svg
               viewBox="0 0 440 440"
-              className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+              className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
               aria-hidden
             >
               <polygon
@@ -203,7 +203,7 @@ export function PhilosophyWheel({
             </svg>
 
             <div
-              className="absolute inset-0 origin-center"
+              className="absolute inset-0 origin-center overflow-visible"
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: SPIN_TRANSITION,
@@ -211,7 +211,7 @@ export function PhilosophyWheel({
             >
               <svg
                 viewBox="0 0 440 440"
-                className="h-full w-full"
+                className="h-full w-full overflow-visible"
                 role="group"
                 aria-label="Segmentos del círculo de la filosofía"
               >
@@ -245,15 +245,26 @@ export function PhilosophyWheel({
 
               {FACETS.map((f, i) => {
                 const pos = polar(LABEL_R, i * SEG);
+                const multiLine = f.short.includes("\n");
+                const longLabel = multiLine || f.short.length > 8;
                 return (
                   <span
                     key={`label-${i}`}
-                    className="pointer-events-none absolute select-none text-sm font-bold text-white"
+                    className={`pointer-events-none absolute select-none text-center font-bold leading-[1.15] text-white ${
+                      multiLine ? "whitespace-pre-line" : ""
+                    } ${
+                      longLabel
+                        ? "text-[10px] sm:text-[11px] md:text-xs"
+                        : "text-xs sm:text-sm"
+                    }`}
                     style={{
                       left: `${(pos.x / 440) * 100}%`,
                       top: `${(pos.y / 440) * 100}%`,
                       transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
                       transition: SPIN_TRANSITION,
+                      width: longLabel ? "5.75rem" : "4.25rem",
+                      maxWidth: "5.75rem",
+                      overflow: "visible",
                     }}
                   >
                     {f.short}
@@ -263,14 +274,14 @@ export function PhilosophyWheel({
             </div>
 
             <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <div className="flex aspect-square w-[46%] flex-col items-center justify-center rounded-full bg-na-surface px-4 text-center shadow-na-soft">
+              <div className="flex aspect-square w-[46%] flex-col items-center justify-center rounded-full bg-na-surface px-3 text-center shadow-na-soft sm:px-4">
                 <span
                   className="text-[10px] font-bold uppercase tracking-[0.2em]"
                   style={{ color: activeArea.color }}
                 >
                   {active ? activeArea.name : "Filosofía"}
                 </span>
-                <span className="mt-1 text-balance text-sm font-black leading-tight text-na-heketDark">
+                <span className="mt-1 whitespace-pre-line text-balance text-sm font-black leading-tight text-na-heketDark">
                   {active ? active.short : "Gira la rueda"}
                 </span>
               </div>

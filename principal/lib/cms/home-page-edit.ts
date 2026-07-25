@@ -26,7 +26,7 @@ export const DEFAULT_HOME_PILLARS: CmsHomePillar[] = [
     id: "voluntariado",
     title: "Voluntariado",
     tagline: "¡Voluntariado para unir!",
-    text: "Acción social y ecológica: jornadas de plantación, acompañamiento a hogares de ancianos y labores con niños.",
+    text: "Acción social y ecológica: jornadas de plantación, acompañamiento a hogares de adultos mayores y labores con niños.",
     img: "/img/eventos/feria-salud.webp",
     imgAlt: "Voluntarios de Nueva Acrópolis en una actividad comunitaria",
     href: "/voluntariado",
