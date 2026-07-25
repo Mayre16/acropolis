@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "title": "¿Es el arte para unos pocos?",
+      "excerpt": "Nunca me había planteado realmente que el arte fuese patrimonio de unos pocos, reservado a unos escogidos. Siempre he sentido la música como una brisa sutil y maravillosa que alcanza a todos. A unos nos deleita; a otros ",
+      "date": "24 de julio de 2026",
+      "image": "/img/mundo/concierto-masivo.webp",
+      "url": "https://www.acropolis.org/es/tristan/2026/es-el-arte-para-unos-pocos/"
+    },
+    {
       "title": "ASAMBLEA GENERAL DE 2026",
       "excerpt": "Asamblea General de 2026 ACTA DE LA ASAMBLEA GENERAL ORDINARIA DE LA OINA DE 24 DE ABRIL DE 2026 DECLARACIÓN GENERAL La Asamblea General de la OINA aprueba la siguiente Declaración General: La Organización Internacional ",
       "date": "13 de mayo de 2026",
@@ -34,13 +41,6 @@
       "date": "15 de octubre de 2024",
       "image": "/img/mundo/beneficios-psicologicos-en-la-practica-del-deporte.webp",
       "url": "https://www.acropolis.org/es/escuela-del-deporte/2024/beneficios-psicologicos-en-la-practica-del-deporte/"
-    },
-    {
-      "title": "El espíritu olímpico: una filosofía cargada de valores",
-      "excerpt": "Autor: Francisco Iglesias - El deporte es una actividad accesible y recomendable para todos. Tal vez por ello, la celebración de unas Olimpiadas despierta siempre tanta expectación. La Escuela del Deporte con Corazón es ",
-      "date": "15 de octubre de 2024",
-      "image": "/img/mundo/antorcha.webp",
-      "url": "https://www.acropolis.org/es/escuela-del-deporte/2024/el-espiritu-olimpico-una-filosofia-cargada-de-valores/"
     }
   ]
 }
