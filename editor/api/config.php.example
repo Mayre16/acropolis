@@ -27,6 +27,8 @@ return [
         'https://civis.acropolis.org.do',
         'https://tienda.acropolis.adesa.com.do',
         'https://tienda.acropolis.org.do',
+        'https://biblioteca.acropolis.org.do',
+        'https://biblioteca-oina.adesa.com.do',
         'https://circulodeamigos.acropolis.adesa.com.do',
         'https://circulodeamigos.acropolis.org.do',
         'http://localhost:3100',

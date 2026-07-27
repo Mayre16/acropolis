@@ -2,7 +2,7 @@ import type { BrandLockupId } from "./brand-assets";
 
 /** URL pública del sitio (metadataBase / Open Graph). Override con NEXT_PUBLIC_SITE_URL en build. */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://acropolis.adesa.com.do"
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://acropolis.org.do"
 ).replace(/\/$/, "");
 
 /** Logo NA en header (todas las páginas — sin país). */
@@ -286,29 +286,50 @@ export type Platform = {
   devHref: string;
 };
 
+/** Dominios reales de producción (objetivo). */
+export const PLATFORM_PRODUCTION_URLS: Record<PlatformId, string> = {
+  // HTTPS del subdominio pendiente de certificado en Pages; HTTP ya sirve el sitio.
+  circulo: "http://circulodeamigos.acropolis.org.do",
+  biblioteca: "https://biblioteca.acropolis.org.do",
+  civis: "https://civis.acropolis.org.do",
+  tienda: "https://tienda.acropolis.org.do",
+};
+
+/**
+ * Mientras el subdominio no tenga DNS/HTTPS listo, el menú enlaza a
+ * `/proximamente/{id}` en este sitio (evita NXDOMAIN / 404).
+ * Círculo ya resuelve; civis/tienda/biblioteca pendientes de DNS.
+ */
+export const PLATFORM_COMING_SOON: Record<PlatformId, boolean> = {
+  circulo: false,
+  biblioteca: true,
+  civis: true,
+  tienda: true,
+};
+
 export const PLATAFORMAS: Platform[] = [
   {
     id: "circulo",
     label: "Amigos",
-    href: "https://circulodeamigos.acropolis.org.do",
+    href: PLATFORM_PRODUCTION_URLS.circulo,
     devHref: "http://localhost:3500",
   },
   {
     id: "biblioteca",
     label: "Biblioteca",
-    href: "https://biblioteca-oina.adesa.com.do",
+    href: PLATFORM_PRODUCTION_URLS.biblioteca,
     devHref: "https://biblioteca-oina.adesa.com.do",
   },
   {
     id: "civis",
     label: "Civis Consulting",
-    href: "https://civis.acropolis.adesa.com.do",
+    href: PLATFORM_PRODUCTION_URLS.civis,
     devHref: "http://localhost:3200",
   },
   {
     id: "tienda",
     label: "Librería Editorial Logos",
-    href: "https://tienda.acropolis.adesa.com.do",
+    href: PLATFORM_PRODUCTION_URLS.tienda,
     devHref: "https://tienda.acropolis.adesa.com.do",
   },
 ];
@@ -333,7 +354,11 @@ function platformEnvOverride(id: PlatformId): string | undefined {
   }
 }
 
-/** URL efectiva de una plataforma (dev o producción). */
+export function platformComingSoonPath(id: PlatformId): string {
+  return `/proximamente/${id}`;
+}
+
+/** URL efectiva de una plataforma (dev, override, live o «próximamente»). */
 export function platformUrl(id: PlatformId): string {
   const override = platformEnvOverride(id);
   if (override) return override;
@@ -341,7 +366,11 @@ export function platformUrl(id: PlatformId): string {
   const platform = PLATAFORMAS.find((p) => p.id === id);
   if (!platform) return "/";
 
-  return isDevPlatformsMode() ? platform.devHref : platform.href;
+  if (isDevPlatformsMode()) return platform.devHref;
+
+  if (PLATFORM_COMING_SOON[id]) return platformComingSoonPath(id);
+
+  return platform.href;
 }
 
 export function platformIsExternal(url: string): boolean {
@@ -352,7 +381,7 @@ export function getPlatform(id: PlatformId): Platform {
   return PLATAFORMAS.find((p) => p.id === id)!;
 }
 
-/** Librería editorial — temporalmente en Tienda (tienda.acropolis.adesa.com.do). */
+/** Librería editorial — tienda.acropolis.org.do (o /proximamente/tienda si aún no hay DNS). */
 export function bibliotecaLibreriaUrl(): string {
   return platformUrl("tienda").replace(/\/$/, "");
 }

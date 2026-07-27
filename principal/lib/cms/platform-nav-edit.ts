@@ -26,12 +26,12 @@ export const PLATFORM_NAV_ORDER: PlatformId[] = [
   "civis",
 ];
 
-/** URLs de producción en código (adesa). Se muestran como referencia en el editor. */
+/** URLs de producción en código. Se muestran como referencia en el editor. */
 export const PLATFORM_NAV_DEFAULT_URLS: Record<PlatformId, string> = {
-  biblioteca: "https://biblioteca-oina.adesa.com.do",
-  civis: "https://civis.acropolis.adesa.com.do",
-  tienda: "https://tienda.acropolis.adesa.com.do",
-  circulo: "https://circulodeamigos.acropolis.org.do",
+  biblioteca: "https://biblioteca.acropolis.org.do",
+  civis: "https://civis.acropolis.org.do",
+  tienda: "https://tienda.acropolis.org.do",
+  circulo: "http://circulodeamigos.acropolis.org.do",
 };
 
 /** Preview GitHub Pages (incluye Librería en Pages). */

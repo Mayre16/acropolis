@@ -18,7 +18,7 @@ const NEXT = join(ROOT, ".next");
 const DEPLOY = join(ROOT, "deploy");
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://acropolis.adesa.com.do";
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://acropolis.org.do";
 
 const cmsUrl =
   process.env.NEXT_PUBLIC_CMS_URL?.trim() ||
