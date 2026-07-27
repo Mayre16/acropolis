@@ -1,5 +1,7 @@
-name: Deploy GitHub Pages preview
+name: Deploy GitHub Pages
 
+# Producción en dominio custom (acropolis.org.do):
+# publica el sitio principal en la raíz de gh-pages, sin basePath de preview.
 on:
   push:
     branches: [main]
@@ -22,15 +24,29 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build combined preview site
-        run: node .github/scripts/build-github-pages.mjs
+      - name: Sync CMS seed for build (fallback sin API)
+        run: |
+          mkdir -p editor/data/acropolis
+          if [ -f principal/data/acropolis/published.json ]; then
+            cp principal/data/acropolis/published.json editor/data/acropolis/published.json
+          fi
 
-      - name: Deploy to gh-pages branch
+      - name: Build principal for acropolis.org.do
+        working-directory: principal
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.org.do' }}
+          NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
+          NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+          # Sin NEXT_PUBLIC_BASE_PATH → assets en /_next/... (no /acropolis/principal/...)
+        run: npm ci && npm run build:cpanel
+
+      - name: Deploy principal to gh-pages (site root)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .pages-site
+          publish_dir: principal/out
           publish_branch: gh-pages
           force_orphan: true
-          # Evita que force_orphan borre el dominio custom en producción Wiser
           cname: acropolis.org.do
