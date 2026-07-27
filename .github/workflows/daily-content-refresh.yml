@@ -63,6 +63,9 @@ jobs:
           git commit -m "Actualizar Instagram y feed internacional."
           git push origin HEAD:main
 
+      # El push a main ya dispara Deploy GitHub Pages (acropolis.org.do).
+      # Si hay FTP (staging adesa), también sube a cPanel:
+
       - name: Sync CMS seeds for build
         if: steps.changes.outputs.changed == '1'
         run: |
@@ -75,7 +78,7 @@ jobs:
         if: steps.changes.outputs.changed == '1'
         working-directory: principal
         env:
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.org.do' }}
           NEXT_PUBLIC_CMS_URL: ${{ secrets.CMS_API_URL || 'https://editor.acropolis.adesa.com.do/api' }}
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
           NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
@@ -105,7 +108,7 @@ jobs:
       - name: Refresh na-feed.php cache on production
         if: always()
         env:
-          SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.adesa.com.do' }}
+          SITE_URL: ${{ secrets.PRINCIPAL_SITE_URL || 'https://acropolis.org.do' }}
         run: |
           BASE="${SITE_URL%/}"
           curl -fsS -o /dev/null -w "na-feed refresh HTTP %{http_code}\n" \
