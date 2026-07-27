@@ -46,26 +46,26 @@ export function useMergedSalones(): Salon[] {
   const acropolis = useAcropolisSalonesCms();
   const hydrated = useCmsHydrated();
 
-  if (!hydrated) return SALONES;
-
-  if (edit?.ready) {
-    return edit.items.map(cmsToSalon);
+  if (!hydrated) {
+    return mergeSalones(null, SALONES);
   }
 
-  if (!isCmsEnabled()) return SALONES;
-  return mergeSalones(acropolis, SALONES);
+  if (edit?.ready) {
+    const sedesHidden = new Set(edit.salonesSedesHidden ?? []);
+    return edit.items
+      .map(cmsToSalon)
+      .filter((s) => !sedesHidden.has(s.sede));
+  }
+
+  return mergeSalones(isCmsEnabled() ? acropolis : null, SALONES);
 }
 
 export function useMergedSalonesBySede() {
-  const acropolis = useAcropolisSalonesCms();
   const salones = useMergedSalones();
-  const sedesHidden = new Set(acropolis?.sections.salonesSedesHidden ?? []);
   return SALON_SEDES.map((sede) => ({
     sede,
     salones: salones.filter((s) => s.sede === sede),
-  })).filter(
-    (group) => group.salones.length > 0 && !sedesHidden.has(group.sede),
-  );
+  })).filter((group) => group.salones.length > 0);
 }
 
 export function useCivisSalonesPage(): CmsCivisSalonesPage {

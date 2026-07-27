@@ -12,22 +12,16 @@ import type { CmsSalonesPage } from "@/lib/cms/types";
 
 export function useMergedSalones(): Salon[] {
   const cms = useCmsDocument();
-  if (!isCmsEnabled()) return SALONES;
-  return mergeSalones(cms, SALONES);
+  // Siempre pasar por mergeSalones para aplicar hides temporales (Naco/Santiago).
+  return mergeSalones(isCmsEnabled() ? cms : null, SALONES);
 }
 
 export function useMergedSalonesBySede() {
-  const cms = useCmsDocument();
   const salones = useMergedSalones();
-  const sedesHidden = new Set(
-    isCmsEnabled() ? (cms?.sections.salonesSedesHidden ?? []) : [],
-  );
   return SALON_SEDES.map((sede) => ({
     sede,
     salones: salones.filter((s) => s.sede === sede),
-  })).filter(
-    (group) => group.salones.length > 0 && !sedesHidden.has(group.sede),
-  );
+  })).filter((group) => group.salones.length > 0);
 }
 
 export function useCmsSalonesPage(): CmsSalonesPage {

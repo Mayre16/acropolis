@@ -32,6 +32,9 @@ export function cmsToSalon(s: CmsSalon): Salon {
   };
 }
 
+/** Temporal: Naco y Santiago ocultos hasta que el editor CMS pueda publicar hides. */
+const TEMP_SALONES_SEDES_HIDDEN = ["Naco", "Santiago"] as const;
+
 export function getSalonesForEdit(
   doc: CmsDocument | null | undefined,
   fallback: Salon[] = SALONES,
@@ -41,8 +44,11 @@ export function getSalonesForEdit(
       ?.salonesHidden ?? []) as string[]),
   ];
   const sedesHidden = [
-    ...(((doc?.sections as { salonesSedesHidden?: string[] } | undefined)
-      ?.salonesSedesHidden ?? []) as string[]),
+    ...new Set([
+      ...(((doc?.sections as { salonesSedesHidden?: string[] } | undefined)
+        ?.salonesSedesHidden ?? []) as string[]),
+      ...TEMP_SALONES_SEDES_HIDDEN,
+    ]),
   ];
   const hiddenSet = new Set(hidden);
   const cmsById = new Map(

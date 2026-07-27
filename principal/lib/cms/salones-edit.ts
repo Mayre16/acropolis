@@ -29,6 +29,12 @@ export function cmsToSalon(s: CmsSalon): Salon {
 
 import type { SalonSede } from "@/lib/salones";
 
+/**
+ * Temporal: Naco y Santiago ocultos hasta que el editor CMS pueda publicar hides.
+ * Quitar TEMP_SALONES_SEDES_HIDDEN cuando el CMS tenga salonesSedesHidden correcto.
+ */
+const TEMP_SALONES_SEDES_HIDDEN: SalonSede[] = ["Naco", "Santiago"];
+
 export type AddSalonOptions = {
   /** Inserta justo después de este salón (misma sede). */
   afterId?: string;
@@ -47,7 +53,12 @@ export function getSalonesForEdit(
   fallback: Salon[] = SALONES,
 ): { items: CmsSalon[]; hidden: string[]; sedesHidden: string[] } {
   const hidden = [...(doc?.sections.salonesHidden ?? [])];
-  const sedesHidden = [...(doc?.sections.salonesSedesHidden ?? [])];
+  const sedesHidden = [
+    ...new Set([
+      ...(doc?.sections.salonesSedesHidden ?? []),
+      ...TEMP_SALONES_SEDES_HIDDEN,
+    ]),
+  ];
   const hiddenSet = new Set(hidden);
   const cmsById = new Map((doc?.sections.salones ?? []).map((s) => [s.id, s]));
   const items: CmsSalon[] = [];

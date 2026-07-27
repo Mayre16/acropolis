@@ -923,7 +923,7 @@
     ],
     "venuesHidden": [],
     "salonesHidden": [],
-    "salonesSedesHidden": [],
+    "salonesSedesHidden": ["Naco", "Santiago"],
     "salones": [
       {
         "id": "agora",
