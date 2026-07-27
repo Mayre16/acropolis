@@ -39,8 +39,25 @@ jobs:
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PRINCIPAL_GA_MEASUREMENT_ID }}
           NEXT_PUBLIC_GSC_VERIFICATION: ${{ secrets.PRINCIPAL_GSC_VERIFICATION }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
-          # Sin NEXT_PUBLIC_BASE_PATH → assets en /_next/... (no /acropolis/principal/...)
+          # Sin NEXT_PUBLIC_BASE_PATH → assets en /na-assets/... (raíz del dominio)
         run: npm ci && npm run build:cpanel
+
+      # Compat: bookmarks / caché del redirect viejo a /principal/
+      - name: Add /principal → / redirect stub
+        run: |
+          mkdir -p principal/out/principal
+          printf '%s\n' \
+            '<!DOCTYPE html>' \
+            '<html lang="es">' \
+            '<head>' \
+            '<meta charset="utf-8" />' \
+            '<meta http-equiv="refresh" content="0; url=/" />' \
+            '<link rel="canonical" href="https://acropolis.org.do/" />' \
+            '<title>Nueva Acrópolis RD</title>' \
+            '</head>' \
+            '<body><p>Redirigiendo a <a href="/">acropolis.org.do</a>…</p></body>' \
+            '</html>' \
+            > principal/out/principal/index.html
 
       - name: Deploy principal to gh-pages (site root)
         uses: peaceiris/actions-gh-pages@v4
