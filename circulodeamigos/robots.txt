@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://mayre16.github.io/acropolis/circulodeamigos/sitemap.xml

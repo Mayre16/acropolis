@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 12 122 62" role="img" aria-labelledby="title">
+  <title id="title">Empresas del sector privado</title>
+  <g fill="none" stroke="#1f6b5c" stroke-width="2.2" stroke-linejoin="round">
+    <rect x="18" y="28" width="34" height="42" rx="2" fill="#1f6b5c" fill-opacity="0.12"/>
+    <rect x="58" y="16" width="38" height="54" rx="2" fill="#2a9d8f" fill-opacity="0.18"/>
+    <rect x="102" y="34" width="30" height="36" rx="2" fill="#1f6b5c" fill-opacity="0.12"/>
+    <path d="M28 38h14M28 46h14M28 54h10"/>
+    <path d="M70 26v8M82 26v8"/>
+    <path d="M112 44h10M112 52h10"/>
+  </g>
+</svg>

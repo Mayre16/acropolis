@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1048 445" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Civis Consulting - Nueva Acropolis">
+  <image xlink:href="civis-identificador-bg.webp" width="1048" height="445" preserveAspectRatio="xMidYMid meet"/>
+  <rect x="52" y="214" width="278" height="58" fill="#252E65"/>
+  <rect x="636" y="178" width="395" height="195" fill="#3E48A1"/>
+  <image xlink:href="civis-na-mark-only.webp" x="100" y="45" width="130" height="175" preserveAspectRatio="xMidYMid meet"/>
+  <text x="62" y="258" fill="#ffffff" font-family="'Arial Black', 'Arial Bold', Arial, sans-serif" font-size="26" font-weight="800" letter-spacing="0.14em">NUEVA ACR&#211;POLIS</text>
+  <image xlink:href="civis-column-icon-crop.webp" x="518" y="72" width="105" height="290" preserveAspectRatio="xMidYMid meet"/>
+  <text x="645" y="272" fill="#ffffff" font-family="'Arial Black', Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="0.02em">CIVIS</text>
+  <text x="648" y="348" fill="#ffffff" font-family="'Arial Black', 'Arial Bold', Arial, sans-serif" font-size="34" font-weight="800" letter-spacing="0.18em">CONSULTING</text>
+</svg>
