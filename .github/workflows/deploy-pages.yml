@@ -32,3 +32,5 @@ jobs:
           publish_dir: .pages-site
           publish_branch: gh-pages
           force_orphan: true
+          # Evita que force_orphan borre el dominio custom en producción Wiser
+          cname: acropolis.org.do
