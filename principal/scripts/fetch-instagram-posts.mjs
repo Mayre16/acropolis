@@ -2,6 +2,9 @@
  * Obtiene publicaciones recientes de @nuevaacropolisdominicana,
  * descarga thumbnails locales y actualiza lib/home-content.ts.
  *
+ * Solo acepta shortcodes cuyo autor verificado sea USERNAME
+ * (evita posts ajenos que DuckDuckGo a veces mezcla en la búsqueda).
+ *
  * Uso: node scripts/fetch-instagram-posts.mjs
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -20,14 +23,7 @@ const HOME = join(ROOT, "lib", "home-content.ts");
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
-const SEARCH_QUERIES = [
-  "nuevaacropolisdominicana instagram",
-  "nueva acropolis dominicana instagram post",
-  "nuevaacropolisdominicana instagram p",
-  `@${USERNAME} instagram`,
-];
-
-/** Fallback cuando DDG/Instagram bloquean descubrimiento automático. */
+/** Fallback cuando Instagram bloquea descubrimiento automático. */
 const SEED_SHORTCODES = [
   "DTCD1NHjusg",
   "C9vFlxtvJCl",
@@ -46,26 +42,6 @@ async function discoverShortcodesFromProfile() {
   return extractShortcodes(html);
 }
 
-async function discoverShortcodesFromSearch() {
-  const seen = new Set();
-  const codes = [];
-
-  for (const query of SEARCH_QUERIES) {
-    const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    const res = await fetch(url, { headers: { "User-Agent": UA } });
-    if (!res.ok) continue;
-    const html = await res.text();
-    for (const code of extractShortcodes(html)) {
-      if (seen.has(code)) continue;
-      seen.add(code);
-      codes.push(code);
-    }
-    await sleep(400);
-  }
-
-  return codes;
-}
-
 function extractShortcodes(html) {
   const seen = new Set();
   const codes = [];
@@ -81,6 +57,39 @@ function extractShortcodes(html) {
     }
   }
   return codes;
+}
+
+/** Confirma que el post pertenece a @USERNAME (embed HTML). */
+async function shortcodeBelongsToAccount(shortcode) {
+  const embedRes = await fetch(
+    `https://www.instagram.com/p/${shortcode}/embed/captioned/`,
+    { headers: { "User-Agent": UA } },
+  );
+  if (!embedRes.ok) return false;
+  const html = await embedRes.text();
+  const users = new Set();
+  for (const m of html.matchAll(/instagram\.com\/([A-Za-z0-9._]+)\//g)) {
+    const u = m[1].toLowerCase();
+    if (
+      [
+        "p",
+        "reel",
+        "reels",
+        "stories",
+        "accounts",
+        "static",
+        "about",
+        "v",
+        "rsrc.php",
+      ].includes(u)
+    ) {
+      continue;
+    }
+    users.add(u);
+  }
+  const jsonUser = html.match(/"username"\s*:\s*"([^"]+)"/i)?.[1]?.toLowerCase();
+  if (jsonUser) users.add(jsonUser);
+  return users.has(USERNAME.toLowerCase());
 }
 
 async function resolveThumbnailUrl(shortcode) {
@@ -111,36 +120,34 @@ function sleep(ms) {
 
 async function fetchRecentPosts() {
   const seen = new Set();
-  const shortcodes = [];
+  const candidates = [];
 
   for (const code of [
     ...(await discoverShortcodesFromProfile()),
-    ...(await discoverShortcodesFromSearch()),
+    ...SEED_SHORTCODES,
   ]) {
     if (seen.has(code)) continue;
     seen.add(code);
-    shortcodes.push(code);
-    if (shortcodes.length >= MAX_POSTS) break;
+    candidates.push(code);
   }
 
-  if (shortcodes.length === 0) {
-    console.warn("  Descubrimiento automático vacío — usando lista verificada.");
-    for (const code of SEED_SHORTCODES) {
-      if (seen.has(code)) continue;
-      seen.add(code);
-      shortcodes.push(code);
-      if (shortcodes.length >= MAX_POSTS) break;
-    }
-  }
-
-  if (shortcodes.length === 0) {
+  if (candidates.length === 0) {
     throw new Error(
       "No se encontraron publicaciones de @nuevaacropolisdominicana.",
     );
   }
 
   const posts = [];
-  for (const code of shortcodes.slice(0, MAX_POSTS)) {
+  for (const code of candidates) {
+    if (posts.length >= MAX_POSTS) break;
+
+    const ok = await shortcodeBelongsToAccount(code);
+    if (!ok) {
+      console.warn(`  Omitido /p/${code}/ — no es de @${USERNAME}`);
+      await sleep(300);
+      continue;
+    }
+
     const thumbUrl = await resolveThumbnailUrl(code);
     if (!thumbUrl) {
       console.warn(`  Sin thumbnail para /p/${code}/ — se omite`);
