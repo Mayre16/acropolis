@@ -53,15 +53,24 @@ for (const dir of [OUT, NEXT]) {
   }
 }
 
-const brand = spawnSync("npm", ["run", "brand:lockups"], {
-  cwd: ROOT,
-  env,
-  stdio: "inherit",
-  shell: true,
-});
-
-if (brand.status !== 0) {
-  process.exit(brand.status ?? 1);
+// En CI (GitHub Actions) no hay las fuentes HD locales: regenerar lockups
+// produce WebP corruptos (wordmark cortado / monograma recortado mal).
+// Usar los assets committed en public/brand/ salvo REGENERATE_BRAND_LOCKUPS=1.
+const regenerateBrand = env.REGENERATE_BRAND_LOCKUPS === "1";
+if (regenerateBrand) {
+  const brand = spawnSync("npm", ["run", "brand:lockups"], {
+    cwd: ROOT,
+    env,
+    stdio: "inherit",
+    shell: true,
+  });
+  if (brand.status !== 0) {
+    process.exit(brand.status ?? 1);
+  }
+} else {
+  console.log(
+    "Omitiendo brand:lockups — usando public/brand del repo (pon REGENERATE_BRAND_LOCKUPS=1 para regenerar).",
+  );
 }
 
 const fetchFeed = spawnSync("node", ["scripts/fetch_mundo_feed.mjs"], {
