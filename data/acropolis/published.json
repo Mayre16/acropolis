@@ -1,0 +1,1181 @@
+{
+  "version": 1,
+  "site": "acropolis",
+  "updatedAt": "2026-07-06T21:00:00.000Z",
+  "sections": {
+    "homeHero": {
+      "h1": "Nueva Acrópolis República Dominicana",
+      "h2": "",
+      "lede": ""
+    },
+    "diplomadoHero": {
+      "badgeWeekday": "Sábado",
+      "badgeDate": "11 jul",
+      "activeLabel": "Próxima sesión",
+      "activeDate": "Sábado 11 de julio",
+      "activeTime": "4:00pm a 6:15pm",
+      "activeModality": "Presencial",
+      "bannerDuration": "5 meses"
+    },
+    "agenda": [
+      {
+        "id": "vol-reforestacion-jul12",
+        "category": "voluntariado",
+        "title": "Jornada de reforestación",
+        "startsAt": "2026-07-12",
+        "date": "Sábado 12 de julio",
+        "time": "8:00 a.m.",
+        "sede": "Parque ecológico · Santo Domingo Este",
+        "tag": "Ecología",
+        "image": "/img/agenda/vol-reforestacion.webp",
+        "imageAlt": "Voluntarios plantando árboles en jornada de reforestación",
+        "description": "Salida de voluntariado ambiental: plantación, cuidado de espacios verdes y educación ecológica. Ropa cómoda y ganas de servir a la naturaleza.",
+        "inscribeMessage": "Hola, me interesa la Jornada de reforestación — sábado 12 de julio, 8:00 a.m. ¿Me pueden confirmar punto de encuentro?",
+        "detailHref": "/voluntariado",
+        "detailLabel": "Ver voluntariado",
+        "showOnHome": true
+      },
+      {
+        "id": "vol-ninos-jul26",
+        "category": "voluntariado",
+        "title": "Actividades con niños",
+        "startsAt": "2026-07-26",
+        "date": "Sábado 26 de julio",
+        "time": "10:00 a.m.",
+        "sede": "Sede Naco",
+        "image": "/img/agenda/vol-ninos-juegos.webp",
+        "imageAlt": "Encuentro cultural y recreativo con niños — voluntariado Nueva Acrópolis",
+        "description": "Jornada de voluntariado con niños: juegos, valores, cultura y apoyo educativo en un ambiente alegre y responsable.",
+        "inscribeMessage": "Hola, me interesan las Actividades con niños — Sede Naco, sábado 26 de julio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/voluntariado",
+        "detailLabel": "Ver voluntariado",
+        "showOnHome": true
+      },
+      {
+        "id": "esfera-manual-ago",
+        "category": "esfera",
+        "title": "Introducción al Manual Esfera",
+        "startsAt": "2026-08-09",
+        "date": "Sábado 9 de agosto",
+        "time": "9:00 a.m. – 1:00 p.m.",
+        "sede": "Sede Naco",
+        "tag": "Punto Focal Esfera",
+        "image": "/img/esfera/manual-esfera-portada-es-card.webp",
+        "imageAlt": "El Manual Esfera — Carta Humanitaria y normas mínimas para la respuesta humanitaria, edición en español 2018",
+        "description": "Taller de base sobre estándares humanitarios y calidad en emergencias. Abierto a voluntarios e instituciones interesadas en la línea Esfera.",
+        "inscribeMessage": "Hola, me interesa el taller Introducción al Manual Esfera — Sede Naco, sábado 9 de agosto. ¿Me pueden confirmar inscripción?",
+        "detailHref": "/esfera",
+        "detailLabel": "Ver Punto Focal Esfera",
+        "showOnHome": true
+      },
+      {
+        "id": "esfera-simulacro-sep",
+        "category": "esfera",
+        "title": "Simulacro de gestión de emergencias",
+        "startsAt": "2026-09-13",
+        "date": "Sábado 13 de septiembre",
+        "time": "8:00 a.m. – 12:00 m.",
+        "sede": "Sede Naco",
+        "tag": "Práctica de campo",
+        "image": "/img/agenda/esfera-simulacro-campo.webp",
+        "imageAlt": "Voluntarios en simulacro de gestión de emergencias — línea Punto Focal Esfera",
+        "description": "Ejercicio práctico de respuesta coordinada, evaluación de necesidades y trabajo en equipo bajo criterios Esfera.",
+        "inscribeMessage": "Hola, me interesa el Simulacro de gestión de emergencias — sábado 13 de septiembre. ¿Me pueden dar más información?",
+        "detailHref": "/esfera",
+        "detailLabel": "Ver Punto Focal Esfera",
+        "showOnHome": true
+      },
+      {
+        "id": "diplomado-los-prados-jun13",
+        "category": "diplomado",
+        "title": "Diplomado de Filosofía para la Vida",
+        "startsAt": "2026-06-23",
+        "date": "Martes 23 de junio",
+        "time": "7pm",
+        "sede": "Sede Los Prados",
+        "tag": "Cupos abiertos",
+        "image": "/img/filosofia/diplomado/diplomado-03.webp",
+        "imageAlt": "Diplomado de Filosofía para la Vida — Parthenon, libros y pensamiento clásico",
+        "description": "Primera sesión del Diplomado de Filosofía para la Vida en la Sede Los Prados. Curso introductorio de filosofía comparada de Oriente y Occidente: cinco meses, una sesión semanal, sin requisitos previos.",
+        "inscribeMessage": "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Sede Los Prados, sábado 13 de junio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/filosofia",
+        "detailLabel": "Ver programa completo"
+      },
+      {
+        "id": "diplomado-naco-jun9",
+        "category": "diplomado",
+        "title": "Diplomado de Filosofía para la Vida",
+        "startsAt": "2026-06-09",
+        "date": "Martes 9 de junio",
+        "time": "7:00 p.m.",
+        "sede": "Izbira",
+        "image": "/img/filosofia/diplomado/diplomado-02.webp",
+        "imageAlt": "Diplomado de Filosofía para la Vida — pirámides, cosmos y exploración del saber",
+        "description": "Grupo del Diplomado de Filosofía para la Vida en horario nocturno, Sede Naco. Programa de cinco meses con enfoque práctico: autoconocimiento, convivencia y futuro.",
+        "inscribeMessage": "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Sede Naco, martes 9 de junio, 7:00 p.m. ¿Me pueden dar más información?",
+        "detailHref": "/filosofia",
+        "detailLabel": "Ver programa completo"
+      },
+      {
+        "id": "diplomado-naco-jun20",
+        "category": "diplomado",
+        "title": "Diplomado de Filosofía para la Vida",
+        "startsAt": "2026-07-30",
+        "date": "Jueves 30 de julio",
+        "time": "07:00 p.m.",
+        "sede": "Sede Naco",
+        "image": "/img/filosofia/temario/temario-02.webp",
+        "imageAlt": "Diplomado de Filosofía para la Vida — manuscritos, ciencia y filosofía comparada",
+        "description": "Nuevo grupo del Diplomado en horario matutino, Sede Naco. Filosofía para la vida en sesiones participativas con prácticas en clase.",
+        "inscribeMessage": "Hola, me interesa inscribirme al Diplomado de Filosofía para la Vida — Sede Naco, sábado 20 de junio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/filosofia",
+        "detailLabel": "Ver programa completo"
+      },
+      {
+        "id": "cultura-teatro-jun11",
+        "category": "cultura",
+        "title": "Taller de Teatro",
+        "startsAt": "2026-06-11",
+        "date": "Jueves 11 de junio",
+        "time": "7:00 p.m.",
+        "sede": "Sede Naco",
+        "tag": "Clase",
+        "image": "/img/cultura/agenda/teatro.webp",
+        "imageAlt": "Grupo de teatro ensayando en escena — expresión escénica",
+        "description": "Taller de expresión escénica en la Sede Naco: voz, cuerpo y presencia en escena. Espacio para todas las edades, con montajes que combinan formación y disfrute del arte dramático.",
+        "inscribeMessage": "Hola, me interesa el Taller de Teatro — Sede Naco, jueves 11 de junio, 7:00 p.m. ¿Me pueden dar más información?",
+        "detailHref": "/cultura",
+        "detailLabel": "Ver cultura"
+      },
+      {
+        "id": "cultura-coro-jun13",
+        "category": "cultura",
+        "title": "Ensayo de Coro",
+        "startsAt": "2026-06-13",
+        "date": "Sábado 13 de junio",
+        "time": "10:00 a.m.",
+        "sede": "Sede Los Prados",
+        "image": "/img/cultura/agenda/coro.webp",
+        "imageAlt": "Coro mixto cantando durante un ensayo",
+        "description": "Ensayo del coro mixto de Nueva Acrópolis en Los Prados. Cantamos en grupo, cultivamos la escucha y preparamos presentaciones para veladas y celebraciones culturales.",
+        "inscribeMessage": "Hola, me interesa el Ensayo de Coro — Sede Los Prados, sábado 13 de junio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/cultura",
+        "detailLabel": "Ver cultura"
+      },
+      {
+        "id": "cultura-jovenes-jun20",
+        "category": "cultura",
+        "title": "Encuentro cultural de jóvenes",
+        "startsAt": "2026-06-20",
+        "date": "Sábado 20 de junio",
+        "time": "10:00 a.m.",
+        "sede": "Sede Naco",
+        "image": "/img/agenda/jovenes-encuentro.webp",
+        "imageAlt": "Jóvenes en encuentro cultural y dinámicas de liderazgo",
+        "description": "Encuentro para jóvenes en la Sede Naco: arte, dinámicas en equipo, naturaleza y reflexión. Un espacio para compartir, crear y conocer propuestas culturales de la escuela.",
+        "inscribeMessage": "Hola, me interesa el Encuentro cultural de jóvenes — Sede Naco, sábado 20 de junio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/cultura",
+        "detailLabel": "Ver cultura"
+      },
+      {
+        "id": "cultura-cineforum-jul8",
+        "category": "cultura",
+        "title": "Cineforum",
+        "startsAt": "2026-07-08",
+        "date": "Martes 8 de julio",
+        "time": "7:00 p.m.",
+        "sede": "Sede Naco",
+        "tag": "Cineforum",
+        "image": "/img/agenda/cine-foro.webp",
+        "imageAlt": "Cineforum filosófico con proyección y debate en sala",
+        "description": "Proyección y diálogo abierto sobre una película con enfoque filosófico: compartimos ideas, preguntas y reflexiones que la obra nos inspira. Espacio para todas las edades.",
+        "inscribeMessage": "Hola, me interesa el Cineforum — Sede Naco, martes 8 de julio, 7:00 p.m. ¿Me pueden dar más información?",
+        "detailHref": "/cultura",
+        "detailLabel": "Ver cultura",
+        "showOnHome": true
+      },
+      {
+        "id": "cultura-coro-jul6",
+        "category": "cultura",
+        "title": "Ensayo de Coro",
+        "startsAt": "2026-07-06",
+        "date": "Domingo 6 de julio",
+        "time": "10:00 a.m.",
+        "sede": "Sede Los Prados",
+        "image": "/img/cultura/agenda/coro.webp",
+        "imageAlt": "Coro mixto cantando durante un ensayo",
+        "description": "Ensayo del coro mixto de Nueva Acrópolis en Los Prados. Cantamos en grupo, cultivamos la escucha y preparamos presentaciones culturales.",
+        "inscribeMessage": "Hola, me interesa el Ensayo de Coro — Sede Los Prados, domingo 6 de julio, 10:00 a.m. ¿Me pueden dar más información?",
+        "detailHref": "/cultura",
+        "detailLabel": "Ver cultura",
+        "showOnHome": true
+      },
+      {
+        "id": "conferencia-arte-vivir-jul16",
+        "category": "conferencia",
+        "title": "El arte de vivir con propósito",
+        "startsAt": "2026-07-16",
+        "date": "Miércoles 16 de julio",
+        "time": "7:00 p.m.",
+        "sede": "Sede Naco · Santo Domingo",
+        "tag": "Abierta y gratuita",
+        "image": "/img/agenda/conferencia-auditorio.webp",
+        "imageAlt": "Conferencia abierta en auditorio universitario",
+        "showOnHome": true,
+        "detailHref": "/cursos",
+        "detailLabel": "Ver cursos y conferencias"
+      },
+      {
+        "id": "viaje-tres-ojos-jul12",
+        "category": "cultura",
+        "title": "Excursión: Los Tres Ojos",
+        "startsAt": "2026-07-12",
+        "date": "Domingo 12 de julio",
+        "time": "8:00 a.m.",
+        "sede": "Salida coordinada · Santo Domingo",
+        "tag": "Viaje cultural",
+        "image": "/img/cultura/viajes/tres-ojos.webp",
+        "imageAlt": "Laguna azul turquesa en el Parque Nacional Los Tres Ojos",
+        "description": "Excursión de medio día al parque de cuevas y lagos subterráneos: naturaleza, geología y simbolismo del agua con una mirada filosófica.",
+        "detailHref": "/cultura/viajes/locales/los-tres-ojos/",
+        "detailLabel": "Ver viaje",
+        "showOnHome": true
+      },
+      {
+        "id": "viaje-pomier-ago16",
+        "category": "cultura",
+        "title": "Excursión: Cuevas de Pomier",
+        "startsAt": "2026-08-16",
+        "date": "Domingo 16 de agosto",
+        "time": "7:00 a.m.",
+        "sede": "Salida desde Santo Domingo · San Cristóbal",
+        "tag": "Viaje cultural",
+        "image": "/img/cultura/viajes/pomier.webp",
+        "imageAlt": "Petroglifos taínos en las Cuevas de Pomier, San Cristóbal",
+        "description": "Jornada completa al mayor santuario rupestre del Caribe: más de cuatro mil petroglifos y pictografías taínas con guía especializado.",
+        "detailHref": "/cultura/viajes/locales/cuevas-de-pomier/",
+        "detailLabel": "Ver viaje",
+        "showOnHome": true
+      },
+      {
+        "id": "viaje-egipto-sep10",
+        "category": "cultura",
+        "title": "Expedición cultural a Egipto",
+        "startsAt": "2026-09-10",
+        "date": "",
+        "time": "7:00 p.m.",
+        "sede": "Charla informativa · Sede Naco",
+        "tag": "Viaje internacional",
+        "image": "/img/cultura/viajes/egipto.webp",
+        "imageAlt": "Grupo de Nueva Acrópolis frente a las pirámides de Giza",
+        "description": "Charla sobre el viaje a El Cairo, Luxor y Aswan: pirámides, templos del Nilo e inscripción a la expedición de diez días.",
+        "detailHref": "/cultura/viajes/internacionales/egipto/",
+        "detailLabel": "Ver expedición",
+        "showOnHome": true
+      }
+    ],
+    "eventos": [
+      {
+        "slug": "el-arte-de-respirar",
+        "title": "Encuentro \"El arte de respirar\"",
+        "date": "6 de mayo de 2026",
+        "category": "Cultura",
+        "excerpt": "Una jornada para redescubrir la respiración consciente como herramienta de calma, atención y bienestar interior.",
+        "image": {
+          "src": "/img/eventos/respirar.webp",
+          "alt": "Encuentro de respiración consciente en Nueva Acrópolis"
+        },
+        "body": [
+          "Nueva Acrópolis Dominicana realizó el encuentro “El arte de respirar: ciencia, respiración y equilibrio interior”, celebrado en Izbira Event Venue como parte de la programación de su Punto Cultural.",
+          "La actividad reunió a 18 participantes en una experiencia de bienestar consciente orientada a hacer una pausa del ritmo cotidiano, reconectar con el cuerpo y explorar el poder de la respiración consciente y el descanso profundo.",
+          "La jornada inició a las 6:30 de la tarde con ejercicios de respiración guiada y continuó con movimientos suaves y restaurativos enfocados en liberar tensiones y promover calma y equilibrio interior en un ambiente sereno y contemplativo.",
+          "Con iniciativas como esta, Nueva Acrópolis Dominicana continúa promoviendo espacios culturales y formativos que integran ciencia, filosofía y bienestar, fomentando una vida más consciente y armónica."
+        ],
+        "gallery": [],
+        "published": true
+      },
+      {
+        "slug": "dia-de-la-tierra",
+        "title": "Día de la Tierra con ciencia, filosofía y acción",
+        "date": "22 de abril de 2026",
+        "category": "Voluntariado",
+        "excerpt": "Celebramos el Día de la Tierra uniendo reflexión filosófica y acción concreta por el medio ambiente.",
+        "image": {
+          "src": "/img/eventos/tierra.webp",
+          "alt": "Voluntarios en jornada de reforestación — Día de la Tierra"
+        },
+        "body": [
+          "En el marco del Día Internacional de la Madre Tierra, Nueva Acrópolis Dominicana llevó a cabo una trilogía de encuentros sobre la naturaleza —abejas, bosques y cosmos— y cerró con una jornada de reforestación en La Jagua, Yaguate (San Cristóbal).",
+          "Cincuenta y tres voluntarios sembraron 1.080 plántulas de caoba dominicana y guázara, uniendo reflexión filosófica y acción ecológica en favor de nuestro entorno.",
+          "La programación integró charlas abiertas y trabajo de campo, reafirmando el compromiso de la escuela con el servicio a la comunidad y el cuidado del planeta."
+        ],
+        "gallery": [],
+        "published": true
+      },
+      {
+        "slug": "valor-de-las-abejas",
+        "title": "Charla sobre el valor de las abejas y apertura del nuevo Centro Cultural",
+        "date": "20 de abril de 2026",
+        "category": "Cultura",
+        "excerpt": "Una charla sobre el papel esencial de las abejas en la naturaleza, junto al anuncio de nuestro nuevo Centro Cultural.",
+        "image": {
+          "src": "/img/eventos/abejas.webp",
+          "alt": "Charla sobre el valor de las abejas y apertura del nuevo Centro Cultural"
+        },
+        "body": [
+          "En el marco de la celebración del Día de la Tierra, Nueva Acrópolis Dominicana llevó a cabo la charla “El secreto de las abejas: la vida pequeña que sostiene todo”, realizada en Izbira, marcando además el inicio de la apertura de un nuevo centro cultural en la ciudad de Santo Domingo.",
+          "La exposición inició con Mónica Ponce de León y Alejandra Flórez, de Miel Nucayní, quienes ofrecieron un recorrido didáctico por la vida de las abejas: su rol esencial como polinizadores, los sistemas de comunicación entre abejas y flores, la estructura del panal y el alto grado de cooperación que caracteriza a estas comunidades.",
+          "A continuación, Sally Polanco Bloise desarrolló una exposición sobre el simbolismo de las abejas en diversas culturas: desde el antiguo Egipto, donde representaban el orden cósmico, hasta la Grecia clásica, donde las “melisas” eran consideradas sacerdotisas guardianas de los misterios sagrados.",
+          "La jornada concluyó con una degustación de miel, propiciando un espacio de encuentro y reforzando el mensaje central de la actividad: valorar, proteger y aprender de estas pequeñas pero esenciales guardianas de la vida."
+        ],
+        "gallery": [],
+        "published": true
+      },
+      {
+        "slug": "feria-de-la-salud",
+        "title": "Participación en la Feria de la Salud Ferries del Caribe",
+        "date": "10 de marzo de 2026",
+        "category": "Comunidad",
+        "excerpt": "Estuvimos presentes en la 13ª Feria de la Salud, acercando filosofía práctica y bienestar a la comunidad.",
+        "image": {
+          "src": "/img/eventos/feria-salud.webp",
+          "alt": "Voluntarios de Nueva Acrópolis en la Feria de la Salud"
+        },
+        "body": [
+          "Nueva Acrópolis Dominicana participó en la 13ª Feria de la Salud organizada por la Fundación Ferries del Caribe, con un stand de voluntarios que acercó a la comunidad ideas de filosofía práctica, bienestar y servicio.",
+          "Durante la jornada compartimos materiales sobre nuestros programas de voluntariado, actividades abiertas y la Escuela de Filosofía, en un espacio de encuentro orientado al cuidado integral de las personas.",
+          "La presencia en ferias comunitarias forma parte de nuestro compromiso de llevar la cultura y el voluntariado a espacios públicos, dialogando con quienes buscan mejorar su calidad de vida."
+        ],
+        "gallery": [],
+        "published": true
+      }
+    ],
+    "articulos": [
+      {
+        "slug": "el-hombre-interior-y-el-hombre-exterior",
+        "title": "El hombre interior y el hombre exterior",
+        "author": "Delia Steinberg Guzmán",
+        "date": "10 de septiembre de 2023",
+        "readingTime": "27 min",
+        "category": "Autoconocimiento",
+        "excerpt": "Desde tradiciones milenarias hasta la psicología y la filosofía: la búsqueda del ser interior que habita tras nuestra apariencia, y cómo despertarlo.",
+        "image": {
+          "src": "/img/articulos/el-hombre-interior-y-el-hombre-exterior.webp",
+          "alt": "Persona contemplando un lago en calma al atardecer, símbolo de interioridad",
+          "credit": "Alexander Aarao-Ward"
+        },
+        "body": [
+          "Hemos titulado nuestra charla “El Hombre Interior y el Hombre Exterior [1] ”, como si viviésemos dos entidades juntas dentro de cada uno de nosotros, como si fuésemos dos cosas que compartimos el camino de la vida. Y no creamos de ninguna manera que esta forma de entender al ser humano es nueva; o que esta dualidad la ha planteado por primera vez la psicología; o que es tan solo hace 100 años o 200 años que el Hombre se ha preguntado si hay algo más aparte de su apariencia, de su cuerpo.",
+          "Esto de poder hablar de un hombre por fuera y otro por dentro es una tradición muy vieja; nos puede remontar en la Historia varios cientos –por no decir varios miles– de años atrás. En los textos más antiguos en los que he buscado, he tratado de encontrar algún trozo, alguna referencia donde se hablase de cómo es este hombre que nosotros llamamos el de afuera, el exterior, el que presenta la cara; y el otro ser, el que vive dentro, un poco encerrado, el que es interior.",
+          "He hallado que bajo formas poéticas, simbólicas, a veces un tanto oscuras, en los viejos libros de Dyzan –antiquísimas obras escritas en hojas de palma, que se conservan todavía allá por el siglo XIX en los que fue la región del Tíbet antiguo, donde hubo tantos monasterios y maestros– aparece una relación al Hombre exterior y al Hombre interior.",
+          "Nos cuentan simbólicamente en este texto, que cuando la Tierra todavía no se había conformado tal como la conocemos ahora; cuando no era tan consistente y se encontraba rodeada de una enorme atmósfera de gases, los seres humanos que vivían en ella tampoco eran tan densos como observamos en la actualidad.",
+          "Se nos habla de que en aquella lejanísima época –época que no podemos siquiera situar con números o fechas– los cuerpos humanos eran como sombras. No eran materia concreta, sino como “fantasmas”; sombras diluidas, etéreas, que podían supervivir en esa espesa atmósfera repleta de gases.",
+          "Mas a medida que fue pasando el tiempo, estas figuras etéreas van concretizando en su parte exterior, una suerte de cáscara que las protege, y que va a contener cada vez más hacia adentro, esa sombra sutil e insubstancial. La parte exterior del cuerpo se forma cada vez mejor, se materializa cada vez más, llegando incluso al aspecto que nosotros tenemos ahora.",
+          "Aquella vieja sombra se encierra definitivamente adentro. Poco a poco va perdiendo la poca capacidad material que tenía y se va organizando como lo que los antiguos llaman el Hombre Interior. A todo este proceso se le conocía como la internalización del hombre psicológico.",
+          "Nos cuentan cómo hace miles y miles de años, dentro de una cáscara, se introdujo un hombre psicológico y que, cuando este proceso terminó, descendieron y se imbricaron en este ser humano otros principios de naturaleza superior: la entidad pensante y razonadora; también, una capacidad intuitiva de comprensión directa, rápida y segura; y además, una chispa de la Gran Divinidad bajo la forma de voluntad.",
+          "He aquí que tenemos a un ser humano con dos facetas: lo más conocido y habitual, lo que se maneja todos los días, su cáscara exterior; y aquel ser que se guardó por dentro, el hombre interior, psicológico, mental, el hombre con el que nos entendemos todos los días…, si es que nos entendemos.",
+          "Repasando lo que hay escrito desde aquellas viejísimas épocas hasta hoy, nos encontramos con que siempre se entabló una relación más o menos amistosa entre el hombre interior y el hombre exterior, la cual ha sido estudiada por muchas disciplinas y diversas ciencias.",
+          "Hemos tratado de recoger todas las fórmulas de relación exterior e interior bajo tres puntos de vista generales. Vamos a ver cómo se conectan estas dos formas humanas desde los aspectos psicológicos, religiosos y filosófico.",
+          "Comencemos por uno que nos interesa mucho: el matiz psicológico; algo del “conócete a ti mismo”, para ver con quien vivimos.",
+          "En líneas generales –y englobando todo lo que se ha dicho antes y ahora- para la psicología el hombre exterior es el cuerpo con sus órganos, las funciones de estos las actividades del organismo con sus instintos y necesidades. Funciones, impulsos y apetitos que muchas veces suelen hundir sus raíces más allá del simple cuerpo físico. Es entonces que preguntamos por el hombre interior. ¿dónde encajan estas raíces?",
+          "Tenemos un hombre interior que se manifiesta por una serie de fenómenos no estrictamente físicos –que es lo que estudia la psicología–. Pero que, sin embargo, tienen la particularidad de reflejarse sobre el hombre exterior.",
+          "Veamos cómo se reflejan.",
+          "Cuando los fenómenos son muy sencillos, simples y básicos, se muestran de manera absoluta y directa sobre el cuerpo físico. Es más, necesitan de la parte material para reflejarse, porque si en el hombre exterior no tienen apoyo, no pueden vivir, no tienen forma posible de expresión.",
+          "Tomemos algunos ejemplos.",
+          "Todos hemos oído hablar de reflejos, de instintos, sensaciones, percepciones, hábitos, etc. Estas funciones psicológicas necesitan del hombre exterior, pues sin él, no tiene cabida. Hablamos de unos reflejos que son propios del hombre como individuo, y de unos instintos que son patrimonio de la especie completa; de unas sensaciones que son los efectos primeros que recibimos en el hombre interior, porque las percibimos forzosamente a través de los sentidos. Sin sentidos no hay impresiones.",
+          "Pocas veces nos hemos detenido a analizar cómo se introducen estas percepciones dentro de nosotros mismos y cómo viven tan solo en el hombre interior; y por qué necesitan el apoyo del hombre exterior.",
+          "De manera muy primaria y simple nos llega un color, un perfume, una sensación que pasa a través de nuestras manos, un sonido. No pensamos mucho sobre ellos, nos llegan. Pero necesitamos del cuerpo –del hombre exterior– y de sus ventanas –que llamamos sentidos– para que todo esto entre en nosotros.",
+          "Pasemos a otro ejemplo.",
+          "La psicología estudia muchísimo los hábitos. Decimos que los hábitos son una manera de reproducir cada vez con mayor facilidad una serie de actos para no tener que pensar demasiado en ellos, sino que surjan espontáneamente.",
+          "Esta necesidad de estar libre, estas costumbres rutinarias que dejamos crecer en nosotros para tener una mayor libertad interior y para que nuestro cuerpo funcione mecánicamente, no pueden existir como entidad psicológica sí no poseemos un vehículo externo que les brinde apoyo.",
+          "Es útil psicológicamente el hábito de escribir a máquina con toda rapidez, porque no podemos detenernos a leer, mirar lo que imprimimos, pensar dos veces en cada palabra. Es mejor mecanizar el hecho y además dejar la mente libre. Mas es necesario un cuerpo como apoyo; de lo contrario, no podemos escribir a máquina.",
+          "Sin embargo, hay otros fenómenos psicológicos mucho más sutiles que no necesitan de una manera tan imperiosa descansar en la materia, pero se manifiestan de todas formas en el hombre físico y su comportamiento.",
+          "Cuando hablamos de sentimientos, de atención, memoria, inteligencia, imaginación, voluntad –elementos que son mucho más sutiles que un hábito o un instinto– nos damos cuenta de que ya no los podemos localizar estrictamente en un sentido, o en una de las funciones de nuestro cuerpo. Están en un más allá psicológico.",
+          "Sin embargo, inciden en nuestro comportamiento físico exterior, de tal forma que se nota cuando una hombre es atento, cuando hay atención interior, porque varía la actitud. Si estamos de pie, lo estamos de otra manera, y si sentado, con otro gesto. Hay otra postura, otra fuerza. Hay como toda una energía que recorre al hombre que está atento, e incluso su mirada se fija diferente, y todo parece estar en una expectativa de lo que pasa, o percibe, que se acoge en el interior.",
+          "Cuando el hombre tiene memoria como función simplemente psicológica, no lo reconoceremos tan solo porque pueda almacenar datos y datos en su interior. Eso es nada más que una de sus posibilidades. Nos damos cuenta porque su capacidad de recordar, de saber, de no olvidar, otorga a este hombre una seguridad en sí mismo muy grande. No es tan solo el retener una fecha o el nombre de alguien. Es sentir que podemos conservar todas las cosas que nos suceden, y experimentar seguridad en esa tranquilidad del recuerdo.",
+          "Cuando un hombre vive en sus sentimientos –aunque estos sean intangibles e insubstanciales– transfigura todo el ser con ellos. Poetas, durante cientos y cientos de años, artistas de toda índole, pintores y escultores han tratado de reflejar el rostro humano cuánto pueden variar las facciones cuando los sentimientos pasan sobre ellas.",
+          "Pero, ¿dónde pasan?",
+          "Solemos hablar del corazón que siente y aún ni siquiera sabemos exactamente dónde está situado. Mas no es exactamente el corazón que se altera; es algo que nos barre, que nos transfigura; es algo que cambia la expresión de los ojos, del rostro, que hace que las manos sean diferentes y que hablen como si cada uno de los dedos fueran palabras.",
+          "Cuando un ser humano tiene inteligencia, no encontramos simplemente la vivacidad de la respuesta, la capacidad de reaccionar rápidamente. Concurre otra cosa. Existe captación: ese hilo de comunicación que nos permite darnos cuenta de que la persona que tenemos enfrente nos comprende inmediatamente.",
+          "Hay ese algo insubstancial, algo que no tiene materia pero que, sin embargo, se refleja en el comportamiento y hace que sepamos que no estamos aislados. Hay un puente, una relación, una unión; una fuerte unión, aunque no haya materia.",
+          "Cuando en un ser humano hay imaginación, no hay tan solo una capacidad de pintar, de escribir, de hablar. Imaginación es riqueza; es poder contestar ante cada circunstancia con una palabra, no original por lo nueva, sino desconocida por lo auténtica, sencilla, íntima y sentida.",
+          "Entonces vemos brotar el río de la imaginación. No tenemos dónde localizarlo de modo tangible, pero se trasunta físicamente en una tremenda creatividad. Nos encontramos ante estos seres humanos a los que catalogamos de afortunados, seres con una gran variedad, con una gama de expresiones que nos admiran, y a quienes –a veces– llegamos a envidiar como si tuviesen el tesoro más grande del mundo.",
+          "Cuando hablamos de personas con voluntad, tampoco sabemos dónde guarda esa energía, pero sí la percibimos. Son los cuerpos físicos, los hombres exteriores, los que albergan la voluntad. Hay en ellos una entereza que parece como si todo el esqueleto –como si todo lo que hay adentro– fuese de metal, un hierro firme que mantuviese ese ser. Hay una decisión irrevocable, seguridad, capacidad de elección, responsabilidad.",
+          "Y no damos cuenta que aunque no podemos guardar en ninguna parte del cuerpo la voluntad, ésta sale al hombre exterior y lo convierte en un pequeño dios.",
+          "Vemos, pues, que todas las funciones psicológicas, internas, se transmiten al ser externo. Entre el hombre exterior y el hombre interior hay una relación innegable.",
+          "A tal punto que el hombre exterior se hace espejo del hombre interior: lo refleja, lo vive, lo exterioriza.",
+          "Nos preguntamos qué papel tiene la conciencia en todo este proceso.",
+          "Muchas veces en psicología se habla de conciencia y no sabemos qué hacer con ella, ni lo que es la conciencia, ni qué representa tenerla.",
+          "Imaginemos que la conciencia es el puente de unión entre el hombre exterior y el hombre interior. Concibámoslo como una vía que hace que se pueda pasar de uno a otro.",
+          "En otro sentido, figurémonos la conciencia como un centro. Decían algunos autores que era como la posesión de sí mismo, como la concentración, la capacidad de colocarse en el centro de gravedad humano que –por ende– estaría dentro del hombre interior y se relacionaría con el hombre exterior desde allí.",
+          "Pero, ¿qué hemos hecho nosotros de la conciencia, de esta que debería ser un centro, un eje fijo e invariable dentro del ser humano? Hemos hecho de ella un punto móvil que va de adentro a afuera, y viceversa. La conciencia está allí donde la llamamos. Si la llama el hombre interior, la conciencia se internaliza; si la requiere el hombre exterior, sale de inmediato.",
+          "¿Quién es el que la llama más? El hombre exterior.",
+          "La razón es muy simple: el hombre exterior ha sido educado para acaparar la conciencia, para exteriorizarla y minorizarla también, para tornarla cáscara y hacerla tan vacía como el hombre exterior, y para que la conciencia no pueda en ningún momento tomar contacto con el hombre interior.",
+          "Desde todo punto de vista se nos obliga a salir. Si queremos pensar no sabemos cómo hacerlo, porque en ninguna escuela se enseña a pensar. Se instruye para escribir, leer, multiplicar, sumar, dividir, restar, sacar raíces cuadradas o hacer cosas mucho más difíciles con los números. Estudiamos historia, geografía, anatomía, astronomía. Pero a pensar, a direccionar la mente, nadie aprende.",
+          "Como no sabemos pensar, nos vemos arrastrados hacia fuera cada vez que queremos, hacerlo. Cuando nos queremos meter dentro, decimos: “¿dentro de qué?, ¿dónde estoy?, ¿qué es esto?” Y ya estamos otra vez afuera. Sonidos, colores, propaganda que nos atrae y atrapa; llamadas que nos sacan al exterior. Siempre estamos en la superficie, siempre hay algo que nos lleva a lo visible.",
+          "Si salimos a la calle, todo nos traslada afuera: mucho ruido, mucha gente, muchos olores y colores. Demasiado de todo; siempre todo multiplicado.",
+          "Si estamos en nuestra propia casa, constantemente hay cosas que nos sacan de dentro, porque hemos aprendido que la vida es atender las circunstancias exteriores nada más. A fuerza de estar afuera, nuestra conciencia ha terminado por conocer perfectamente al hombre exterior, todos sus caprichos, instintos y necesidades; pero no sabe absolutamente nada del hombre interior. Y como lo desconoce, le teme.",
+          "Podríamos decir sin ningún temor a equivocarnos, que el hombre exterior ha perdido al hombre interior. Lo perdió, lo dejó en alguna parte de su camino. No sabe ya ni quién es.",
+          "Mas el hombre interior no se resigna, y llama y golpea. Por esto, desde el punto de vista psicológico, decimos que si bien se ha perdido al hombre interior, la búsqueda ancestral que viene desde el fondo de los tiempos continúa.",
+          "Ahora, hemos descubierto que cuando el hombre interior llama de manera desconocida y extraña, podemos referirnos a la parapsicología –más allá de la psicología. Hay que ir al fondo de la psicología, porque hay más porqués de los que ofrece esta ciencia.",
+          "La realidad es que la búsqueda sigue y aunque la conciencia aprendió a vivir por fuera, no se resigna a haber perdido algo que recuerda vagamente y que es su centro, su natural domicilio, el sitio donde realmente tendría que estar.",
+          "Todo esto que decimos lo expresamos desde el punto de vista psicológico. Vamos a ver ahora qué nos han dicho las religiones a lo largo del tiempo sobre esta realidad “hombre exterior – hombre interior”, porque es un tema que ha interesado enormemente a los diferentes cultos.",
+          "Si pudiésemos sumar todas las definiciones de las distintas religiones y resumirlas en una, llegaríamos a decir que el hombre exterior es el cuerpo que sirve de vehículo al alma. Este vehículo es una forma material que se toma prestada nada más que para poder soportar una serie de pruebas, y después de salir vencedores de ellas, dejarla definitivamente y reunirse con el alma, única y verdadera esencia.",
+          "Para todas las creencias, el hombre interior es el alma, que es un reflejo de Dios, pero que momentáneamente se halla atrapada por la forma material. Es decir, el hombre exterior se apodera de un modo transitorio del hombre interior, pero el primero debe pasar por una serie de pruebas para reconocer que lo único que vale es el espíritu.",
+          "Absolutamente todas las religiones nos dicen que el hombre exterior es perecedero y mortal. El viene y va. No se lo puede retener, no es eterno; es como arena que corre entre las manos. Mas todas coinciden en que el hombre interior es eterno; siempre nos aseguran que el ser oculto es de otra naturaleza, que es permanente.",
+          "Incluso hay algunos cultos que nos van a asegurar –yendo más al fondo de la cuestión– que el hombre interior permanece eternamente: no tuvo un principio ni tendrá un final. Para él es la Eternidad, aunque a veces se vista de materia y aparezca a la vida.",
+          "Así –según estas otras religiones– entraríamos a tratar el tema que en muchas oportunidades hemos tocado y que se refiere a la Reencarnación.",
+          "Según esta doctrina, el alma eterna e imperecedera toma a veces cuerpo, y cuando esto sucede recoge experiencia, desarrolla una serie de aptitudes, las guarda en su interior, saca conclusiones, resultados. Cuando termina su aprendizaje, deja el cuerpo, vuelve a su naturaleza íntima, recupera su forma real de ser. Luego descansa, toma de nuevo otro cuerpo, lleva a cabo más tareas –sobre todo en base a las anteriores–, las afirma y afianza. Termina el ciclo, se libera de la materia, reposa, y otra vez vuelve al contacto con su esencia íntima.",
+          "Siempre nos encontramos con que aparecer con cuerpo una y muchas veces es para el alma un experimento. Todas las viejas religiones nos hablan de la prueba, el dolor, el sacrificio, el tener que pasar por circunstancias difíciles. Y todo esto es por algo muy simple que podríamos explicar brevemente.",
+          "Las pruebas hacen que a través del dolor, la conciencia –aquel famoso puente, aquel famoso centro– recobre al hombre interior. Por medio de las pruebas, la conciencia puede llegar a reconocer la inmortalidad del hombre interior, y va a llegar a redimir al alma que alguna vez se incrustó en la materia, liberándola así del vehículo que la atrapa, enceguece, oscurece e imposibilita.",
+          "Las pruebas son como piedras en el camino, toques de atención, son llamadas para decir al caminante: “¡Detente! Mira un poco lo que pasa a tu alrededor. Ahora recoge tu experiencia y sigue; el dolor es apenas una enseñanza”.",
+          "Hemos encontrado siempre relaciones a peregrinaciones, a largos viajes para llegar a un punto, castigos que uno se aplica a sí mismo, penitencias, torturas, sacrificios, misterios que se realizaban en la antigüedad. Todos ellos tienen el mismo fin: reduciendo el cuerpo y las apetencias del hombre exterior, el hombre interior puede aflorar en su verdadera naturaleza.",
+          "Cuando los antiguos –especialmente los griegos de los cuales recogemos esta tradición– celebraban sus misterios, el hombre ponía su cuerpo al límite: sin dormir, prácticamente sin comer, etc. Y lo llevaba a una pureza y a una sensibilidad tal, a un afinamiento de sus necesidades materiales, que el alma se veía liberada y podía entrar en contacto con Dios a través de experiencias místicas, casi en estado de éxtasis, y con un ansia íntima de abrirse hacia adentro –que aunque parezca paradójico es como abrirse hacia fuera.",
+          "Cuando hablamos de peregrinaciones y de seres que caminaban muchos kilómetros padeciendo penurias con tal de llegar a la meta, ese fin no es tan solo un centro de adoración, un altar, una iglesia, una catedral, un templo a la religión que fuese. Esa meta es el propio hombre interior.",
+          "Cuando se termina la peregrinación lo que hay que encontrar es el Cristo que subyace dentro, la luz que está dentro. Por eso se caminaba siempre a través de las religiones con objeto de encontrar esa otra verdad.",
+          "Como decíamos al principio, en lo psicológico y también en lo religioso, la búsqueda continúa. Y sigue, porque el hombre interior no se ha podido hallar todavía por muchas razones.",
+          "Una de ellas es que las religiones –todas ellas– han sido despedazadas por la acerada crítica humana. Al hombre se le enseñó a criticar, a destrozar, a ser fiera. Se le instruyó no a partir el alimento, sino a desgarrarlo, a arrebatarlo. Y cuando ya no sirve para nada, dice que no lo quiere.",
+          "De las religiones extraemos poco –o nada– para nuestra búsqueda, porque la fe humana ha sido reemplazada por la razón. Ahora en vez de creer queremos a razonar, sin darnos cuenta de que son dos cosas absolutamente distintas. La razón sirve para un ámbito y la fe para otro. En ciertas ideas de índole espiritual, la razón es totalmente inútil.",
+          "Por esto razonamos, pero no creemos; buscamos, pero no encontramos. Además, faltan aquellos viejos sacerdotes que llevaban este nombre porque se habían constituido en verdaderos médicos para el alma: la curaban, sabían trabajar con ella. Podían comprender los problemas de este hombre interior que muchas veces está abandonado sin que nadie le atienda.",
+          "No habiendo sacerdotes médicos del alma, los que nos llamamos fieles, dejamos de serlo. Como no existen ni sacerdotes ni fieles, la búsqueda continúa.",
+          "Ante esta situación comprendemos que resta un solo paso para llegar a la negación del hombre interior. Si las religiones no nos hacen caso, si los sacerdotes no nos satisfacen, el hombre interior –al que no podemos encontrar– – no existe.",
+          "Si el hombre interior no existe, el alma tampoco. Si el alma no existe, la inmortalidad menos. Y si la inmortalidad no existe, Dios muchísimo menos.",
+          "Por lo tanto al encontrarnos con la gran cantidad de ateísmo que prolifera sobre el mundo, pensamos que lo milagroso es que todavía no haya mucho más, pues es una consecuencia totalmente natural de una situación donde nada sirve, todo se razona, donde ya nada está situado en su lugar.",
+          "Hay personas que de manera particular e individual intentan una búsqueda místico-religiosa, en base al conocimiento, a la meditación, a la oración; una búsqueda basada en perfumes, colores, lectura de viejos libros, tomarse de las manos y convocar a los dioses.",
+          "Existe una añoranza en el interior de todos los seres vivos de una Religión –así con mayúscula– que cubra todas las heridas interiores que nos hemos venido haciendo a través del tiempo. Una Religión que restaure todos estos dolores que cultos múltiples han generado en nuestros corazones.",
+          "Todos evocamos una Religión grande que cumpla su función de religar, de reunir, de volver a unir lo que alguna vez estuvo ligado: el hombre exterior con el Hombre Interior; o lo que es lo mismo, el Hombre consigo mismo. Al hombre con los demás hombres –que ahora se amontonan, pero no están unidos. Al hombre con Dios –que ahora tiene grandes casas, pero nadie cree ya en Él.",
+          "Esta es la Religión que en el fondo todos añoran, y por eso decimos que la búsqueda continúa.",
+          "Vamos a enfocar ahora esta cuestión desde el punto de vista filosófico, que por lo mismo que es filosófico –en Nueva Acrópolis llamamos Filosofía al “amor al conocimiento”, según la antigua tradición– es un aspecto que engloba al psicológico, al religioso, al moral y a toda aquella consideración que podemos entablar sobre el hombre interior y el hombre exterior.",
+          "Unificando todas las filosofías, podemos decir que el hombre exterior es una ilusión. Muchas corrientes ideológicas han explicado este concepto de ilusión. Ilusión es algo que no es que no exista, no es que no esté ahí, sino que simplemente no dura, no perdura a través del tiempo, no tiene existencia eterna.",
+          "El cuerpo exterior participa del estado de ilusión: tiene existencia relativa. Es como las limaduras de hierro que se juntan bajo el fuerte impulso del imán. El imán es el hombre interior; las limaduras de hierro son el hombre exterior.",
+          "Entonces, el hombre interior sí es real, es lo único que existe. Siendo lo realmente verdadero utiliza al hombre exterior para reflejarse, expresarse y plasmarse a través de él. Pero lo que “existe” es lo que está adentro, lo cual se refleja en nuestros comportamientos.",
+          "Cuando a veces catalogamos a los seres humanos como “vacíos” e intranscendentes es porque duerme el hombre interior. No es que no esté, sino que está adormecido. Cuando hablamos de un personaje lleno de vida, es que tiene el manantial interior vivo, que brota, que se nota y se expresa a través del hombre exterior.",
+          "Decíamos que el hombre exterior es reflejo del hombre interior. Yo me atrevo a decir que sí y no. El hombre exterior se transforma como en un espejo que mira hacia adentro, recoge imágenes y las refleja. En tal caso sí que el hombre exterior es la estampa del hombre interior, porque ambos existen.",
+          "Mas cuando no hay hombre interior, cuando duerme, ¿qué va a reflejar el de afuera? Nada. Entonces la figura material toma imágenes del medio ambiente en lugar de captarlas de su espíritu. Proyecta todo lo que viene de afuera: las modas, circunstancias, casualidades.",
+          "Por eso cambia y cambia; es completamente variable, estúpidamente móvil, aunque se crea poderosamente libre. No refleja nada de adentro, el símbolo viene del exterior. Se podría decir: “Con verte, es fácil saber dónde vives, quiénes son los seres que te rodean, porque tu eres el reflejo de todos ellos”.",
+          "Aquella tan mentada afirmación de que un cuerpo bello representa un alma bella es cierta a veces, pero no siempre.",
+          "Una apariencia agradable también puede pertenecer a un ser vacío que dedica todo su tiempo a cuidar su vehículo material. Entonces lo tiene bastante bien, porque lo mima, lo lava, le da muchas vitaminas, masajes, toma el sol, va a la playa, mucho médico, etc. Por todo ello, ¡claro!, lo tiene estupendamente.",
+          "La realidad es que es una hermosísima cáscara que si la sacudiésemos, no tendría absolutamente nada. Es el típico rostro bonito que cuando queremos mirarlo para ver qué surge desde adentro, no sale nada, porque no hay nada.",
+          "De la misma manera, no podemos asegurar que un cuerpo de estos que llamamos feo tenga que tener por fuerza un alma oscura. Puede ser feo porque está enfermo y gastado; porque ha vivido y actuado.",
+          "Mas hay cuerpos que si los vemos nada más en una fotografía, nos parecen poco agraciados, y sin embargo, al tenerlo delante, sale a través de ellos una fuerza, un impacto, una vitalidad, un encanto tan irresistible, que no podemos dejar de decir “tiene algo especial”. Ese “algo especial” es lo que está vivo, lo que está dentro.",
+          "De la misma forma, nos atrevemos a asegurar que cuando hablamos de hombres malos, de seres que hieren, matan, destrozan, roban, violan, son personas que no reflejan su ente interior, porque este está dormido. Son seres que viven nada más que del exterior, de los instintos, de la fuerza de provocar malas intenciones que no pueden controlar. Son personas que no se respetan a sí mismos y por consiguiente no respetan a los demás; que destruyen porque en su desesperación por no encontrarse, hacen como los niños: romper los juguetes para ver si adentro hay un secreto.",
+          "Estos hombres rompen y destrozan, porque en el fondo están buscando algo dentro del juguete que para ellos representa la vida.",
+          "Cuando hablamos de hombres buenos, es que estamos en presencia de aquellos que tienen su ser exterior perfectamente armonizado y dirigido por su ser interior.",
+          "El problema humano reside en que el Hombre Interior duerme, y nos preguntamos qué podemos hacer para despertarlo.",
+          "Vamos a suponer que el Hombre Interior es un prisionero que llevamos dentro, encerrado en los barrotes de nuestra propia materia. Le hemos fabricado una extraordinaria y fortísima cárcel día tras día. Para llegar a él necesitamos internalizar la conciencia, que ésta pase a través de las rejas de su celda, y lo despierte.",
+          "Hay que tener cuidado, porque adentro está muy oscuro, es un caos, porque nunca se prestó atención a este ser interior. Habrá que tener paciencia y cuidado para volver a dar un poco de luz, de orden; para aceptar –ante esta realidad que se acaba de iluminar– los propios errores, los defect6os, las incomprensiones, las angustias, las ignorancias.",
+          "Una vez aceptado todo lo anterior, hay que tomar la firme resolución de comenzar a trabajar con este ser de la misma manera que actuamos con el hombre exterior todos los días, desde que nos levantamos hasta que nos acostamos.",
+          "Sobre todo hace falta la dosis de valentía necesaria, para en medio de este mundo tan tremendamente materializado, poder decir: “Yo salgo en busca de mí mismo; yo voy en busca de mi Yo Interior; abriré mis propios barrote y trataré de encontrar la Realidad que duerme en el fondo”",
+          "Una vez despertado el Ser Interior, ¿cómo lo alimentaremos? Ningún ente vive si no se le nutre.",
+          "Hemos aceptado que para que el hombre exterior viva hay que darle de comer varias veces al día, y no cualquier cosa, sino los artículos sanos, limpios, puros, aprobados, sin contaminación, etc.",
+          "Con el Hombre interior debemos tener el mismo cuidado. Alimentarlo psicológicamente con los mejores sentimientos. Nutrirlo mentalmente con las mejores ideas. Sostenerlo espiritualmente con una fuerte dosis de fe exente de toda duda, de toda desesperación; una fe íntima, profunda, sincera y natural.",
+          "Y hay que tener muchísimo cuidado con los contaminantes.",
+          "Los malos sentimientos y las bajas pasiones nos enferman el ser interior. Las malas ideas, las dudas progresivas, los razonamientos estériles quebrantan nuestra capacidad de razonar. La falta de fe, la frialdad interior y la creencia en el hombre como ser absoluto y único en la naturaleza, destroza, destroza al pobre espíritu que ya bastante prueba tiene con tener que vivir dentro de un cuerpo.",
+          "¿Cómo educar al Hombre Interior? No se lo educa desde abajo –puesto que no es el hombre exterior el que le educa, sino desde arriba.",
+          "Le educa y modela la fuerza más grande de que dispone el ser humano: la voluntad. Mas como muchas veces no disponemos de esta virtud, porque no la hemos desarrollado, vamos a utilizar los substitutos que tenemos al alcance de nuestra mano: la paciencia, la perseverancia y la fe. Con estos tres elementos es casi como si obrásemos con la voluntad, así encaminar poco a poco a este ser oculto al que tuvimos tato tiempo descuidado.",
+          "El hombre interior –como el exterior– no crece en un día. Tenemos paciencia con un pequeño bebé, porque sabemos que en la torpeza de hoy está la habilidad del mañana. Debemos ser tolerantes con nuestro ser interior porque en él está la grandeza del mañana. Necesitamos tiempo para dedicarle día a día un poco de tiempo, para que se nutra, para que se expansione entre en contacto con nosotros.",
+          "Entonces podremos asegurar que la búsqueda continúa, puesto que estaremos detrás de este prisionero que subyace dentro de nosotros y que necesitamos liberarle.",
+          "Cuando este Hombre Interior salga, podemos llegar a sentir por un instante que un enemigo se ha levantado dentro nuestro. Un enemigo moralizante, filósofo, creyente.",
+          "Él no dice que los instintos, pasiones, necesidades haya que erradicarlas por completo, sino darles su justo lugar, otorgarle la cantidad de energía justa para que otro tipo de manifestaciones humanas también tenga cabida, con objeto de no ser un instinto que camina, un trozo de pasión que pasa por la vida sin hacer absolutamente nada. Y para que nuevas y mejores expresiones también puedan salir a través del hombre exterior.",
+          "Yo quisiera rogarles –a ustedes amigos que me escuchan con tanta paciencia– que hoy se levanten de sus sillas sintiéndose inmensamente ricos, felices. Con la riqueza y la felicidad que supone el saber que llevamos al Hombre Interior con nosotros y que lo tenemos, que no está perdido. Saber que hemos encontrado al amigo que tuvimos mucho tiempo abandonado, pero que es nuestro íntimo amigo a través del tiempo.",
+          "Escuchémosle. El hablará con nosotros, nos contactará lo que sabe desde el infinito, nos comentará acerca de la vida, del universo y de los hombres. Nos dirá por qué vivimos…",
+          "Entonces, cuando este amigo se haya levantado dentro de nosotros, llamaremos al hombre exterior y le diremos: “Tú, que no estás solo, sal y actúa en el mundo”.",
+          "Notas",
+          "[1] Nota del Editor: el presente texto muestra la transcripción de la conferencia dictada por Delia Steinberg en 1980. No hemos corregido el término genérico “hombre” por otro más propio actualmente del lenguaje inclusivo, para reflejar con más exactitud el original. Asimismo hemos respetado el uso de la mayúscula en conceptos abstractos y/oascendentes."
+        ],
+        "featured": true,
+        "gallery": []
+      },
+      {
+        "slug": "simbolismo-de-la-escalera",
+        "title": "Simbolismo de la Escalera",
+        "author": "Redacción Nueva Acrópolis",
+        "date": "25 de septiembre de 2023",
+        "readingTime": "3 min",
+        "category": "Simbolismo",
+        "excerpt": "La escalera, presente en todas las culturas, encarna la ascensión hacia el conocimiento y el reencuentro con la Unidad: del Egipto antiguo a la escala de Jacob.",
+        "image": {
+          "src": "/img/articulos/simbolismo-de-la-escalera.webp",
+          "alt": "Escalera de madera ascendente sobre fondo claro",
+          "credit": "Ricardo Gomez Angel"
+        },
+        "body": [
+          "La escalera es un símbolo que aparece con mucha frecuencia en la iconografía universal de todos los tiempos. Engloba las ideas de ascensión, gradación y comunicación entre los diversos niveles de altura y verticalidad. Es el símbolo de la progresión hacia la sabiduría, de la ascensión al conocimiento y la transfiguración. Si sube hacia el cielo, trata de alcanzar el conocimiento del mundo divino, y si penetra en el subsuelo, es la búsqueda del saber oculto, de las profundidades del inconsciente. Al igual que la escala, la escalera simboliza la búsqueda del conocimiento, tanto exotérico (la subida hacia la luz o apertura), como esotérico (la bajada a lo oculto y los misterios del ser).",
+          "En el sistema jeroglífico egipcio, la escalera es un signo determinativo para el acto de subir y entra en la composición de uno de los epítetos de Osiris, a quien se invoca como “el que está en lo alto de la escalera”. También su esposa Isis lleva en muchas ocasiones como atributo sobre su cabeza una escalera de tres peldaños por los que nos invita a subir para alcanzar el cielo. Los escalones que representaban los egipcios solían ser nueve ‒el triple ternario‒, símbolo de los dioses de la enéada que, con Osiris, completaban el diez que cierra el ciclo de retorno a la Unidad primigenia. En muchas tumbas egipcias se han encontrado amuletos en forma de escaleras de mano, y en “El Libro de los Muertos” se dice: “Está ya colocada mi escalera para que pueda subir a ver a los dioses”. Los egipcios conocían perfectamente este símbolo de ascensión, y las pirámides son básicamente una analogía de la escalera, lo que es particularmente evidente en el caso de las pirámides escalonadas. En la antigüedad egipcia se representaban barcas que llevaban en el centro ‒a guisa de mástil y velamen‒ una escalera de siete o nueve peldaños que simbolizaba la última y final ascensión del alma hacia las estrellas, en las cuales se confundía al unirse con la luz de Amon-Ra; estas son las Barcas de la Escalera del Cielo, símbolos de la ascensión del alma al abandonar el cuerpo que la envuelve en la Tierra.",
+          "La escalera es también uno de los símbolos más notables del culto a los antepasados. Formas emparentadas con la escalera son los montes sagrados o las construcciones arquitectónicas con escalones, como los zigurats mesopotámicos o los teocallis de la América precolombina. Se refunden así dos símbolos: el del templo-montaña y el de la escalera, significando que todo el cosmos es una vía de ascensión y de vuelta hacia lo Uno, hacia el Espíritu Original.",
+          "En los misterios de Mitra, la escalera ceremonial tenía siete escalones, siendo cada uno de un metal diferente (como lo eran, figuradamente, los planos del zigurat). Según el Zohar, la cima de la Escala de Jacob se perdía en las mansiones del cielo. Y según la tradición islámica, Mahoma tuvo la visión de una escalera por la que los justos subían al paraíso.",
+          "En el arte y el pensamiento románico, la escalera es el símbolo de la relación entre el mundo superior y el terrestre, pero no hay que olvidar que, desde el punto de vista espacial, los puntos que señalan los mundos no son dos, sino tres, pues hay que agregar el mundo inferior del Hades o submundo. En definitiva, la escalera es un símbolo ascensional clásico, que designa no solamente el acceso al conocimiento, sino una elevación integrada de todos los seres hacia sus orígenes, hacia la Unidad."
+        ],
+        "gallery": []
+      },
+      {
+        "slug": "el-reto-de-la-convivencia",
+        "title": "El Reto de la Convivencia",
+        "author": "Redacción Nueva Acrópolis",
+        "date": "15 de septiembre de 2023",
+        "readingTime": "30 min",
+        "category": "Filosofía práctica",
+        "excerpt": "El ser humano es un ser social, pero su historia está marcada por el conflicto. ¿Qué puede aportar la filosofía para aprender a vivir juntos y en libertad?",
+        "image": {
+          "src": "/img/articulos/el-reto-de-la-convivencia.webp",
+          "alt": "Grupo diverso de personas conviviendo en un espacio público",
+          "credit": "Levi Meir Clancy"
+        },
+        "body": [
+          "Antes que nada quiero aclarar que hablaremos desde el punto de vista filosófico y trataremos de hacer honor a lo que siempre han sido las escuelas de filosofía y los filósofos en la antigüedad.",
+          "Siempre han estado muy imbricados en su entorno, en su momento social. De ninguna manera la filosofía ha sido algo alejado de la ciudad, del ciudadano, de los problemas sociales. Desde que tenemos noción –por lo menos en nuestra parte occidental, en cuanto a la filosofía occidental se refiere–, los filósofos y las escuelas de filosofía siempre han estado imbricados en su entorno, les ha interesado el ser humano, fundamentalmente. Les ha interesado todo aquello que ha formado parte de la vida del ser humano y por tanto el tema de la convivencia es un tema altamente filosófico.",
+          "En estos momentos tenemos la tendencia a especializarnos, a separar todas las ramas del conocimiento y hoy diríamos que tal vez serían los sociólogos los que tendrían que ocuparse de este tema, pero nosotros pensamos que como filósofos tenemos algo que decir. Porque como he dicho al principio, para nosotros la filosofía es, al igual que en las escuelas clásicas, una ciencia y un modo de vida. Esto lo voy a aclarar brevemente: nunca ha habido una separación entre la teoría y la práctica. Nunca, en las escuelas de filosofía clásicas, se ha separado una vida intelectual de una vida moral, de una vida práctica. Nosotros no somos una escuela clásica de filosofía, somos una escuela a la manera clásica. Y como somos “a la manera clásica” queremos retomar estos viejos conceptos de tratar de reflexionar, de hacer una introspección válida para llegar a conclusiones positivas, y al mismo tiempo tratar de llevar todas esas conclusiones –que consideramos válidas– a la práctica, a la vida cotidiana. Por eso, nos autodefinimos como escuela de filosofía a la manera clásica.",
+          "Vamos a entrar en el tema que voy a tratar de tocar brevemente, para luego poder dialogar, algo muy clásico y muy filosófico también, para tener un tiempo de diálogo donde poder exponer preguntas, otros puntos de vista, razonamientos y poder compartir entre nosotros una serie de ideas, de “logos” complementarios y ahí entrar en la faceta del diálogo, que también enriquece a todos los seres humanos.",
+          "De entrada lo que podemos decir es algo obvio, que nadie pone en duda y nadie puede negar: el ser humano es un ser social. Somos seres sociales. No sabemos muy bien el origen de las sociedades; y no lo sabemos porque, por más que vayamos atrás en el tiempo, por más que tengamos descubrimientos cada vez más antiguos acerca del origen de los seres humanos, nos vamos a encontrar con que los seres humanos, desde sus inicios, ya viven en sociedad, ya forman agrupaciones humanas. Sin ir más lejos, aquí en España nosotros tenemos el yacimiento prehistórico de Atapuerca, y estamos hablando de cientos de miles y tal vez millones de años de antigüedad. Pero estos humanos o restos de humanos que estamos encontrando en Atapuerca ya viven en comunidad, ya son seres sociales. Tal vez será porque los “cachorros” humanos necesitan de la protección de la familia. No somos como el resto de los animales que en muy poco tiempo pueden valerse, más o menos, por sí mismos.",
+          "No sabemos la causa, pero el hombre es un ser social. Aun aquellos anacoretas de la zona de la Tebaida, en Egipto, que querían estar solos, no estaban tan solos. Eso es lo que ha quedado un poco en la mitología o el folklore: personas subidas en enormes columnas, para estar más cerca del cielo. Pero lo que a veces no sabemos es que tenían toda una corte de admiradores alrededor. Cuando hacía falta les subían comida y bebida y esperaban que, de vez en cuando, tuvieran una inspiración y todos pudieran beneficiarse de las palabras de esa persona santa que había renunciado al mundo y estaba tan cerca del cielo.",
+          "Así es que nos encontramos con que el hombre es un ser social.",
+          "Pero la historia de nuestra convivencia es una historia de conflictos. Podríamos escribir la historia de la humanidad a través de las guerras que en el mundo han sido. Hemos de reconocer que no podemos estar los unos sin los otros, pero que eso a su vez nos provoca una serie de conflictos, grandes conflictos. Posiblemente, si ahora cada uno de nosotros pensara sobre sus propios problemas, llegaríamos a la conclusión de que nuestros grandes problemas están provocados por la relación con otros seres humanos. Sea en el ámbito laboral del trabajo, sea en el ámbito sentimental, sea en el terreno que queramos, posiblemente ahí esté la fuente de nuestros problemas.",
+          "No hace falta hacer todo un repaso histórico que nos llevaría mucho tiempo; ahí están los documentales y los libros de historia. Pero para tratar de definir cómo hemos llegado hasta aquí o en qué punto nos encontramos, me permitiréis que hable brevemente de dos cosas.",
+          "Para entender nuestro siglo XXI, primero quiero hablar de la modernidad y sobre todo del período comprendido entre 1880-1914. Ese fue el esplendor del mundo occidental. Éramos los dueños y señores del mundo. Los científicos habían rediseñado nuevos conceptos para interpretar el mundo. En el mundo de la cultura, la música, la literatura se creaban nuevos lenguajes. Los filósofos creían que habían descubierto verdades irrebatibles e inconmovibles. O sea, todo el mundo vivía en una era de paz y esplendor. La máquina estaba dando sus frutos; todos esperaban que en poco tiempo lo que iba a venir era el paraíso celeste, pero aquí en la tierra. Sin embargo, en 1914 llegó la Primera Guerra Mundial. Esto fue un shock tan terrible que los europeos todavía no se han recuperado, porque fue una caída desde la altura. Cuando Europa estaba en lo más alto y en su esplendor, cuando dominaba el mundo, intelectual y materialmente, vino la Primera Guerra Mundial. Nadie creía que los seres humanos eran capaces de semejantes atrocidades. Porque la realidad de la Primera Mundial fue de millones de seres humanos muertos, toda una generación de jóvenes desaparecida en el barro de la tierra francesa, ciudades arrasadas, bombardeos masivos, la utilización del gas, etc. Esto fue terrible para la mentalidad occidental y europea. Nadie pensaba que el ser humano fuera capaz de semejantes atrocidades, y al poco tiempo la Segunda Guerra Mundial…",
+          "Esto por un lado; por otro lado, hemos de reconocer como filósofos, como amantes del conocimiento, que la democracia no ha solucionado los problemas de convivencia. Tenemos que hacer un examen de conciencia en este punto. Los sistemas en sí no son ni buenos ni malos, depende de la gente que conforma esos sistemas. Si somos veraces y consecuentes con nosotros mismos, estamos en un momento donde el producto interior bruto mundial crece año tras año; sin embargo, la pobreza también crece años tras año.",
+          "Cada vez hay más riqueza en el mundo, pero también cada vez hay más pobres. Cada año que pasa, son casi 200 los países que vulneran los derechos humanos. Estos son informes emitidos por la ONU. Nos encontramos con que una democracia que pretendía un liberalismo intelectual y político, en lo que se ha convertido es en una economía de mercado. Y hoy decir democracia es igual a decir libertad de mercados, y es igual a decir que lo que rige es la ley de la demanda y la oferta. O sea, que todos tenemos derecho a producir y a consumir y tenemos, justamente, metidos en la cabeza que esa es la gran libertad, a la que nos ha llevado nuestro momento actual en el terreno de la política. Claro, hay que recordar que nuestra democracia es la evolución de la República que apareció con la Revolución Francesa.",
+          "Estamos donde estamos porque nosotros no somos herederos tampoco de esa democracia griega que nos quieren vender como que fue el antecedente. La democracia griega duró apenas 100 años y solo fue en un pequeño territorio de Grecia. Nuestra democracia es una evolución del concepto de República que aparece en la Revolución Francesa, donde recuerdo que ya se publicaron los derechos del hombre y del ciudadano, en 1789 [1] . Nuestros actuales derechos humanos han visto la luz, han sido abiertos al gran público y fueron aprobados después de la Segunda Guerra Mundial.",
+          "Cuando hablamos de la República estamos hablando de que lo que importa es la cosa pública, la Res Publica , el bien común. Y esto era necesario para limitar el poder de los Estados que hasta ese momento tenían a los ciudadanos en un puño; había privilegios, había favoritismos…",
+          "Entonces, tenemos toda esa Revolución Francesa y aparece el Estado de derecho, donde se trata de que el ciudadano sea juzgado por la Ley y no por la fuerza; no por la ley del más fuerte, sino por la Ley. Todo esto ha ido derivando a nuestras democracias actuales.",
+          "Pero hemos de reconocer que la democracia no es un producto acabado; tiene que mejorar, tenemos que mejorar. Hay un gran margen de mejora y como no es un producto acabado tampoco ha solucionado los grandes problemas que tiene la humanidad y la sociedad; entre ellos el problema de la convivencia, que sigue siendo un gran problema, como habíamos dicho.",
+          "¿Qué podemos hacer? Llegados a este punto, ¿qué puede ofrecernos la filosofía cuando hablamos de la convivencia? Siempre las escuelas de filosofía han tratado de mejorar al ser humano y el mundo en el que vive. Y nos han dicho que deberíamos tener en cuenta tres grandes principios en nuestra vida.",
+          "Uno de los principios de los que nos van a hablar consiste en trabajar la parte interna del ser humano, para que el ser humano pueda ser mucho mejor de lo que es; para que el ser humano pueda avanzar y crecer internamente. Desarrollar una serie de valores internos, una serie de facultades, de virtudes, de potencias, que le haga poder comprender y entender mucho mejor a la Naturaleza. Trabajar de acuerdo con la Naturaleza y vivir de una forma mucho más natural.",
+          "Esa sería una de las patas del trípode en el que se apoyaría la filosofía de todos los tiempos; para explicarnos que nosotros sí podemos hacer algo frente a este estado de cosas. Nos diría que esto es necesario para que el ser humano realmente pueda disfrutar de su libertad, pueda disfrutar de su capacidad de raciocinio y de su capacidad de elección.",
+          "Para eso tendríamos que crecer internamente como seres humanos, porque solo podríamos ser realmente libres si empezamos a descubrir al ser humano interno que todos llevamos adentro y empezamos a darnos cuenta de que todos podemos ser mucho mejores de lo que somos. Podemos ser mucho más fuertes de lo que somos, podemos ser mucho mejores de lo que somos.",
+          "Otro punto importante para la filosofía es que nos diría que no debemos encerrarnos en una sola forma de pensamiento o de conocimiento, sino que para todo ser humano es importante el conocimiento comparado. Es importante tratar de alcanzar un eclecticismo, basado en el estudio comparado del otro. Hoy se habla mucho de la “otredad”, es decir, de la otra persona, de otros tipos de cultura, de otros tipos de pensamiento, de otras formas científicas, filosóficas, religiosas y políticas. Porque si solo nos quedamos anclados en un conocimiento limitado, pequeño, no vamos a ser capaces de ver en su totalidad, en conjunto, desde todos los puntos de vista, los problemas que nos aquejan, en este caso el gran problema de la convivencia. Esto conseguiría que el ser humano, que está acercándose trabajosamente hacia ese eclecticismo del que estamos hablando, ese ser humano sería mejor realmente, porque podría conocer y comparar formas diferentes a la suya; algo muy necesario para la convivencia: conocer otras formas diferentes.",
+          "Y por último, nos hablarían de un principio y de una finalidad; tal vez el más importante de todos, que estaría relacionado con la fraternidad ‒que es lo más difícil de alcanzar‒, porque se trata de una verdadera hermandad, de corazón, sin tener en cuenta una serie de características que la mayoría de las veces, o todas las veces prácticamente, son provocadas por el nacimiento. Por ejemplo, la religión a la que pertenecemos ‒si todos nosotros hubiéramos nacido en Egipto tendríamos otra religión ahora mismo‒, el sexo que tenemos, la clase social a la que pertenecemos, las ideas políticas que tenemos, la raza, el color de piel, todo eso no tiene mayor importancia cuando estamos hablando de la fraternidad, de la verdadera fraternidad.",
+          "Con esos principios, que son fines al mismo tiempo, la filosofía tradicional antigua, natural, siempre ha tratado de que el ser humano sea capaz de solucionar uno de los mayores y fundamentales problemas que tenemos, la convivencia; ser capaces de vivir juntos y en libertad, que esa es la definición de la democracia que acuñó la República. Se trataba de conseguir un sistema donde todos pudiéramos vivir juntos y en libertad.",
+          "Pero es un sistema, como habíamos dicho, no totalmente evolucionado; todavía tenemos que dar algunos pasos en esa dirección. El profesor Livraga ‒para mí el mejor filósofo del siglo XX y que tenía una manera muy clara y sencilla de explicar las cosas, de llegar a la gente‒, explicó, en varias ocasiones, que el gran problema de nuestro tiempo es el desconcierto en cuanto a fines y principios. Es decir, en nuestras sociedades actuales no tenemos muy claro de dónde venimos ni a dónde vamos, ni por qué hacemos las cosas. Solía explicar de forma muy pedagógica que imagináramos a nuestro mundo y nuestra sociedad como si fuera un tren expreso que va a alta velocidad por unos raíles. Pero nadie sabe dónde comenzó ese viaje, dónde empiezan esos raíles y nadie sabe dónde van a acabar tampoco. Nadie sabe a dónde vamos. No hay que ser un gran especialista para darnos cuenta de que si nuestro mundo se basa en el crecimiento interior bruto y en la explotación de los recursos de la tierra y de las materias primas, alguna vez esto se va a acabar. No hay que ser un fenómeno económico para darse cuenta de esto. ¿A dónde va nuestro tren? ¿A dónde va nuestro mundo?",
+          "Él explicaba que en ese tren hay dos vagones, uno de primera clase y otro de segunda. En el de primera van los que pueden pagarse el billete de primera. Y en segunda van los que no pueden pagarse el billete de primera, los de segunda. De vez en cuando se cambia al que conduce el tren. Se hacen votaciones, elecciones y cambian al maquinista, pero el maquinista tampoco sabe a dónde va el tren. Lo único que puede hacer es ir un poco más rápido o un poco más lento, hacer sonar las sirenas, si eso le gusta, soltar pitidos… y nada más. A unos les prometen: “¡Tranquilos! No armen demasiado escándalo ni protesten mucho, que es cuestión de tiempo que los de segunda pasarán al vagón de primera, sin duda”. Y a los de primera les prometen: “En cuanto podamos nos vamos a librar de los de segunda, porque molestan mucho y a los de primera clase les molestan ciertas voces.”",
+          "Así explicaba cómo era la realidad de nuestro mundo, donde hay un gran desconcierto en cuanto a fines y principios. ¿Por qué la filosofía en que nos basamos podría ayudarnos en todo esto? ¿Por qué la filosofía podría solucionar este estado de cosas? Vamos a recurrir a un símbolo, para explicar esto, si bien desde el punto de vista filosófico hay otras maneras de explicarlo. Sabemos que los viejos alquimistas relacionaban los cuatro elementos: tierra, agua, aire y fuego con estados de la naturaleza. Por ejemplo, relacionaban la tierra con el mundo físico, evidentemente; relacionaban el agua con el mundo energético y vital; relacionaban el aire con el mundo psicológico y relacionaban el fuego con la mente. El fuego siempre ha estado relacionado con la mente. Este símbolo es muy importante para nosotros, porque nosotros somos seres humanos, lo que significa que somos seres con fuego, seres con mente. Cuando nosotros decimos “yo soy un ser humano”, lo que estoy diciendo es “yo tengo mente”, que viene de la raíz del sánscrito Manas . Yo tengo mente, es decir, soy hu-mano. Estoy diciendo al mismo tiempo: “Yo tengo fuego; yo soy un fuego, porque tengo mente”. En la antigüedad todos los pueblos sabían que ese fuego del que disponen los humanos no es un fuego cualquiera, no era el fuego material, el fuego con el que cocinamos, el fuego que usamos para iluminarnos por la noche. No; era el fuego de los dioses. En casi todas las mitologías y religiones antiguas, y de una forma más acabada en la Grecia Antigua, lo que vamos a encontrar es que los dioses nos dieron su fuego, el fuego divino. Ese fuego, entonces, está dentro de cada ser humano.",
+          "Y siempre se ha relacionado con la convivencia. La zona de la que yo vengo antiguamente formaba parte del reino de la Corona de Aragón. Hace muchos años tuve que hacer un trabajo de investigación. En los archivos de la Corona de Aragón, muchos documentos estaban en latín, o en catalán o en valenciano antiguo. En documentos de alrededor del 1200 es muy curioso que cuando están hablando de pueblos, lugares, villas, no dicen “hay diez casas” o por ejemplo, “hay 40 familias en 40 casas”… No dicen eso. La expresión literal tanto en latín como en catalán y valenciano es “en tal pueblo hay 40 fuegos ”. De ahí viene la palabra hogar: de la palabra fuego. Es decir, que cuando hablamos de fuego, inevitablemente estamos hablando de convivencia: los seres con fuego, los seres humanos, nos reunimos alrededor del fuego, en círculo o en líneas, porque al fin y al cabo lo que reúne a los seres humanos, de una o de otra manera, siempre es el fuego. Si pensamos en las características del fuego, caeremos en la cuenta de que además de otras muchas, el fuego nos da luz y calor.",
+          "Calor y luz en el mundo físico equivalen en el mundo metafísico al amor y al conocimiento. El calor del fuego en este plano de la vida, en este mundo vibratorio físico, ese calor en el mundo metafísico es amor. Por eso nosotros, cuando realmente amamos, notamos un calor interno, un fuego que se activa. Y la luz, la luz que da el fuego en el mundo físico, en el metafísico es conocimiento.",
+          "De ahí que los humanos, los seres con mente, cuando se reúnen entre ellos y comparten su fuego, es para ser cada vez más humanos, o sea, tener más calor y más conocimiento. Pero ese amor al conocimiento, ese amor a la sabiduría eso es lo que significa filosofía: amor al conocimiento. Luego, la filosofía tiene mucho que decir cuando hablamos de la convivencia, cuando hablamos de compartir entre los seres humanos aquello que precisamente nos dignifica y nos mantiene de pie, como es el fuego.",
+          "Cada vez que podemos, no perdemos la oportunidad de aclarar que el filósofo es un buscador. El filósofo no es un sabio, no es un Sophos; es un Filo – Sophos . No tenemos la sabiduría, la verdad última. Lo que nosotros hacemos es buscar ‒porque eso es filosofía, como decía Platón, buscar lo que nos falta‒, y los seres humanos, los que tenemos mente, nos movemos en busca de lo que no tenemos, precisamente. Nosotros buscamos, buscamos saber, porque no sabemos.",
+          "Esto es fundamental para la convivencia; porque en una verdadera convivencia todos aquellos que entren en contacto con nosotros deberían llevarse un poco más de calor, un poco más de conocimiento, menos oscuridad y menos frío; eso es filosofía precisamente. La filosofía, entonces, está muy relacionada con el fuego y con los humanos. Casi podríamos decir que es el estado natural del ser humano: buscar aquello que no tiene, porque lo que ya tenemos no lo vamos a buscar.",
+          "Y llegados aquí, ¿qué elementos fundamentales considera la filosofía que deberíamos tener en cuenta a la hora de convivir, en lo que llamamos la convivencia? Por encima de todas las cosas tenemos que empezar por la Justicia. Si queremos mejorar y avanzar en cuanto a convivencia humana debemos tener en cuenta la Justicia. La definición clásica de Justicia, era dar a cada cual lo que le corresponde, según sus actos y naturaleza. Dar a cada cual lo que es suyo. Pero hay que tener en cuenta qué hace esa persona y quién es el que lo hace. Porque no es el mismo delito el que realiza una persona menor de edad, o sea inconsciente, o que no ha sido educada lo suficiente; no es el mismo delito robar 100 euros, que un ministro robe 100 millones de euros; evidentemente no es lo mismo. Una verdadera justicia tiene en cuenta no solo qué hacemos sino quién es el que hace eso, y por encima de todas estas cosas, también debe tener en cuenta el factor humano.",
+          "El factor humano es fundamental cuando hablamos de justicia, y el factor humano se compone de dos elementos, la condición humana y la dignidad humana. Esto conviene no olvidarlo. Cuando hablamos de la condición humana nos referimos a esas cosas que hemos traído a la vida y las que nos han ido educando y nos han ido incorporando poco a poco. Esas cosas que tenemos en nosotros más bien son una materia opaca, donde todo está mezclado, lo bueno y lo malo, lo alto y lo bajo, lo largo y lo estrecho. Es la naturaleza humana, donde a veces hacemos cosas que no deberíamos hacer, pero la naturaleza humana no puede evitar hacerlas, comer chocolate por ejemplo, o fumar un cigarrillo, etc.; cada uno de nuestros pequeños vicios… No hablemos de los grandes, que también es la naturaleza humana, al fin y al cabo; pero nuestros pequeños vicios eso está marcado por la naturaleza humana: somos así, se nos van los ojos, se nos van los pies, se nos van las manos, porque es la naturaleza humana.",
+          "Pero hay que tener en cuenta que también hay algo en nosotros que es como el fuego. Es vertical. ¿Habéis visto el fuego? Aunque lo inclinemos, cuando encendemos una cerilla, aunque la pongamos boca abajo, el fuego va hacia arriba. El fuego es vertical, no es horizontal ni tampoco desciende nunca. Y si las cosas vuelven a su origen, como aquello de “polvo eres y en polvo te convertirás”, esto nos debería enseñar mucho de por qué el fuego va hacia arriba, seguramente porque ese es su origen. A lo mejor no era mentira cuando aquellos antiguos griegos nos decían que era el fuego de los dioses, que habían bajado a la tierra para nosotros.",
+          "Hay que tener en cuenta la dignidad humana, o sea, una parte dentro de nosotros que tiene que vivir de pie, no morir de pie. Eso que románticamente se dice que “hay que morir de pie y no vivir de rodillas” está muy bien… pero lo más difícil es vivir de pie ‒no morir de pie‒, toda nuestra vida. Como el fuego, hacia arriba, vertical, hacia lo alto. Eso es complicado, pero cuando hablamos de justicia tenemos que contemplar que dentro de un ser humano están estas dos partes y que todo eso es el factor humano.",
+          "Algo más para tener en cuenta: también hemos de contemplar, cuando hablamos de la convivencia, el factor de la felicidad. La felicidad es muy importante. Los antiguos filósofos estaban de acuerdo, prácticamente todos, en colocar la felicidad fundamentalmente en la ataraxia y la autarquía; pero esto no es tan fácil. Son términos griegos que vienen a significar algo así como que: yo no soy perturbado por nada, o sea, nada ajeno a mí me puede desestabilizar, me puede conmover, me puede sacar de mi centro. Y yo soy independiente: autárquico.",
+          "Sin ir tan lejos como estos viejos filósofos, sí me atrevería a decir que tal vez la felicidad, para nosotros, a nuestro nivel ‒para que sea algo más entendible, alcanzable, mucho más cercano‒, está en nuestra capacidad de enamorarnos de las cosas elevadas, aunque no seamos ni autárquicos ni apáticos, o sea, no ser afectados. Lo que si podemos hacer es enamorarnos de las cosas elevadas. Eso al fin y al cabo es lo que significa Acro-polis, o sea la parte elevada de las cosas, lo mejor, lo más brillante. Por ejemplo, lo mejor de nuestros amigos, lo mejor de los que comparten la vida con nosotros, nuestras mejores experiencias, lo mejor de las culturas que estudiamos, lo mejor de otros modos de pensar, lo mejor de otros modos de vivir. Porque lo peor, lo peor de otros modos de vivir, de pensar, ya lo tenemos. Eso no ha variado. Lo peor del imperio Romano, que siempre sale en las películas, en forma de orgías, bacanales, etc. eso que era lo peor se hace hoy en día en todos lados. Para qué vamos a fijarnos entonces en estas cosas.",
+          "Tenemos que tratar de elevar nuestra conciencia hacia lo mejor, a la parte elevada. Lo más alto eso es lo que significa Acrópolis, que como sabéis estaba en la parte elevada de las ciudades. Ahí es donde estaban los templos. Tenía que costar un esfuerzo al ciudadano subir, ascender la colina, para llegar a los templos y para poder tratar de entrar en contacto consigo mismo, con su parte inmortal, con su parte de fuego. Para eso se han construido siempre los templos, en todas las culturas: para facilitar que el ser humano pueda contactar y conectar con su propia parte espiritual, su parte de fuego que todos tenemos, a no ser que alguien rechace la mente. Si alguien dice “no, yo no quiero tener mente”, entonces este no tendrá fuego, y sin mente ya me diréis cómo hacemos para comunicarnos, como ahora por ejemplo; pues tenemos que admitir que somos seres hechos de fuego.",
+          "También deberemos tener muy en cuenta, cuando hablamos de la convivencia, la libertad. Desde nuestro punto de vista filosófico y de la mayoría de los pensadores, la libertad está basada en la educación, la educación que recibimos. Lo que sucede es que eso ahora está fallando. Precisamente nuestros sistemas de gobierno y nuestra democracia es el sistema que más necesita de la educación, porque ahora los ciudadanos pueden decidir. Tienen que decidir, tienen que pensar y decidir. Luego, es cuando más falta hace la educación. Y estamos fallando en eso. Porque no generamos seres humanos, ciudadanos, que sean capaces de sacrificarse por el bien común ‒que para eso estamos juntos‒, que antepongan el bien común a sus propios intereses personales e individuales; por eso está fallando la educación. El concepto antiguo, clásico, filosófico natural, de siempre, ha sido que el ciudadano tiene que ser útil, feliz y consciente. Materialmente, en el mundo físico ha de ser útil; tenemos que ser útiles a los demás. ¿Queremos convivir con los demás? Tenemos que ser útiles. ¿Yo qué sé hacer?, ¿yo qué puedo hacer por la colectividad? Tengo que sentirme útil. Para eso tengo que hacerlo de manera voluntaria; no sirve si lo hago obligado. Tiene que ser un auténtico voluntariado.",
+          "Y para que realmente algo sea voluntario se tienen que poner en marcha dos fuerzas que son impresionantes, que por separado ya lo son y cuando están juntas es lo que más hace crecer a un ser humano: la voluntad y la libertad. Cuando hacemos algo voluntariamente, porque queremos, porque nadie nos obliga, es algo que nos cuesta, tenemos que poner en funcionamiento la voluntad y la libertad. El ser humano se desarrolla como tal a una velocidad increíble. Si solo somos teóricos, muy intelectuales, jamás pondremos manos a la obra en nada. Estaremos limitados; nuestro desarrollo será limitado.",
+          "Entonces, el buen ciudadano, el que tiene que convivir con los demás, tiene que ser materialmente útil, psicológicamente feliz. Tal vez la felicidad se pueda alcanzar a través de valorar lo mejor que encontramos en nuestra vida, seleccionar experiencias, seleccionar lo mejor e ir dejando atrás lo peor. Cultivarnos. Nuestro concepto de cultura no es cultura por la cultura en sí. No queremos cultura, cultivarnos, para saber más de muchas cosas. No. La cultura que nosotros proponemos, que siempre está traspasada por un hilo filosófico, es una cultura que nos ennoblece. Es como, por ejemplo, en el caso de los metales: nosotros hablamos de hierro, de cobre; pero hay otros metales nobles, por ejemplo el oro, que brillan, que no se corrompen.",
+          "De alguna manera así, nosotros pensamos que la cultura nos ennoblece, que tiene que servir para sacar nuestro brillo, nuestro oro, lo mejor de nosotros mismos y no lo peor; para sacar lo peor no necesitamos cultura. La cultura nos tiene que “cultivar” y a través de este cultivo de nuestra personalidad, de nuestro carácter, nosotros nos vamos ennobleciendo, vamos brillando, como el oro. Y tal vez esto nos acerque a la felicidad de la que hablábamos.",
+          "Y espiritualmente tenemos que ser conscientes, es decir, fértiles, fecundos, para entendernos. Y así tenemos a un ciudadano que puede convivir con otros ciudadanos. ¡Cuidado!, que de momento esto es una utopía. Esto está basado en lo que hemos dicho de los fines y principios: lo que está al principio y está al final no lo hemos alcanzado todavía. Pero es que el ser humano tampoco está completo. Somos seres en evolución. ¿O alguien cree que ya no va a mejorar, que no puede mejorar absolutamente nada? “Aquí he llegado y aquí me quedo. Soy como soy y de aquí no me muevo”. ¿Alguien cree eso? Todos podemos mejorar. Todos nos sorprenderemos cuando la vida nos traiga experiencias y de pronto diremos: “¡Anda!, esto que me hacía tanto daño cinco años atrás, ahora ya no me afecta. ¡Fíjate!, soy más fuerte. Esto que no lo entendía, que no lo había entendido nunca, ahora, de pronto, a estas alturas de la vida, lo entiendo perfectamente!”. ¡Pues claro que si! Nuestra vida es un continuo aprender, un constante aprendizaje.",
+          "Entonces, el fin de algo es un logro; esto no es un don de nadie. Esto tiene que hacerse, tiene que conseguirse, esto depende de nosotros. Y aquí llega la gran pregunta: ¿Qué vamos a hacer? Porque la filosofía es práctica, habíamos dicho al principio. Y hay muchas cosas que dependen de nosotros. ¿Qué vamos a hacer? ¿Vamos a caminar con paso firme, de manera consciente hacia la convivencia? ¿Vamos a conseguir tener una mentalidad de continuidad?, que no es fácil. ¿Vamos a tener conciencia de inmortalidad, de alguna manera? Porque esto es importante para la convivencia.",
+          "Vamos a hacer un ejercicio de imaginación; con la imaginación nos podemos ir donde queramos. Imaginemos que estamos en otra época, que estamos en Grecia, en Atenas, siglo V antes de Cristo. Vámonos a Atenas… Un ciudadano ateniense de esa época, en un año, en un solo año había vivido casi de todo: había ido a la guerra, había visto morir a sus compañeros, había vivido, tal vez, sequías, epidemias, había habido muchas fiestas… Y de pronto llegaba el momento esperado: ¡el teatro! El ateniense estaba todo el año esperando que llegara el momento de los certámenes de teatro. Había obras de teatro que duraban ocho horas, y ahí estaban. Los estamos viendo, vestidos con túnicas, bajo el cielo estrellado, a la luz de las antorchas y están representando el Prometeo Encadenado , de Esquilo, por ejemplo. Ese hombre estaba ahí con su mujer. Estaban viendo esa obra de teatro, estaban escuchando las palabras del gran Esquilo; cuando Prometeo decía que robó el fuego de los dioses, para dárselo a los humanos, y que lo hizo por amor a la humanidad, porque la humanidad no sabía moverse, no veía su futuro, no veía su destino, no entendía la vida, no encontraba el sentido de la vida. Prometeo robó ese fuego y ese hombre griego, que había estado un año esperando, estaba viéndolo representar. De pronto escuchaba cómo el coro, formado por varias voces, todos a una decían: “¿Y ahora los efímeros poseen el fuego de los dioses?” Cuando el ateniense escuchaba eso, se daba cuenta de que no era un ser efímero, porque ahora tenía el fuego de los dioses.",
+          "Ese ser humano, que no tenía un coche como el nuestro para ir a 200 por hora, que no iba en avión, que no tenía ordenadores, ese ser humano tomaba conciencia de que era inmortal, de que no era efímero, de que dentro de él había un fuego que debía pasar siglo tras siglo, vida tras vida, y tenía un concepto, una idea de continuidad; de que lo que iba a conseguir individualmente, de lo que cada ser humano podía superar por sí mismo, iba a beneficiar al conjunto, iba a beneficiar al colectivo. Tenían conciencia de que lo que hacían no era solo para ellos, sino también para las generaciones venideras, para las generaciones futuras. Ellos no eran efímeros, no iban a acabar con cincuenta, sesenta, setenta o cien años sino que iban a continuar más allá del tiempo. Tal vez a nosotros nos falte esa mentalidad para entender lo que es la convivencia y que todos los logros que consigamos no se van a perder. Eso va a quedar para las generaciones futuras, aunque hagan un mal uso después. Pero ya vendrán otras y otras y otras generaciones como las oleadas en la playa, y algún día, la humanidad podrá vivir en paz, en libertad, en convivencia.",
+          "Para acabar, voy a leeros un cuento relacionado con la convivencia.",
+          "Asamblea en la carpintería",
+          "Hubo en la carpintería una extraña asamblea, las herramientas se reunieron para arreglar sus diferencias. El martillo fue el primero en ejercer la presidencia; empero la asamblea anunció que debía renunciar. ¿La causa? Hacía demasiado ruido y se pasaba el tiempo golpeando. El martillo reconoció su culpa, pero pidió que fuera expulsado el tornillo: había que darle muchas vueltas para que sirviera de algo. El tornillo aceptó su retiro, pero, a su vez, pidió la expulsión de la lija: era muy áspera en su trato y siempre tenía fricciones con los demás. La lija estuvo de acuerdo, con la condición de que fuera expulsado el metro; pues se pasaba el tiempo midiendo a los demás como si él fuera perfecto.",
+          "En eso entró el carpintero. Se puso delante e inició su trabajo utilizando alternativamente el martillo, la lija, el metro y el tornillo. Al final, el trozo de madera se había convertido en un lindo mueble. Cuando la carpintería quedó sola otra vez la asamblea reanudó la deliberación. Dijo el serrucho: “Señores, ha quedado demostrado que tenemos defectos; pero el carpintero trabaja con nuestras cualidades. Eso es lo que nos hace maravillosos, así que no pensemos ya en nuestras flaquezas y concentrémonos en nuestras virtudes. La asamblea encontró, entonces, que el martillo era fuerte, el tornillo unía y daba solidez, la lija limaba asperezas y el metro era preciso y exacto. Se sintieron como un equipo capaz de producir hermosos muebles. Y sus diferencias pasaron a segundo plano.",
+          "[1] La Declaración de los Derechos del Hombre y del Ciudadano de 1789 , aprobada por la Asamblea Nacional Constituyente francesa el 26 de agosto de 1789"
+        ],
+        "gallery": []
+      },
+      {
+        "slug": "el-mito-de-batman",
+        "title": "El mito de Batman",
+        "author": "Martha Valenzuela",
+        "date": "13 de junio 2026",
+        "readingTime": "10 min",
+        "category": "septimo arte filosofico",
+        "excerpt": "Miradas filosóficas a los mitos del séptimo arte",
+        "image": {
+          "src": "/uploads/acropolis/1781362308279-c8vbkc.webp",
+          "alt": "El mito de Batman — reflexión filosófica"
+        },
+        "gallery": [
+          {
+            "src": "/uploads/acropolis/1781362587562-xuvinz.webp",
+            "alt": "Batman y el Guasón — dualidad del héroe"
+          }
+        ],
+        "body": [
+          "A menudo vemos como representana ese hombre solitario que aparenta tenerlo todo y eso volverse su super poder. El bien material como una si fuese un poder parapsicologico que abre la spuertas infintas de para combatir el crimen a nivel de cualquier super poder. Solo el deseo de acabar con la injusticia pues ha perdido a manos de ellos lo mas precios de su vida, su familia. ",
+          "No solo vemos que el dinero es una herramiento y no parte esencial de su persona, sino que el querer la intecion y el proposito claro hace que el camino para para el deber se vea mas claro. ",
+          "Sin embargo veamos ahora a Batman como un ser humano ahogado en la personalidad emlaconlina de su traje, y comparemos con el villano mas emblemetico del persona, El guason, otro espiritu atrapago en un traje sumida en la melancolia, sin embargo menos sombrio que el hereo, pero ambas en una mision clara: combatir la injusticia. "
+        ],
+        "featured": true
+      }
+    ],
+    "filosofiaPage": {
+      "heroEyebrow": "Filosofía",
+      "heroTitle": "Escuela de Filosofía a la manera clásica",
+      "heroLede": "Un espacio para pensar, conocerse y vivir mejor. La filosofía no como teoría abstracta, sino como una forma práctica de afrontar la vida.",
+      "sesionesTitle": "Próximas sesiones",
+      "sesionesIntro": "Algunas de nuestras próximas clases, charlas y encuentros en las distintas sedes."
+    },
+    "articulosHidden": [],
+    "viajes": [
+      {
+        "slug": "los-tres-ojos",
+        "categoria": "locales",
+        "title": "Los Tres Ojos",
+        "location": "Parque Nacional Los Tres Ojos, Santo Domingo Este",
+        "duration": "Medio día",
+        "excerpt": "Excursión al parque de cuevas y lagos subterráneos más visitado del país: naturaleza, geología y simbolismo del agua.",
+        "image": {
+          "src": "/img/cultura/viajes/tres-ojos.webp",
+          "alt": "Laguna azul turquesa en el Parque Nacional Los Tres Ojos"
+        },
+        "body": [
+          "Los Tres Ojos es uno de los espacios naturales más singulares del Gran Santo Domingo: un conjunto de lagunas de agua dulce dentro de cuevas de piedra caliza, formadas hace miles de años. Nueva Acrópolis organiza salidas para redescubrir este parque con una mirada que combina geología, historia y simbolismo.",
+          "El recorrido inicia en la laguna Agua Azul, de tono turquesa intenso, y continúa hacia la Laguna de Azufre y la famosa «Nevera», donde la temperatura desciende de forma sorprendente. En cada parada compartimos observaciones sobre la formación del paisaje kárstico y el papel del agua en las tradiciones de los pueblos originarios del Caribe.",
+          "La excursión incluye tiempo para caminar con calma, tomar fotografías y conversar sobre cómo la naturaleza nos invita a la contemplación. Es una salida apta para familias y para quienes se acercan por primera vez a las propuestas culturales de la escuela."
+        ],
+        "highlights": [
+          "Recorrido por las cuatro lagunas del parque",
+          "Lago de azufre y la cueva «La Nevera»",
+          "Reflexión sobre el agua como símbolo de vida"
+        ]
+      },
+      {
+        "slug": "cuevas-de-pomier",
+        "categoria": "locales",
+        "title": "Cuevas de Pomier",
+        "location": "San Cristóbal",
+        "duration": "Día completo",
+        "excerpt": "Visita al mayor santuario rupestre del Caribe: más de cuatro mil petroglifos y pictografías taínas en un entorno de bosque seco.",
+        "image": {
+          "src": "/img/cultura/viajes/pomier.webp",
+          "alt": "Petroglifos taínos en las Cuevas de Pomier, San Cristóbal"
+        },
+        "body": [
+          "Las Cuevas de Pomier, en el municipio de San Cristóbal, albergan uno de los conjuntos de arte rupestre más importantes del hemisferio: miles de grabados y pinturas dejados por los taínos y culturas anteriores. Nueva Acrópolis propone una jornada para acercarnos a este patrimonio con respeto y profundidad.",
+          "Con guía local recorremos senderos entre bosque seco y visitamos cuevas seleccionadas donde podemos observar espirales, antropomorfos y escenas de la vida cotidiana de quienes habitaron la isla antes del contacto europeo. Comentamos el simbolismo de los signos y su relación con el cosmos y la agricultura.",
+          "La salida incluye transporte coordinado desde Santo Domingo, refrigerio y un espacio final de diálogo sobre la memoria colectiva y la responsabilidad de proteger estos sitios. Se recomienda calzado cómodo y ropa ligera."
+        ],
+        "highlights": [
+          "Guía especializado en arqueología taína",
+          "Cuevas Número 1 y 18 con arte rupestre",
+          "Contexto histórico de los pueblos originarios"
+        ],
+        "proximaFecha": "29 de junio"
+      },
+      {
+        "slug": "egipto",
+        "categoria": "internacionales",
+        "title": "Egipto",
+        "location": "El Cairo, Luxor y Aswan",
+        "duration": "10 días",
+        "excerpt": "Expedición a las pirámides de Giza, el Valle de los Reyes y los templos del Nilo: historia viva de una de las civilizaciones más influyentes.",
+        "image": {
+          "src": "/img/cultura/viajes/egipto.webp",
+          "alt": "Grupo de Nueva Acrópolis frente a las pirámides de Giza"
+        },
+        "body": [
+          "Egipto concentra en pocas millas uno de los legados más fascinantes de la humanidad. Nueva Acrópolis organiza expediciones culturales para recorrer sus monumentos no solo como turistas, sino como estudiantes de la historia del pensamiento y de las tradiciones iniciáticas del antiguo mundo.",
+          "El itinerario incluye El Cairo —con las pirámides de Giza y el Museo Egipcio— y un viaje al alto Egipto: Luxor, el Valle de los Reyes y los templos de Karnak y Hatshepsut. En cada sitio dedicamos tiempo a la lectura simbólica de la arquitectura, la escultura y los textos jeroglíficos.",
+          "Los grupos son reducidos y viajan con guías egiptólogos y acompañantes de Nueva Acrópolis. Las fechas se publican con antelación en nuestras redes; quienes deseen información pueden escribirnos por WhatsApp para recibir el dossier del próximo viaje."
+        ],
+        "highlights": [
+          "Pirámides de Giza y la Esfinge",
+          "Templos de Karnak y Luxor",
+          "Crucero por el Nilo hasta Aswan"
+        ],
+        "proximaFecha": "10 de septiembre 2026"
+      },
+      {
+        "slug": "machu-picchu",
+        "categoria": "internacionales",
+        "title": "Machu Picchu",
+        "location": "Cusco y Valle Sagrado, Perú",
+        "duration": "8 días",
+        "excerpt": "Ruta por la capital inca, el Valle Sagrado y la ciudadela de Machu Picchu: arquitectura, astronomía y espiritualidad andina.",
+        "image": {
+          "src": "/img/cultura/viajes/machu-picchu.webp",
+          "alt": "Ciudadela inca de Machu Picchu entre las montañas andinas"
+        },
+        "body": [
+          "Machu Picchu es mucho más que una postal: es un testimonio de la ingeniería, la astronomía y la cosmovisión inca. Nueva Acrópolis propone una expedición que recorre Cusco, el Valle Sagrado y la ciudadela, integrando historia, paisaje y reflexión sobre la relación entre el ser humano y la montaña.",
+          "La ruta incluye la ciudad imperial de Cusco, el templo de Qorikancha, los mercados artesanales de Pisac y la fortaleza de Ollantaytambo antes de subir en tren hacia Aguas Calientes. La visita a Machu Picchu se realiza al amanecer, cuando la niebla se levanta sobre las terrazas y los templos del Sol y de las Tres Ventanas.",
+          "Como en todas nuestras expediciones internacionales, el viaje combina visitas guiadas, tiempo libre para la contemplación y encuentros de grupo para compartir lecturas sobre la sabiduría andina. Consulta fechas y requisitos de inscripción en nuestras sedes o por WhatsApp."
+        ],
+        "highlights": [
+          "Cusco y Qorikancha",
+          "Valle Sagrado: Ollantaytambo y Pisac",
+          "Machu Picchu al amanecer"
+        ],
+        "proximaFecha": "5 de abril 2027"
+      }
+    ],
+    "viajesHidden": [],
+    "eventosHidden": [],
+    "voluntariadoPage": {
+      "proximasTitle": "Próximas actividades",
+      "proximasIntro": "Jornadas y encuentros de voluntariado en nuestras sedes. Haz clic para ver más."
+    },
+    "diplomadoInscription": {
+      "eyebrow": "Más información",
+      "title": "¿Quieres unirte a esta aventura?",
+      "intro": "Escríbenos por WhatsApp y te orientamos sobre fechas, sedes disponibles y el proceso de inscripción.",
+      "capacityNote": "Cupo limitado · Requiere inscripción previa",
+      "inscribeWhatsApp": "Hola, me interesa inscribirme al Diplomado Filosofía para la Vida (Nueva Acrópolis). ¿Me pueden dar información sobre fechas, sedes e inscripción?"
+    },
+    "diplomadoPage": {
+      "heroLede": "Un viaje de 5 meses por las grandes tradiciones filosóficas del mundo para transformar tu manera de pensar, sentir y actuar.",
+      "otrasSesionesTitle": "Cupos disponibles",
+      "otrasSesionesIntro": "",
+      "testimonialEyebrow": "Como tú",
+      "testimonialQuote": "«Conócete a ti mismo» — el primer paso para vivir con mayor sentido y claridad.",
+      "testimonialVideoUrl": "https://www.youtube.com/watch?v=4sMY_gaAadE"
+    },
+    "culturaPage": {
+      "proximasTitle": "Próximas actividades",
+      "proximasIntro": "Clases, ensayos y encuentros culturales en nuestras sedes de Santo Domingo y en el Punto Cultural Roberto Pastoriza. Haz clic para ver más.",
+      "circuloAmigos": {
+        "eyebrow": "Abierto al público",
+        "title": "¿Quieres ser amigo de Nueva Acrópolis?",
+        "lede": "Un espacio para quienes aman la filosofía, la cultura y el voluntariado — jóvenes adultos, personas de mediana edad y mayores — y desean seguir vinculados a Nueva Acrópolis sin integrarse al plan de estudios regular. Incluye diálogos semanales sobre filosofía y temas de actualidad, y otras actividades abiertas a quienes no pueden formar parte del plan de estudios.",
+        "imageSrc": "/img/circulo-amigos/conversacion.webp",
+        "imageAlt": "Hombres y mujeres de distintas edades conversando juntos en círculo sobre filosofía y temas de actualidad"
+      },
+      "talleres": [
+        {
+          "id": "coro",
+          "src": "/img/cultura/talleres/coro.webp",
+          "alt": "Coro mixto cantando durante un ensayo",
+          "title": "Coro",
+          "text": "La voz como instrumento de unión: ensayos y presentaciones que cultivan la escucha y el trabajo en equipo."
+        },
+        {
+          "id": "teatro",
+          "src": "/img/cultura/talleres/teatro.webp",
+          "alt": "Grupo de teatro de distintas edades ensayando en escena",
+          "title": "Teatro",
+          "text": "Expresión, memoria y carácter sobre el escenario; montajes con sentido formativo y humano, para todas las edades.",
+          "sede": "Naco",
+          "date": "Sábados 10 a.m. - 12 m."
+        },
+        {
+          "id": "cineforum",
+          "src": "/img/actividades/cineforum.webp",
+          "alt": "Cineforum filosófico con proyección y debate en sala",
+          "title": "Cineforum",
+          "text": "Cine y filosofía: proyección seguida de diálogo sobre la obra, sus ideas y lo que nos mueve como personas.",
+          "sede": "Naco",
+          "date": "Martes 8 de julio · 7:00 p.m."
+        },
+        {
+          "id": "danza",
+          "src": "/img/cultura/talleres/danza.webp",
+          "alt": "Clase de merengue con trajes típicos dominicanos",
+          "title": "Danza",
+          "text": "El movimiento como lenguaje: desde el merengue y nuestras danzas típicas hasta danzas de distintas culturas y su simbolismo."
+        },
+        {
+          "id": "jovenes",
+          "src": "/img/cultura/talleres/jovenes.webp",
+          "alt": "Jóvenes en un ejercicio de trabajo en equipo al aire libre",
+          "title": "Jóvenes",
+          "text": "Actividades pensadas para jóvenes: arte, naturaleza, retos y voluntariado con espíritu de equipo."
+        }
+      ]
+    },
+    "heroCarousels": {
+      "voluntariado": [
+        {
+          "id": "default-0",
+          "src": "/img/voluntariado/cards/ecologia.webp",
+          "alt": "Voluntarios en jornada de reforestación"
+        },
+        {
+          "id": "default-1",
+          "src": "/img/voluntariado/cards/ninos.webp",
+          "alt": "Jornada de servicio con niños"
+        },
+        {
+          "id": "default-2",
+          "src": "/img/voluntariado/cards/ancianos.webp",
+          "alt": "Visita solidaria a hogar de adultos mayores"
+        },
+        {
+          "id": "default-3",
+          "src": "/img/voluntariado/cards/playa.webp",
+          "alt": "Limpieza de playa con voluntarios"
+        },
+        {
+          "id": "default-4",
+          "src": "/img/eventos/simulacros.webp",
+          "alt": "Capacitación en gestión de emergencias"
+        },
+        {
+          "id": "default-5",
+          "src": "/img/actividades/unibe.webp",
+          "alt": "Nueva Acrópolis en la Feria de Voluntariado de UNIBE"
+        }
+      ],
+      "cultura": [
+        {
+          "id": "default-0",
+          "src": "/img/cultura/talleres/coro.webp",
+          "alt": "Coro mixto de Nueva Acrópolis en ensayo"
+        },
+        {
+          "id": "default-1",
+          "src": "/video/cultura/baile.mp4",
+          "alt": "Baile y danza en actividad cultural de Nueva Acrópolis",
+          "media": "video",
+          "poster": "/img/cultura/talleres/danza.webp"
+        },
+        {
+          "id": "default-2",
+          "src": "/img/cultura/talleres/jovenes.webp",
+          "alt": "Actividades culturales para jóvenes"
+        },
+        {
+          "id": "default-3",
+          "src": "/img/cultura/eventos/midsommar.webp",
+          "alt": "Celebración Bienvenida Primavera"
+        },
+        {
+          "id": "default-4",
+          "src": "/img/cultura/eventos/velada.webp",
+          "alt": "Velada cultural con cuarteto de cuerdas"
+        },
+        {
+          "id": "default-5",
+          "src": "/img/cultura/viajes/egipto.webp",
+          "alt": "Expedición cultural a las pirámides de Giza"
+        },
+        {
+          "id": "default-6",
+          "src": "/img/cultura/viajes/tres-ojos.webp",
+          "alt": "Excursión a los Tres Ojos, Santo Domingo"
+        },
+        {
+          "id": "hero-mqcxu5b4-c65n",
+          "src": "/uploads/acropolis/1781390392129-u10kmz.webp",
+          "alt": "Nueva foto del carrusel"
+        }
+      ],
+      "cursos": [
+        {
+          "id": "default-0",
+          "src": "/img/cursos/respirar.webp",
+          "alt": "Taller El arte de respirar"
+        },
+        {
+          "id": "default-1",
+          "src": "/img/cursos/pintura.webp",
+          "alt": "Taller de pintura"
+        },
+        {
+          "id": "default-2",
+          "src": "/img/cursos/chi-kung-salon.webp",
+          "alt": "Grupo visto de espaldas practicando Chi Kung en salón con espejo y piso de madera"
+        },
+        {
+          "id": "default-3",
+          "src": "/img/cursos/astrologia.webp",
+          "alt": "Astrología filosófica"
+        }
+      ]
+    },
+    "viajesPage": {},
+    "venues": [
+      {
+        "id": "sede-naco",
+        "name": "Naco",
+        "kind": "sede",
+        "city": "Santo Domingo",
+        "zone": "Ens. Naco",
+        "address": "Calle Cub Scouts No. 6, 3er nivel",
+        "reference": "Antes de Av. Tiradentes, detrás de Plaza Merengue",
+        "phone": "(849) 352-7054",
+        "mapsQuery": "Calle Cub Scouts 6 Naco Santo Domingo República Dominicana"
+      },
+      {
+        "id": "sede-los-prados",
+        "name": "Los Prados",
+        "kind": "sede",
+        "city": "Santo Domingo",
+        "zone": "Los Prados",
+        "address": "Eugenio Deschamps No. 81",
+        "reference": "Plaza Los Prados",
+        "phone": "(849) 352-7054",
+        "mapsQuery": "Eugenio Deschamps 81 Los Prados Santo Domingo República Dominicana"
+      },
+      {
+        "id": "punto-cultural-roberto-pastoriza",
+        "name": "Roberto Pastoriza",
+        "kind": "centro-cultural",
+        "city": "Santo Domingo",
+        "zone": "Evaristo Morales",
+        "address": "Roberto Pastoriza No. 709",
+        "phone": "(849) 352-7054",
+        "mapsQuery": "Roberto Pastoriza 709 Evaristo Morales Santo Domingo"
+      },
+      {
+        "id": "sede-santiago",
+        "name": "Santiago",
+        "kind": "sede",
+        "city": "Santiago",
+        "zone": "Santiago de los Caballeros",
+        "address": "Dirección próximamente",
+        "phone": "(849) 352-7054",
+        "mapsQuery": "Nueva Acrópolis Santiago de los Caballeros República Dominicana"
+      }
+    ],
+    "venuesHidden": [],
+    "salonesHidden": [],
+    "salonesSedesHidden": ["Naco", "Santiago"],
+    "salones": [
+      {
+        "id": "agora",
+        "name": "Ágora",
+        "sede": "Naco",
+        "city": "Santo Domingo",
+        "summary": "Sala principal para asambleas, charlas y formaciones amplias. Buena acústica y ambiente sobrio al estilo de nuestra escuela.",
+        "featuredLayout": "butacas",
+        "capacities": {
+          "butacas": 30,
+          "mesas": 25,
+          "herradura": 15
+        },
+        "image": {
+          "src": "/img/salones/agora-butacas.webp",
+          "alt": "Salón Ágora en Naco con butacas en filas, decoración clásica sobria"
+        }
+      },
+      {
+        "id": "hipatia",
+        "name": "Hipatia",
+        "sede": "Naco",
+        "city": "Santo Domingo",
+        "summary": "Sala de estudio y seminarios, ideal para cursos con trabajo escrito y dinámicas en mesa.",
+        "featuredLayout": "mesas",
+        "capacities": {
+          "butacas": 20,
+          "mesas": 15,
+          "herradura": 13
+        },
+        "image": {
+          "src": "/img/salones/hipatia-mesas.webp",
+          "alt": "Salón Hipatia en Naco con mesas tipo escuela y estantería filosófica"
+        }
+      },
+      {
+        "id": "aristoteles",
+        "name": "Aristóteles",
+        "sede": "Naco",
+        "city": "Santo Domingo",
+        "summary": "Espacio versátil para talleres de diálogo, liderazgo y trabajo en equipo con disposición herradura.",
+        "featuredLayout": "herradura",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 12,
+          "herradura": 15
+        },
+        "image": {
+          "src": "/img/salones/aristoteles-herradura.webp",
+          "alt": "Salón Aristóteles en Naco en disposición herradura para facilitación grupal"
+        }
+      },
+      {
+        "id": "socrates",
+        "name": "Sócrates",
+        "sede": "Los Prados",
+        "city": "Santo Domingo",
+        "summary": "Aula íntima para cursos y talleres de mediano tamaño en nuestra sede de Los Prados.",
+        "featuredLayout": "mesas",
+        "capacities": {
+          "butacas": 35,
+          "mesas": 25,
+          "herradura": 22
+        },
+        "image": {
+          "src": "/img/salones/socrates-mesas.webp",
+          "alt": "Salón Sócrates en Los Prados con mesas tipo escuela"
+        }
+      },
+      {
+        "id": "platon",
+        "name": "Platón",
+        "sede": "Los Prados",
+        "city": "Santo Domingo",
+        "summary": "Salón amplio con butacas para charlas, proyecciones y encuentros formativos.",
+        "featuredLayout": "butacas",
+        "capacities": {
+          "butacas": 50,
+          "mesas": 32,
+          "herradura": 28
+        },
+        "image": {
+          "src": "/img/salones/platon-butacas.webp",
+          "alt": "Salón Platón en Los Prados con butacas en filas y escenario"
+        }
+      },
+      {
+        "id": "apolo",
+        "name": "Apolo",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Salón para charlas, proyecciones y encuentros formativos en nuestra sede de Santiago de los Caballeros.",
+        "featuredLayout": "butacas",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/salones/apolo-butacas.webp",
+          "alt": "Salón Apolo en Sede Santiago — espacio para charlas y formación"
+        }
+      },
+      {
+        "id": "atenea",
+        "name": "Atenea",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Aula versátil para cursos y talleres con trabajo en mesa en Santiago.",
+        "featuredLayout": "mesas",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/salones/hipatia-mesas.webp",
+          "alt": "Salón Atenea en Sede Santiago con mesas tipo escuela"
+        }
+      },
+      {
+        "id": "olimpia",
+        "name": "Olimpia",
+        "sede": "Santiago",
+        "city": "Santiago",
+        "summary": "Espacio para dinámicas grupales, diálogo y facilitación en disposición herradura.",
+        "featuredLayout": "herradura",
+        "capacities": {
+          "butacas": 25,
+          "mesas": 25,
+          "herradura": 25
+        },
+        "image": {
+          "src": "/img/salones/aristoteles-herradura.webp",
+          "alt": "Salón Olimpia en Sede Santiago en disposición herradura"
+        }
+      }
+    ],
+    "salonesPage": {
+      "eyebrow": "Espacios",
+      "title": "Alquiler de salones para talleres y cursos",
+      "intro": "Salones sobrios y elegantes en nuestras sedes de Santo Domingo y Santiago, con distintas disposiciones según el tipo de actividad. Ideal para cursos, charlas, formaciones corporativas y encuentros formativos."
+    },
+    "cursosPage": {
+      "proximasTitle": "Próximas convocatorias",
+      "proximasIntro": "Cursos, talleres y conferencias con fecha próxima. Haz clic para inscribirte o pedir más información.",
+      "ofertaEyebrow": "Nuestra oferta",
+      "ofertaCursosIntro": "Cursos con horario fijo e inscripción abierta. Consulta fechas y sedes en cada tarjeta y escríbenos para más información.",
+      "ofertaConferenciasIntro": "Charlas y conferencias abiertas al público sobre filosofía, cultura y valores. Muchas son gratuitas; consulta fechas y sedes por WhatsApp.",
+      "cursosTalleres": [
+        {
+          "id": "curso-el-arte-de-respirar",
+          "src": "/img/cursos/respirar.webp",
+          "alt": "Taller El arte de respirar — respiración consciente y equilibrio interior",
+          "title": "El arte de respirar",
+          "text": "Redescubre la respiración consciente como herramienta de calma, atención y bienestar. Ejercicios guiados para hacer una pausa del ritmo cotidiano y reconectar con el cuerpo.",
+          "sede": "Punto Cultural Roberto Pastoriza",
+          "tag": "Bienestar"
+        },
+        {
+          "id": "curso-taller-de-pintura",
+          "src": "/img/cursos/pintura.webp",
+          "alt": "Taller de pintura con participantes frente a sus caballetes",
+          "title": "Taller de pintura",
+          "text": "Desarrolla la sensibilidad artística a través del color y la forma. Un espacio creativo para expresar ideas, observar con atención y disfrutar del proceso de pintar.",
+          "sede": "Naco",
+          "tag": "Arte"
+        },
+        {
+          "id": "curso-circulo-de-lectura",
+          "src": "/img/cursos/lectura.webp",
+          "alt": "Círculo de lectura con grupo conversando sobre libros",
+          "title": "Círculo de lectura",
+          "text": "Leer y dialogar en grupo sobre textos que invitan a pensar. Un encuentro para compartir ideas, profundizar en autores y descubrir nuevas miradas sobre la vida.",
+          "sede": "Los Prados",
+          "tag": "Cultura",
+          "fechaApertura": "Último jueves de cada mes"
+        },
+        {
+          "id": "curso-tai-chi-y-chi-kung",
+          "src": "/img/cursos/chi-kung-salon.webp",
+          "alt": "Grupo practicando Tai Chi y Chi Kung en salón con espejo y piso de madera",
+          "title": "Tai Chi y Chi Kung",
+          "text": "Curso recurrente de movimientos suaves y respiración profunda: meditación en movimiento que mejora equilibrio, flexibilidad y calma mental. Apto para todas las edades, sin impacto. Inversión: RD$3,000 mensuales.",
+          "facilitador": "Daniel Salinas",
+          "sede": "Sede Los Prados",
+          "tag": "Bienestar",
+          "fechaApertura": "Martes y jueves · 7:00 a.m. – 9:00 a.m."
+        },
+        {
+          "id": "curso-conciencia-y-bienestar",
+          "src": "/img/cursos/bienestar.webp",
+          "alt": "Taller de conciencia y bienestar con prácticas de atención plena",
+          "title": "Conciencia y bienestar",
+          "text": "Herramientas prácticas para cultivar presencia, equilibrio emocional y armonía interior. Integra cuerpo, respiración y reflexión en un camino de cuidado personal.",
+          "tag": "Bienestar"
+        },
+        {
+          "id": "curso-liderar-conflictos-con-inteligencia",
+          "src": "/img/cursos/conflictos.webp",
+          "alt": "Taller sobre liderar conflictos con inteligencia en grupo",
+          "title": "Liderar conflictos con inteligencia",
+          "text": "Aprende a abordar desacuerdos con claridad, empatía y estrategia. Desarrolla habilidades de comunicación y convivencia para resolver tensiones de forma constructiva.",
+          "tag": "Comunicación"
+        },
+        {
+          "id": "curso-astrologia-filosofica",
+          "src": "/img/cursos/astrologia.webp",
+          "alt": "Carta astral y símbolos del zodíaco sobre una mesa de estudio",
+          "title": "Astrología filosófica",
+          "text": "El lenguaje simbólico del cosmos como espejo del mundo interior. Descubre la relación entre el ser humano y el universo a través de la carta astral. Niveles I y II.",
+          "facilitador": "Daniel Salinas",
+          "sede": "Sede Los Prados"
+        },
+        {
+          "id": "curso-oratoria",
+          "src": "/img/cursos/oratoria.webp",
+          "alt": "Persona exponiendo ante un grupo en un taller de oratoria",
+          "title": "Oratoria",
+          "text": "La palabra como herramienta de valor. Gana claridad en la expresión, buen lenguaje corporal y seguridad para hablar en público.",
+          "tag": "Comunicación"
+        },
+        {
+          "id": "curso-crochet",
+          "src": "/img/cursos/crochet.webp",
+          "alt": "Manos tejiendo a crochet con ovillos de lana de colores",
+          "title": "Crochet con confianza",
+          "text": "Aprende crochet paso a paso en un ambiente de encuentro y paciencia: mejora la concentración, reduce el estrés y desarrolla motricidad fina mientras creas piezas únicas.",
+          "facilitador": "Jeimy Troncoso",
+          "sede": "Sede Naco",
+          "tag": "Arte y oficio",
+          "fechaApertura": "Sábados · 10:00 a.m. – 12:00 p.m."
+        },
+        {
+          "id": "curso-circulo-de-amigos",
+          "src": "/img/circulo-amigos/conversacion.webp",
+          "alt": "Personas de distintas edades conversando en círculo — Círculo de Amigos Nueva Acrópolis",
+          "title": "Círculo de Amigos",
+          "text": "Red abierta para quienes comparten los principios de Nueva Acrópolis y desean dialogar sobre filosofía, cultura y voluntariado sin integrarse al plan de estudios regular.",
+          "tag": "Filosofía",
+          "fechaApertura": "Miércoles · encuentro virtual semanal",
+          "inscribeKind": "actividad",
+          "inscribeLabel": "Quiero unirme"
+        }
+      ]
+    },
+    "esferaPage": {
+      "esferaLogoSrc": "/brand/logo-esfera-punto-focal.webp",
+      "esferaLogoWhiteSrc": "/brand/logo-esfera-punto-focal-white.webp",
+      "esferaLogoAlt": "Esfera Punto Focal",
+      "brochureHref": "/docs/brochure-talleres-charlas-oinadom-esfera.pdf",
+      "brochureButtonLabel": "Descarga nuestro brochure"
+    }
+  }
+}

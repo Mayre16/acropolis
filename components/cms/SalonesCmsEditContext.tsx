@@ -1,0 +1,571 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { usePathname } from "next/navigation";
+import { mergeHeroCarouselsIntoDoc } from "@/lib/cms/hero-carousel-registry";
+import { SALONES } from "@/lib/salones";
+import {
+  buildDocWithSalones,
+  getSalonesForEdit,
+  DEFAULT_SALONES_PAGE,
+  newSalonId,
+  type AddSalonOptions,
+} from "@/lib/cms/salones-edit";
+import type { SalonSede } from "@/lib/salones";
+import {
+  fetchCmsDraft,
+  saveCmsDraft,
+} from "@/lib/cms/api-client";
+import { postToEditor } from "@/lib/cms/edit-bridge";
+import { runCoordinatedCmsPublish } from "@/lib/cms/publish-coordinator";
+import { registerCmsEditInit } from "@/lib/cms/edit-session";
+import type { CmsDocument, CmsSalon, CmsSalonesPage } from "@/lib/cms/types";
+import {
+  EditField,
+  EditPanelChrome,
+  EditToolbar,
+  ImageField,
+} from "@/components/cms/CmsEditFields";
+import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+
+const LAYOUT_OPTIONS = [
+  { value: "butacas", label: "Butacas en filas" },
+  { value: "mesas", label: "Mesas tipo escuela" },
+  { value: "herradura", label: "Disposición herradura" },
+] as const;
+
+type SalonesCmsEditContextValue = {
+  ready: boolean;
+  items: CmsSalon[];
+  page: CmsSalonesPage;
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+  patchItem: (id: string, patch: Partial<CmsSalon>) => void;
+  addSalon: (options?: import("@/lib/cms/salones-edit").AddSalonOptions) => void;
+  hideSalon: (id: string) => void;
+  restoreSalon?: (id: string) => void;
+  hideSalonSede?: (sede: SalonSede) => void;
+  restoreSalonSede?: (sede: SalonSede) => void;
+  salonesSedesHidden?: string[];
+  salonesHidden?: string[];
+  patchPage: (patch: Partial<CmsSalonesPage>) => void;
+  saveDraft: () => Promise<void>;
+  publish: () => Promise<void>;
+  dirty: boolean;
+  busy: boolean;
+  token: string | null;
+};
+
+const SalonesCmsEditContext = createContext<SalonesCmsEditContextValue | null>(
+  null,
+);
+
+export function useSalonesCmsEdit() {
+  const cursos = useCursosCmsEdit();
+  if (cursos?.ready) {
+    return {
+      ready: cursos.ready,
+      items: cursos.salonesItems,
+      page: cursos.salonesPage,
+      selectedId: cursos.selectedId,
+      setSelectedId: cursos.setSelectedId,
+      patchItem: cursos.patchSalon,
+      addSalon: cursos.addSalon,
+      hideSalon: cursos.hideSalon,
+      restoreSalon: cursos.restoreSalon,
+      hideSalonSede: cursos.hideSalonSede,
+      restoreSalonSede: cursos.restoreSalonSede,
+      salonesSedesHidden: cursos.salonesSedesHidden,
+      salonesHidden: cursos.salonesHidden,
+      patchPage: cursos.patchSalonesPage,
+      saveDraft: cursos.saveDraft,
+      publish: cursos.publish,
+      dirty: cursos.dirty,
+      busy: cursos.busy,
+      token: cursos.token,
+    } satisfies SalonesCmsEditContextValue;
+  }
+  return useContext(SalonesCmsEditContext);
+}
+
+function SalonesCmsEditInner({ children }: { children: ReactNode }) {
+  const [token, setToken] = useState<string | null>(null);
+  const [doc, setDoc] = useState<CmsDocument | null>(null);
+  const [items, setItems] = useState<CmsSalon[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [sedesHidden, setSedesHidden] = useState<string[]>([]);
+  const [page, setPage] = useState<CmsSalonesPage>(DEFAULT_SALONES_PAGE);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState("");
+
+  const ready = !!token;
+
+  const markDirty = useCallback(() => {
+    setDirty(true);
+    postToEditor({ type: "cms-dirty", dirty: true });
+  }, []);
+
+  const applyLoadedDoc = useCallback((draft: CmsDocument) => {
+    setDoc(draft);
+    const salonesLoaded = getSalonesForEdit(draft, SALONES);
+    setItems(salonesLoaded.items);
+    setHidden(salonesLoaded.hidden);
+    setSedesHidden(salonesLoaded.sedesHidden);
+    setPage({ ...DEFAULT_SALONES_PAGE, ...draft.sections.salonesPage });
+    setDirty(false);
+    postToEditor({ type: "cms-dirty", dirty: false });
+  }, []);
+
+  const saveDraft = useCallback(async () => {
+    if (!token) return;
+    setBusy(true);
+    setStatus("Guardando borrador…");
+    try {
+      const latest = await fetchCmsDraft("acropolis");
+      const next = mergeHeroCarouselsIntoDoc(
+        buildDocWithSalones(latest, items, page, hidden, sedesHidden),
+      );
+      await saveCmsDraft("acropolis", token, next);
+      setDoc(next);
+      setDirty(false);
+      setStatus("Borrador guardado.");
+      postToEditor({ type: "cms-status", text: "Borrador guardado.", ok: true });
+      postToEditor({ type: "cms-dirty", dirty: false });
+    } catch (e) {
+      const text = String(e);
+      setStatus(text);
+      postToEditor({ type: "cms-status", text, ok: false });
+    } finally {
+      setBusy(false);
+    }
+  }, [token, items, page, hidden, sedesHidden]);
+
+  const publish = useCallback(async () => {
+    await runCoordinatedCmsPublish();
+  }, []);
+
+  useEffect(() => {
+    return registerCmsEditInit((initToken) => {
+      setToken(initToken);
+      fetchCmsDraft("acropolis")
+        .then((draft) => {
+          applyLoadedDoc(draft);
+          postToEditor({ type: "cms-ready" });
+        })
+        .catch(() => setStatus("No se pudo cargar el borrador."));
+    }, "acropolis");
+  }, [applyLoadedDoc]);
+
+  useCmsEditBridge(saveDraft);
+
+  const patchItem = useCallback(
+    (id: string, patch: Partial<CmsSalon>) => {
+      setItems((list) =>
+        list.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+      );
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const patchPage = useCallback(
+    (patch: Partial<CmsSalonesPage>) => {
+      setPage((p) => ({ ...p, ...patch }));
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const addSalon = useCallback(
+    (options?: AddSalonOptions) => {
+      const id = newSalonId();
+      const defaultSede: SalonSede =
+        options?.sede ?? options?.atStartOfSede ?? "Naco";
+
+      setItems((list) => {
+        let sede: SalonSede = defaultSede;
+        let city: CmsSalon["city"] =
+          sede === "Santiago" ? "Santiago" : "Santo Domingo";
+
+        if (options?.afterId) {
+          const after = list.find((s) => s.id === options.afterId);
+          if (after) {
+            sede = after.sede;
+            city = after.city;
+          }
+        }
+
+        const entry: CmsSalon = {
+          id,
+          name: "Nuevo salón",
+          sede,
+          city,
+          summary: "",
+          featuredLayout: "butacas",
+          capacities: { butacas: 0, mesas: 0, herradura: 0 },
+          image: { src: "", alt: "" },
+        };
+
+        if (options?.afterId) {
+          const idx = list.findIndex((s) => s.id === options.afterId);
+          if (idx >= 0) {
+            const next = [...list];
+            next.splice(idx + 1, 0, entry);
+            return next;
+          }
+        }
+
+        if (options?.atStartOfSede) {
+          const idx = list.findIndex((s) => s.sede === options.atStartOfSede);
+          const next = [...list];
+          if (idx >= 0) {
+            next.splice(idx, 0, entry);
+          } else {
+            next.push(entry);
+          }
+          return next;
+        }
+
+        return [...list, entry];
+      });
+
+      setSelectedId(id);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const hideSalon = useCallback(
+    (id: string) => {
+      setItems((list) => list.filter((s) => s.id !== id));
+      if (SALONES.some((s) => s.id === id)) {
+        setHidden((h) => (h.includes(id) ? h : [...h, id]));
+      }
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const restoreSalon = useCallback(
+    (id: string) => {
+      setHidden((h) => h.filter((x) => x !== id));
+      setItems((list) => {
+        if (list.some((s) => s.id === id)) return list;
+        const seed = SALONES.find((s) => s.id === id);
+        if (!seed) return list;
+        return [
+          ...list,
+          {
+            id: seed.id,
+            name: seed.name,
+            sede: seed.sede,
+            city: seed.city,
+            summary: seed.summary,
+            featuredLayout: seed.featuredLayout,
+            capacities: { ...seed.capacities },
+            image: { src: seed.image.src, alt: seed.image.alt },
+          },
+        ];
+      });
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const hideSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSedesHidden((h) => (h.includes(sede) ? h : [...h, sede]));
+      setSelectedId(null);
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const restoreSalonSede = useCallback(
+    (sede: SalonSede) => {
+      setSedesHidden((h) => h.filter((x) => x !== sede));
+      markDirty();
+    },
+    [markDirty],
+  );
+
+  const selected = items.find((s) => s.id === selectedId) ?? null;
+
+  const value = useMemo(
+    (): SalonesCmsEditContextValue => ({
+      ready,
+      items,
+      page,
+      selectedId,
+      setSelectedId,
+      patchItem,
+      addSalon,
+      hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
+      salonesSedesHidden: sedesHidden,
+      salonesHidden: hidden,
+      patchPage,
+      saveDraft,
+      publish,
+      dirty,
+      busy,
+      token,
+    }),
+    [
+      ready,
+      items,
+      page,
+      selectedId,
+      patchItem,
+      addSalon,
+      hideSalon,
+      restoreSalon,
+      hideSalonSede,
+      restoreSalonSede,
+      sedesHidden,
+      hidden,
+      patchPage,
+      saveDraft,
+      publish,
+      dirty,
+      busy,
+      token,
+    ],
+  );
+
+  return (
+    <SalonesCmsEditContext.Provider value={value}>
+      <EditToolbar
+        label="Salones en alquiler"
+        dirty={dirty}
+        busy={busy}
+        status={status}
+        onSave={() => void saveDraft()}
+        onPublish={() => void publish()}
+      />
+      {!ready ? (
+        <div className="bg-amber-50 py-3 text-center text-sm text-na-muted">
+          Conectando con el editor…
+        </div>
+      ) : null}
+      {children}
+      {selectedId === "__section__" ? (
+        <EditPanelChrome
+          title="Textos de la sección"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Etiqueta superior"
+              value={page.eyebrow ?? ""}
+              onChange={(v) => patchPage({ eyebrow: v })}
+            />
+            <EditField
+              label="Título"
+              value={page.title ?? ""}
+              onChange={(v) => patchPage({ title: v })}
+            />
+            <EditField
+              label="Introducción"
+              value={page.intro ?? ""}
+              onChange={(v) => patchPage({ intro: v })}
+              multiline
+            />
+            <div className="rounded-lg border border-slate-200 p-3">
+              <p className="text-sm font-semibold text-slate-700">
+                Sedes visibles en alquiler
+              </p>
+              <ul className="mt-3 space-y-2">
+                {(["Naco", "Los Prados", "Santiago"] as SalonSede[]).map(
+                  (sede) => {
+                    const isHidden = sedesHidden.includes(sede);
+                    return (
+                      <li
+                        key={sede}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>
+                          Sede {sede}
+                          {isHidden ? (
+                            <span className="ml-2 text-xs font-semibold text-amber-800">
+                              (oculta)
+                            </span>
+                          ) : null}
+                        </span>
+                        {isHidden ? (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                            onClick={() => restoreSalonSede(sede)}
+                          >
+                            Mostrar
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-xs font-semibold text-red-700"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `¿Ocultar la sede ${sede} del catálogo de salones?`,
+                                )
+                              ) {
+                                hideSalonSede(sede);
+                              }
+                            }}
+                          >
+                            Ocultar
+                          </button>
+                        )}
+                      </li>
+                    );
+                  },
+                )}
+              </ul>
+            </div>
+            {hidden.length > 0 ? (
+              <div className="rounded-lg border border-slate-200 p-3">
+                <p className="text-sm font-semibold text-slate-700">
+                  Salones ocultos
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {hidden.map((id) => {
+                    const salon = SALONES.find((s) => s.id === id);
+                    return (
+                      <li
+                        key={id}
+                        className="flex items-center justify-between gap-2 text-sm"
+                      >
+                        <span>{salon?.name ?? id}</span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-xs font-semibold text-emerald-800"
+                          onClick={() => restoreSalon(id)}
+                        >
+                          Mostrar de nuevo
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        </EditPanelChrome>
+      ) : null}
+      {selected ? (
+        <EditPanelChrome
+          title={`Editar salón — ${selected.name}`}
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelectedId(null)}
+          onSave={() => void saveDraft()}
+        >
+          <div className="space-y-4">
+            <EditField
+              label="Nombre"
+              value={selected.name}
+              onChange={(v) => patchItem(selected.id, { name: v })}
+            />
+            <EditField
+              label="Resumen"
+              value={selected.summary}
+              onChange={(v) => patchItem(selected.id, { summary: v })}
+              multiline
+            />
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-700">
+                Disposición en la foto
+              </span>
+              <select
+                value={selected.featuredLayout}
+                onChange={(e) =>
+                  patchItem(selected.id, {
+                    featuredLayout: e.target
+                      .value as CmsSalon["featuredLayout"],
+                  })
+                }
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+              >
+                {LAYOUT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <EditField
+                label="Cap. butacas"
+                value={String(selected.capacities.butacas)}
+                onChange={(v) =>
+                  patchItem(selected.id, {
+                    capacities: {
+                      ...selected.capacities,
+                      butacas: Number(v) || 0,
+                    },
+                  })
+                }
+              />
+              <EditField
+                label="Cap. mesas"
+                value={String(selected.capacities.mesas)}
+                onChange={(v) =>
+                  patchItem(selected.id, {
+                    capacities: {
+                      ...selected.capacities,
+                      mesas: Number(v) || 0,
+                    },
+                  })
+                }
+              />
+              <EditField
+                label="Cap. herradura"
+                value={String(selected.capacities.herradura)}
+                onChange={(v) =>
+                  patchItem(selected.id, {
+                    capacities: {
+                      ...selected.capacities,
+                      herradura: Number(v) || 0,
+                    },
+                  })
+                }
+              />
+            </div>
+            <ImageField
+              label="Foto del salón"
+              media={selected.image}
+              token={token}
+              onChange={(image) => patchItem(selected.id, { image })}
+            />
+          </div>
+        </EditPanelChrome>
+      ) : null}
+    </SalonesCmsEditContext.Provider>
+  );
+}
+
+export function SalonesCmsEditProvider({ children }: { children: ReactNode }) {
+  // En /cursos la edición de salones la maneja CursosCmsEditContext (un solo guardado).
+  return <>{children}</>;
+}

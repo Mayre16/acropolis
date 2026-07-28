@@ -1,0 +1,62 @@
+name: Daily content refresh (Instagram + feed internacional)
+
+on:
+  schedule:
+    # 11:00 UTC ≈ 07:00 AST (República Dominicana)
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-content-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Fetch Instagram posts
+        continue-on-error: true
+        run: npm run fetch:instagram
+
+      - name: Fetch international RSS (mundo)
+        continue-on-error: true
+        run: npm run fetch:mundo
+
+      - name: Detect content changes
+        id: changes
+        run: |
+          git add \
+            lib/home-content.ts \
+            public/img/instagram \
+            public/data/mundo-feed.json \
+            public/img/mundo \
+            || true
+          if git diff --cached --quiet; then
+            echo "changed=0" >> "$GITHUB_OUTPUT"
+            echo "Sin cambios en Instagram ni feed internacional."
+          else
+            echo "changed=1" >> "$GITHUB_OUTPUT"
+            git status --short
+          fi
+
+      - name: Commit refreshed content
+        if: steps.changes.outputs.changed == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Actualizar Instagram y feed internacional."
+          git push origin HEAD:main

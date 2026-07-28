@@ -1,0 +1,223 @@
+/* Footer principal — grid 3 columnas (patrón Civis) sobre Heket. */
+.principal-footer {
+  width: 100%;
+  margin-top: auto;
+  color: #fff;
+  background: #086357;
+}
+
+.principal-footer__inner {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+  padding: 1.25rem 1rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .principal-footer__inner {
+    padding-inline: 1.5rem;
+  }
+}
+
+.principal-footer__grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .principal-footer__grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .principal-footer__na-mark {
+    justify-self: center;
+  }
+
+  .principal-footer__nav-col {
+    justify-self: end;
+    max-width: min(100%, 34rem);
+    text-align: right;
+  }
+
+  .principal-footer__connect {
+    max-width: min(100%, 18rem);
+  }
+}
+
+.principal-footer__na-mark {
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+  padding-block: 0.5rem 0.75rem;
+}
+
+.principal-footer__section-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.principal-footer__tagline {
+  margin: 0.625rem 0 0;
+  max-width: 18rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.principal-footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.principal-footer__social a {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.principal-footer__social a:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.principal-footer__nav-block + .principal-footer__nav-block {
+  margin-top: 0.625rem;
+}
+
+.principal-footer__nav-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  justify-content: flex-end;
+}
+
+.principal-footer__nav-list + .principal-footer__nav-list {
+  margin-top: 0.25rem;
+}
+
+.principal-footer__nav-list li {
+  display: inline-flex;
+}
+
+.principal-footer__nav-list a {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.principal-footer__nav-list a:hover {
+  color: #fff;
+}
+
+.principal-footer__meta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (min-width: 640px) {
+  .principal-footer__meta-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .principal-footer__legal-inline {
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+}
+
+.principal-footer__domicile {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.principal-footer__legal-inline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+}
+
+.principal-footer__legal-inline a {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.principal-footer__legal-inline a:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.principal-footer__legal-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.principal-footer__legal-bar-inner {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+@media (min-width: 640px) {
+  .principal-footer__legal-bar-inner {
+    flex-direction: row;
+    align-items: center;
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .principal-footer__nav-col {
+    text-align: left;
+  }
+
+  .principal-footer__nav-list {
+    justify-content: flex-start;
+  }
+}

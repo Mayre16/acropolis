@@ -1,0 +1,153 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { Pencil } from "lucide-react";
+import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useCmsEditMode } from "@/hooks/useCmsEditMode";
+import { pickHomeHeroBackground } from "@/lib/cms/home-hero-display";
+import {
+  isCmsEnabled,
+  useCmsDocument,
+  useCmsMediaReady,
+} from "@/lib/cms/provider";
+import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { assetUrl } from "@/lib/asset-url";
+import {
+  CMS_EDIT_HERO_PENDING_CLASS,
+  CMS_EDIT_HERO_READY_CLASS,
+  isInEditorIframe,
+  parseCmsEditParam,
+  readStoredCmsEditMode,
+} from "@/lib/cms/edit-mode";
+
+function isHomeCmsEditActive(): boolean {
+  if (typeof window === "undefined") return false;
+  const fromUrl = parseCmsEditParam(
+    new URLSearchParams(window.location.search).get("cmsEdit"),
+  );
+  if (fromUrl === "1") return true;
+  return isInEditorIframe() && readStoredCmsEditMode() === "1";
+}
+
+const HERO_OVERLAY = "bg-na-heket/[0.78]";
+const HERO_CTA =
+  "inline-flex items-center justify-center rounded-2xl border-2 border-white bg-na-heket/50 px-10 py-4 text-xs font-bold uppercase tracking-[0.22em] text-white transition hover:bg-na-heket/65 sm:rounded-3xl sm:px-12 sm:py-[1.125rem] sm:text-sm";
+
+export function HomeHeroCms() {
+  const cmsEditMode = useCmsEditMode();
+  const cms = useCmsDocument();
+  const mediaReady = useCmsMediaReady();
+  const edit = useHomeCmsEdit();
+  const published = cms?.sections.homeHero;
+  const draft = edit?.homeHero;
+  const [imageLoadedSrc, setImageLoadedSrc] = useState<string | null>(null);
+  // Foto del repo en SSR + primer paint; CMS solo tras montar (sin flash verde).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const inHomeEdit =
+    cmsEditMode === "1" ||
+    (typeof window !== "undefined" && isHomeCmsEditActive());
+
+  const awaitingDraft = inHomeEdit && !edit?.ready;
+
+  const h1 =
+    (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
+    "Nueva Acrópolis República Dominicana";
+
+  const heroBackground = awaitingDraft
+    ? null
+    : inHomeEdit && edit?.ready
+      ? pickHomeHeroBackground(draft?.background)
+      : pickHomeHeroBackground(
+          mounted && isCmsEnabled() && mediaReady
+            ? published?.background
+            : undefined,
+          { allowRepoFallback: true },
+        );
+
+  const resolvedBackgroundSrc = heroBackground
+    ? assetUrl(
+        resolveCmsMediaUrl(heroBackground.src) ?? heroBackground.src,
+      )
+    : null;
+
+  const showPhoto =
+    Boolean(resolvedBackgroundSrc) && imageLoadedSrc === resolvedBackgroundSrc;
+
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (!inHomeEdit) {
+      root.classList.remove(CMS_EDIT_HERO_PENDING_CLASS, CMS_EDIT_HERO_READY_CLASS);
+      return;
+    }
+    if (edit?.ready && showPhoto) {
+      root.classList.add(CMS_EDIT_HERO_READY_CLASS);
+    } else {
+      root.classList.remove(CMS_EDIT_HERO_READY_CLASS);
+    }
+  }, [inHomeEdit, edit?.ready, showPhoto]);
+
+  return (
+    <section
+      id="home-hero"
+      className="relative flex min-h-screen items-center justify-center overflow-x-hidden scroll-mt-24 bg-na-heketDark"
+    >
+      <div className="absolute inset-0" data-hero-bg aria-hidden>
+        {/* Fondo oscuro (no degradado pastel) mientras llega la foto. */}
+        <div className="absolute inset-0 bg-na-heketDark" />
+        {resolvedBackgroundSrc ? (
+          <Image
+            key={resolvedBackgroundSrc}
+            src={resolvedBackgroundSrc}
+            alt={heroBackground?.alt ?? ""}
+            fill
+            priority
+            unoptimized
+            className={`object-cover object-center transition-opacity duration-300 ${
+              showPhoto ? "opacity-100" : "opacity-0"
+            }`}
+            sizes="100vw"
+            onLoad={() => setImageLoadedSrc(resolvedBackgroundSrc)}
+          />
+        ) : null}
+      </div>
+      <div
+        className={`pointer-events-none absolute inset-0 ${HERO_OVERLAY}`}
+        aria-hidden
+      />
+
+      {edit?.ready ? (
+        <button
+          type="button"
+          onClick={() => edit.setSelected("hero", "__hero__")}
+          className="absolute right-4 top-24 z-20 inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-lg"
+        >
+          <Pencil className="h-4 w-4" />
+          Editar encabezado
+        </button>
+      ) : null}
+
+      <div className="relative mx-auto flex w-full max-w-[700px] flex-col items-center overflow-visible px-5 pb-10 pt-24 text-center sm:pt-28 md:px-12 md:pb-[50px] md:pt-[100px]">
+        <HeroOinadomLogo
+          priority
+          align="center"
+          size="hero"
+          maxWidthClass="max-w-[min(94vw,32rem)]"
+        />
+        <h1 className="sr-only">{h1}</h1>
+        <Link
+          href="/quienes-somos"
+          className={`${HERO_CTA} pointer-events-auto mt-8 sm:mt-10`}
+        >
+          Qué es Nueva Acrópolis
+        </Link>
+      </div>
+    </section>
+  );
+}

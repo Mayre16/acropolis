@@ -1,0 +1,292 @@
+/* Header integrado — identificador recortado + menú sobre azul de marca. */
+.circulo-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+  --circulo-header-brand: #53a3da;
+  --circulo-mark-height: clamp(
+    2.65rem,
+    calc((100vw - 3.25rem) / var(--circulo-mark-aspect, 7.607)),
+    min(4.5rem, calc((100vw - 3.25rem) / var(--circulo-mark-aspect, 7.607)))
+  );
+  --circulo-header-white-max: calc(
+    var(--circulo-mark-aspect, 7.607) * var(--circulo-mark-height) * 0.115
+  );
+  background: var(--circulo-header-brand);
+}
+
+.circulo-site-header__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  min-height: var(--circulo-mark-height);
+  padding: 0;
+  gap: 0;
+  background: var(--circulo-header-brand);
+  position: relative;
+  overflow: visible;
+}
+
+.circulo-site-header__row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--circulo-header-white-max);
+  background: #fff;
+  z-index: 0;
+  clip-path: polygon(0 0, 63.5% 0, 100% 100%, 0 100%);
+}
+
+.circulo-site-header__brand {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 0;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  height: var(--circulo-mark-height);
+  max-width: calc(100% - 3.25rem);
+  padding-right: var(--circulo-header-mark-pad, 0.75rem);
+  box-sizing: border-box;
+}
+
+.circulo-site-header__brand :is(span, img) {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.circulo-site-header__mark,
+.circulo-brand-mark {
+  display: block;
+  flex-shrink: 0;
+  vertical-align: top;
+}
+
+.circulo-brand-mark--lg {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.circulo-site-header__menu-btn {
+  position: relative;
+  z-index: 3;
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+  list-style: none;
+}
+
+.circulo-site-header__menu-btn::-webkit-details-marker {
+  display: none;
+}
+
+.circulo-site-header__mobile-menu {
+  margin-left: auto;
+  align-self: center;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 3;
+}
+
+.circulo-site-header__mobile-menu[open] {
+  width: 100%;
+}
+
+.circulo-site-header__mobile-menu[open] > .circulo-site-header__menu-btn {
+  margin-left: auto;
+}
+
+.circulo-site-header__menu-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.circulo-site-header__nav {
+  display: none;
+  min-width: 0;
+  flex: 1;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 0.125rem;
+  padding: 0 0.75rem 0 0;
+  margin: 0;
+  margin-left: -2.25rem;
+  position: relative;
+  z-index: 2;
+  background: var(--circulo-header-brand);
+}
+
+.circulo-site-header__link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 3px solid transparent;
+  padding: 0 0.85rem;
+  font-family: var(--font-noto-sans), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(17, 22, 49, 0.3);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.circulo-site-header__link:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.circulo-site-header__link--active {
+  color: #fff;
+  font-weight: 900;
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.circulo-site-header__mobile-nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--circulo-header-brand);
+  padding: 0.75rem 1rem 1rem;
+}
+
+.circulo-site-header__mobile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.circulo-site-header__mobile-link {
+  display: block;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  font-family: var(--font-noto-sans), sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgba(17, 22, 49, 0.28);
+  transition: background 0.15s ease;
+}
+
+.circulo-site-header__mobile-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.circulo-site-header__mobile-link--active {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 -3px 0 #fff;
+}
+
+@media (min-width: 640px) {
+  .circulo-site-header {
+    --circulo-mark-height: 5.25rem;
+  }
+
+  .circulo-site-header__row,
+  .circulo-site-header__brand {
+    min-height: var(--circulo-mark-height);
+    height: var(--circulo-mark-height);
+  }
+
+  .circulo-site-header__nav {
+    margin-left: -2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .circulo-site-header {
+    --circulo-mark-height: 6.25rem;
+  }
+
+  .circulo-site-header__row,
+  .circulo-site-header__brand {
+    min-height: var(--circulo-mark-height);
+    height: var(--circulo-mark-height);
+  }
+
+  .circulo-site-header__nav {
+    margin-left: -2.75rem;
+    display: flex;
+    gap: 0.25rem;
+    padding-right: 1rem;
+  }
+
+  .circulo-site-header__brand {
+    flex: 0 0 auto;
+    width: min(
+      calc(
+        var(--circulo-mark-aspect, 7.607) * var(--circulo-mark-height) +
+          var(--circulo-header-mark-pad, 0.75rem)
+      ),
+      calc(100vw - 3.25rem)
+    );
+    max-width: calc(100vw - 3.25rem);
+    overflow: visible;
+    box-sizing: content-box;
+  }
+
+  .circulo-site-header__link {
+    padding: 0 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .circulo-site-header__menu-btn {
+    display: none;
+  }
+
+  .circulo-site-header__mobile-menu {
+    display: none;
+  }
+
+  .circulo-site-header__mobile-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .circulo-site-header {
+    --circulo-mark-height: 6.75rem;
+  }
+
+  .circulo-site-header__row,
+  .circulo-site-header__brand {
+    min-height: var(--circulo-mark-height);
+    height: var(--circulo-mark-height);
+  }
+
+  .circulo-site-header__nav {
+    margin-left: -3rem;
+  }
+}

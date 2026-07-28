@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Marca OINA — fondo claro verde + neutros. */
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Modo edición CMS: oculta el hero pre-renderizado hasta que el borrador esté listo.
+   Fondo oscuro mientras tanto — evita el flash verde pastel del body. */
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero {
+  background-color: #0a3d36;
+}
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero [data-hero-bg],
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero > img {
+  visibility: hidden;
+}
+html.cms-edit-pending-hero:not(.cms-edit-hero-ready) #home-hero > [aria-hidden]:not([data-hero-bg]) {
+  /* Overlay verde encima de nada = mancha pastel; debajo oscuro basta. */
+  opacity: 0.35;
+}
+
+/* Iframe del editor: la barra ámbar del sitio queda oculta (Guardar/Publicar van arriba en el editor). */
+html.cms-edit-embedded [data-cms-edit-toolbar],
+html.cms-edit-embedded [data-cms-edit-connecting] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(0, 150, 132, 0.12), transparent 52%),
+    radial-gradient(circle at 82% 6%, rgba(255, 201, 13, 0.12), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(216, 217, 219, 0.55), transparent 55%),
+    linear-gradient(180deg, #eef0f2 0%, #f8f9fa 100%);
+  color: #1d1d1b;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(8, 99, 87, 0.28);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 99, 87, 0.4);
+}
+
+@keyframes diplomado-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes world-map-dot-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.85);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
+  }
+}
+
+.world-map__dot {
+  animation: world-map-dot-pulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-map__dot {
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

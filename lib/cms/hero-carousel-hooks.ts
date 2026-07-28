@@ -1,0 +1,68 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  isCmsEnabled,
+  useCmsDocument,
+  useCmsMediaReady,
+} from "@/lib/cms/provider";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import {
+  HERO_CAROUSEL_DEFAULTS,
+  heroImagesForKey,
+  toHeroImage,
+  type CmsHeroCarouselKey,
+} from "@/lib/cms/hero-carousel-edit";
+import type { HeroImage } from "@/lib/hero-images";
+
+function resolveFallbackImages(
+  key: CmsHeroCarouselKey,
+  fallback?: HeroImage[],
+): HeroImage[] {
+  const base = fallback ?? HERO_CAROUSEL_DEFAULTS[key];
+  return base
+    .map((img) =>
+      toHeroImage({
+        id: "fallback",
+        src: img.src,
+        alt: img.alt,
+        media: img.media,
+        poster: img.poster,
+      }),
+    )
+    .filter((img): img is HeroImage => img !== null);
+}
+
+/** Imágenes del carrusel hero: CMS publicado o borrador en edición. */
+export function useHeroCarouselImages(
+  key: CmsHeroCarouselKey,
+  fallback?: HeroImage[],
+): HeroImage[] {
+  const cms = useCmsDocument();
+  const mediaReady = useCmsMediaReady();
+  const edit = useHeroCarouselCmsEdit();
+  // SSR y primer paint del cliente deben coincidir (sin early-CMS en el HTML).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (edit?.ready) {
+    const images = heroImagesForKey(edit.carousels, key);
+    return images.length ? images : resolveFallbackImages(key, fallback);
+  }
+
+  // Vacío hasta montar + CMS listo: evita hydration mismatch y flash del repo.
+  if (!mounted || (isCmsEnabled() && !mediaReady)) {
+    return [];
+  }
+
+  const fromCms = cms?.sections.heroCarousels?.[key];
+  if (fromCms?.length) {
+    const images = fromCms
+      .map(toHeroImage)
+      .filter((img): img is HeroImage => img !== null);
+    if (images.length) return images;
+  }
+  return resolveFallbackImages(key, fallback);
+}
