@@ -30,8 +30,10 @@ export async function loadPublishedCms(): Promise<CmsDocument | null> {
   const base = process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "");
   if (base) {
     try {
+      // force-cache: en `output: "export"` el no-store puede vaciar generateMetadata
+      // (sin og:image el compartir no muestra preview de la foto).
       const res = await fetch(`${base}/content/acropolis/published`, {
-        cache: "no-store",
+        cache: "force-cache",
       });
       if (res.ok) {
         const doc = (await res.json()) as CmsDocument;
@@ -42,6 +44,21 @@ export async function loadPublishedCms(): Promise<CmsDocument | null> {
     }
   }
   return readLocalCms();
+}
+
+/** URL absoluta pública de un upload CMS (para og:image / crawlers). */
+export function absoluteCmsUploadUrl(src?: string): string | undefined {
+  if (!src?.trim()) return undefined;
+  if (/^https?:\/\//i.test(src)) return src;
+  const path = src.match(
+    /(\/uploads\/(?:acropolis|civis|editorial|circulodeamigos)\/[^\s"?#]+)/,
+  )?.[1];
+  if (!path) return undefined;
+  const api = (
+    process.env.NEXT_PUBLIC_CMS_URL?.trim() ||
+    "https://editor.acropolis.adesa.com.do/api"
+  ).replace(/\/$/, "");
+  return `${api}${path}`;
 }
 
 export async function getArticuloStaticParams() {

@@ -32,6 +32,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Sync CMS published.json (frases / og:image en build)
+        env:
+          CMS_API: https://editor.acropolis.adesa.com.do/api
+        run: |
+          mkdir -p data/acropolis
+          curl -fsSL "$CMS_API/content/acropolis/published" -o data/acropolis/published.json
+          node -e "const d=require('./data/acropolis/published.json'); const n=(d.sections&&d.sections.frasesDelDia||[]).filter(f=>f&&f.src).length; console.log('frases con foto:', n); if(d.version!==1) process.exit(1)"
+
       - name: Build Next.js (producción acropolis.org.do)
         env:
           NEXT_PUBLIC_SITE_URL: https://acropolis.org.do

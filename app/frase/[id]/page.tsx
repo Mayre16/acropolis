@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { FraseDelDiaShareView } from "@/components/home/FraseDelDiaShareView";
-import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
+  absoluteCmsUploadUrl,
   getFraseDelDiaStaticParams,
   getMergedFraseDelDia,
 } from "@/lib/cms/static-params";
@@ -10,6 +10,7 @@ import {
   FRASE_DEL_DIA_SHARE_TITLE,
   fraseDelDiaSharePath,
 } from "@/lib/frases-del-dia-share";
+import { SITE_URL } from "@/lib/site-config";
 
 export async function generateStaticParams() {
   return getFraseDelDiaStaticParams();
@@ -25,10 +26,11 @@ export async function generateMetadata({
   if (!frase) {
     return { title: "Frase del día" };
   }
-  const image = resolveCmsMediaUrl(frase.src) ?? frase.src;
+  const image = absoluteCmsUploadUrl(frase.src);
   const title = FRASE_DEL_DIA_SHARE_TITLE;
   const description = FRASE_DEL_DIA_SHARE_TEXT;
   const path = fraseDelDiaSharePath(frase.id);
+  const pageUrl = `${SITE_URL}${path}`;
   return {
     title,
     description,
@@ -37,8 +39,20 @@ export async function generateMetadata({
       type: "website",
       title,
       description,
-      url: path,
-      images: image ? [{ url: image, alt: frase.alt || "Frase del día" }] : [],
+      url: pageUrl,
+      siteName: "Nueva Acrópolis República Dominicana",
+      locale: "es_DO",
+      images: image
+        ? [
+            {
+              url: image,
+              alt: frase.alt || "Frase del día",
+              type: image.toLowerCase().endsWith(".png")
+                ? "image/png"
+                : "image/webp",
+            },
+          ]
+        : [],
     },
     twitter: {
       card: "summary_large_image",
