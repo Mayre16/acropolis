@@ -1,12 +1,182 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Pencil, Plus } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Pencil,
+  Plus,
+  Share2,
+  X,
+} from "lucide-react";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { useCmsFrasesDelDia } from "@/lib/cms/hooks";
+import type { CmsFraseDelDia } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
+
+function absoluteMediaUrl(src: string): string {
+  if (!src) return "";
+  if (/^https?:\/\//i.test(src)) return src;
+  if (typeof window === "undefined") return src;
+  return new URL(src, window.location.origin).href;
+}
+
+async function downloadFraseImage(src: string, filename: string) {
+  const url = absoluteMediaUrl(src);
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) throw new Error("fetch failed");
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    // Fallback: open in new tab if CORS blocks blob download
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
+async function shareFrase(src: string, alt: string) {
+  const url = absoluteMediaUrl(src);
+  const title = "Frase del día — Nueva Acrópolis RD";
+  const text =
+    alt?.trim() ||
+    "Frase del día de Nueva Acrópolis República Dominicana";
+
+  if (navigator.share) {
+    try {
+      const res = await fetch(url, { mode: "cors" });
+      if (res.ok && typeof navigator.canShare === "function") {
+        const blob = await res.blob();
+        const ext = blob.type.includes("png")
+          ? "png"
+          : blob.type.includes("jpeg") || blob.type.includes("jpg")
+            ? "jpg"
+            : "webp";
+        const file = new File([blob], `frase-del-dia.${ext}`, {
+          type: blob.type || "image/webp",
+        });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title, text });
+          return;
+        }
+      }
+    } catch {
+      /* fall through to URL share */
+    }
+    try {
+      await navigator.share({ title, text, url });
+      return;
+    } catch (e) {
+      if ((e as Error)?.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(url);
+    window.alert("Enlace de la imagen copiado.");
+  } catch {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
+function FraseLightbox({
+  frase,
+  src,
+  onClose,
+}: {
+  frase: CmsFraseDelDia;
+  src: string;
+  onClose: () => void;
+}) {
+  const titleId = useId();
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-na-heketDark/80 p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onClick={onClose}
+    >
+      <div
+        className="relative flex max-h-[min(92vh,52rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-na-heket/10 px-4 py-3">
+          <h3
+            id={titleId}
+            className="text-sm font-bold uppercase tracking-[0.18em] text-na-kefer"
+          >
+            Frase del día
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1.5 text-na-heket transition hover:bg-na-heket/10"
+            aria-label="Cerrar"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
+
+        <div className="relative min-h-0 flex-1 overflow-auto bg-[#f4f5f6] px-4 py-4 sm:px-6 sm:py-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={frase.alt || "Frase del día"}
+            className="mx-auto max-h-[min(70vh,40rem)] w-auto max-w-full rounded-lg object-contain shadow-md"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-na-heket/10 px-4 py-3 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => void shareFrase(src, frase.alt)}
+            className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 bg-white px-4 py-2 text-sm font-semibold text-na-heketDark transition hover:bg-na-heket/5"
+          >
+            <Share2 className="h-4 w-4" aria-hidden />
+            Compartir
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              void downloadFraseImage(
+                src,
+                `frase-del-dia-${frase.id.slice(0, 12)}.webp`,
+              )
+            }
+            className="inline-flex items-center gap-2 rounded-full bg-na-heket px-4 py-2 text-sm font-semibold text-white transition hover:bg-na-heketDark"
+          >
+            <Download className="h-4 w-4" aria-hidden />
+            Descargar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Carrusel de frases del día (fotos subidas desde el editor).
@@ -21,10 +191,17 @@ export function HomeFrasesDelDiaSection() {
 
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [lightboxId, setLightboxId] = useState<string | null>(null);
   const withSrc = list.filter((f) => f.src?.trim() || edit?.ready);
   const n = withSrc.length;
   const visible = Math.min(3, Math.max(1, n));
   const maxIndex = Math.max(0, n - visible);
+  const lightboxFrase = lightboxId
+    ? withSrc.find((f) => f.id === lightboxId)
+    : null;
+  const lightboxSrc = lightboxFrase
+    ? (resolveCmsMediaUrl(lightboxFrase.src) ?? lightboxFrase.src)
+    : "";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -38,22 +215,22 @@ export function HomeFrasesDelDiaSection() {
   }, [maxIndex]);
 
   useEffect(() => {
-    if (n <= visible || reduceMotion) return;
+    if (n <= visible || reduceMotion || lightboxId) return;
     const t = setInterval(
       () => setIndex((i) => (i + 1) % (maxIndex + 1)),
       5000,
     );
     return () => clearInterval(t);
-  }, [n, visible, maxIndex, reduceMotion]);
+  }, [n, visible, maxIndex, reduceMotion, lightboxId]);
 
   if (!edit?.ready && n === 0) return null;
 
   return (
     <section
       id="frases-del-dia"
-      className="scroll-mt-24 border-t border-na-heket/10 bg-white py-12 sm:py-14"
+      className="scroll-mt-24 border-t border-na-heket/10 bg-white py-14 sm:py-16"
     >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8 lg:px-10">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-na-kefer">
@@ -67,7 +244,11 @@ export function HomeFrasesDelDiaSection() {
                 Sube las fotos desde el lápiz o «Añadir frase». Publica para verlas
                 en el sitio.
               </p>
-            ) : null}
+            ) : (
+              <p className="mt-1.5 max-w-xl text-sm text-na-muted">
+                Toca una frase para verla grande, compartirla o descargarla.
+              </p>
+            )}
           </div>
           {edit?.ready ? (
             <button
@@ -82,18 +263,18 @@ export function HomeFrasesDelDiaSection() {
         </div>
 
         {n === 0 ? (
-          <div className="mt-6 rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-10 text-center text-sm text-amber-900">
+          <div className="mt-8 rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-10 text-center text-sm text-amber-900">
             Aún no hay frases. Pulsa «Añadir frase» y sube la imagen.
           </div>
         ) : (
-          <div className="relative mt-6">
-            <div className="overflow-hidden rounded-xl">
+          <div className="relative mt-8">
+            <div className="overflow-hidden px-1 sm:px-2">
               <ul
-                className="flex gap-3 transition-transform duration-700 ease-in-out sm:gap-4"
+                className="flex gap-4 transition-transform duration-700 ease-in-out sm:gap-5"
                 style={{
                   transform:
                     n > visible
-                      ? `translateX(calc(-${index} * ((100% - ${(visible - 1) * 0.75}rem) / ${visible} + 0.75rem)))`
+                      ? `translateX(calc(-${index} * ((100% - ${(visible - 1) * 1.25}rem) / ${visible} + 1.25rem)))`
                       : undefined,
                 }}
               >
@@ -105,30 +286,44 @@ export function HomeFrasesDelDiaSection() {
                       className={cn(
                         "shrink-0",
                         visible === 1 && "w-full",
-                        visible === 2 && "w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)]",
+                        visible === 2 &&
+                          "w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.25rem)/2)]",
                         visible >= 3 &&
-                          "w-[calc((100%-1.5rem)/3)] sm:w-[calc((100%-2rem)/3)]",
+                          "w-[calc((100%-2rem)/3)] sm:w-[calc((100%-2.5rem)/3)]",
                       )}
                     >
-                      <div className="group relative overflow-hidden rounded-lg bg-na-heket/5 shadow-na-soft">
+                      <div className="group relative overflow-hidden rounded-xl bg-na-heket/[0.04] p-2 shadow-na-soft sm:p-2.5">
                         {edit?.ready ? (
                           <button
                             type="button"
                             onClick={() => edit.setSelected("frase", frase.id)}
-                            className="absolute right-2 top-2 z-10 rounded-full bg-na-helios p-1.5 text-na-ink shadow"
+                            className="absolute right-3 top-3 z-10 rounded-full bg-na-helios p-1.5 text-na-ink shadow"
                             aria-label="Editar frase"
                           >
                             <Pencil className="h-3 w-3" />
                           </button>
                         ) : null}
-                        <div className="relative aspect-square w-full">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!src) {
+                              if (edit?.ready) {
+                                edit.setSelected("frase", frase.id);
+                              }
+                              return;
+                            }
+                            setLightboxId(frase.id);
+                          }}
+                          className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-na-kefer"
+                          aria-label={`Ver frase más grande: ${frase.alt || "Frase del día"}`}
+                        >
                           {src ? (
                             <Image
                               src={src}
                               alt={frase.alt || "Frase del día"}
                               fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 40vw, 220px"
+                              className="object-contain transition duration-300 group-hover:scale-[1.02]"
+                              sizes="(max-width: 640px) 80vw, 280px"
                               unoptimized
                             />
                           ) : (
@@ -136,7 +331,7 @@ export function HomeFrasesDelDiaSection() {
                               Sin imagen — clic en lápiz
                             </div>
                           )}
-                        </div>
+                        </button>
                       </div>
                     </li>
                   );
@@ -145,7 +340,7 @@ export function HomeFrasesDelDiaSection() {
             </div>
 
             {n > visible ? (
-              <div className="mt-4 flex items-center justify-center gap-3">
+              <div className="mt-5 flex items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={() =>
@@ -186,6 +381,14 @@ export function HomeFrasesDelDiaSection() {
           </div>
         )}
       </div>
+
+      {lightboxFrase && lightboxSrc ? (
+        <FraseLightbox
+          frase={lightboxFrase}
+          src={lightboxSrc}
+          onClose={() => setLightboxId(null)}
+        />
+      ) : null}
     </section>
   );
 }
