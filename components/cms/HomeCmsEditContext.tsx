@@ -49,6 +49,7 @@ import type {
   CmsDocument,
   CmsEsferaHomePromo,
   CmsEvento,
+  CmsFraseDelDia,
   CmsHomePage,
   CmsHomePillar,
 } from "@/lib/cms/types";
@@ -72,6 +73,7 @@ import { useCmsActivityPhotos } from "@/lib/cms/hooks";
 type HomeSelectedKind =
   | "carousel"
   | "photo"
+  | "frase"
   | "hero"
   | "whatIsNa"
   | "pillar"
@@ -80,10 +82,15 @@ type HomeSelectedKind =
   | "esferaHome"
   | null;
 
+function newFraseId() {
+  return `frase-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
 type HomeCmsEditContextValue = {
   ready: boolean;
   carousel: CmsAgendaEntry[];
   photos: CmsActivityPhoto[];
+  frases: CmsFraseDelDia[];
   homePage: CmsHomePage;
   circuloAmigos: CmsCirculoAmigosPromo;
   esferaHomePromo: CmsEsferaHomePromo;
@@ -99,6 +106,7 @@ type HomeCmsEditContextValue = {
   setSelected: (kind: HomeSelectedKind, id: string | null) => void;
   patchCarousel: (id: string, patch: Partial<CmsAgendaEntry>) => void;
   patchPhoto: (index: number, patch: Partial<CmsActivityPhoto>) => void;
+  patchFrase: (id: string, patch: Partial<CmsFraseDelDia>) => void;
   patchHomePage: (patch: Partial<CmsHomePage>) => void;
   patchPillar: (id: string, patch: Partial<CmsHomePillar>) => void;
   patchCirculoAmigos: (patch: Partial<CmsCirculoAmigosPromo>) => void;
@@ -112,7 +120,10 @@ type HomeCmsEditContextValue = {
   }) => void;
   addCarousel: () => void;
   addPhoto: () => void;
+  addFrase: () => void;
   deletePhoto: (index: number) => void;
+  deleteFrase: (id: string) => void;
+  moveFrase: (id: string, dir: -1 | 1) => void;
   deleteCarousel: (id: string) => void;
   promoteCarouselToEvento: (entry: CmsAgendaEntry) => void;
   saveDraft: () => Promise<void>;
@@ -132,6 +143,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [carousel, setCarousel] = useState<CmsAgendaEntry[]>([]);
   const [photos, setPhotos] = useState<CmsActivityPhoto[]>([]);
+  const [frases, setFrases] = useState<CmsFraseDelDia[]>([]);
   const [homeHero, setHomeHero] = useState<{
     h1?: string;
     h2?: string;
@@ -176,6 +188,14 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
             caption: p.caption,
           })),
     );
+    setFrases(
+      (draft.sections.frasesDelDia ?? []).map((f) => ({
+        id: f.id || newFraseId(),
+        src: f.src ?? "",
+        alt: f.alt ?? "Frase del día",
+        caption: f.caption,
+      })),
+    );
     setHidden(draft.sections.agendaHidden ?? []);
     setHomeHero(normalizeHomeHeroSection(draft.sections.homeHero ?? {}));
     setHomePage(mergeHomePage(draft.sections.homePage));
@@ -204,6 +224,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         sections: {
           ...withDrafts.sections,
           activityPhotos: photos,
+          frasesDelDia: frases,
           homeHero: normalizeHomeHeroSection(homeHero),
           homePage,
           culturaPage: {
@@ -218,7 +239,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         },
       });
     },
-    [carousel, photos, hidden, eventoDrafts, homeHero, homePage, circuloAmigos, esferaHomePromo, esferaLogo],
+    [carousel, photos, frases, hidden, eventoDrafts, homeHero, homePage, circuloAmigos, esferaHomePromo, esferaLogo],
   );
 
   const saveDraft = useCallback(async () => {
@@ -351,6 +372,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       ready,
       carousel,
       photos,
+      frases,
       homePage,
       circuloAmigos,
       esferaHomePromo,
@@ -374,6 +396,12 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       patchPhoto: (index, patch) => {
         setPhotos((list) =>
           list.map((p, i) => (i === index ? { ...p, ...patch } : p)),
+        );
+        markDirty();
+      },
+      patchFrase: (id, patch) => {
+        setFrases((list) =>
+          list.map((f) => (f.id === id ? { ...f, ...patch } : f)),
         );
         markDirty();
       },
@@ -401,9 +429,38 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         });
         markDirty();
       },
+      addFrase: () => {
+        const frase: CmsFraseDelDia = {
+          id: newFraseId(),
+          src: "",
+          alt: "Frase del día",
+          caption: "",
+        };
+        setFrases((list) => [...list, frase]);
+        setSelected("frase", frase.id);
+        markDirty();
+      },
       deletePhoto: (index) => {
         setPhotos((list) => list.filter((_, i) => i !== index));
         setSelected(null, null);
+        markDirty();
+      },
+      deleteFrase: (id) => {
+        setFrases((list) => list.filter((f) => f.id !== id));
+        setSelected(null, null);
+        markDirty();
+      },
+      moveFrase: (id, dir) => {
+        setFrases((list) => {
+          const i = list.findIndex((f) => f.id === id);
+          if (i < 0) return list;
+          const j = i + dir;
+          if (j < 0 || j >= list.length) return list;
+          const next = [...list];
+          const [item] = next.splice(i, 1);
+          next.splice(j, 0, item);
+          return next;
+        });
         markDirty();
       },
       deleteCarousel: (id) => {
@@ -437,6 +494,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       ready,
       carousel,
       photos,
+      frases,
       homePage,
       circuloAmigos,
       esferaHomePromo,
@@ -459,6 +517,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       markDirty,
       eventoDrafts,
       photos.length,
+      frases.length,
     ],
   );
 
@@ -466,6 +525,10 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const selectedPhotoIndex =
     selectedKind === "photo" && selectedId != null
       ? Number(selectedId)
+      : null;
+  const selectedFrase =
+    selectedKind === "frase" && selectedId
+      ? frases.find((f) => f.id === selectedId)
       : null;
   const selectedPillar =
     selectedKind === "pillar" && selectedId
@@ -532,6 +595,29 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
             onDelete={() => {
               if (window.confirm("¿Quitar esta foto del home?")) {
                 value.deletePhoto(selectedPhotoIndex);
+              }
+            }}
+          />
+        </EditPanelChrome>
+      ) : null}
+      {selectedKind === "frase" && selectedFrase ? (
+        <EditPanelChrome
+          title="Editar frase del día"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelected(null, null)}
+          onSave={() => void saveDraft()}
+        >
+          <HomeFraseEditFields
+            frase={selectedFrase}
+            token={token}
+            onChange={(patch) => value.patchFrase(selectedFrase.id, patch)}
+            onMoveUp={() => value.moveFrase(selectedFrase.id, -1)}
+            onMoveDown={() => value.moveFrase(selectedFrase.id, 1)}
+            onDelete={() => {
+              if (window.confirm("¿Quitar esta frase del carrusel?")) {
+                value.deleteFrase(selectedFrase.id);
               }
             }}
           />
@@ -822,6 +908,71 @@ function HomePhotoEditFields({
           className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
         >
           Quitar foto del home
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function HomeFraseEditFields({
+  frase,
+  token,
+  onChange,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+}: {
+  frase: CmsFraseDelDia;
+  token: string | null;
+  onChange: (patch: Partial<CmsFraseDelDia>) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onDelete?: () => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <AgendaEntryImageField
+        image={frase.src}
+        imageAlt={frase.alt}
+        token={token}
+        onChange={(patch) => {
+          if (patch.image !== undefined) onChange({ src: patch.image });
+          if (patch.imageAlt !== undefined) onChange({ alt: patch.imageAlt });
+        }}
+      />
+      <EditField
+        label="Texto alternativo"
+        value={frase.alt}
+        onChange={(v) => onChange({ alt: v })}
+      />
+      <EditField
+        label="Nota interna (opcional)"
+        value={frase.caption ?? ""}
+        onChange={(v) => onChange({ caption: v })}
+      />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={onMoveUp}
+          className="flex-1 rounded-lg border border-na-heket/20 py-2 text-sm font-semibold text-na-heketDark"
+        >
+          ← Antes
+        </button>
+        <button
+          type="button"
+          onClick={onMoveDown}
+          className="flex-1 rounded-lg border border-na-heket/20 py-2 text-sm font-semibold text-na-heketDark"
+        >
+          Después →
+        </button>
+      </div>
+      {onDelete ? (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="w-full rounded-lg border border-red-200 py-2 text-sm font-semibold text-red-700"
+        >
+          Quitar del carrusel
         </button>
       ) : null}
     </div>

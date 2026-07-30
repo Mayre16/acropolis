@@ -10,6 +10,7 @@ import { CirculoAmigosPromoCms } from "@/components/cms/CirculoAmigosPromoCms";
 import { UpcomingActivitiesHome } from "@/components/home/UpcomingActivitiesHome";
 import { HomeTalleresYCursosSection } from "@/components/home/HomeTalleresYCursosSection";
 import { HomeSalonesCarousel } from "@/components/home/HomeSalonesCarousel";
+import { HomeFrasesDelDiaSection } from "@/components/home/HomeFrasesDelDiaSection";
 import { InstagramFeedSection } from "@/components/home/InstagramFeedSection";
 import { ContentDigitalSection } from "@/components/home/ContentDigitalSection";
 import { SITE_URL, SOCIAL_LINKS } from "@/lib/site-config";
@@ -49,6 +50,7 @@ export default function Home() {
       <HomeTalleresYCursosSection />
       <HomeActivityPhotosSection />
       <HomeSalonesCarousel />
+      <HomeFrasesDelDiaSection />
       <ContentDigitalSection />
       <InstagramFeedSection variant="carousel" showSocialHeader={false} />
     </>

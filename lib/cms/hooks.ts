@@ -223,6 +223,14 @@ export function useCmsActivityPhotos() {
   return photos.slice(0, HOME_ACTIVITY_PHOTOS_LIMIT);
 }
 
+/** Frases del día publicadas; vacío si aún no hay ninguna en el CMS. */
+export function useCmsFrasesDelDia() {
+  const cms = useCmsDocument();
+  const list = cms?.sections.frasesDelDia;
+  if (!isCmsEnabled() || !list?.length) return [];
+  return list.filter((f) => f.src?.trim());
+}
+
 export function useMergedArticulos() {
   const cms = useCmsDocument();
   return mergeArticulos(ARTICULOS, cms);

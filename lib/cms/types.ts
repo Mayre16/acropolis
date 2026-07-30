@@ -842,6 +842,14 @@ export type CmsActivityPhoto = {
   caption?: string;
 };
 
+/** Foto de «Frase del día» en el carrusel del home (subida desde el editor). */
+export type CmsFraseDelDia = {
+  id: string;
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
 export type CmsHeroCarouselItem = {
   id: string;
   src: string;
@@ -958,6 +966,8 @@ export type CmsDocument = {
     articulosPage?: CmsArticulosPage;
     viajesPage?: CmsViajesPage;
     activityPhotos?: CmsActivityPhoto[];
+    /** Carrusel de frases del día (fotos) encima de Contenido digital. */
+    frasesDelDia?: CmsFraseDelDia[];
     heroCarousels?: CmsHeroCarousels;
     filosofiaPage?: CmsFilosofiaPage;
     agenda?: CmsAgendaEntry[];
