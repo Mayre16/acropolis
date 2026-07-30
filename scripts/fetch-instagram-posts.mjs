@@ -33,7 +33,18 @@ const UA =
  * Actualizar a mano cuando se confirmen posts nuevos.
  */
 const ALLOWLIST = [
+  // Recientes (jul 2026) — verificados en perfil @nuevaacropolisdominicana
+  "DbZKn1SEo-K",
+  "DbV9sNdEs9y",
+  "DbSy-n9lebg",
+  "DbRyjM4kruj",
+  "DbHMYWzkrhL",
+  "DbA6LIXEhMZ",
+  "Da3ih2UkmeF",
+  "Da3cNbQErY9",
+  "DZuvpbzkqax",
   "DavokKXElyr",
+  // Anteriores confirmados RD
   "DAd3eCqNDj_",
   "C9vFlxtvJCl",
   "DML_C8Rvrxa",
