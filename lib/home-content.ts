@@ -57,28 +57,28 @@ export const INSTAGRAM_POSTS: InstagramPost[] = [
     href: "https://www.instagram.com/p/DavokKXElyr/",
   },
   {
-    src: "/img/instagram/DaqOdQGjiOu.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DaqOdQGjiOu/",
-  },
-  {
-    src: "/img/instagram/DaoIyGqt6xX.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DaoIyGqt6xX/",
-  },
-  {
-    src: "/img/instagram/DHYyYpgpWln.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DHYyYpgpWln/",
-  },
-  {
     src: "/img/instagram/DAd3eCqNDj_.webp",
     alt: "Publicación de @nuevaacropolisdominicana en Instagram",
     href: "https://www.instagram.com/p/DAd3eCqNDj_/",
   },
   {
-    src: "/img/instagram/DaeXXF3NdcJ.webp",
+    src: "/img/instagram/C9vFlxtvJCl.webp",
     alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DaeXXF3NdcJ/",
-  }
+    href: "https://www.instagram.com/p/C9vFlxtvJCl/",
+  },
+  {
+    src: "/img/instagram/DML_C8Rvrxa.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DML_C8Rvrxa/",
+  },
+  {
+    src: "/img/instagram/DJNajckqkUA.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DJNajckqkUA/",
+  },
+  {
+    src: "/img/instagram/DFiqGiAPqCb.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DFiqGiAPqCb/",
+  },
 ];

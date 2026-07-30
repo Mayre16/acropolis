@@ -2,8 +2,12 @@
  * Obtiene publicaciones recientes de @nuevaacropolisdominicana,
  * descarga thumbnails locales y actualiza lib/home-content.ts.
  *
- * Solo acepta shortcodes cuyo autor verificado sea USERNAME
- * (evita posts ajenos que DuckDuckGo a veces mezcla en la búsqueda).
+ * Reglas (Instagram a menudo bloquea verificación de autor):
+ * - ok === true  → aceptar (autor confirmado)
+ * - ok === false → rechazar (otra cuenta)
+ * - ok === null  → solo aceptar si está en ALLOWLIST (curada a mano)
+ *
+ * Nunca confiar en shortcodes “descubiertos” sin autor confirmado.
  *
  * Uso: node scripts/fetch-instagram-posts.mjs
  */
@@ -23,23 +27,22 @@ const HOME = join(ROOT, "lib", "home-content.ts");
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
-/** Fallback cuando Instagram bloquea descubrimiento automático. */
-const SEED_SHORTCODES = [
+/**
+ * Shortcodes verificados visualmente como de @nuevaacropolisdominicana (RD).
+ * NO incluir posts de otras sedes, medios o cuentas ajenas.
+ * Actualizar a mano cuando se confirmen posts nuevos.
+ */
+const ALLOWLIST = [
   "DavokKXElyr",
-  "DaqOdQGjiOu",
-  "DaoIyGqt6xX",
-  "DHYyYpgpWln",
   "DAd3eCqNDj_",
-  "DaeXXF3NdcJ",
-  "DaSxk3pju9T",
-  "DJQCfRUty9X",
-  "DFiqGiAPqCb",
   "C9vFlxtvJCl",
   "DML_C8Rvrxa",
   "DJNajckqkUA",
+  "DFiqGiAPqCb",
+  "DJQCfRUty9X",
 ];
 
-const SEED_SET = new Set(SEED_SHORTCODES);
+const ALLOW_SET = new Set(ALLOWLIST);
 
 async function discoverShortcodesFromProfile() {
   const res = await fetch(PROFILE_URL, {
@@ -71,7 +74,7 @@ function extractShortcodes(html) {
  * Confirma autor vía embed.
  * - true: es @USERNAME
  * - false: es otra cuenta (detectada)
- * - null: inconcluso (login wall / HTML sin username) → se permiten seeds
+ * - null: inconcluso (login wall / HTML sin username)
  */
 async function shortcodeBelongsToAccount(shortcode) {
   const embedRes = await fetch(
@@ -103,7 +106,7 @@ async function shortcodeBelongsToAccount(shortcode) {
   const jsonUser = html.match(/"username"\s*:\s*"([^"]+)"/i)?.[1]?.toLowerCase();
   if (jsonUser) users.add(jsonUser);
 
-  if (users.size === 0) return null; // login wall / embed vacío
+  if (users.size === 0) return null;
   return users.has(USERNAME.toLowerCase());
 }
 
@@ -137,9 +140,10 @@ async function fetchRecentPosts() {
   const seen = new Set();
   const candidates = [];
 
+  // Allowlist primero (orden curado), luego descubrimiento de perfil.
   for (const code of [
+    ...ALLOWLIST,
     ...(await discoverShortcodesFromProfile()),
-    ...SEED_SHORTCODES,
   ]) {
     if (seen.has(code)) continue;
     seen.add(code);
@@ -162,16 +166,16 @@ async function fetchRecentPosts() {
       await sleep(300);
       continue;
     }
-    if (ok === null && !SEED_SET.has(code)) {
+    if (ok === null && !ALLOW_SET.has(code)) {
       console.warn(
-        `  Omitido /p/${code}/ — no se pudo verificar autor (Instagram login wall)`,
+        `  Omitido /p/${code}/ — autor no verificable y no está en allowlist`,
       );
       await sleep(300);
       continue;
     }
-    if (ok === null && SEED_SET.has(code)) {
+    if (ok === null && ALLOW_SET.has(code)) {
       console.warn(
-        `  /p/${code}/ — autor no verificable; se usa por estar en seeds confiables`,
+        `  /p/${code}/ — autor no verificable; se usa por allowlist curada`,
       );
     }
 
@@ -220,20 +224,14 @@ ${posts
   .join(",\n")}
 ];`;
 
-  let text = readFileSync(HOME, "utf8");
-  text = text.replace(
+  let src = readFileSync(HOME, "utf8");
+  src = src.replace(
     /\/\*\* Publicaciones recientes[\s\S]*?export const INSTAGRAM_POSTS: InstagramPost\[\] = \[[\s\S]*?\];/,
     block,
   );
-
-  writeFileSync(HOME, text, "utf8");
+  writeFileSync(HOME, src);
   console.log(`Actualizado lib/home-content.ts (${posts.length} publicaciones)`);
 } catch (err) {
-  // CI diario: no tumbar el job si Instagram bloquea; se mantienen las fotos actuales.
-  console.warn(
-    "Advertencia Instagram:",
-    err instanceof Error ? err.message : String(err),
-  );
-  console.warn("Se conservan las publicaciones ya existentes en home-content.ts.");
-  process.exitCode = 0;
+  console.error(err);
+  process.exit(1);
 }
