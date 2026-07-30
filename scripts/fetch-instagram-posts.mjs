@@ -7,7 +7,7 @@
  * - ok === false → rechazar (otra cuenta)
  * - ok === null  → solo aceptar si está en ALLOWLIST (curada a mano)
  *
- * Nunca confiar en shortcodes “descubiertos” sin autor confirmado.
+ * No hay filtro de “posts parecidos/iguales”: se toman los más recientes.
  *
  * Uso: node scripts/fetch-instagram-posts.mjs
  */
@@ -18,7 +18,7 @@ import { downloadAsWebp } from "./image-webp.mjs";
 
 const USERNAME = "nuevaacropolisdominicana";
 const PROFILE_URL = `https://www.instagram.com/${USERNAME}/`;
-const MAX_POSTS = 6;
+const MAX_POSTS = 9;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DEST = join(ROOT, "public", "img", "instagram");
