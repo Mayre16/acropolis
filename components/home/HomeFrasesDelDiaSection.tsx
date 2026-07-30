@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
+import { shareFraseDelDiaLink } from "@/lib/frases-del-dia-share";
 import { useCmsFrasesDelDia } from "@/lib/cms/hooks";
 import type { CmsFraseDelDia } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
@@ -40,50 +42,6 @@ async function downloadFraseImage(src: string, filename: string) {
     URL.revokeObjectURL(objectUrl);
   } catch {
     // Fallback: open in new tab if CORS blocks blob download
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
-async function shareFrase(src: string, alt: string) {
-  const url = absoluteMediaUrl(src);
-  const title = "Frase del día — Nueva Acrópolis RD";
-  const text =
-    alt?.trim() ||
-    "Frase del día de Nueva Acrópolis República Dominicana";
-
-  if (navigator.share) {
-    try {
-      const res = await fetch(url, { mode: "cors" });
-      if (res.ok && typeof navigator.canShare === "function") {
-        const blob = await res.blob();
-        const ext = blob.type.includes("png")
-          ? "png"
-          : blob.type.includes("jpeg") || blob.type.includes("jpg")
-            ? "jpg"
-            : "webp";
-        const file = new File([blob], `frase-del-dia.${ext}`, {
-          type: blob.type || "image/webp",
-        });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title, text });
-          return;
-        }
-      }
-    } catch {
-      /* fall through to URL share */
-    }
-    try {
-      await navigator.share({ title, text, url });
-      return;
-    } catch (e) {
-      if ((e as Error)?.name === "AbortError") return;
-    }
-  }
-
-  try {
-    await navigator.clipboard.writeText(url);
-    window.alert("Enlace de la imagen copiado.");
-  } catch {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 }
@@ -153,7 +111,7 @@ function FraseLightbox({
         <div className="flex flex-wrap items-center justify-center gap-2 border-t border-na-heket/10 px-4 py-3 sm:gap-3">
           <button
             type="button"
-            onClick={() => void shareFrase(src, frase.alt)}
+            onClick={() => void shareFraseDelDiaLink(frase.id)}
             className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 bg-white px-4 py-2 text-sm font-semibold text-na-heketDark transition hover:bg-na-heket/5"
           >
             <Share2 className="h-4 w-4" aria-hidden />
@@ -192,7 +150,19 @@ export function HomeFrasesDelDiaSection() {
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
+  const [uploadingMany, setUploadingMany] = useState(false);
+  const multiFileRef = useRef<HTMLInputElement>(null);
   const withSrc = list.filter((f) => f.src?.trim() || edit?.ready);
+
+  async function onPickFraseFiles(files: FileList | null) {
+    if (!files?.length || !edit?.ready) return;
+    setUploadingMany(true);
+    try {
+      await edit.addFrasesFromFiles(files);
+    } finally {
+      setUploadingMany(false);
+    }
+  }
   const n = withSrc.length;
   const visible = Math.min(3, Math.max(1, n));
   const maxIndex = Math.max(0, n - visible);
@@ -241,8 +211,8 @@ export function HomeFrasesDelDiaSection() {
             </h2>
             {edit?.ready ? (
               <p className="mt-1.5 max-w-xl text-xs font-semibold text-amber-800">
-                Sube las fotos desde el lápiz o «Añadir frase». Publica para verlas
-                en el sitio.
+                Puedes subir varias fotos a la vez con «Añadir fotos». Publica
+                para verlas en el sitio.
               </p>
             ) : (
               <p className="mt-1.5 max-w-xl text-sm text-na-muted">
@@ -251,20 +221,50 @@ export function HomeFrasesDelDiaSection() {
             )}
           </div>
           {edit?.ready ? (
-            <button
-              type="button"
-              onClick={() => edit.addFrase()}
-              className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow"
-            >
-              <Plus className="h-4 w-4" aria-hidden />
-              Añadir frase
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={multiFileRef}
+                type="file"
+                accept={CMS_IMAGE_ACCEPT}
+                multiple
+                className="sr-only"
+                disabled={uploadingMany}
+                onChange={(e) => {
+                  void onPickFraseFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+              <button
+                type="button"
+                disabled={uploadingMany}
+                onClick={() => multiFileRef.current?.click()}
+                className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow disabled:opacity-60"
+              >
+                <Plus className="h-4 w-4" aria-hidden />
+                {uploadingMany ? "Subiendo…" : "Añadir fotos"}
+              </button>
+            </div>
           ) : null}
         </div>
 
         {n === 0 ? (
           <div className="mt-8 rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-10 text-center text-sm text-amber-900">
-            Aún no hay frases. Pulsa «Añadir frase» y sube la imagen.
+            {edit?.ready ? (
+              <>
+                Aún no hay frases.{" "}
+                <button
+                  type="button"
+                  disabled={uploadingMany}
+                  onClick={() => multiFileRef.current?.click()}
+                  className="font-bold underline underline-offset-2 disabled:opacity-60"
+                >
+                  Elige una o varias fotos
+                </button>{" "}
+                (WebP, JPG o PNG).
+              </>
+            ) : (
+              "Aún no hay frases."
+            )}
           </div>
         ) : (
           <div className="relative mt-8">

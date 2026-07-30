@@ -35,6 +35,7 @@ import {
   fetchCmsDraft,
   resolveCmsMediaUrl,
   saveCmsDraft,
+  uploadCmsImage,
 } from "@/lib/cms/api-client";
 import {
   normalizeHomeHeroSection,
@@ -121,6 +122,8 @@ type HomeCmsEditContextValue = {
   addCarousel: () => void;
   addPhoto: () => void;
   addFrase: () => void;
+  /** Sube una o varias fotos y las añade al carrusel de frases. */
+  addFrasesFromFiles: (files: FileList | File[]) => Promise<void>;
   deletePhoto: (index: number) => void;
   deleteFrase: (id: string) => void;
   moveFrase: (id: string, dir: -1 | 1) => void;
@@ -367,6 +370,51 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
     [markDirty],
   );
 
+  const addFrasesFromFiles = useCallback(
+    async (files: FileList | File[]) => {
+      if (!token) {
+        window.alert("Inicia sesión en el editor para subir fotos.");
+        return;
+      }
+      const list = Array.from(files);
+      if (list.length === 0) return;
+
+      const created: CmsFraseDelDia[] = [];
+      const errors: string[] = [];
+      for (const file of list) {
+        try {
+          const url = await uploadCmsImage("acropolis", token, file);
+          created.push({
+            id: newFraseId(),
+            src: url,
+            alt: "Frase del día",
+            caption: "",
+          });
+        } catch (e) {
+          errors.push(`${file.name}: ${String(e)}`);
+        }
+      }
+
+      if (created.length > 0) {
+        setFrases((prev) => [...prev, ...created]);
+        setSelected("frase", created[created.length - 1]!.id);
+        markDirty();
+      }
+
+      if (errors.length > 0) {
+        const head = errors.slice(0, 5).join("\n");
+        const more =
+          errors.length > 5 ? `\n…y ${errors.length - 5} más.` : "";
+        window.alert(
+          created.length > 0
+            ? `Se añadieron ${created.length} foto(s). Fallaron ${errors.length}:\n${head}${more}`
+            : `No se pudo subir ninguna foto:\n${head}${more}`,
+        );
+      }
+    },
+    [token, markDirty, setSelected],
+  );
+
   const value = useMemo(
     (): HomeCmsEditContextValue => ({
       ready,
@@ -440,6 +488,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         setSelected("frase", frase.id);
         markDirty();
       },
+      addFrasesFromFiles,
       deletePhoto: (index) => {
         setPhotos((list) => list.filter((_, i) => i !== index));
         setSelected(null, null);
@@ -518,6 +567,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       eventoDrafts,
       photos.length,
       frases.length,
+      addFrasesFromFiles,
     ],
   );
 
@@ -615,6 +665,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
             onChange={(patch) => value.patchFrase(selectedFrase.id, patch)}
             onMoveUp={() => value.moveFrase(selectedFrase.id, -1)}
             onMoveDown={() => value.moveFrase(selectedFrase.id, 1)}
+            onAddMoreFiles={(files) => value.addFrasesFromFiles(files)}
             onDelete={() => {
               if (window.confirm("¿Quitar esta frase del carrusel?")) {
                 value.deleteFrase(selectedFrase.id);
@@ -921,6 +972,7 @@ function HomeFraseEditFields({
   onMoveUp,
   onMoveDown,
   onDelete,
+  onAddMoreFiles,
 }: {
   frase: CmsFraseDelDia;
   token: string | null;
@@ -928,7 +980,11 @@ function HomeFraseEditFields({
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onDelete?: () => void;
+  onAddMoreFiles?: (files: FileList | File[]) => Promise<void>;
 }) {
+  const moreRef = useRef<HTMLInputElement>(null);
+  const [addingMore, setAddingMore] = useState(false);
+
   return (
     <div className="space-y-4">
       <AgendaEntryImageField
@@ -950,6 +1006,33 @@ function HomeFraseEditFields({
         value={frase.caption ?? ""}
         onChange={(v) => onChange({ caption: v })}
       />
+      {onAddMoreFiles ? (
+        <div className="space-y-1">
+          <input
+            ref={moreRef}
+            type="file"
+            accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
+            multiple
+            className="sr-only"
+            disabled={addingMore || !token}
+            onChange={(e) => {
+              const files = e.target.files;
+              e.target.value = "";
+              if (!files?.length) return;
+              setAddingMore(true);
+              void onAddMoreFiles(files).finally(() => setAddingMore(false));
+            }}
+          />
+          <button
+            type="button"
+            disabled={addingMore || !token}
+            onClick={() => moreRef.current?.click()}
+            className="w-full rounded-lg border border-na-heket/20 py-2 text-sm font-semibold text-na-heketDark disabled:opacity-60"
+          >
+            {addingMore ? "Subiendo…" : "Añadir más fotos al carrusel"}
+          </button>
+        </div>
+      ) : null}
       <div className="flex gap-2">
         <button
           type="button"

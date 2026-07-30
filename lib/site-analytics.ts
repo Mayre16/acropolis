@@ -66,6 +66,8 @@ export function trackPageview(site: AnalyticsSiteId, path: string) {
     event: "pageview",
     path,
     visitorId: getVisitorId(),
+    referrer: typeof document !== "undefined" ? document.referrer || "" : "",
+    host: typeof window !== "undefined" ? window.location.hostname : "",
   });
 }
 

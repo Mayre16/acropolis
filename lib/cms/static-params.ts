@@ -84,3 +84,17 @@ export async function getMergedViaje(categoria: string, slug: string) {
   );
 }
 
+export async function getFraseDelDiaStaticParams() {
+  const cms = await loadPublishedCms();
+  const list = cms?.sections.frasesDelDia ?? [];
+  return list
+    .filter((f) => f.id?.trim() && f.src?.trim())
+    .map((f) => ({ id: f.id }));
+}
+
+export async function getMergedFraseDelDia(id: string) {
+  const cms = await loadPublishedCms();
+  const list = cms?.sections.frasesDelDia ?? [];
+  return list.find((f) => f.id === id && f.src?.trim()) ?? null;
+}
+
