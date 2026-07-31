@@ -36,7 +36,7 @@ import {
 } from "@/components/cms/CmsEditFields";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 
 const LAYOUT_OPTIONS = [
   { value: "butacas", label: "Butacas en filas" },

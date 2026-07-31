@@ -46,7 +46,7 @@ const HomeTalleresYCursosSection = dynamic(
 );
 const HomeActivityPhotosSection = dynamic(
   () =>
-    import("@/components/cms/HomeCmsEditContext").then((m) => ({
+    import("@/components/home/HomeActivityPhotosSection").then((m) => ({
       default: m.HomeActivityPhotosSection,
     })),
   { loading: () => null },

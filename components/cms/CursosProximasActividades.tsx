@@ -16,7 +16,7 @@ import {
 import { filterCursosAgendaEntries } from "@/lib/cursos-agenda";
 import { UpcomingAgenda } from "@/components/UpcomingAgenda";
 import { AgendaCardBody, AgendaCardThumbnail } from "@/components/ContentCardMedia";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { accentCardShell, accentTokens } from "@/lib/brand-accents";
 
 const DEFAULT_INSCRIBE =

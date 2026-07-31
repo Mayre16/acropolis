@@ -4,7 +4,7 @@ import Image from "next/image";
 import { EyeOff, MapPin, Pencil, Plus, User } from "lucide-react";
 import { CourseInscribeButton } from "@/components/CourseInscribeButton";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { ofertaSelectedId } from "@/lib/cms/cursos-oferta-edit";
 import { useCursosOfertaDisplay } from "@/lib/cms/cursos-display";
 import { splitCursosOferta } from "@/lib/cursos-permanentes";

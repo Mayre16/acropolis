@@ -1,6 +1,6 @@
 "use client";
 
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import {
   CONFERENCIAS_DEFAULTS,

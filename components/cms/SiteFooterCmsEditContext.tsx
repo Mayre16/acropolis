@@ -1,14 +1,20 @@
 "use client";
 
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
+  type ReactNode
 } from "react";
+import {
+  SiteFooterCmsEditContext,
+  type SiteFooterCmsEditContextValue,
+  useSiteFooterCmsEdit,
+} from "@/components/cms/SiteFooterCmsEditHooks";
+export type { SiteFooterCmsEditContextValue };
+export { useSiteFooterCmsEdit };
+
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import {
@@ -30,25 +36,6 @@ import {
   EditField,
   EditPanelChrome,
 } from "@/components/cms/CmsEditFields";
-
-type SiteFooterCmsEditContextValue = {
-  ready: boolean;
-  panelOpen: boolean;
-  openPanel: () => void;
-  closePanel: () => void;
-  footer: CmsSiteFooter;
-  patchFooter: (patch: Partial<CmsSiteFooter>) => void;
-  saveDraft: () => Promise<void>;
-  dirty: boolean;
-  busy: boolean;
-};
-
-const SiteFooterCmsEditContext =
-  createContext<SiteFooterCmsEditContextValue | null>(null);
-
-export function useSiteFooterCmsEdit() {
-  return useContext(SiteFooterCmsEditContext);
-}
 
 export { SITE_FOOTER_PANEL_ID };
 

@@ -36,8 +36,8 @@ import {
   mergePlatformNav,
   mergePlatformNavItems,
 } from "@/lib/cms/platform-nav-edit";
-import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditContext";
-import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditContext";
+import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditHooks";
+import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditHooks";
 import {
   DIPLOMADO_INFO_BANNER,
   DIPLOMADO_INSCRIPTION,

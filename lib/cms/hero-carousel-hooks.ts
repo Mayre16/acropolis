@@ -6,7 +6,7 @@ import {
   useCmsDocument,
   useCmsMediaReady,
 } from "@/lib/cms/provider";
-import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditHooks";
 import {
   HERO_CAROUSEL_DEFAULTS,
   heroImagesForKey,

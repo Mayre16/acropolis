@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   Users,
 } from "lucide-react";
-import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditContext";
+import { usePlatformNavCmsEdit } from "@/components/cms/PlatformNavCmsEditHooks";
 import { useMergedPlatformNavItems } from "@/lib/cms/hooks";
 import { type PlatformId } from "@/lib/site-config";
 

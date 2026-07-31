@@ -1,7 +1,7 @@
 "use client";
 
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
 import { useCmsDocument } from "@/lib/cms/provider";

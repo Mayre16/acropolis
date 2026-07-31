@@ -31,7 +31,7 @@ import {
   pageMediaBlockSelectedId,
 } from "@/lib/cms/page-media";
 import type { CmsPageMediaBlock, CmsPageMediaBlockKind } from "@/lib/cms/types";
-import type { PageMediaCmsEditContextValue } from "@/components/cms/PageMediaCmsContext";
+import type { PageMediaCmsEditContextValue } from "@/components/cms/PageMediaCmsHooks";
 
 const BLOCK_KINDS: CmsPageMediaBlockKind[] = [
   "text",

@@ -12,7 +12,7 @@ import {
   Pencil,
   User,
 } from "lucide-react";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { ofertaSelectedId } from "@/lib/cms/cursos-oferta-edit";
 import { CourseInscribeButton } from "@/components/CourseInscribeButton";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";

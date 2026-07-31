@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { MapPin, Pencil, Phone } from "lucide-react";
 import { NaBrandLockupGroup } from "@/components/NaBrandLockupGroup";
-import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditContext";
+import { useSiteFooterCmsEdit } from "@/components/cms/SiteFooterCmsEditHooks";
 import { useMergedSiteFooter } from "@/lib/cms/hooks";
 import {
   FOOTER_NAV_PRIMARY,

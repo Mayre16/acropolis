@@ -1,7 +1,7 @@
 "use client";
 
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import {
   DEFAULT_ESFERA_HOME_PROMO,
   ESFERA_HOME_PROMO_SECTION_ID,

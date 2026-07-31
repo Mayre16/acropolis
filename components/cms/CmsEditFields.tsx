@@ -16,7 +16,7 @@ import {
   cmsImageSlotHint,
   type CmsImageSlotId,
 } from "@/lib/cms/upload-file-validate";
-import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditHooks";
 import {
   type CmsHeroCarouselKey,
 } from "@/lib/cms/hero-carousel-edit";

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import { HeroOinadomLogo } from "@/components/HeroOinadomLogo";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { pickHomeHeroBackground } from "@/lib/cms/home-hero-display";
 import {

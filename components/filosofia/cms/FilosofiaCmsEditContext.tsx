@@ -55,7 +55,7 @@ import {
   FILOSOFIA_TEMARIO_DEFAULTS,
 } from "@/lib/filosofia-content";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
-import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
+import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditHooks";
 import { Images } from "lucide-react";
 import {
   FilosofiaAvanzadosPanel,

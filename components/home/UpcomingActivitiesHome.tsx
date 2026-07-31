@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UpcomingActivitiesCarousel } from "@/components/home/UpcomingActivitiesCarousel";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { cmsEntryToAgenda } from "@/lib/cms/agenda-edit";
 import type { AgendaEntry } from "@/lib/agenda";
 import type { CmsAgendaEntry } from "@/lib/cms/types";

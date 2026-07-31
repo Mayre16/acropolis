@@ -12,7 +12,7 @@ import {
   Pencil,
   UsersRound,
 } from "lucide-react";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import { SalonInquiryButton } from "@/components/SalonInquiryButton";
 import { cn } from "@/lib/utils/cn";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";

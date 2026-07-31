@@ -1,7 +1,7 @@
 "use client";
 
 import { useEsferaCmsEdit } from "@/components/cms/EsferaCmsEditContext";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { mergeEsferaPage } from "@/lib/cms/esfera-page-edit";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import type { CmsEsferaPage } from "@/lib/cms/types";

@@ -13,10 +13,8 @@ import {
   isCmsEditOrigin,
   type CmsEditMessage,
 } from "@/lib/cms/edit-bridge";
-import { HeroCarouselCmsEditProvider } from "@/components/cms/HeroCarouselCmsEditContext";
+import { CmsChromeEditGate } from "@/components/cms/CmsChromeEditGate";
 import { CmsPublishCoordinator } from "@/components/cms/CmsPublishCoordinator";
-import { SiteFooterCmsEditProvider } from "@/components/cms/SiteFooterCmsEditContext";
-import { PlatformNavCmsEditProvider } from "@/components/cms/PlatformNavCmsEditContext";
 import type { CmsDocument } from "@/lib/cms/types";
 import {
   EARLY_CMS_PUBLISHED_KEY,
@@ -116,11 +114,7 @@ export function CmsProvider({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <CmsPublishCoordinator />
         </Suspense>
-        <HeroCarouselCmsEditProvider>
-          <SiteFooterCmsEditProvider>
-            <PlatformNavCmsEditProvider>{children}</PlatformNavCmsEditProvider>
-          </SiteFooterCmsEditProvider>
-        </HeroCarouselCmsEditProvider>
+        <CmsChromeEditGate>{children}</CmsChromeEditGate>
       </CmsStatusContext.Provider>
     </CmsContext.Provider>
   );

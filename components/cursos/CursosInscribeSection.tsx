@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Clock, Pencil, User } from "lucide-react";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
 import {
   CURSOS_INSCRIBE_SECTION_ID,
   DEFAULT_CURSOS_INSCRIBE,

@@ -1,12 +1,9 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/SiteChrome";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { SiteAnalytics } from "@/components/SiteAnalytics";
+import { DeferredSiteScripts } from "@/components/DeferredSiteScripts";
 import { CmsProvider } from "@/lib/cms/provider";
-import { CmsEditModeBootstrap } from "@/components/cms/CmsEditModeBootstrap";
 import { SITE_URL } from "@/lib/site-config";
 import { cmsFaviconUrl } from "@/lib/cms-favicon-url";
 const notoSans = Noto_Sans({
@@ -77,13 +74,7 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} flex min-h-screen flex-col font-sans antialiased text-na-ink`}
       >
-        <Suspense fallback={null}>
-          <GoogleAnalytics />
-          <SiteAnalytics site="acropolis" />
-        </Suspense>
-        <Suspense fallback={null}>
-          <CmsEditModeBootstrap />
-        </Suspense>
+        <DeferredSiteScripts />
         <CmsProvider>
           <SiteChrome>{children}</SiteChrome>
         </CmsProvider>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, Drama, HeartHandshake, ArrowRight, Pencil } from "lucide-react";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { DEFAULT_HOME_PAGE, mergeHomePage } from "@/lib/cms/home-page-edit";
 import { useCmsDocument, isCmsEnabled } from "@/lib/cms/provider";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";

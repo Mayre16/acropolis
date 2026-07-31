@@ -1,17 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Fragment } from "react";
 import { Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { CmsSectionEditBar } from "@/components/cms/CmsEditPencil";
 import {
   usePageMediaCmsEdit,
   usePageMediaDisplay,
-} from "@/components/cms/PageMediaCmsContext";
-import {
-  PageMediaSortableBlocks,
-} from "@/components/cms/PageMediaSortableBlocks";
+} from "@/components/cms/PageMediaCmsHooks";
+import { PageMediaBlocksRead } from "@/components/cms/PageMediaBlocksRead";
 import { getSectionBlocks, pageMediaSectionSelectedId } from "@/lib/cms/page-media";
 import type { CmsPageMediaTarget } from "@/lib/cms/types";
+
+const PageMediaSortableBlocks = dynamic(
+  () =>
+    import("@/components/cms/PageMediaSortableBlocks").then((m) => ({
+      default: m.PageMediaSortableBlocks,
+    })),
+  { ssr: false, loading: () => null },
+);
 
 export function PageMediaSections({ pageId }: { pageId: CmsPageMediaTarget }) {
   const edit = usePageMediaCmsEdit();
@@ -93,12 +100,16 @@ export function PageMediaSections({ pageId }: { pageId: CmsPageMediaTarget }) {
                   </p>
                 ) : null}
                 <div className={section.title || section.intro ? "mt-8" : ""}>
-                  <PageMediaSortableBlocks
-                    sectionId={section.id}
-                    blocks={blocks}
-                    editing={editing}
-                    edit={edit && edit.pageId === pageId ? edit : null}
-                  />
+                  {editing ? (
+                    <PageMediaSortableBlocks
+                      sectionId={section.id}
+                      blocks={blocks}
+                      editing={editing}
+                      edit={edit && edit.pageId === pageId ? edit : null}
+                    />
+                  ) : (
+                    <PageMediaBlocksRead blocks={blocks} />
+                  )}
                 </div>
               </div>
             </section>

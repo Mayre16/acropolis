@@ -1,8 +1,8 @@
 "use client";
 
 import { useCulturaCmsEdit } from "@/components/cms/CulturaCmsEditContext";
-import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditContext";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useCursosCmsEdit } from "@/components/cms/CursosCmsEditHooks";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { CULTURA_CIRCULO_AMIGOS_DEFAULTS } from "@/lib/cultura-content";

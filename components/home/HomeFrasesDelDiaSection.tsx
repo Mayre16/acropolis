@@ -11,7 +11,7 @@ import {
   Share2,
   X,
 } from "lucide-react";
-import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditContext";
+import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
 import { shareFraseDelDiaLink } from "@/lib/frases-del-dia-share";

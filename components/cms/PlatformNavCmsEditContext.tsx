@@ -1,14 +1,20 @@
 "use client";
 
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
+  type ReactNode
 } from "react";
+import {
+  PlatformNavCmsEditContext,
+  type PlatformNavCmsEditContextValue,
+  usePlatformNavCmsEdit,
+} from "@/components/cms/PlatformNavCmsEditHooks";
+export type { PlatformNavCmsEditContextValue };
+export { usePlatformNavCmsEdit };
+
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
 import { useCmsEditBridge } from "@/hooks/useCmsEditBridge";
 import {
@@ -37,27 +43,6 @@ import {
 import type { CmsDocument, CmsPlatformNav } from "@/lib/cms/types";
 import type { PlatformId } from "@/lib/site-config";
 import { EditPanelChrome } from "@/components/cms/CmsEditFields";
-
-type PlatformNavCmsEditContextValue = {
-  ready: boolean;
-  panelOpen: boolean;
-  openPanel: () => void;
-  closePanel: () => void;
-  platformNav: CmsPlatformNav;
-  setPlatformVisible: (id: PlatformId, visible: boolean) => void;
-  setPlatformUrl: (id: PlatformId, url: string) => void;
-  applyGithubUrls: () => void;
-  saveDraft: () => Promise<void>;
-  dirty: boolean;
-  busy: boolean;
-};
-
-const PlatformNavCmsEditContext =
-  createContext<PlatformNavCmsEditContextValue | null>(null);
-
-export function usePlatformNavCmsEdit() {
-  return useContext(PlatformNavCmsEditContext);
-}
 
 export { PLATFORM_NAV_PANEL_ID };
 

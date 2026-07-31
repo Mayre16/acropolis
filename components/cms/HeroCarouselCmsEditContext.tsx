@@ -1,14 +1,20 @@
 "use client";
 
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
+  type ReactNode
 } from "react";
+import {
+  HeroCarouselCmsEditContext,
+  type HeroCarouselCmsEditContextValue,
+  useHeroCarouselCmsEdit,
+} from "@/components/cms/HeroCarouselCmsEditHooks";
+export type { HeroCarouselCmsEditContextValue };
+export { useHeroCarouselCmsEdit };
+
 import { usePathname } from "next/navigation";
 import { Images, Plus } from "lucide-react";
 import { useCmsEditMode } from "@/hooks/useCmsEditMode";
@@ -40,32 +46,6 @@ import {
   EditPanelChrome,
 } from "@/components/cms/CmsEditFields";
 import { AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
-
-type HeroCarouselCmsEditContextValue = {
-  ready: boolean;
-  token: string | null;
-  carousels: CmsHeroCarousels;
-  selectedKey: CmsHeroCarouselKey | null;
-  selectedSlideId: string | null;
-  openCarousel: (key: CmsHeroCarouselKey) => void;
-  openSlide: (key: CmsHeroCarouselKey, slideId: string) => void;
-  closePanel: () => void;
-  patchSlide: (
-    key: CmsHeroCarouselKey,
-    slideId: string,
-    patch: Partial<CmsHeroCarouselItem>,
-  ) => void;
-  addSlide: (key: CmsHeroCarouselKey) => void;
-  removeSlide: (key: CmsHeroCarouselKey, slideId: string) => void;
-  markDirty: () => void;
-};
-
-const HeroCarouselCmsEditContext =
-  createContext<HeroCarouselCmsEditContextValue | null>(null);
-
-export function useHeroCarouselCmsEdit() {
-  return useContext(HeroCarouselCmsEditContext);
-}
 
 function HeroCarouselCmsEditInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
