@@ -54,16 +54,15 @@ export function HomeHeroCms() {
     cmsEditMode === "1" ||
     (typeof window !== "undefined" && isHomeCmsEditActive());
 
-  const awaitingDraft = inHomeEdit && !edit?.ready;
-
   const h1 =
     (edit?.ready ? draft?.h1 : isCmsEnabled() ? published?.h1 : undefined) ??
     "Nueva Acrópolis República Dominicana";
 
-  const heroBackground = awaitingDraft
-    ? null
-    : inHomeEdit && edit?.ready
-      ? pickHomeHeroBackground(draft?.background)
+  // Siempre hay foto de fallback (repo) mientras carga el borrador — evita
+  // el bloque verde vacío solo en Inicio dentro del editor.
+  const heroBackground =
+    inHomeEdit && edit?.ready
+      ? pickHomeHeroBackground(draft?.background, { allowRepoFallback: true })
       : pickHomeHeroBackground(
           mounted && isCmsEnabled() && mediaReady
             ? published?.background

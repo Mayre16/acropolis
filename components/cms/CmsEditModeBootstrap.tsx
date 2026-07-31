@@ -5,6 +5,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { isCmsEditOrigin, postToEditor, type CmsEditMessage } from "@/lib/cms/edit-bridge";
 import { setCmsEditSession } from "@/lib/cms/edit-session";
 import {
+  CMS_EDIT_EMBEDDED_CLASS,
+  CMS_EDIT_HERO_PENDING_CLASS,
   CMS_EDIT_STORAGE_KEY,
   isInEditorIframe,
   parseCmsEditParam,
@@ -28,7 +30,22 @@ export function CmsEditModeBootstrap() {
   const param = parseCmsEditParam(params.get("cmsEdit"));
 
   useLayoutEffect(() => {
-    if (!isInEditorIframe()) return;
+    // Reaplicar tras hidratar: React puede borrar clases que el script inline
+    // puso en <html> (solo se notaba en Inicio al volver el SSR).
+    const inFrame = isInEditorIframe();
+    if (inFrame) {
+      document.documentElement.classList.add(CMS_EDIT_EMBEDDED_CLASS);
+    }
+    const q = window.location.search;
+    const editParam = /[?&]cmsEdit=(?:1|medios)(?:&|$)/.test(q);
+    if (
+      editParam ||
+      (inFrame && sessionStorage.getItem(CMS_EDIT_STORAGE_KEY))
+    ) {
+      document.documentElement.classList.add(CMS_EDIT_HERO_PENDING_CLASS);
+    }
+
+    if (!inFrame) return;
 
     function onMessage(ev: MessageEvent<CmsEditMessage>) {
       if (!isCmsEditOrigin(ev.origin)) return;

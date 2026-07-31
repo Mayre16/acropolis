@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import { Images } from "lucide-react";
+import {
+  CMS_EDIT_EMBEDDED_CLASS,
+  isInEditorIframe,
+} from "@/lib/cms/edit-mode";
 import {
   cmsUploadPathExample,
   resolveCmsMediaUrl,
@@ -391,6 +395,14 @@ export function EditToolbar({
   onSave: () => void;
   onPublish: () => void;
 }) {
+  // React puede borrar cms-edit-embedded del <html> al hidratar Inicio (SSR).
+  // Reponerla aquí para que el CSS oculte esta barra duplicada en el iframe.
+  useLayoutEffect(() => {
+    if (isInEditorIframe()) {
+      document.documentElement.classList.add(CMS_EDIT_EMBEDDED_CLASS);
+    }
+  }, []);
+
   return (
     <div
       data-cms-edit-toolbar
