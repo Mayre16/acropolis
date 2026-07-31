@@ -20,7 +20,14 @@ export async function runCoordinatedCmsPublish(): Promise<void> {
   if (publishing) return;
 
   const session = getCmsEditSession();
-  if (!session?.token) return;
+  if (!session?.token) {
+    postToEditor({
+      type: "cms-status",
+      text: "No hay sesión de edición. Recarga la pestaña del editor e inicia sesión de nuevo.",
+      ok: false,
+    });
+    return;
+  }
 
   if (!window.confirm(CMS_PUBLISH_CONFIRM_MSG)) return;
 
