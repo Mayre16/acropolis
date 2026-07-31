@@ -37,6 +37,7 @@ function DrMapPin({
   hideLabel?: boolean;
 }) {
   const fill = variant === "centro" ? "#009485" : "#f39300";
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
 
   return (
     <g transform={`translate(${x} ${y})`}>

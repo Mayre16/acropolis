@@ -11,6 +11,12 @@ type Props = {
 };
 
 export function VenueMapPicker({ mapX, mapY, label, hideLabel, onPick }: Props) {
+  const hasPin =
+    mapX != null &&
+    mapY != null &&
+    Number.isFinite(mapX) &&
+    Number.isFinite(mapY);
+
   function onClick(e: React.MouseEvent<SVGRectElement>) {
     const svg = e.currentTarget.ownerSVGElement;
     if (!svg) return;
@@ -29,8 +35,8 @@ export function VenueMapPicker({ mapX, mapY, label, hideLabel, onPick }: Props) 
         Pin en el mapa RD — clic para colocar
       </p>
       <p className="text-xs text-slate-500">
-        Las coordenadas X/Y son del dibujo del mapa (0–1000, 0–686), no latitud
-        de Google. Use el botón «Desde Google Maps» o haga clic aquí.
+        Esto solo mueve el punto en el dibujo de RD del sitio. El enlace de
+        Google Maps se edita arriba (campo «Enlace o búsqueda»).
       </p>
       <DrMapSvg
         gradientId="venuePickerFill"
@@ -46,7 +52,7 @@ export function VenueMapPicker({ mapX, mapY, label, hideLabel, onPick }: Props) 
           onClick={onClick}
           className="cursor-crosshair"
         />
-        {mapX != null && mapY != null ? (
+        {hasPin ? (
           <g transform={`translate(${mapX} ${mapY})`} pointerEvents="none">
             <circle r="14" fill="#f39300" opacity="0.35" />
             <circle r="10" fill="#f39300" stroke="#fff" strokeWidth="2.5" />
@@ -65,7 +71,7 @@ export function VenueMapPicker({ mapX, mapY, label, hideLabel, onPick }: Props) 
           </g>
         ) : null}
       </DrMapSvg>
-      {mapX != null && mapY != null ? (
+      {hasPin ? (
         <p className="text-xs text-slate-600">
           Posición actual: X {mapX}, Y {mapY}
         </p>

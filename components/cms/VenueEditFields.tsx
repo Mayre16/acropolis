@@ -106,13 +106,16 @@ export function VenueEditFields({
         multiline
       />
       <p className="-mt-2 text-xs text-slate-500">
-        Puede pegar el enlace completo de Google Maps (el de la barra del
-        navegador o «Compartir»). «Probar» abrirá ese enlace tal cual. Si el
-        enlace trae coordenadas, el pin del mapa RD se coloca solo.
+        Pegue el enlace de Google Maps y use «Probar» / guarde / publique. Eso
+        basta para el botón del sitio. El pin del dibujo RD es aparte: clic en
+        el mapa abajo, o un enlace largo con{" "}
+        <code className="rounded bg-slate-100 px-1">@18.…,-69.…</code> (no el
+        corto maps.app.goo.gl).
       </p>
       {isGoogleMapsUrl(venue.mapsQuery) ? (
         <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-950">
-          Enlace de Google Maps detectado — el botón del sitio abrirá esta URL.
+          Enlace de Google Maps detectado — «Probar» y el sitio abrirán esta
+          URL. No hace falta «Calcular pin» para eso.
         </p>
       ) : null}
       <EditField
@@ -168,17 +171,31 @@ export function VenueEditFields({
         <div className="grid gap-2 sm:grid-cols-2">
           <EditField
             label="Mapa X (SVG 0–1000)"
-            value={venue.mapX != null ? String(venue.mapX) : ""}
-            onChange={(v) =>
-              onChange({ mapX: v.trim() ? Number(v) : undefined })
+            value={
+              venue.mapX != null && Number.isFinite(venue.mapX)
+                ? String(venue.mapX)
+                : ""
             }
+            onChange={(v) => {
+              const n = Number(v.trim());
+              onChange({
+                mapX: v.trim() && Number.isFinite(n) ? n : undefined,
+              });
+            }}
           />
           <EditField
             label="Mapa Y (SVG 0–686)"
-            value={venue.mapY != null ? String(venue.mapY) : ""}
-            onChange={(v) =>
-              onChange({ mapY: v.trim() ? Number(v) : undefined })
+            value={
+              venue.mapY != null && Number.isFinite(venue.mapY)
+                ? String(venue.mapY)
+                : ""
             }
+            onChange={(v) => {
+              const n = Number(v.trim());
+              onChange({
+                mapY: v.trim() && Number.isFinite(n) ? n : undefined,
+              });
+            }}
           />
         </div>
         <button
@@ -187,7 +204,9 @@ export function VenueEditFields({
             const gps = parseLatLonFromMapsInput(venue.mapsQuery);
             if (!gps) {
               window.alert(
-                "No se encontraron coordenadas en el campo de Google Maps. Pegue un enlace con @lat,lon o lat,lon.",
+                "Ese enlace no trae coordenadas (@lat,lon).\n\n" +
+                  "Para el botón de Google Maps: basta pegar el enlace, «Probar», Guardar y Publicar.\n\n" +
+                  "Para el pin del mapa RD: haga clic en el dibujo, o abra el sitio en Google Maps y copie la URL larga de la barra (con @18.…,-69.…), no el link corto.",
               );
               return;
             }
@@ -196,7 +215,7 @@ export function VenueEditFields({
           }}
           className="w-full rounded-lg border border-na-heket/20 py-2 text-sm font-semibold text-na-heketDark"
         >
-          Calcular pin desde Google Maps
+          Calcular pin del mapa RD (opcional)
         </button>
       </div>
       {venue.mapsQuery ? (
