@@ -112,14 +112,15 @@ export function CmsProvider({ children }: { children: ReactNode }) {
   return (
     <CmsContext.Provider value={doc}>
       <CmsStatusContext.Provider value={status}>
+        {/* Suspense solo para el coordinador — no envolver children (rompe SSR/LCP). */}
         <Suspense fallback={null}>
           <CmsPublishCoordinator />
-          <HeroCarouselCmsEditProvider>
-            <SiteFooterCmsEditProvider>
-              <PlatformNavCmsEditProvider>{children}</PlatformNavCmsEditProvider>
-            </SiteFooterCmsEditProvider>
-          </HeroCarouselCmsEditProvider>
         </Suspense>
+        <HeroCarouselCmsEditProvider>
+          <SiteFooterCmsEditProvider>
+            <PlatformNavCmsEditProvider>{children}</PlatformNavCmsEditProvider>
+          </SiteFooterCmsEditProvider>
+        </HeroCarouselCmsEditProvider>
       </CmsStatusContext.Provider>
     </CmsContext.Provider>
   );
