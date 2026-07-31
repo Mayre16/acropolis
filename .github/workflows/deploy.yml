@@ -37,7 +37,16 @@ jobs:
           CMS_API: https://editor.acropolis.adesa.com.do/api
         run: |
           mkdir -p data/acropolis
-          curl -fsSL "$CMS_API/content/acropolis/published" -o data/acropolis/published.json
+          TMP="$(mktemp)"
+          if curl -fsSL "$CMS_API/content/acropolis/published" -o "$TMP" \
+            && node -e "const d=require(process.argv[1]); if(d.version!==1) process.exit(1)" "$TMP"; then
+            mv "$TMP" data/acropolis/published.json
+            echo "CMS sync OK"
+          else
+            rm -f "$TMP"
+            echo "CMS sync failed — using committed data/acropolis/published.json"
+            test -f data/acropolis/published.json
+          fi
           node -e "const d=require('./data/acropolis/published.json'); const n=(d.sections&&d.sections.frasesDelDia||[]).filter(f=>f&&f.src).length; console.log('frases con foto:', n); if(d.version!==1) process.exit(1)"
 
       - name: Build Next.js (producción acropolis.org.do)
