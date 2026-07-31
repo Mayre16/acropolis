@@ -3,6 +3,7 @@ import {
   DIPLOMADO_WHATSAPP_URL,
   INFO_EMAIL,
 } from "@/lib/site-config";
+import { isGoogleMapsUrl } from "@/lib/map-coords";
 
 export type VenueKind = "sede" | "centro-cultural";
 
@@ -73,8 +74,13 @@ export const VENUE_LOCATIONS: VenueLocation[] = [
   },
 ];
 
+/** Abre el enlace pegado tal cual, o busca por texto si no es URL de Maps. */
 export function mapsUrl(query: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  const t = query.trim();
+  if (!t) return "https://www.google.com/maps";
+  if (isGoogleMapsUrl(t)) return t;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t)}`;
 }
 
 export function venuesByKind(kind: VenueKind): VenueLocation[] {

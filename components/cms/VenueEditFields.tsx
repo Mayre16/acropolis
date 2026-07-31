@@ -1,14 +1,29 @@
 "use client";
 
 import type { CmsVenue } from "@/lib/cms/types";
-import { venueDisplayName } from "@/lib/locations";
+import { mapsUrl, venueDisplayName } from "@/lib/locations";
 import { EditField } from "@/components/cms/CmsEditFields";
 import { VenueMapPicker } from "@/components/cms/VenueMapPicker";
 import {
+  isGoogleMapsUrl,
   latLonToDrMapSvg,
   looksLikeGpsNotSvg,
   parseLatLonFromMapsInput,
 } from "@/lib/map-coords";
+
+function applyMapsField(
+  value: string,
+  onChange: (patch: Partial<CmsVenue>) => void,
+) {
+  const patch: Partial<CmsVenue> = { mapsQuery: value };
+  const gps = parseLatLonFromMapsInput(value);
+  if (gps) {
+    const { x, y } = latLonToDrMapSvg(gps.lat, gps.lon);
+    patch.mapX = x;
+    patch.mapY = y;
+  }
+  onChange(patch);
+}
 
 export function VenueEditFields({
   venue,
@@ -85,10 +100,21 @@ export function VenueEditFields({
         />
       </div>
       <EditField
-        label="Búsqueda en Google Maps"
+        label="Enlace o búsqueda de Google Maps"
         value={venue.mapsQuery}
-        onChange={(v) => onChange({ mapsQuery: v })}
+        onChange={(v) => applyMapsField(v, onChange)}
+        multiline
       />
+      <p className="-mt-2 text-xs text-slate-500">
+        Puede pegar el enlace completo de Google Maps (el de la barra del
+        navegador o «Compartir»). «Probar» abrirá ese enlace tal cual. Si el
+        enlace trae coordenadas, el pin del mapa RD se coloca solo.
+      </p>
+      {isGoogleMapsUrl(venue.mapsQuery) ? (
+        <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-950">
+          Enlace de Google Maps detectado — el botón del sitio abrirá esta URL.
+        </p>
+      ) : null}
       <EditField
         label="Nota breve"
         value={venue.note ?? ""}
@@ -175,7 +201,7 @@ export function VenueEditFields({
       </div>
       {venue.mapsQuery ? (
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.mapsQuery)}`}
+          href={mapsUrl(venue.mapsQuery)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex text-sm font-semibold text-na-kefer hover:underline"
