@@ -1,13 +1,27 @@
 /** Validación cliente de subidas CMS (espejo del servidor). */
 
-export const CMS_IMAGE_ACCEPT =
-  "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+import {
+  CMS_IMAGE_MAX_PX,
+  CMS_IMAGE_SLOTS,
+  cmsImageSlotHint,
+  type CmsImageSlotId,
+} from "@/lib/cms/cms-image-slots";
+
+export type { CmsImageSlotId };
+export { cmsImageSlotHint, CMS_IMAGE_SLOTS };
+
+/** Solo WebP — mensaje y accept para inputs de foto. */
+export const CMS_IMAGE_ACCEPT = "image/webp,.webp";
 export const CMS_PDF_ACCEPT = "application/pdf,.pdf";
 export const CMS_VIDEO_ACCEPT = "video/mp4,video/webm,.mp4,.webm";
 
-export const CMS_UPLOAD_MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+/** Fotos CMS: WebP y máximo 100 KB. */
+export const CMS_UPLOAD_MAX_IMAGE_BYTES = 100 * 1024;
 export const CMS_UPLOAD_MAX_PDF_BYTES = 15 * 1024 * 1024;
 export const CMS_UPLOAD_MAX_VIDEO_BYTES = 40 * 1024 * 1024;
+
+export const CMS_IMAGE_UPLOAD_HINT =
+  "Solo fotos WebP y menos de 100 KB. Comprime la imagen antes de subirla.";
 
 export type CmsUploadKind = "image" | "document" | "video";
 
@@ -63,15 +77,68 @@ async function detectFile(file: File): Promise<Detected | null> {
   return detectMagic(bytes);
 }
 
-/** Lanza Error si el archivo no es una foto WebP/JPG/PNG real. */
-export async function assertCmsImageFile(file: File): Promise<void> {
+async function readImageDimensions(
+  file: File,
+): Promise<{ w: number; h: number } | null> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      const bmp = await createImageBitmap(file);
+      const dims = { w: bmp.width, h: bmp.height };
+      bmp.close();
+      return dims;
+    } catch {
+      /* fallback */
+    }
+  }
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const dims = { w: img.naturalWidth, h: img.naturalHeight };
+      URL.revokeObjectURL(url);
+      resolve(dims);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+/** Lanza Error si el archivo no es WebP ≤ 100 KB o supera el tope de píxeles. */
+export async function assertCmsImageFile(
+  file: File,
+  slotId: CmsImageSlotId = "card",
+): Promise<void> {
   if (file.size <= 0 || file.size > CMS_UPLOAD_MAX_IMAGE_BYTES) {
-    throw new Error("La foto supera el máximo de 8 MB.");
+    throw new Error(
+      "La foto debe ser WebP y pesar menos de 100 KB. Comprime la imagen e inténtalo de nuevo.",
+    );
   }
   const detected = await detectFile(file);
-  if (!detected || detected.kind !== "image") {
+  if (!detected || detected.kind !== "image" || detected.ext !== "webp") {
     throw new Error(
-      "Solo se permiten fotos WebP, JPG o PNG. No se aceptan PDF ni otros formatos.",
+      "Solo se permiten fotos WebP de menos de 100 KB. No se aceptan JPG, PNG, PDF ni otros formatos.",
+    );
+  }
+
+  const slot = CMS_IMAGE_SLOTS[slotId] ?? CMS_IMAGE_SLOTS.card;
+  const dims = await readImageDimensions(file);
+  if (!dims) {
+    throw new Error(
+      "No se pudo leer el tamaño de la imagen. Exporta de nuevo en WebP e inténtalo.",
+    );
+  }
+  if (dims.w > slot.max.w || dims.h > slot.max.h) {
+    throw new Error(
+      `La foto mide ${dims.w}×${dims.h} px y supera el máximo de ${slot.max.w}×${slot.max.h} px para «${slot.label}». ` +
+        `Recórtala a ${slot.recommended.w}×${slot.recommended.h} px (${slot.aspectHint}) y vuelve a subir.`,
+    );
+  }
+  if (dims.w > CMS_IMAGE_MAX_PX.w || dims.h > CMS_IMAGE_MAX_PX.h) {
+    throw new Error(
+      `La foto no puede superar ${CMS_IMAGE_MAX_PX.w}×${CMS_IMAGE_MAX_PX.h} px.`,
     );
   }
 }
@@ -80,6 +147,10 @@ export async function assertCmsImageFile(file: File): Promise<void> {
 export async function assertCmsPdfFile(file: File): Promise<void> {
   if (file.size <= 0 || file.size > CMS_UPLOAD_MAX_PDF_BYTES) {
     throw new Error("El PDF supera el máximo de 15 MB.");
+  }
+  const name = file.name.toLowerCase();
+  if (name && !name.endsWith(".pdf")) {
+    throw new Error("Solo se permiten archivos PDF (.pdf).");
   }
   const detected = await detectFile(file);
   if (!detected || detected.kind !== "document") {
@@ -101,8 +172,9 @@ export async function assertCmsVideoFile(file: File): Promise<void> {
 export async function assertCmsUploadFile(
   file: File,
   kind: CmsUploadKind,
+  imageSlot: CmsImageSlotId = "card",
 ): Promise<void> {
   if (kind === "document") return assertCmsPdfFile(file);
   if (kind === "video") return assertCmsVideoFile(file);
-  return assertCmsImageFile(file);
+  return assertCmsImageFile(file, imageSlot);
 }

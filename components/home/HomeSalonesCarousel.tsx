@@ -20,6 +20,7 @@ import { useMergedSalones } from "@/lib/cms/salones-hooks";
 import { cmsToSalon } from "@/lib/cms/salones-edit";
 import { HOME_SALONES_CAROUSEL } from "@/lib/home-cursos-carousels";
 import { LAYOUT_LABELS, type Salon } from "@/lib/salones";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 const CARD_LG_HEIGHT = "lg:h-[380px] lg:min-h-[380px]";
 
@@ -211,17 +212,11 @@ export function HomeSalonesCarousel() {
             <>
               <div className="mt-5 flex items-center justify-center gap-2">
                 {items.map((item, i) => (
-                  <button
+                  <CarouselDotButton
                     key={item.id}
-                    type="button"
+                    active={i === index}
                     onClick={() => setIndex(i)}
-                    className={`h-2.5 rounded-full transition-all ${
-                      i === index
-                        ? "w-8 bg-na-heket"
-                        : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
-                    }`}
-                    aria-label={`Ver salón: ${item.name}`}
-                    aria-current={i === index ? "true" : undefined}
+                    label={`Ver salón: ${item.name}`}
                   />
                 ))}
               </div>

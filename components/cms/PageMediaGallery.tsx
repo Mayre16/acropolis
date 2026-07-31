@@ -10,6 +10,7 @@ import type {
   CmsPageMediaCard,
   CmsPageMediaGalleryBlock,
 } from "@/lib/cms/types";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 function GallerySlide({
   item,
@@ -255,17 +256,12 @@ function GalleryCarousel({
 
           <div className="mt-4 flex items-center justify-center gap-2">
             {items.map((item, i) => (
-              <button
+              <CarouselDotButton
                 key={item.id}
-                type="button"
+                size="sm"
+                active={i === index}
                 onClick={() => onIndexChange(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === index
-                    ? "w-7 bg-na-heket"
-                    : "w-2 bg-na-heket/25 hover:bg-na-heket/45"
-                }`}
-                aria-label={`Ver foto ${i + 1}`}
-                aria-current={i === index ? "true" : undefined}
+                label={`Ver foto ${i + 1}`}
               />
             ))}
           </div>

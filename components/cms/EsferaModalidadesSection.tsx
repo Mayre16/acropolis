@@ -130,6 +130,8 @@ export function EsferaModalidadesSection() {
             <a
               href={brochureHref}
               download
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-na-heket px-6 py-3 text-sm font-bold text-na-heket transition hover:bg-na-heket hover:text-white"
             >
               <FileDown className="h-4 w-4" aria-hidden />

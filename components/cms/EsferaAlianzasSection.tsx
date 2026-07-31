@@ -13,6 +13,7 @@ import { useEsferaPageDisplay } from "@/lib/cms/esfera-display";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import type { CmsEsferaAlianza } from "@/lib/cms/types";
 import { accentCardShell, accentEyebrowClass, accentTokens } from "@/lib/brand-accents";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 /** En grid estático caben 5 por fila en xl; a partir de 6 rota en carrusel. */
 const ALIANZAS_GRID_MAX = 5;
@@ -157,17 +158,12 @@ function EsferaAlianzasCarousel({
         <>
           <div className="mt-5 flex items-center justify-center gap-2">
             {Array.from({ length: pageCount }, (_, i) => (
-              <button
+              <CarouselDotButton
                 key={i}
-                type="button"
+                size="sm"
+                active={i === start}
                 onClick={() => setStart(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === start
-                    ? "w-7 bg-na-heket"
-                    : "w-2 bg-na-heket/25 hover:bg-na-heket/45"
-                }`}
-                aria-label={`Ver grupo ${i + 1} de alianzas`}
-                aria-current={i === start ? "true" : undefined}
+                label={`Ver grupo ${i + 1} de alianzas`}
               />
             ))}
           </div>

@@ -395,8 +395,9 @@ function HeroSlideEditFields({
         ← Volver al listado
       </button>
       <AgendaEntryImageField
-        label="Foto del carrusel"
+        label="Foto del carrusel (header)"
         site="acropolis"
+        imageSlot="pageHero"
         image={slide.src}
         imageAlt={slide.alt}
         token={token}

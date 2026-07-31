@@ -79,6 +79,9 @@ export function HomeHeroCms() {
 
   const showPhoto =
     Boolean(resolvedBackgroundSrc) && imageLoadedSrc === resolvedBackgroundSrc;
+  // En la web pública: pintar la foto de inmediato (LCP). El fade solo aplica
+  // en el iframe del editor para evitar flashes al cargar el borrador.
+  const visiblePhoto = !inHomeEdit || showPhoto;
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -108,9 +111,15 @@ export function HomeHeroCms() {
             alt={heroBackground?.alt ?? ""}
             fill
             priority
+            fetchPriority="high"
+            decoding="sync"
             unoptimized
-            className={`object-cover object-center transition-opacity duration-300 ${
-              showPhoto ? "opacity-100" : "opacity-0"
+            className={`object-cover object-center ${
+              inHomeEdit
+                ? `transition-opacity duration-300 ${
+                    visiblePhoto ? "opacity-100" : "opacity-0"
+                  }`
+                : "opacity-100"
             }`}
             sizes="100vw"
             onLoad={() => setImageLoadedSrc(resolvedBackgroundSrc)}

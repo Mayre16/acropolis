@@ -7,7 +7,11 @@ import {
   resolveCmsMediaUrl,
   uploadCmsImage,
 } from "@/lib/cms/api-client";
-import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
+import {
+  CMS_IMAGE_ACCEPT,
+  cmsImageSlotHint,
+  type CmsImageSlotId,
+} from "@/lib/cms/upload-file-validate";
 import { useHeroCarouselCmsEdit } from "@/components/cms/HeroCarouselCmsEditContext";
 import {
   type CmsHeroCarouselKey,
@@ -92,22 +96,25 @@ export function ImageField({
   token,
   onChange,
   site = "acropolis",
+  imageSlot = "card",
 }: {
   label: string;
   media: CmsMedia;
   token: string | null;
   onChange: (m: CmsMedia) => void;
   site?: "acropolis" | "civis";
+  imageSlot?: CmsImageSlotId;
 }) {
   const [uploading, setUploading] = useState(false);
   const previewSrc = resolveCmsMediaUrl(media.src);
   const pathHint = cmsUploadPathExample(site);
+  const sizeHint = cmsImageSlotHint(imageSlot);
 
   async function handleUpload(file: File) {
     if (!token) return;
     setUploading(true);
     try {
-      const url = await uploadCmsImage(site, token, file);
+      const url = await uploadCmsImage(site, token, file, imageSlot);
       onChange({ ...media, src: url });
     } catch (e) {
       window.alert(String(e));
@@ -129,9 +136,7 @@ export function ImageField({
         <code className="rounded bg-slate-100 px-1">{pathHint}</code>. También
         puedes pegar una ruta del sitio o de una foto ya subida.
       </p>
-      <p className="text-xs text-amber-800">
-        Solo fotos <strong>WebP, JPG o PNG</strong> (máx. 8 MB). Recomendado: WebP.
-      </p>
+      <p className="text-xs text-amber-800">{sizeHint}</p>
       <EditField
         label="Texto alternativo"
         value={media.alt}

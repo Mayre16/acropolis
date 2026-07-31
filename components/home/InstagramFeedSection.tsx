@@ -8,6 +8,7 @@ import { INSTAGRAM_HANDLE, SOCIAL_LINKS, YOUTUBE_HANDLE } from "@/lib/site-confi
 import { assetUrl } from "@/lib/asset-url";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 import { cn } from "@/lib/utils/cn";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -194,17 +195,12 @@ export function InstagramFeedSection({
               </button>
               <div className="flex gap-1.5">
                 {Array.from({ length: maxIndex + 1 }, (_, i) => (
-                  <button
+                  <CarouselDotButton
                     key={i}
-                    type="button"
+                    size="sm"
+                    active={i === index}
                     onClick={() => setIndex(i)}
-                    className={`h-2 rounded-full transition-all ${
-                      i === index
-                        ? "w-6 bg-na-heket"
-                        : "w-2 bg-na-heket/25 hover:bg-na-heket/45"
-                    }`}
-                    aria-label={`Grupo de publicaciones ${i + 1}`}
-                    aria-current={i === index ? "true" : undefined}
+                    label={`Grupo de publicaciones ${i + 1}`}
                   />
                 ))}
               </div>

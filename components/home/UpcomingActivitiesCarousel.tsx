@@ -22,6 +22,7 @@ import {
 } from "@/lib/agenda";
 import { agendaInscribeHref, type WhatsAppUrls } from "@/lib/whatsapp-messages";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 type CarouselVariant = "primary" | "cultura" | "agenda";
 
@@ -390,21 +391,15 @@ export function UpcomingActivitiesCarousel({
           {n > 1 ? (
             <div className="mt-5 flex items-center justify-center gap-2">
               {items.map((item, i) => (
-                <button
+                <CarouselDotButton
                   key={item.id}
-                  type="button"
+                  active={i === index}
                   onClick={() => setIndex(i)}
-                  className={`h-2.5 rounded-full transition-all ${
-                    i === index
-                      ? "w-8 bg-na-heket"
-                      : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
-                  }`}
-                  aria-label={
+                  label={
                     item.date
                       ? `Ver: ${item.title}, ${item.date}`
                       : `Ver: ${item.title}`
                   }
-                  aria-current={i === index ? "true" : undefined}
                 />
               ))}
             </div>

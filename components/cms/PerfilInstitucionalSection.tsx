@@ -49,6 +49,8 @@ export function PerfilInstitucionalSection() {
             <a
               href={href}
               download
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white transition hover:bg-na-kefer"
             >
               <FileDown className="h-4 w-4" aria-hidden />

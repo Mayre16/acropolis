@@ -16,6 +16,7 @@ import { getCursosRecientesFromEventos } from "@/lib/cursos-eventos-recientes";
 import type { CmsVoluntariadoReciente } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
 import { accentEyebrowClass } from "@/lib/brand-accents";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 const CARD_HEIGHT = "h-[220px] sm:h-[240px]";
 
@@ -119,17 +120,12 @@ function CursosRecientesCarousel({ items }: { items: CmsVoluntariadoReciente[] }
         <>
           <div className="mt-4 flex items-center justify-center gap-2">
             {items.map((item, i) => (
-              <button
+              <CarouselDotButton
                 key={item.id}
-                type="button"
+                size="sm"
+                active={i === index}
                 onClick={() => setIndex(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === index
-                    ? "w-7 bg-na-heket"
-                    : "w-2 bg-na-heket/25 hover:bg-na-heket/45"
-                }`}
-                aria-label={`Ver crónica: ${item.title}`}
-                aria-current={i === index ? "true" : undefined}
+                label={`Ver crónica: ${item.title}`}
               />
             ))}
           </div>

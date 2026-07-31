@@ -59,6 +59,11 @@ Options -Indexes
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
   </FilesMatch>
+  # Estáticos con hash o fotos: caché largo (Apache/cPanel). En GitHub Pages
+  # el CDN fija ~max-age=600 y este .htaccess no aplica.
+  <FilesMatch "\.(?:css|js|woff2?|webp|png|jpe?g|gif|svg|ico|webmanifest)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
 </IfModule>
 
 <IfModule mod_deflate.c>

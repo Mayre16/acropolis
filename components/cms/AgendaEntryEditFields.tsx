@@ -13,6 +13,11 @@ import {
   PublishCategorySelect,
   SeoTagsField,
 } from "@/components/cms/PublishCategoryFields";
+import {
+  CMS_IMAGE_ACCEPT,
+  cmsImageSlotHint,
+  type CmsImageSlotId,
+} from "@/lib/cms/upload-file-validate";
 
 export function AgendaEntryImageField({
   image,
@@ -21,6 +26,7 @@ export function AgendaEntryImageField({
   onChange,
   label = "Foto",
   site = "acropolis",
+  imageSlot = "card",
 }: {
   image: string;
   imageAlt: string;
@@ -28,16 +34,18 @@ export function AgendaEntryImageField({
   onChange: (patch: { image?: string; imageAlt?: string }) => void;
   label?: string;
   site?: "acropolis" | "civis";
+  imageSlot?: CmsImageSlotId;
 }) {
   const [uploading, setUploading] = useState(false);
   const previewSrc = resolveCmsMediaUrl(image);
   const pathHint = cmsUploadPathExample(site);
+  const sizeHint = cmsImageSlotHint(imageSlot);
 
   async function handleUpload(file: File) {
     if (!token) return;
     setUploading(true);
     try {
-      const url = await uploadCmsImage(site, token, file);
+      const url = await uploadCmsImage(site, token, file, imageSlot);
       onChange({ image: url });
     } catch (e) {
       window.alert(String(e));
@@ -61,9 +69,7 @@ export function AgendaEntryImageField({
         <code className="rounded bg-slate-100 px-1">/img/cultura/talleres/coro.webp</code>
         ) o la ruta de una foto ya subida.
       </p>
-      <p className="text-xs text-amber-800">
-        Recomendado: formato <strong>WebP</strong> — buena calidad con menos peso.
-      </p>
+      <p className="text-xs text-amber-800">{sizeHint}</p>
       {previewSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -78,10 +84,10 @@ export function AgendaEntryImageField({
         </p>
       ) : null}
       <label className="block text-sm">
-        <span className="font-semibold text-slate-700">Subir foto</span>
+        <span className="font-semibold text-slate-700">Subir foto (WebP)</span>
         <input
           type="file"
-          accept="image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png"
+          accept={CMS_IMAGE_ACCEPT}
           disabled={!token || uploading}
           onChange={(e) => {
             const f = e.target.files?.[0];

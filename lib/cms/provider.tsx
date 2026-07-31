@@ -22,6 +22,7 @@ import {
   EARLY_CMS_PUBLISHED_KEY,
   type EarlyCmsPublishedSlot,
 } from "@/lib/cms/early-published-bootstrap";
+import acropolisPublishedSnapshot from "@/data/acropolis/published.json";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL?.replace(/\/$/, "");
 const CMS_SITE = "acropolis";
@@ -29,21 +30,19 @@ const CMS_SITE = "acropolis";
 export type CmsLoadStatus = "loading" | "ready";
 
 const CmsContext = createContext<CmsDocument | null>(null);
-const CmsStatusContext = createContext<CmsLoadStatus>(
-  CMS_URL ? "loading" : "ready",
-);
+const CmsStatusContext = createContext<CmsLoadStatus>("ready");
+
+function snapshotPublished(): CmsDocument | null {
+  const doc = acropolisPublishedSnapshot as CmsDocument;
+  if (doc && typeof doc === "object" && doc.version === 1) return doc;
+  return null;
+}
+
+const BUNDLED_PUBLISHED = snapshotPublished();
 
 function earlySlot(): EarlyCmsPublishedSlot | undefined {
   if (typeof window === "undefined") return undefined;
   return window[EARLY_CMS_PUBLISHED_KEY as "__acropolisCmsPublished"];
-}
-
-function readEarlyPublished(): CmsDocument | null {
-  const doc = earlySlot()?.doc;
-  if (doc && typeof doc === "object" && (doc as CmsDocument).version === 1) {
-    return doc as CmsDocument;
-  }
-  return null;
 }
 
 function earlyPublishedPromise(): Promise<CmsDocument | null> | null {
@@ -57,10 +56,18 @@ function earlyPublishedPromise(): Promise<CmsDocument | null> | null {
   });
 }
 
+function isNewerPublished(next: CmsDocument, current: CmsDocument | null): boolean {
+  if (!current?.updatedAt) return true;
+  if (!next.updatedAt) return true;
+  return next.updatedAt >= current.updatedAt;
+}
+
 export function CmsProvider({ children }: { children: ReactNode }) {
-  const [doc, setDoc] = useState<CmsDocument | null>(() => readEarlyPublished());
+  // Snapshot del build: listo en el primer paint (SSR = cliente). La API
+  // solo refresca en segundo plano; no bloquea mediaReady / LCP.
+  const [doc, setDoc] = useState<CmsDocument | null>(() => BUNDLED_PUBLISHED);
   const [status, setStatus] = useState<CmsLoadStatus>(() =>
-    !CMS_URL || readEarlyPublished() ? "ready" : "loading",
+    !CMS_URL || BUNDLED_PUBLISHED ? "ready" : "loading",
   );
 
   const loadPublished = useCallback(() => {
@@ -69,7 +76,9 @@ export function CmsProvider({ children }: { children: ReactNode }) {
       return;
     }
     const apply = (data: CmsDocument | null) => {
-      if (data?.version === 1) setDoc(data);
+      if (data?.version === 1) {
+        setDoc((prev) => (isNewerPublished(data, prev) ? data : prev));
+      }
       setStatus("ready");
     };
     const early = earlyPublishedPromise();
@@ -120,7 +129,7 @@ export function useCmsDocument() {
   return useContext(CmsContext);
 }
 
-/** `loading` mientras llega el JSON publicado; evita flash de fotos del repo. */
+/** `loading` solo si no hay snapshot ni CMS desactivado; el refresh no bloquea. */
 export function useCmsStatus() {
   return useContext(CmsStatusContext);
 }

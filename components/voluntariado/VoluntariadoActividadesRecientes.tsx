@@ -18,6 +18,7 @@ import {
   voluntariadoRecienteId,
 } from "@/lib/cms/voluntariado-display";
 import type { CmsVoluntariadoReciente } from "@/lib/cms/types";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 import { accentCardShell, accentEyebrowClass } from "@/lib/brand-accents";
 
 function useCarouselPerView(itemCount: number) {
@@ -181,17 +182,12 @@ function VoluntariadoRecientesCarousel({
 
       <div className="mt-5 flex items-center justify-center gap-2">
         {Array.from({ length: pageCount }, (_, i) => (
-          <button
+          <CarouselDotButton
             key={i}
-            type="button"
+            size="sm"
+            active={i === start}
             onClick={() => setStart(i)}
-            className={`h-2 rounded-full transition-all ${
-              i === start
-                ? "w-7 bg-na-heket"
-                : "w-2 bg-na-heket/25 hover:bg-na-heket/45"
-            }`}
-            aria-label={`Ver grupo ${i + 1} de actividades`}
-            aria-current={i === start ? "true" : undefined}
+            label={`Ver grupo ${i + 1} de actividades`}
           />
         ))}
       </div>

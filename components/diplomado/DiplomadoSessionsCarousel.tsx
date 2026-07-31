@@ -13,6 +13,7 @@ import {
   Pencil,
 } from "lucide-react";
 import type { AgendaEntry } from "@/lib/agenda";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 type Props = {
   items: AgendaEntry[];
@@ -213,17 +214,13 @@ export function DiplomadoSessionsCarousel({
         <>
           <div className="mt-5 flex items-center justify-center gap-2">
             {Array.from({ length: pageCount }, (_, i) => (
-              <button
+              <CarouselDotButton
                 key={i}
-                type="button"
+                size="sm"
+                active={i === start}
                 onClick={() => setStart(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === start
-                    ? "w-7 bg-[var(--dip-teal)]"
-                    : "w-2 bg-[var(--dip-teal)]/25 hover:bg-[var(--dip-teal)]/45"
-                }`}
-                aria-label={`Ver grupo de sesiones ${i + 1}`}
-                aria-current={i === start ? "true" : undefined}
+                label={`Ver grupo de sesiones ${i + 1}`}
+                colorClassName="bg-[var(--dip-teal)]"
               />
             ))}
           </div>

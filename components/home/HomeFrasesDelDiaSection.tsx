@@ -18,6 +18,7 @@ import { shareFraseDelDiaLink } from "@/lib/frases-del-dia-share";
 import { useCmsFrasesDelDia } from "@/lib/cms/hooks";
 import type { CmsFraseDelDia } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 
 function absoluteMediaUrl(src: string): string {
   if (!src) return "";
@@ -353,18 +354,12 @@ export function HomeFrasesDelDiaSection() {
                 </button>
                 <div className="flex gap-1.5">
                   {Array.from({ length: maxIndex + 1 }, (_, i) => (
-                    <button
+                    <CarouselDotButton
                       key={i}
-                      type="button"
+                      size="sm"
+                      active={i === index}
                       onClick={() => setIndex(i)}
-                      className={cn(
-                        "h-2 rounded-full transition",
-                        i === index
-                          ? "w-6 bg-na-heket"
-                          : "w-2 bg-na-heket/25 hover:bg-na-heket/40",
-                      )}
-                      aria-label={`Ir al grupo ${i + 1}`}
-                      aria-current={i === index ? "true" : undefined}
+                      label={`Ir al grupo ${i + 1}`}
                     />
                   ))}
                 </div>

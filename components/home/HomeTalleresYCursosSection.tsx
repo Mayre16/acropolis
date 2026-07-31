@@ -17,6 +17,7 @@ import { ofertaSelectedId } from "@/lib/cms/cursos-oferta-edit";
 import { CourseInscribeButton } from "@/components/CourseInscribeButton";
 import { OfertaFormativaItem } from "@/components/OfertaFormativaItem";
 import { cn } from "@/lib/utils/cn";
+import { CarouselDotButton } from "@/components/CarouselDotButton";
 import { useCursosOfertaDisplay } from "@/lib/cms/cursos-display";
 import {
   HOME_TALLERES_CAROUSEL,
@@ -264,17 +265,11 @@ export function HomeTalleresYCursosSection() {
           {n > 1 ? (
             <div className="mt-5 flex items-center justify-center gap-2">
               {items.map((item, i) => (
-                <button
+                <CarouselDotButton
                   key={item.id}
-                  type="button"
+                  active={i === index}
                   onClick={() => setIndex(i)}
-                  className={`h-2.5 rounded-full transition-all ${
-                    i === index
-                      ? "w-8 bg-na-heket"
-                      : "w-2.5 bg-na-heket/25 hover:bg-na-heket/45"
-                  }`}
-                  aria-label={`Ver: ${item.title}`}
-                  aria-current={i === index ? "true" : undefined}
+                  label={`Ver: ${item.title}`}
                 />
               ))}
             </div>

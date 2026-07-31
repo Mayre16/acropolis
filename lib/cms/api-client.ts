@@ -188,9 +188,10 @@ export async function uploadCmsFile(
   token: string,
   file: File,
   kind: "image" | "document" | "video" = "image",
+  imageSlot: import("@/lib/cms/cms-image-slots").CmsImageSlotId = "card",
 ): Promise<string> {
   const { assertCmsUploadFile } = await import("@/lib/cms/upload-file-validate");
-  await assertCmsUploadFile(file, kind);
+  await assertCmsUploadFile(file, kind, imageSlot);
   const fd = new FormData();
   fd.append("file", file);
   fd.append("kind", kind);
@@ -224,6 +225,7 @@ export async function uploadCmsImage(
   site: "acropolis" | "civis",
   token: string,
   file: File,
+  imageSlot: import("@/lib/cms/cms-image-slots").CmsImageSlotId = "card",
 ): Promise<string> {
-  return uploadCmsFile(site, token, file, "image");
+  return uploadCmsFile(site, token, file, "image", imageSlot);
 }

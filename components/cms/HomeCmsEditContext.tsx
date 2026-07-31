@@ -685,8 +685,9 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         >
           <div className="space-y-4">
             <AgendaEntryImageField
-              label="Foto de fondo del landing"
+              label="Foto de fondo del landing (header)"
               site="acropolis"
+              imageSlot="homeHero"
               image={homeHero.background?.src ?? ""}
               imageAlt={
                 homeHero.background?.alt ??
