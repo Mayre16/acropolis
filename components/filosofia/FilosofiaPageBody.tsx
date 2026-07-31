@@ -22,7 +22,7 @@ import {
   useFilosofiaProgramaDisplay,
   useFilosofiaTemarioDisplay,
 } from "@/lib/cms/filosofia-display";
-import { useWhatsAppUrls } from "@/lib/cms/hooks";
+import { useMergedVenues, useWhatsAppUrls } from "@/lib/cms/hooks";
 import { buildWhatsAppHref } from "@/lib/cms/site-footer-edit";
 import { accentCardClass, accentCardShell, accentTokens } from "@/lib/brand-accents";
 import { filosofiaSedeEntries } from "@/lib/filosofia-content";
@@ -76,6 +76,8 @@ export function FilosofiaPageBody() {
   const temario = useFilosofiaTemarioDisplay();
   const avanzados = useFilosofiaAvanzadosDisplay();
   const esParaTi = useFilosofiaEsParaTiDisplay();
+  const venues = useMergedVenues();
+  const sedeEntries = filosofiaSedeEntries(venues);
   const cta = useFilosofiaCtaDisplay();
   const whatsapp = useWhatsAppUrls();
   const ctaHref = buildWhatsAppHref(
@@ -410,7 +412,7 @@ export function FilosofiaPageBody() {
                         {title}
                       </h3>
                       <ul className="mt-2 space-y-2 text-sm leading-relaxed sm:text-base">
-                        {filosofiaSedeEntries().map(({ id: venueId, label, address, mapsQuery }) => (
+                        {sedeEntries.map(({ id: venueId, label, address, mapsQuery }) => (
                           <li key={venueId}>
                             <span className="font-semibold text-na-heketDark">{label}</span>
                             {" — "}

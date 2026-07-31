@@ -186,10 +186,12 @@ const FILOSOFIA_SEDE_VENUES = [
   { venueId: "punto-cultural-roberto-pastoriza", label: "Izbira" },
 ] as const;
 
-/** Sedes del diplomado con dirección y consulta de Google Maps desde `locations.ts`. */
-export function filosofiaSedeEntries(): FilosofiaSedeEntry[] {
+/** Sedes del diplomado: direcciones y Maps desde sedes CMS (fallback código). */
+export function filosofiaSedeEntries(
+  venues: typeof VENUE_LOCATIONS = VENUE_LOCATIONS,
+): FilosofiaSedeEntry[] {
   return FILOSOFIA_SEDE_VENUES.flatMap(({ venueId, label }) => {
-    const venue = VENUE_LOCATIONS.find((v) => v.id === venueId);
+    const venue = venues.find((v) => v.id === venueId);
     if (!venue) return [];
 
     const address =

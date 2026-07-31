@@ -419,6 +419,7 @@ export function FilosofiaEsParaTiPanel() {
   );
   const selectedId = parseFilosofiaFaqSelectedId(ctx.selectedFilosofiaSubId);
   const selected = items.find((item) => item.id === selectedId);
+  const isSedesCard = selected?.id === "sedes";
 
   return (
     <div className="space-y-4">
@@ -472,12 +473,32 @@ export function FilosofiaEsParaTiPanel() {
             value={selected.title}
             onChange={(v) => ctx.patchFilosofiaFaq(selected.id, { title: v })}
           />
-          <EditField
-            label="Texto"
-            value={selected.text}
-            onChange={(v) => ctx.patchFilosofiaFaq(selected.id, { text: v })}
-            multiline
-          />
+          {isSedesCard ? (
+            <div className="space-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-3 text-xs text-sky-950">
+              <p className="font-semibold">
+                Esta tarjeta no usa el texto de abajo.
+              </p>
+              <p>
+                Las direcciones y enlaces de Google Maps salen de{" "}
+                <strong>Dónde estamos</strong> (sedes del sitio). Cámbialas
+                allí: pestaña <strong>Dónde estamos</strong> → lápiz de cada
+                sede → dirección + enlace de Maps → Guardar → Publicar.
+              </p>
+              <p className="text-sky-800/90">
+                El campo «Texto» solo queda como respaldo histórico; el cuadro
+                de la página siempre muestra las sedes reales.
+              </p>
+            </div>
+          ) : (
+            <EditField
+              label="Texto"
+              value={selected.text}
+              onChange={(v) =>
+                ctx.patchFilosofiaFaq(selected.id, { text: v })
+              }
+              multiline
+            />
+          )}
         </div>
       ) : (
         <p className="text-xs text-slate-500">Selecciona una tarjeta para editarla.</p>
