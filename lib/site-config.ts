@@ -61,6 +61,10 @@ export const ESFERA_SOLICITUD_EMAIL =
 export const ESFERA_CC_EMAIL =
   process.env.NEXT_PUBLIC_ESFERA_CC_EMAIL?.trim() || "Santiago.a@acropolis.org";
 
+/** Copia en inscripciones del Círculo de Amigos. */
+export const CIRCULO_AMIGOS_CC_EMAIL =
+  process.env.NEXT_PUBLIC_CIRCULO_AMIGOS_CC_EMAIL?.trim() || "miguelsantos@acropolis.org";
+
 /**
  * Sedes con filial propia (clases regulares).
  * `map` = coordenadas en el viewBox del mapa SVG (0 0 1000 686).
