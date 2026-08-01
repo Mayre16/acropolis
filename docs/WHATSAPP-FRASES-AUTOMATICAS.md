@@ -1,10 +1,78 @@
 # Envío Automático de Frases del Día por WhatsApp
 
-Esta guía explica cómo configurar el envío automático de frases del día a través de WhatsApp Business API.
+Esta guía explica cómo configurar el envío automático de frases del día a través de WhatsApp.
 
 ## Opciones Disponibles
 
-### Opción 1: Canales de WhatsApp (Recomendado para empezar)
+| Opción | Costo | Automatización | Dificultad |
+|--------|-------|----------------|------------|
+| **Twilio Sandbox** | Gratis | ✅ Automático | ⭐ Fácil |
+| Canales de WhatsApp | Gratis | ❌ Manual | ⭐ Muy fácil |
+| WhatsApp Business API | ~$0.05/msg | ✅ Automático | ⭐⭐⭐ Avanzado |
+
+---
+
+## Opción 1: Twilio WhatsApp Sandbox (Recomendado para empezar)
+
+El sandbox de Twilio es **GRATUITO** y permite probar el envío automático de mensajes.
+
+### Paso 1: Crear cuenta en Twilio
+
+1. Ve a [twilio.com](https://www.twilio.com/try-twilio) y crea una cuenta gratuita
+2. No necesitas tarjeta de crédito para el sandbox
+3. Verifica tu número de teléfono
+
+### Paso 2: Configurar el sandbox de WhatsApp
+
+1. En la consola de Twilio, ve a **Messaging** → **Try it out** → **Send a WhatsApp message**
+2. Verás un número de sandbox (usualmente `+1 415 523 8886`)
+3. Envía el código de unión desde tu WhatsApp al número del sandbox:
+   ```
+   join <palabra-clave>
+   ```
+   (Twilio te mostrará el código exacto)
+
+### Paso 3: Obtener credenciales
+
+En la consola de Twilio, copia:
+- **Account SID**: `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Auth Token**: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+### Paso 4: Configurar variables de entorno
+
+```env
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+```
+
+### Paso 5: Agregar suscriptores al sandbox
+
+**Importante:** En el sandbox, cada persona que quiera recibir mensajes debe:
+1. Enviar el código de unión (`join <palabra>`) al número del sandbox
+2. Mantener el sandbox activo (se desactiva después de 72h sin actividad)
+
+### Paso 6: Probar el envío
+
+```bash
+# Modo de prueba (no envía mensajes)
+WHATSAPP_DRY_RUN=true node scripts/send-frase-del-dia.mjs
+
+# Envío real
+node scripts/send-frase-del-dia.mjs
+```
+
+### Limitaciones del Sandbox
+
+- Solo funciona con números que se hayan unido al sandbox
+- El sandbox se desactiva después de 72 horas sin actividad
+- Máximo ~500 mensajes/día
+
+Para producción con muchos usuarios, considera Twilio de pago o WhatsApp Business API.
+
+---
+
+## Opción 2: Canales de WhatsApp (Sin código)
 
 La forma más sencilla es crear un **Canal de WhatsApp** (WhatsApp Channel):
 
@@ -25,11 +93,11 @@ La forma más sencilla es crear un **Canal de WhatsApp** (WhatsApp Channel):
 
 ---
 
-### Opción 2: WhatsApp Business API (Automatizado)
+## Opción 3: WhatsApp Business API (Producción)
 
-Para envío completamente automático, necesitas la WhatsApp Business API.
+Para envío completamente automático a gran escala.
 
-## Requisitos
+### Requisitos
 
 1. **Cuenta de Meta Business** verificada
 2. **Aplicación en Meta for Developers** con el producto WhatsApp

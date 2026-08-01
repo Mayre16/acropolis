@@ -9,13 +9,22 @@
  * Ejemplo de cron (enviar a las 7:00 AM todos los días):
  *   0 7 * * * cd /path/to/project && node scripts/send-frase-del-dia.mjs >> logs/frase-del-dia.log 2>&1
  *
- * VARIABLES DE ENTORNO REQUERIDAS:
+ * PROVEEDORES SOPORTADOS:
+ *   1. Twilio WhatsApp Sandbox (RECOMENDADO para pruebas - GRATIS)
+ *   2. WhatsApp Business API (Meta) - para producción
+ *
+ * VARIABLES DE ENTORNO - TWILIO (sandbox gratuito):
+ *   - TWILIO_ACCOUNT_SID: Tu Account SID de Twilio
+ *   - TWILIO_AUTH_TOKEN: Tu Auth Token de Twilio
+ *   - TWILIO_WHATSAPP_FROM: Número del sandbox (default: whatsapp:+14155238886)
+ *
+ * VARIABLES DE ENTORNO - META (producción):
  *   - WHATSAPP_BUSINESS_PHONE_NUMBER_ID
  *   - WHATSAPP_BUSINESS_ACCESS_TOKEN
- *   - NEXT_PUBLIC_SITE_URL (para construir la URL de la imagen)
  *
  * OPCIONALES:
- *   - WHATSAPP_TEMPLATE_NAME (si usas templates pre-aprobados)
+ *   - NEXT_PUBLIC_SITE_URL (para construir la URL de la imagen)
+ *   - WHATSAPP_PROVIDER=twilio|meta (default: detecta automáticamente)
  *   - WHATSAPP_DRY_RUN=true (para probar sin enviar mensajes)
  */
 
@@ -32,6 +41,25 @@ const SITE_URL =
   "https://acropolis.org.do";
 
 const DRY_RUN = process.env.WHATSAPP_DRY_RUN === "true";
+
+function detectProvider() {
+  const explicit = process.env.WHATSAPP_PROVIDER?.toLowerCase();
+  if (explicit === "twilio") return "twilio";
+  if (explicit === "meta") return "meta";
+
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+    return "twilio";
+  }
+  if (
+    process.env.WHATSAPP_BUSINESS_PHONE_NUMBER_ID &&
+    process.env.WHATSAPP_BUSINESS_ACCESS_TOKEN
+  ) {
+    return "meta";
+  }
+  return null;
+}
+
+const PROVIDER = detectProvider();
 
 function log(message, ...args) {
   const timestamp = new Date().toISOString();
@@ -84,7 +112,59 @@ function buildImageUrl(src) {
   return `${SITE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
 }
 
-async function sendWhatsAppImage(phone, imageUrl, caption) {
+// ============================================================================
+// TWILIO WHATSAPP SANDBOX (Gratuito para pruebas)
+// ============================================================================
+
+async function sendViaTwilio(phone, imageUrl, caption) {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const fromNumber = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886";
+
+  if (!accountSid || !authToken) {
+    throw new Error(
+      "Twilio no configurado. Configura TWILIO_ACCOUNT_SID y TWILIO_AUTH_TOKEN."
+    );
+  }
+
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+  const digits = phone.replace(/\D/g, "");
+  const toNumber = `whatsapp:+${digits}`;
+
+  const formData = new URLSearchParams();
+  formData.append("From", fromNumber);
+  formData.append("To", toNumber);
+  formData.append("Body", caption);
+  if (imageUrl) {
+    formData.append("MediaUrl", imageUrl);
+  }
+
+  const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formData.toString(),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || data.error_code) {
+    throw new Error(data.error_message || `HTTP ${res.status}`);
+  }
+
+  return data.sid;
+}
+
+// ============================================================================
+// META WHATSAPP BUSINESS API (Producción)
+// ============================================================================
+
+async function sendViaMeta(phone, imageUrl, caption) {
   const phoneNumberId = process.env.WHATSAPP_BUSINESS_PHONE_NUMBER_ID;
   const accessToken = process.env.WHATSAPP_BUSINESS_ACCESS_TOKEN;
   const apiVersion = process.env.WHATSAPP_API_VERSION || "v18.0";
@@ -126,12 +206,38 @@ async function sendWhatsAppImage(phone, imageUrl, caption) {
   return data.messages?.[0]?.id;
 }
 
+// ============================================================================
+// FUNCIÓN UNIFICADA DE ENVÍO
+// ============================================================================
+
+async function sendWhatsAppImage(phone, imageUrl, caption) {
+  if (PROVIDER === "twilio") {
+    return sendViaTwilio(phone, imageUrl, caption);
+  } else if (PROVIDER === "meta") {
+    return sendViaMeta(phone, imageUrl, caption);
+  } else {
+    throw new Error(
+      "No hay proveedor de WhatsApp configurado. Configura Twilio (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN) o Meta (WHATSAPP_BUSINESS_PHONE_NUMBER_ID, WHATSAPP_BUSINESS_ACCESS_TOKEN)."
+    );
+  }
+}
+
 async function main() {
   log("=== Inicio del envío de frase del día ===");
 
   if (DRY_RUN) {
     log("⚠️  MODO DE PRUEBA (DRY_RUN=true) - No se enviarán mensajes reales");
   }
+
+  if (!PROVIDER) {
+    logError("No hay proveedor de WhatsApp configurado.");
+    logError("Opciones:");
+    logError("  1. Twilio (sandbox gratuito): TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN");
+    logError("  2. Meta (producción): WHATSAPP_BUSINESS_PHONE_NUMBER_ID + WHATSAPP_BUSINESS_ACCESS_TOKEN");
+    process.exit(1);
+  }
+
+  log(`Proveedor: ${PROVIDER === "twilio" ? "Twilio WhatsApp Sandbox" : "Meta WhatsApp Business API"}`);
 
   try {
     const frases = await loadFrasesDelDia();
