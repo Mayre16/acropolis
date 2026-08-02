@@ -380,6 +380,11 @@ export function EditPanelChrome({
   );
 }
 
+export type EditToolbarShortcut = {
+  label: string;
+  targetId: string;
+};
+
 export function EditToolbar({
   label,
   dirty,
@@ -387,6 +392,7 @@ export function EditToolbar({
   status,
   onSave,
   onPublish,
+  shortcuts,
 }: {
   label: string;
   dirty: boolean;
@@ -394,6 +400,7 @@ export function EditToolbar({
   status: string;
   onSave: () => void;
   onPublish: () => void;
+  shortcuts?: EditToolbarShortcut[];
 }) {
   // React puede borrar cms-edit-embedded del <html> al hidratar Inicio (SSR).
   // Reponerla aquí para que el CSS oculte esta barra duplicada en el iframe.
@@ -436,6 +443,24 @@ export function EditToolbar({
           </button>
         </div>
       </div>
+      {shortcuts?.length ? (
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-amber-100 px-3 py-1.5">
+          <span className="text-[11px] text-amber-700">Ir a:</span>
+          {shortcuts.map((s) => (
+            <button
+              key={s.targetId}
+              type="button"
+              onClick={() => {
+                const el = document.getElementById(s.targetId);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              className="rounded-full bg-amber-200/60 px-2.5 py-0.5 text-[11px] font-semibold text-amber-900 transition hover:bg-amber-300/70"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {status ? (
         <p className="border-t border-amber-100 px-3 py-1 text-center text-xs text-amber-800">
           {status}
