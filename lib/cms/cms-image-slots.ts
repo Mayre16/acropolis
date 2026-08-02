@@ -72,9 +72,6 @@ export const CMS_IMAGE_MAX_PX = {
   h: CMS_IMAGE_SLOTS.homeHero.max.h,
 } as const;
 
-export function cmsImageSlotHint(slotId: CmsImageSlotId = "card"): string {
-  const s = CMS_IMAGE_SLOTS[slotId];
-  const rec = `${s.recommended.w}×${s.recommended.h}`;
-  const base = `Tamaño recomendado: ${rec} px (${s.aspectHint}). WebP < 500 KB.`;
-  return s.note ? `${base} ${s.note}` : base;
+export function cmsImageSlotHint(_slotId: CmsImageSlotId = "card"): string {
+  return "Solo WebP y menos de 100 KB.";
 }
