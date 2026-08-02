@@ -14,13 +14,13 @@ export const CMS_IMAGE_ACCEPT = "image/webp,.webp";
 export const CMS_PDF_ACCEPT = "application/pdf,.pdf";
 export const CMS_VIDEO_ACCEPT = "video/mp4,video/webm,.mp4,.webm";
 
-/** Fotos CMS: WebP y máximo 100 KB. */
-export const CMS_UPLOAD_MAX_IMAGE_BYTES = 100 * 1024;
+/** Fotos CMS: WebP y máximo 500 KB. */
+export const CMS_UPLOAD_MAX_IMAGE_BYTES = 500 * 1024;
 export const CMS_UPLOAD_MAX_PDF_BYTES = 15 * 1024 * 1024;
 export const CMS_UPLOAD_MAX_VIDEO_BYTES = 40 * 1024 * 1024;
 
 export const CMS_IMAGE_UPLOAD_HINT =
-  "Solo fotos WebP y menos de 100 KB. Comprime la imagen antes de subirla.";
+  "Solo fotos WebP y menos de 500 KB. Comprime la imagen antes de subirla.";
 
 export type CmsUploadKind = "image" | "document" | "video";
 
@@ -112,13 +112,13 @@ export async function assertCmsImageFile(
 ): Promise<void> {
   if (file.size <= 0 || file.size > CMS_UPLOAD_MAX_IMAGE_BYTES) {
     throw new Error(
-      "La foto debe ser WebP y pesar menos de 100 KB. Comprime la imagen e inténtalo de nuevo.",
+      "La foto debe ser WebP y pesar menos de 500 KB. Comprime la imagen e inténtalo de nuevo.",
     );
   }
   const detected = await detectFile(file);
   if (!detected || detected.kind !== "image" || detected.ext !== "webp") {
     throw new Error(
-      "Solo se permiten fotos WebP de menos de 100 KB. No se aceptan JPG, PNG, PDF ni otros formatos.",
+      "Solo se permiten fotos WebP de menos de 500 KB. No se aceptan JPG, PNG, PDF ni otros formatos.",
     );
   }
 
