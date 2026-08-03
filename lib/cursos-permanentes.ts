@@ -12,13 +12,16 @@ export const CURSO_PERMANENTE_IDS = new Set([
   "curso-tai-chi-y-chi-kung",
   "curso-crochet",
   "curso-circulo-de-lectura",
+]);
+
+/** Ya no van en el catálogo de /cursos (tienen sitio propio u otra sección). */
+export const CURSOS_CATALOG_REMOVED_IDS = new Set([
   "curso-circulo-de-amigos",
 ]);
 
-/** Activos en /cursos pero no en el carrusel del home (evita duplicar el bloque promocional). */
-export const HOME_CURSOS_CAROUSEL_EXCLUDE_IDS = new Set([
-  "curso-circulo-de-amigos",
-]);
+/** Activos en /cursos pero no en el carrusel del home. */
+export const HOME_CURSOS_CAROUSEL_EXCLUDE_IDS = new Set<string>();
+
 export function isCursoPermanente(id: string) {
   return CURSO_PERMANENTE_IDS.has(id);
 }

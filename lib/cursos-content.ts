@@ -106,18 +106,6 @@ export const CURSOS_TALLERES: OfertaCurso[] = [
     horario: "Sábados · 10:00 a.m. – 12:00 p.m.",
     recurrent: true,
   },
-  {
-    id: "curso-circulo-de-amigos",
-    src: "/img/circulo-amigos/conversacion.webp",
-    alt: "Personas de distintas edades conversando en círculo — Círculo de Amigos Nueva Acrópolis",
-    title: "Círculo de Amigos",
-    text: "Red abierta para quienes comparten los principios de Nueva Acrópolis y desean dialogar sobre filosofía, cultura y voluntariado sin integrarse al plan de estudios regular.",
-    tag: "Filosofía",
-    horario: "Miércoles · encuentro virtual semanal",
-    recurrent: true,
-    inscribeKind: "actividad",
-    inscribeLabel: "Quiero unirme",
-  },
 ];
 
 export const CURSOS_EVENTOS_RECIENTES_SECTION = {

@@ -7,7 +7,10 @@ import {
   CURSOS_TALLERES_DEFAULTS,
   mergeCursosCards,
 } from "@/lib/cms/cursos-oferta-edit";
-import { CURSOS_ACTIVOS_INTRO } from "@/lib/cursos-permanentes";
+import {
+  CURSOS_ACTIVOS_INTRO,
+  CURSOS_CATALOG_REMOVED_IDS,
+} from "@/lib/cursos-permanentes";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import type { CmsCursosCard, CmsCursosPage } from "@/lib/cms/types";
 
@@ -61,7 +64,7 @@ export function useCursosOfertaDisplay() {
         CURSOS_TALLERES_DEFAULTS,
         page?.cursosTalleres,
         page?.cursosTalleresHidden,
-      ),
+      ).filter((c) => !CURSOS_CATALOG_REMOVED_IDS.has(c.id)),
     ),
     conferencias: resolveCards(
       mergeCursosCards(
