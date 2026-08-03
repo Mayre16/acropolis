@@ -165,12 +165,12 @@ export function InstagramFeedSection({
                     className="group block overflow-hidden rounded-lg bg-na-heket/5 shadow-na-soft"
                     aria-label={post.alt}
                   >
-                    <div className="relative aspect-square w-full">
+                    <div className="relative aspect-[4/5] w-full bg-na-heket/[0.06] sm:aspect-square">
                       <Image
                         src={assetUrl(post.src)}
                         alt={post.alt}
                         fill
-                        className="object-cover transition duration-300 group-hover:scale-105"
+                        className="object-contain transition duration-300 group-hover:scale-[1.02]"
                         sizes="(max-width: 640px) 40vw, 220px"
                         unoptimized
                       />
