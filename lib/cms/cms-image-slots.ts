@@ -6,8 +6,7 @@ export type CmsImageSlotId =
   | "pageHero"
   | "card"
   | "gallery"
-  | "thumb"
-  | "fraseDelDia";
+  | "thumb";
 
 export type CmsImageSlot = {
   id: CmsImageSlotId;
@@ -23,7 +22,7 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     id: "homeHero",
     label: "Header / landing (pantalla completa)",
     recommended: { w: 1600, h: 900 },
-    max: { w: 4000, h: 4000 },
+    max: { w: 1920, h: 1080 },
     aspectHint: "16:9",
     note: "Fondo del inicio. Recorta a 1600×900 antes de subir.",
   },
@@ -31,7 +30,7 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     id: "pageHero",
     label: "Header de página / carrusel",
     recommended: { w: 1400, h: 788 },
-    max: { w: 4000, h: 4000 },
+    max: { w: 1600, h: 900 },
     aspectHint: "16:9",
     note: "Cabeceras de Filosofía, Cultura, etc.",
   },
@@ -39,7 +38,7 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     id: "card",
     label: "Tarjeta / listado",
     recommended: { w: 800, h: 500 },
-    max: { w: 4000, h: 4000 },
+    max: { w: 1200, h: 750 },
     aspectHint: "8:5",
     note: "Agenda, talleres, salones, crónicas.",
   },
@@ -47,23 +46,15 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     id: "gallery",
     label: "Galería",
     recommended: { w: 1200, h: 750 },
-    max: { w: 4000, h: 4000 },
+    max: { w: 1600, h: 1000 },
     aspectHint: "8:5",
   },
   thumb: {
     id: "thumb",
     label: "Miniatura",
     recommended: { w: 640, h: 640 },
-    max: { w: 4000, h: 4000 },
+    max: { w: 800, h: 800 },
     aspectHint: "1:1",
-  },
-  fraseDelDia: {
-    id: "fraseDelDia",
-    label: "Frase del día",
-    recommended: { w: 1080, h: 1350 },
-    max: { w: 4000, h: 4000 },
-    aspectHint: "4:5",
-    note: "Sin restricción estricta de tamaño.",
   },
 };
 
@@ -72,6 +63,10 @@ export const CMS_IMAGE_MAX_PX = {
   h: CMS_IMAGE_SLOTS.homeHero.max.h,
 } as const;
 
-export function cmsImageSlotHint(_slotId: CmsImageSlotId = "card"): string {
-  return "Solo WebP y menos de 100 KB.";
+export function cmsImageSlotHint(slotId: CmsImageSlotId = "card"): string {
+  const s = CMS_IMAGE_SLOTS[slotId];
+  const rec = `${s.recommended.w}×${s.recommended.h}`;
+  const max = `${s.max.w}×${s.max.h}`;
+  const base = `Tamaño: ${rec} px (${s.aspectHint}). Máximo ${max} px. WebP < 100 KB.`;
+  return s.note ? `${base} ${s.note}` : base;
 }

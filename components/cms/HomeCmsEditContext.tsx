@@ -54,7 +54,6 @@ import {
   EditField,
   EditPanelChrome,
   EditToolbar,
-  type EditToolbarShortcut,
 } from "@/components/cms/CmsEditFields";
 import { AgendaEntryEditFields, AgendaEntryImageField } from "@/components/cms/AgendaEntryEditFields";
 import { CirculoAmigosEditFields } from "@/components/cms/CirculoAmigosEditFields";
@@ -322,7 +321,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       const errors: string[] = [];
       for (const file of list) {
         try {
-          const url = await uploadCmsImage("acropolis", token, file, "fraseDelDia");
+          const url = await uploadCmsImage("acropolis", token, file);
           created.push({
             id: newFraseId(),
             src: url,
@@ -527,10 +526,6 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
   const philosophyBand =
     homePage.philosophyBand ?? DEFAULT_HOME_PAGE.philosophyBand!;
 
-  const homeShortcuts: EditToolbarShortcut[] = [
-    { label: "Frases del día", targetId: "frases-del-dia" },
-  ];
-
   return (
     <HomeCmsEditContext.Provider value={value}>
       <EditToolbar
@@ -540,7 +535,6 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         status={status}
         onSave={() => void saveDraft()}
         onPublish={() => void publish()}
-        shortcuts={homeShortcuts}
       />
       {!ready ? (
         <div
@@ -936,7 +930,6 @@ function HomeFraseEditFields({
         image={frase.src}
         imageAlt={frase.alt}
         token={token}
-        imageSlot="fraseDelDia"
         onChange={(patch) => {
           if (patch.image !== undefined) onChange({ src: patch.image });
           if (patch.imageAlt !== undefined) onChange({ alt: patch.imageAlt });

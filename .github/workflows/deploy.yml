@@ -35,19 +35,9 @@ jobs:
       - name: Sync CMS published.json (frases / og:image en build)
         env:
           CMS_API: https://editor.acropolis.adesa.com.do/api
-        run: |
-          mkdir -p data/acropolis
-          TMP="$(mktemp)"
-          if curl -fsSL "$CMS_API/content/acropolis/published" -o "$TMP" \
-            && node -e "const d=require(process.argv[1]); if(d.version!==1) process.exit(1)" "$TMP"; then
-            mv "$TMP" data/acropolis/published.json
-            echo "CMS sync OK"
-          else
-            rm -f "$TMP"
-            echo "CMS sync failed — using committed data/acropolis/published.json"
-            test -f data/acropolis/published.json
-          fi
-          node -e "const d=require('./data/acropolis/published.json'); const n=(d.sections&&d.sections.frasesDelDia||[]).filter(f=>f&&f.src).length; console.log('frases con foto:', n); if(d.version!==1) process.exit(1)"
+          # Tras publicar desde el editor, exigir sync real (no servir frases viejas).
+          CMS_SYNC_REQUIRED: ${{ github.event_name == 'repository_dispatch' && '1' || '0' }}
+        run: node scripts/sync-cms-published.mjs
 
       - name: Build Next.js (producción acropolis.org.do)
         env:

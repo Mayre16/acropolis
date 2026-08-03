@@ -92,8 +92,8 @@ export const INSTAGRAM_POSTS: InstagramPost[] = [
     href: "https://www.instagram.com/p/Da3cNbQErY9/",
   },
   {
-    src: "/img/instagram/DZuvpbzkqax.webp",
+    src: "/img/instagram/DavokKXElyr.webp",
     alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DZuvpbzkqax/",
-  }
+    href: "https://www.instagram.com/p/DavokKXElyr/",
+  },
 ];

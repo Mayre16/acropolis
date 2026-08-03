@@ -14,8 +14,11 @@ export function FraseDelDiaShareView({
   initial: CmsFraseDelDia | null;
 }) {
   const live = useCmsFrasesDelDia();
-  const frase =
-    (initial?.id ? live.find((f) => f.id === initial.id) : null) ?? initial;
+  // Preferir live solo si trae foto; si no, mantener el SSR del build.
+  const liveMatch = initial?.id
+    ? live.find((f) => f.id === initial.id && f.src?.trim())
+    : undefined;
+  const frase = liveMatch ?? initial;
   const src = frase?.src
     ? (resolveCmsMediaUrl(frase.src) ?? frase.src)
     : "";
