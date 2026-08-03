@@ -255,6 +255,11 @@ export const NAV_INSTITUCIONAL = {
       label: "Perfil institucional",
     },
     {
+      type: "link",
+      href: "/anuario",
+      label: "Anuario",
+    },
+    {
       type: "group",
       label: "Internacional",
       href: "/relaciones-institucionales/",

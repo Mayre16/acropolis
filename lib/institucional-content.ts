@@ -115,6 +115,6 @@ export const QUIENES_SOMOS_SECTIONS: {
   { id: "presidencia", label: "Presidencia" },
   { id: "areas-actuacion", label: "Áreas" },
   { id: "direccion-nacional", label: "Dirección RD" },
-  { id: "perfil-institucional", label: "Perfil OINADOM" },
+  { id: "perfil-institucional", label: "Perfil" },
   { id: "anuario", label: "Anuario" },
 ];
