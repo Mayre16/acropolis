@@ -76,20 +76,6 @@ export const AREAS_ACTUACION_INSTITUCIONAL = [
   },
 ] as const;
 
-/** Listado bajo Áreas: Anuario y CV / Perfil institucional. */
-export const AREAS_DOCUMENTOS_INSTITUCIONALES = [
-  {
-    title: "Anuario",
-    href: "/anuario",
-    text: "Memoria de actividades de Nueva Acrópolis Internacional: anuarios y publicaciones oficiales.",
-  },
-  {
-    title: "CV institucional",
-    href: "/perfil-institucional",
-    text: "Perfil institucional OINADOM: misión, estructura y presencia en República Dominicana (PDF).",
-  },
-] as const;
-
 /** Anuarios internacionales OINA (acropolis.org). */
 export const ANUARIO_INTERNACIONAL_URL =
   "https://www.acropolis.org/es/anuarios-internacionales/";
