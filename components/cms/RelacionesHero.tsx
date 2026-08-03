@@ -1,6 +1,17 @@
 "use client";
 
-import { ArrowRight, HeartHandshake } from "lucide-react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Building2,
+  Globe2,
+  HeartHandshake,
+  HeartHandshake as HeartHandshakeIcon,
+  Leaf,
+  Newspaper,
+  Scale,
+  Users,
+} from "lucide-react";
 import { EsferaLogo } from "@/components/EsferaLogo";
 import { CmsPageHero } from "@/components/cms/CmsPageHero";
 import { mergeRelacionesPage } from "@/lib/cms/institutional-page-edit";
@@ -12,14 +23,6 @@ import { resolvePageHero } from "@/lib/cms/page-hero";
 import { useHeroCarouselImages } from "@/lib/cms/hero-carousel-hooks";
 import { RELACIONES_HERO_IMAGES } from "@/lib/hero-images";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
-import {
-  Globe2,
-  HeartHandshake as HeartHandshakeIcon,
-  Building2,
-  Scale,
-  Leaf,
-  Users,
-} from "lucide-react";
 
 const FALLBACK = {
   eyebrow: "Institucional",
@@ -239,6 +242,33 @@ export function RelacionesPageBody() {
               </a>
             </div>
           </div>
+
+          <Link
+            href="/eventos"
+            className="mt-10 flex flex-col gap-4 rounded-2xl border border-na-heket/10 bg-gradient-to-br from-na-sand/80 via-na-surface to-na-kefer/[0.08] p-6 shadow-na-soft transition hover:border-na-heket/25 hover:shadow-na-card sm:flex-row sm:items-center sm:justify-between sm:p-8"
+          >
+            <div className="flex gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-na-heket/10 text-na-heket">
+                <Newspaper className="h-6 w-6" strokeWidth={1.8} aria-hidden />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-na-kefer">
+                  Internacional
+                </p>
+                <h3 className="mt-1 text-xl font-black text-na-heketDark">
+                  Noticias internacionales
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-na-muted">
+                  Eventos y noticias de Nueva Acrópolis en el mundo: celebraciones,
+                  actividades y la vida de la organización internacional.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-na-heket">
+              Ver noticias
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </span>
+          </Link>
         </div>
       </section>
     </>
