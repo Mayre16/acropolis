@@ -83,16 +83,26 @@ export function mapsUrl(query: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t)}`;
 }
 
+/** Búsqueda estable Naco (misma que Civis; “C.” abreviado geocodifica mal). */
+const NACO_MAP_EMBED_QUERY =
+  "Calle Cub Scouts No. 6, Ensanche Naco, Santo Domingo, República Dominicana";
+
 /** Dirección estable para iframe cuando mapsQuery es enlace corto. */
 export function mapsEmbedFallback(venue: {
+  id?: string;
   address?: string;
   zone?: string;
   city?: string;
 }): string {
-  return [venue.address, venue.zone, venue.city, "República Dominicana"]
+  if (venue.id === "sede-naco") return NACO_MAP_EMBED_QUERY;
+  const address = (venue.address ?? "")
+    .trim()
+    .replace(/^C\.\s+/i, "Calle ")
+    .replace(/^Av\.\s+/i, "Avenida ");
+  const parts = [address, venue.zone, venue.city, "República Dominicana"]
     .map((p) => p?.trim())
-    .filter(Boolean)
-    .join(", ");
+    .filter(Boolean) as string[];
+  return [...new Set(parts)].join(", ");
 }
 
 /**
