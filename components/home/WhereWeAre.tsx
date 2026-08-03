@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import {
   Building2,
   ExternalLink,
@@ -13,8 +12,6 @@ import {
 } from "lucide-react";
 import { useWhatsAppUrls } from "@/lib/cms/hooks";
 import {
-  mapsEmbedFallback,
-  mapsEmbedUrl,
   mapsUrl,
   type VenueLocation,
   type VenueKind,
@@ -77,112 +74,36 @@ function DrMapPin({
   );
 }
 
-function LazyStreetMap({ venue }: { venue: VenueLocation }) {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const el = hostRef.current;
-    if (!el) return;
-    setReady(false);
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setReady(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "240px 0px" },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [venue.id]);
-
-  const embedSrc = mapsEmbedUrl(
-    venue.mapsQuery,
-    mapsEmbedFallback(venue),
-  );
-
-  return (
-    <div
-      ref={hostRef}
-      className="overflow-hidden rounded-2xl border border-na-heket/10 bg-na-heket/[0.04] shadow-na-soft"
-    >
-      {ready ? (
-        <iframe
-          title={`Mapa — ${venue.name}`}
-          src={embedSrc}
-          className="aspect-[16/10] min-h-[260px] w-full border-0 sm:min-h-[320px]"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
-      ) : (
-        <div
-          className="flex aspect-[16/10] min-h-[260px] w-full items-center justify-center bg-na-heket/[0.06] sm:min-h-[320px]"
-          aria-hidden
-        />
-      )}
-    </div>
-  );
-}
-
 function MapPanel({ venues }: { venues: VenueLocation[] }) {
   const pins = getMapPinsFromVenues(venues);
   const hasCentroPins = pins.some((p) => p.variant === "centro");
-  const streetVenue =
-    venues.find((v) => v.id === "sede-naco") ??
-    venues.find(
-      (v) =>
-        v.kind === "sede" &&
-        !v.address.toLowerCase().includes("próximamente"),
-    );
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
-      {streetVenue ? (
-        <div className="space-y-3">
-          <p className="text-center text-xs font-bold uppercase tracking-[0.28em] text-na-kefer lg:text-left">
-            Sede {streetVenue.name} · dirección
-          </p>
-          <LazyStreetMap venue={streetVenue} />
-          <p className="text-center text-sm text-na-muted lg:text-left">
-            {streetVenue.address}
-            {streetVenue.zone ? ` · ${streetVenue.zone}` : ""}
-            {streetVenue.city ? `, ${streetVenue.city}` : ""}
-          </p>
-        </div>
-      ) : null}
-
-      <div className="relative rounded-2xl border border-na-heket/10 bg-na-surface p-4 shadow-na-soft sm:p-5">
-        <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.28em] text-na-kefer">
-          Vista nacional
-        </p>
-        <DrMapSvg ariaLabel="Mapa de República Dominicana con sedes de Nueva Acrópolis por ciudad">
-          {pins.map((pin) => (
-            <DrMapPin
-              key={pin.id}
-              x={pin.x}
-              y={pin.y}
-              label={pin.label}
-              variant={pin.variant}
-              hideLabel={pin.hideLabel}
-            />
-          ))}
-        </DrMapSvg>
-        <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-na-muted">
+    <div className="relative mx-auto max-w-3xl rounded-2xl border border-na-heket/10 bg-na-surface p-4 shadow-na-soft sm:p-6">
+      <DrMapSvg ariaLabel="Mapa de República Dominicana con sedes de Nueva Acrópolis por ciudad">
+        {pins.map((pin) => (
+          <DrMapPin
+            key={pin.id}
+            x={pin.x}
+            y={pin.y}
+            label={pin.label}
+            variant={pin.variant}
+            hideLabel={pin.hideLabel}
+          />
+        ))}
+      </DrMapSvg>
+      <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-na-muted">
+        <li className="inline-flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-na-amon ring-2 ring-na-amon/30" />
+          Sedes
+        </li>
+        {hasCentroPins ? (
           <li className="inline-flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-na-amon ring-2 ring-na-amon/30" />
-            Sedes
+            <span className="h-2.5 w-2.5 rounded-full bg-na-kefer ring-2 ring-na-kefer/30" />
+            Puntos culturales
           </li>
-          {hasCentroPins ? (
-            <li className="inline-flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-na-kefer ring-2 ring-na-kefer/30" />
-              Puntos culturales
-            </li>
-          ) : null}
-        </ul>
-      </div>
+        ) : null}
+      </ul>
     </div>
   );
 }
