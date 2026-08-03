@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ExternalLink, Handshake } from "lucide-react";
 import {
   QuienesSomosHero,
   QuienesSomosIntroSection,
@@ -14,7 +15,6 @@ import { Values } from "@/components/home/Values";
 import { FundacionOrganizacionSection } from "@/components/quienes-somos/FundacionOrganizacionSection";
 import { SimbolismoSection } from "@/components/quienes-somos/SimbolismoSection";
 import { AreasActuacionInstitucionalSection } from "@/components/quienes-somos/AreasActuacionInstitucionalSection";
-import { bibliotecaLibreriaUrl } from "@/lib/site-config";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
 import {
   ANUARIO_INTERNACIONAL_URL,
@@ -115,31 +115,51 @@ export function QuienesSomosPageContent({ initialSection }: Props) {
           </div>
           <div className="mt-8 rounded-2xl border border-na-heket/10 bg-na-heket/[0.04] p-6 sm:p-8">
             <h3 className="text-lg font-bold text-na-heketDark">
-              Anuarios internacionales
+              Ediciones del anuario
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-na-muted">
-              Consulta y descarga las ediciones recientes en el portal oficial de
-              Nueva Acrópolis Internacional. Para información local sobre
-              disponibilidad impresa, acércate a nuestras sedes o escríbenos.
-              También puedes encontrar publicaciones relacionadas en nuestra{" "}
-              <LeaveSiteLink
-                href={bibliotecaLibreriaUrl()}
-                className="font-semibold text-na-heket underline-offset-2 hover:underline"
-              >
-                Librería
-              </LeaveSiteLink>
-              .
+              El anuario internacional de Nueva Acrópolis recoge la memoria de
+              actividades en todos los países. Consulta y descarga las ediciones
+              recientes en el portal oficial; para disponibilidad impresa en RD,
+              acércate a nuestras sedes o escríbenos.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <LeaveSiteLink
                 href={ANUARIO_INTERNACIONAL_URL}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-na-heket px-5 py-2.5 text-sm font-bold text-white transition hover:bg-na-kefer"
               >
-                Ver anuarios en acropolis.org
+                Ver ediciones en acropolis.org
                 <ExternalLink className="h-4 w-4" aria-hidden />
               </LeaveSiteLink>
             </div>
           </div>
+
+          <Link
+            href="/relaciones-institucionales/"
+            className="mt-10 flex flex-col gap-4 rounded-2xl border border-na-heket/10 bg-gradient-to-br from-na-sand/80 via-na-surface to-na-kefer/[0.08] p-6 shadow-na-soft transition hover:border-na-heket/25 hover:shadow-na-card sm:flex-row sm:items-center sm:justify-between sm:p-8"
+          >
+            <div className="flex gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-na-heket/10 text-na-heket">
+                <Handshake className="h-6 w-6" strokeWidth={1.8} aria-hidden />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-na-kefer">
+                  Internacional
+                </p>
+                <h3 className="mt-1 text-xl font-black text-na-heketDark">
+                  Relaciones institucionales
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-na-muted">
+                  Convenios, alianzas y presencia de Nueva Acrópolis ante
+                  organismos e instituciones en República Dominicana y el mundo.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-na-heket">
+              Ver relaciones
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </span>
+          </Link>
         </div>
       </section>
     </QuienesSomosPageShell>

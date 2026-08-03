@@ -250,16 +250,20 @@ export const NAV_INSTITUCIONAL = {
       label: "Dirección Nacional",
     },
     {
+      type: "link",
+      href: "/perfil-institucional",
+      label: "Perfil institucional",
+    },
+    {
       type: "group",
       label: "Internacional",
       href: "/relaciones-institucionales/",
       items: [
         {
-          href: "https://www.acropolis.org/es/anuarios-internacionales/",
-          label: "Anuario",
+          href: "/relaciones-institucionales/",
+          label: "Relaciones institucionales",
         },
-        { href: "/relaciones-institucionales/", label: "Relaciones institucionales" },
-        { href: "/eventos/#mundo", label: "Noticias internacionales" },
+        { href: "/eventos", label: "Noticias internacionales" },
       ],
     },
   ] satisfies NavInstitucionalItem[],
