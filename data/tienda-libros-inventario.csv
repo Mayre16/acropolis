@@ -1,0 +1,30 @@
+SKU,TITULO,PRECIO,STOCK,DISPONIBLE,CATEGORIA
+LIB-001,Que hacemos con el corazón?,700.00,1,SI,Filosofía
+LIB-002,Ankor,1100.00,1,SI,Filosofía
+LIB-003,El Alquimista,900.00,0,NO,Filosofía
+LIB-004,El arte de vivir,500.00,1,SI,Filosofía
+LIB-005,El poder de los símbolos,500.00,0,NO,Filosofía
+LIB-006,El regalo de la música,1000.00,0,NO,Arte y Cultura
+LIB-007,Filosofía para vivir,700.00,1,SI,Filosofía
+LIB-008,Guía para entender Platón,650.00,0,NO,Filosofía Clásica
+LIB-009,La alquimia de la pareja,750.00,0,NO,Desarrollo Personal
+LIB-010,Las 7 leyes de la naturaleza,800.00,0,NO,Filosofía
+LIB-011,Las Parábolas del Buda,600.00,0,NO,Filosofía Oriental
+LIB-012,Los espíritus elementales,750.00,0,NO,Esoterismo
+LIB-013,Los secretos del Olimpo,900.00,2,SI,Mitología
+LIB-014,Memorias,550.00,0,NO,Biografía
+LIB-015,Misterios de los Inkas,450.00,1,SI,Historia
+LIB-016,Mossy,800.00,0,NO,Literatura
+LIB-017,Nacidos para triunfar,450.00,0,NO,Desarrollo Personal
+LIB-018,Para conocerse mejor,700.00,1,SI,Desarrollo Personal
+LIB-019,Poemas épicos,450.00,1,SI,Poesía
+LIB-020,Poemas filosóficos,450.00,0,NO,Poesía
+LIB-021,Las esferas de la conciencia,1450.00,13,SI,Filosofía
+LIB-022,Pythagoras la música de las esferas,1000.00,0,NO,Filosofía Clásica
+LIB-023,Reflexiones de un filósofo,900.00,1,SI,Filosofía
+LIB-024,Dhammapada,550.00,0,NO,Filosofía Oriental
+LIB-026,Estoicos,900.00,0,NO,Filosofía Clásica
+LIB-031,Manuales Esferas,1500.00,2,SI,Manuales
+LIB-032,El Ideal: Secreto de los Templarios D.S.G,600.00,0,NO,Historia
+LIB-033,ISO REEDICIÓN REVISADA DELIA S. G,1200.00,0,NO,Filosofía
+LIB-034,An Invitation to Think,800.00,2,SI,Filosofía
