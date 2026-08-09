@@ -15,7 +15,7 @@ import {
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
 import { resolveCmsMediaUrl, uploadCmsImage } from "@/lib/cms/api-client";
 import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
-import { shareFraseDelDiaLink } from "@/lib/frases-del-dia-share";
+import { shareFraseDelDiaLink, getDiaFromIndex } from "@/lib/frases-del-dia-share";
 import { useCmsFrasesDelDia } from "@/lib/cms/hooks";
 import type { CmsFraseDelDia } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
@@ -219,13 +219,16 @@ async function downloadFraseImage(src: string, filename: string) {
 function FraseLightbox({
   frase,
   src,
+  dayIndex,
   onClose,
 }: {
   frase: CmsFraseDelDia;
   src: string;
+  dayIndex: number;
   onClose: () => void;
 }) {
   const titleId = useId();
+  const dia = getDiaFromIndex(dayIndex);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -257,7 +260,7 @@ function FraseLightbox({
             id={titleId}
             className="text-sm font-bold uppercase tracking-[0.18em] text-na-kefer"
           >
-            Frase del día
+            {dia.saludo}
           </h3>
           <button
             type="button"
@@ -273,7 +276,7 @@ function FraseLightbox({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
-            alt={frase.alt || "Frase del día"}
+            alt={frase.alt || `Frase del ${dia.slug}`}
             className="mx-auto max-h-[min(70vh,40rem)] w-auto max-w-full rounded-lg object-contain shadow-md"
           />
         </div>
@@ -281,7 +284,7 @@ function FraseLightbox({
         <div className="flex flex-wrap items-center justify-center gap-2 border-t border-na-heket/10 px-4 py-3 sm:gap-3">
           <button
             type="button"
-            onClick={() => void shareFraseDelDiaLink(frase.id)}
+            onClick={() => void shareFraseDelDiaLink(dayIndex)}
             className="inline-flex items-center gap-2 rounded-full border border-na-heket/20 bg-white px-4 py-2 text-sm font-semibold text-na-heketDark transition hover:bg-na-heket/5"
           >
             <Share2 className="h-4 w-4" aria-hidden />
@@ -292,7 +295,7 @@ function FraseLightbox({
             onClick={() =>
               void downloadFraseImage(
                 src,
-                `frase-del-dia-${frase.id.slice(0, 12)}.webp`,
+                `frase-${dia.slug.toLowerCase()}.webp`,
               )
             }
             className="inline-flex items-center gap-2 rounded-full bg-na-heket px-4 py-2 text-sm font-semibold text-white transition hover:bg-na-heketDark"
@@ -319,7 +322,7 @@ export function HomeFrasesDelDiaSection() {
 
   const [index, setIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [lightboxId, setLightboxId] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [uploadingMany, setUploadingMany] = useState(false);
   const multiFileRef = useRef<HTMLInputElement>(null);
   const withSrc = list.filter((f) => f.src?.trim() || edit?.ready);
@@ -336,9 +339,7 @@ export function HomeFrasesDelDiaSection() {
   const n = withSrc.length;
   const visible = Math.min(3, Math.max(1, n));
   const maxIndex = Math.max(0, n - visible);
-  const lightboxFrase = lightboxId
-    ? withSrc.find((f) => f.id === lightboxId)
-    : null;
+  const lightboxFrase = lightboxIndex !== null ? list[lightboxIndex] : null;
   const lightboxSrc = lightboxFrase
     ? (resolveCmsMediaUrl(lightboxFrase.src) ?? lightboxFrase.src)
     : "";
@@ -355,13 +356,13 @@ export function HomeFrasesDelDiaSection() {
   }, [maxIndex]);
 
   useEffect(() => {
-    if (n <= visible || reduceMotion || lightboxId) return;
+    if (n <= visible || reduceMotion || lightboxIndex !== null) return;
     const t = setInterval(
       () => setIndex((i) => (i + 1) % (maxIndex + 1)),
       5000,
     );
     return () => clearInterval(t);
-  }, [n, visible, maxIndex, reduceMotion, lightboxId]);
+  }, [n, visible, maxIndex, reduceMotion, lightboxIndex]);
 
   if (!edit?.ready && n === 0) return null;
 
@@ -411,6 +412,7 @@ export function HomeFrasesDelDiaSection() {
               >
                 {withSrc.map((frase) => {
                   const src = resolveCmsMediaUrl(frase.src) ?? frase.src;
+                  const fraseIndex = list.findIndex((f) => f.id === frase.id);
                   return (
                     <li
                       key={frase.id}
@@ -443,7 +445,7 @@ export function HomeFrasesDelDiaSection() {
                               }
                               return;
                             }
-                            setLightboxId(frase.id);
+                            setLightboxIndex(fraseIndex >= 0 ? fraseIndex : 0);
                           }}
                           className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-na-kefer"
                           aria-label={`Ver frase más grande: ${frase.alt || "Frase del día"}`}
@@ -507,11 +509,12 @@ export function HomeFrasesDelDiaSection() {
         )}
       </div>
 
-      {lightboxFrase && lightboxSrc ? (
+      {lightboxFrase && lightboxSrc && lightboxIndex !== null ? (
         <FraseLightbox
           frase={lightboxFrase}
           src={lightboxSrc}
-          onClose={() => setLightboxId(null)}
+          dayIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       ) : null}
     </section>

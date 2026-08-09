@@ -6,9 +6,10 @@ import {
   getMergedFraseDelDia,
 } from "@/lib/cms/static-params";
 import {
-  FRASE_DEL_DIA_SHARE_TEXT,
   FRASE_DEL_DIA_SHARE_TITLE,
   fraseDelDiaSharePath,
+  fraseDelDiaShareText,
+  getDiaFromIndex,
 } from "@/lib/frases-del-dia-share";
 import { SITE_URL } from "@/lib/site-config";
 
@@ -26,10 +27,12 @@ export async function generateMetadata({
   if (!frase) {
     return { title: "Frase del día" };
   }
+  const dayIndex = frase.dayIndex ?? 0;
+  const dia = getDiaFromIndex(dayIndex);
   const image = absoluteCmsUploadUrl(frase.src);
-  const title = FRASE_DEL_DIA_SHARE_TITLE;
-  const description = FRASE_DEL_DIA_SHARE_TEXT;
-  const path = fraseDelDiaSharePath(frase.id);
+  const title = `${dia.saludo} — Nueva Acrópolis RD`;
+  const description = fraseDelDiaShareText(dayIndex);
+  const path = fraseDelDiaSharePath(dia.slug);
   const pageUrl = `${SITE_URL}${path}`;
   return {
     title,
@@ -46,7 +49,7 @@ export async function generateMetadata({
         ? [
             {
               url: image,
-              alt: frase.alt || "Frase del día",
+              alt: frase.alt || `Frase del ${dia.slug}`,
               type: image.toLowerCase().endsWith(".png")
                 ? "image/png"
                 : "image/webp",
@@ -70,5 +73,5 @@ export default async function FraseDelDiaPage({
 }) {
   const { id } = await params;
   const frase = await getMergedFraseDelDia(id);
-  return <FraseDelDiaShareView initial={frase} />;
+  return <FraseDelDiaShareView initial={frase} dayIndex={frase?.dayIndex ?? 0} />;
 }
