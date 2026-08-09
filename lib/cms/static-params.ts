@@ -101,17 +101,28 @@ export async function getMergedViaje(categoria: string, slug: string) {
   );
 }
 
+import { DIAS_FRASE, getIndexFromSlug } from "@/lib/frases-del-dia-share";
+
 export async function getFraseDelDiaStaticParams() {
-  const cms = await loadPublishedCms();
-  const list = cms?.sections.frasesDelDia ?? [];
-  return list
-    .filter((f) => f.id?.trim() && f.src?.trim())
-    .map((f) => ({ id: f.id }));
+  return DIAS_FRASE.map((d) => ({ id: d.slug }));
 }
 
-export async function getMergedFraseDelDia(id: string) {
+export async function getMergedFraseDelDia(slugOrId: string) {
   const cms = await loadPublishedCms();
   const list = cms?.sections.frasesDelDia ?? [];
-  return list.find((f) => f.id === id && f.src?.trim()) ?? null;
+  
+  const dayIndex = getIndexFromSlug(slugOrId);
+  const fraseByIndex = list[dayIndex];
+  if (fraseByIndex?.src?.trim()) {
+    return { ...fraseByIndex, dayIndex };
+  }
+  
+  const fraseById = list.find((f) => f.id === slugOrId && f.src?.trim());
+  if (fraseById) {
+    const idx = list.indexOf(fraseById);
+    return { ...fraseById, dayIndex: idx >= 0 ? idx : 0 };
+  }
+  
+  return null;
 }
 
