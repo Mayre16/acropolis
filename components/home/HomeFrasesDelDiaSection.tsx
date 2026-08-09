@@ -82,7 +82,7 @@ function FraseDaySlot({
         }}
       />
       {src ? (
-        <div className="group relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-na-heket/5 shadow-sm">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-na-heket/5 shadow-sm">
           <Image
             src={src}
             alt={frase?.alt || `Frase ${dayName}`}
@@ -91,7 +91,7 @@ function FraseDaySlot({
             sizes="120px"
             unoptimized
           />
-          <div className="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition group-hover:opacity-100">
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-1.5 pt-4">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
