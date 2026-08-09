@@ -15,8 +15,9 @@ export const CMS_IMAGE_ACCEPT = "image/webp,.webp";
 export const CMS_PDF_ACCEPT = "application/pdf,.pdf";
 export const CMS_VIDEO_ACCEPT = "video/mp4,video/webm,.mp4,.webm";
 
-/** Fotos CMS: WebP y máximo 100 KB. */
+/** Fotos CMS: WebP y máximo 100 KB (150 KB para frases del día). */
 export const CMS_UPLOAD_MAX_IMAGE_BYTES = 100 * 1024;
+export const CMS_UPLOAD_MAX_FRASE_BYTES = 150 * 1024;
 export const CMS_UPLOAD_MAX_PDF_BYTES = 15 * 1024 * 1024;
 export const CMS_UPLOAD_MAX_VIDEO_BYTES = 40 * 1024 * 1024;
 
@@ -106,20 +107,23 @@ async function readImageDimensions(
   });
 }
 
-/** Lanza Error si el archivo no es WebP ≤ 100 KB o supera el tope de píxeles. */
+/** Lanza Error si el archivo no es WebP ≤ 100 KB (150 KB para frases) o supera el tope de píxeles. */
 export async function assertCmsImageFile(
   file: File,
   slotId: CmsImageSlotId = "card",
 ): Promise<void> {
-  if (file.size <= 0 || file.size > CMS_UPLOAD_MAX_IMAGE_BYTES) {
+  const maxBytes = slotId === "fraseDelDia" ? CMS_UPLOAD_MAX_FRASE_BYTES : CMS_UPLOAD_MAX_IMAGE_BYTES;
+  const maxKb = Math.round(maxBytes / 1024);
+  
+  if (file.size <= 0 || file.size > maxBytes) {
     throw new Error(
-      "La foto debe ser WebP y pesar menos de 100 KB. Comprime la imagen e inténtalo de nuevo.",
+      `La foto debe ser WebP y pesar menos de ${maxKb} KB. Comprime la imagen e inténtalo de nuevo.`,
     );
   }
   const detected = await detectFile(file);
   if (!detected || detected.kind !== "image" || detected.ext !== "webp") {
     throw new Error(
-      "Solo se permiten fotos WebP de menos de 100 KB. No se aceptan JPG, PNG, PDF ni otros formatos.",
+      `Solo se permiten fotos WebP de menos de ${maxKb} KB. No se aceptan JPG, PNG, PDF ni otros formatos.`,
     );
   }
 
