@@ -403,6 +403,12 @@ export function EditToolbar({
     }
   }, []);
 
+  const handleHardRefresh = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("_t", Date.now().toString());
+    window.location.href = url.toString();
+  };
+
   return (
     <div
       data-cms-edit-toolbar
@@ -418,6 +424,14 @@ export function EditToolbar({
           ) : null}
         </p>
         <div className="flex flex-wrap gap-1">
+          <button
+            type="button"
+            onClick={handleHardRefresh}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 sm:text-sm"
+            title="Recargar página sin caché (Ctrl+Shift+R)"
+          >
+            ⟳ Recargar
+          </button>
           <button
             type="button"
             disabled={busy}
