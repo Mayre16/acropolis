@@ -321,7 +321,7 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
       const errors: string[] = [];
       for (const file of list) {
         try {
-          const url = await uploadCmsImage("acropolis", token, file);
+          const url = await uploadCmsImage("acropolis", token, file, "fraseDelDia");
           created.push({
             id: newFraseId(),
             src: url,
@@ -930,6 +930,7 @@ function HomeFraseEditFields({
         image={frase.src}
         imageAlt={frase.alt}
         token={token}
+        imageSlot="fraseDelDia"
         onChange={(patch) => {
           if (patch.image !== undefined) onChange({ src: patch.image });
           if (patch.imageAlt !== undefined) onChange({ alt: patch.imageAlt });
