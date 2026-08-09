@@ -195,6 +195,7 @@ export async function uploadCmsFile(
   const fd = new FormData();
   fd.append("file", file);
   fd.append("kind", kind);
+  fd.append("imageSlot", imageSlot);
   const res = await fetch(`${cmsApiBase()}/upload/${site}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
