@@ -427,6 +427,27 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
         markDirty();
       },
       addFrasesFromFiles,
+      setFraseAtIndex: (index: number, src: string) => {
+        setFrases((list) => {
+          const next = [...list];
+          while (next.length <= index) {
+            next.push({
+              id: newFraseId(),
+              src: "",
+              alt: "Frase del día",
+              caption: "",
+            });
+          }
+          next[index] = {
+            ...next[index],
+            id: next[index]?.id || newFraseId(),
+            src,
+            alt: next[index]?.alt || "Frase del día",
+          };
+          return next;
+        });
+        markDirty();
+      },
       deletePhoto: (index) => {
         setPhotos((list) => list.filter((_, i) => i !== index));
         setSelected(null, null);
