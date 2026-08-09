@@ -61,7 +61,7 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     id: "fraseDelDia",
     label: "Frase del día",
     recommended: { w: 1080, h: 1350 },
-    max: { w: 1920, h: 1920 },
+    max: { w: 1920, h: 1400 },
     aspectHint: "libre",
   },
 };
