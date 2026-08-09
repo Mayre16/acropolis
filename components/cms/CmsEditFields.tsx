@@ -36,23 +36,6 @@ import {
   SpellcheckHints,
 } from "@/components/cms/SpellcheckHints";
 
-function FormattedSizeHint({ hint }: { hint: string }) {
-  const parts = hint.split(/(\d+×\d+ px|\d+ KB)/g);
-  return (
-    <>
-      {parts.map((part, i) =>
-        /\d+×\d+ px|\d+ KB/.test(part) ? (
-          <strong key={i} className="font-bold">
-            {part}
-          </strong>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  );
-}
-
 const fieldClass =
   "mt-1 w-full rounded-lg border px-3 py-2 spellcheck-field";
 
@@ -157,9 +140,7 @@ export function ImageField({
         <code className="rounded bg-slate-100 px-1">{pathHint}</code>. También
         puedes pegar una ruta del sitio o de una foto ya subida.
       </p>
-      <p className="text-xs text-amber-800">
-        <FormattedSizeHint hint={sizeHint} />
-      </p>
+      <p className="text-xs text-amber-800">{sizeHint}</p>
       <EditField
         label="Texto alternativo"
         value={media.alt}
