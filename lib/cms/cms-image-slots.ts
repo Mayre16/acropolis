@@ -6,7 +6,8 @@ export type CmsImageSlotId =
   | "pageHero"
   | "card"
   | "gallery"
-  | "thumb";
+  | "thumb"
+  | "fraseDelDia";
 
 export type CmsImageSlot = {
   id: CmsImageSlotId;
@@ -55,6 +56,13 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
     recommended: { w: 640, h: 640 },
     max: { w: 800, h: 800 },
     aspectHint: "1:1",
+  },
+  fraseDelDia: {
+    id: "fraseDelDia",
+    label: "Frase del día",
+    recommended: { w: 1080, h: 1350 },
+    max: { w: 1080, h: 1350 },
+    aspectHint: "4:5",
   },
 };
 
