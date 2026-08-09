@@ -1,7 +1,6 @@
 /** Validación cliente de subidas CMS (espejo del servidor). */
 
 import {
-  CMS_IMAGE_MAX_PX,
   CMS_IMAGE_SLOTS,
   cmsImageSlotHint,
   type CmsImageSlotId,
@@ -138,11 +137,6 @@ export async function assertCmsImageFile(
     throw new Error(
       `La foto mide ${dims.w}×${dims.h} px y supera el máximo de ${slot.max.w}×${slot.max.h} px para «${slot.label}». ` +
         `Recórtala a ${slot.recommended.w}×${slot.recommended.h} px (${slot.aspectHint}) y vuelve a subir.`,
-    );
-  }
-  if (dims.w > CMS_IMAGE_MAX_PX.w || dims.h > CMS_IMAGE_MAX_PX.h) {
-    throw new Error(
-      `La foto no puede superar ${CMS_IMAGE_MAX_PX.w}×${CMS_IMAGE_MAX_PX.h} px.`,
     );
   }
 }

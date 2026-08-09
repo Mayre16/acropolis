@@ -1062,7 +1062,7 @@ function FrasesGalleryEditFields({
   return (
     <div className="space-y-3">
       <p className="text-xs text-amber-800">
-        Sube una foto para cada día de la semana. WebP, máximo 1080×1350 px.
+        Sube una foto para cada día de la semana. WebP, máximo 1080×1350 px, menos de 150 KB.
       </p>
       {DIAS_SEMANA_GALLERY.map((dayName, i) => (
         <FraseGalleryDayRow
