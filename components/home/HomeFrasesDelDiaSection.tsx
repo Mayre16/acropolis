@@ -159,9 +159,19 @@ function FrasesEditorGrid() {
 
   return (
     <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50/50 p-4">
-      <p className="mb-3 text-center text-xs font-semibold text-amber-800">
-        Una frase por día — Domingo a Domingo (8 días)
-      </p>
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs font-semibold text-amber-800">
+          Una frase por día — Domingo a Domingo (8 días)
+        </p>
+        <button
+          type="button"
+          onClick={() => edit?.setSelected("frasesGallery", "all")}
+          className="inline-flex items-center gap-1.5 rounded-full bg-na-helios px-3 py-1.5 text-xs font-bold text-na-ink shadow hover:brightness-105"
+        >
+          <Pencil className="h-3 w-3" />
+          Editar galería
+        </button>
+      </div>
       <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
         {DIAS_SEMANA.map((dayName, i) => (
           <FraseDaySlot
