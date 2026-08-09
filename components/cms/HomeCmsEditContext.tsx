@@ -1072,6 +1072,7 @@ function FrasesGalleryEditFields({
           frase={frases[i] ?? null}
           token={token}
           onUploaded={(url) => onSetFraseAtIndex(i, url)}
+          onDelete={() => onSetFraseAtIndex(i, "")}
         />
       ))}
     </div>
@@ -1084,12 +1085,14 @@ function FraseGalleryDayRow({
   frase,
   token,
   onUploaded,
+  onDelete,
 }: {
   dayIndex: number;
   dayName: string;
   frase: CmsFraseDelDia | null;
   token: string | null;
   onUploaded: (url: string) => void;
+  onDelete: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -1144,14 +1147,26 @@ function FraseGalleryDayRow({
           {src ? "Foto cargada" : "Sin foto"}
         </p>
       </div>
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={uploading || !token}
-        className="shrink-0 rounded-lg bg-na-heket px-3 py-1.5 text-xs font-semibold text-white hover:bg-na-heketDark disabled:opacity-50"
-      >
-        {uploading ? "Subiendo…" : src ? "Cambiar" : "Subir"}
-      </button>
+      <div className="flex shrink-0 gap-1">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading || !token}
+          className="rounded-lg bg-na-heket px-3 py-1.5 text-xs font-semibold text-white hover:bg-na-heketDark disabled:opacity-50"
+        >
+          {uploading ? "Subiendo…" : src ? "Cambiar" : "Subir"}
+        </button>
+        {src && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="rounded-lg border border-red-200 bg-white px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+            title="Eliminar"
+          >
+            ✕
+          </button>
+        )}
+      </div>
     </div>
   );
 }
