@@ -6,19 +6,178 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  ImagePlus,
   Pencil,
   Plus,
   Share2,
   X,
 } from "lucide-react";
 import { useHomeCmsEdit } from "@/components/cms/HomeCmsEditHooks";
-import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
+import { resolveCmsMediaUrl, uploadCmsImage } from "@/lib/cms/api-client";
 import { CMS_IMAGE_ACCEPT } from "@/lib/cms/upload-file-validate";
 import { shareFraseDelDiaLink } from "@/lib/frases-del-dia-share";
 import { useCmsFrasesDelDia } from "@/lib/cms/hooks";
 import type { CmsFraseDelDia } from "@/lib/cms/types";
 import { cn } from "@/lib/utils/cn";
 import { CarouselDotButton } from "@/components/CarouselDotButton";
+
+const DIAS_SEMANA = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+  "Domingo (próx.)",
+] as const;
+
+function FraseDaySlot({
+  dayIndex,
+  dayName,
+  frase,
+  token,
+  onUploaded,
+  onEdit,
+}: {
+  dayIndex: number;
+  dayName: string;
+  frase: CmsFraseDelDia | null;
+  token: string | null;
+  onUploaded: (url: string) => void;
+  onEdit: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const src = frase?.src ? (resolveCmsMediaUrl(frase.src) ?? frase.src) : "";
+
+  async function handleUpload(file: File) {
+    if (!token) return;
+    setUploading(true);
+    try {
+      const url = await uploadCmsImage("acropolis", token, file, "fraseDelDia");
+      onUploaded(url);
+    } catch (e) {
+      window.alert(String(e));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col">
+      <p className="mb-1.5 text-center text-xs font-bold text-na-heket">
+        {dayName}
+      </p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={CMS_IMAGE_ACCEPT}
+        className="sr-only"
+        disabled={uploading || !token}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleUpload(f);
+          e.target.value = "";
+        }}
+      />
+      {src ? (
+        <div className="group relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-na-heket/5 shadow-sm">
+          <Image
+            src={src}
+            alt={frase?.alt || `Frase ${dayName}`}
+            fill
+            className="object-contain"
+            sizes="120px"
+            unoptimized
+          />
+          <div className="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition group-hover:opacity-100">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="rounded-full bg-white p-1.5 text-na-ink shadow hover:bg-na-helios"
+              title="Cambiar foto"
+            >
+              <ImagePlus className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={onEdit}
+              className="rounded-full bg-white p-1.5 text-na-ink shadow hover:bg-na-helios"
+              title="Editar"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+              <span className="text-xs font-semibold text-amber-700">Subiendo…</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading || !token}
+          className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 text-amber-700 transition hover:border-amber-400 hover:bg-amber-100 disabled:opacity-50"
+        >
+          {uploading ? (
+            <span className="text-xs font-semibold">Subiendo…</span>
+          ) : (
+            <>
+              <ImagePlus className="h-5 w-5" />
+              <span className="text-[10px] font-semibold">Subir</span>
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function FrasesEditorGrid() {
+  const edit = useHomeCmsEdit();
+  if (!edit?.ready) return null;
+
+  const frases = edit.frases;
+  const paddedFrases: (CmsFraseDelDia | null)[] = DIAS_SEMANA.map(
+    (_, i) => frases[i] ?? null
+  );
+
+  function handleUploaded(index: number, url: string) {
+    edit?.setFraseAtIndex(index, url);
+  }
+
+  function handleEdit(index: number) {
+    const frase = frases[index];
+    if (frase) {
+      edit?.setSelected("frase", frase.id);
+    }
+  }
+
+  return (
+    <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50/50 p-4">
+      <p className="mb-3 text-center text-xs font-semibold text-amber-800">
+        Una frase por día — Domingo a Domingo (8 días)
+      </p>
+      <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
+        {DIAS_SEMANA.map((dayName, i) => (
+          <FraseDaySlot
+            key={i}
+            dayIndex={i}
+            dayName={dayName}
+            frase={paddedFrases[i]}
+            token={edit.token}
+            onUploaded={(url) => handleUploaded(i, url)}
+            onEdit={() => handleEdit(i)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function absoluteMediaUrl(src: string): string {
   if (!src) return "";
@@ -212,8 +371,7 @@ export function HomeFrasesDelDiaSection() {
             </h2>
             {edit?.ready ? (
               <p className="mt-1.5 max-w-xl text-xs font-semibold text-amber-800">
-                Puedes subir varias fotos a la vez con «Añadir fotos». Publica
-                para verlas en el sitio.
+                Sube una foto por día. Publica para verlas en el sitio.
               </p>
             ) : (
               <p className="mt-1.5 max-w-xl text-sm text-na-muted">
@@ -221,51 +379,13 @@ export function HomeFrasesDelDiaSection() {
               </p>
             )}
           </div>
-          {edit?.ready ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                ref={multiFileRef}
-                type="file"
-                accept={CMS_IMAGE_ACCEPT}
-                multiple
-                className="sr-only"
-                disabled={uploadingMany}
-                onChange={(e) => {
-                  void onPickFraseFiles(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-              <button
-                type="button"
-                disabled={uploadingMany}
-                onClick={() => multiFileRef.current?.click()}
-                className="inline-flex items-center gap-2 rounded-full bg-na-helios px-4 py-2 text-xs font-bold uppercase text-na-ink shadow disabled:opacity-60"
-              >
-                <Plus className="h-4 w-4" aria-hidden />
-                {uploadingMany ? "Subiendo…" : "Añadir fotos"}
-              </button>
-            </div>
-          ) : null}
         </div>
 
-        {n === 0 ? (
+        {edit?.ready ? (
+          <FrasesEditorGrid />
+        ) : n === 0 ? (
           <div className="mt-8 rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-10 text-center text-sm text-amber-900">
-            {edit?.ready ? (
-              <>
-                Aún no hay frases.{" "}
-                <button
-                  type="button"
-                  disabled={uploadingMany}
-                  onClick={() => multiFileRef.current?.click()}
-                  className="font-bold underline underline-offset-2 disabled:opacity-60"
-                >
-                  Elige una o varias fotos
-                </button>{" "}
-                (WebP, JPG o PNG).
-              </>
-            ) : (
-              "Aún no hay frases."
-            )}
+            Aún no hay frases.
           </div>
         ) : (
           <div className="relative mt-8">

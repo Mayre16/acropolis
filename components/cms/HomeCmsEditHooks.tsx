@@ -65,6 +65,7 @@ export type HomeCmsEditContextValue = {
   addPhoto: () => void;
   addFrase: () => void;
   addFrasesFromFiles: (files: FileList | File[]) => Promise<void>;
+  setFraseAtIndex: (index: number, src: string) => void;
   deletePhoto: (index: number) => void;
   deleteFrase: (id: string) => void;
   moveFrase: (id: string, dir: -1 | 1) => void;
