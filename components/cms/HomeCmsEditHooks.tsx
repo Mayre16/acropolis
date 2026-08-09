@@ -16,6 +16,7 @@ export type HomeSelectedKind =
   | "carousel"
   | "photo"
   | "frase"
+  | "frasesGallery"
   | "hero"
   | "whatIsNa"
   | "pillar"

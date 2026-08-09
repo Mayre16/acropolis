@@ -633,6 +633,22 @@ function HomeCmsEditInner({ children }: { children: ReactNode }) {
           />
         </EditPanelChrome>
       ) : null}
+      {selectedKind === "frasesGallery" ? (
+        <EditPanelChrome
+          title="Galería de frases del día"
+          dirty={dirty}
+          busy={busy}
+          status={status}
+          onClose={() => setSelected(null, null)}
+          onSave={() => void saveDraft()}
+        >
+          <FrasesGalleryEditFields
+            frases={frases}
+            token={token}
+            onSetFraseAtIndex={value.setFraseAtIndex}
+          />
+        </EditPanelChrome>
+      ) : null}
       {selectedKind === "hero" ? (
         <EditPanelChrome
           title="Encabezado del inicio"
@@ -1019,6 +1035,123 @@ function HomeFraseEditFields({
           Quitar del carrusel
         </button>
       ) : null}
+    </div>
+  );
+}
+
+const DIAS_SEMANA_GALLERY = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+  "Domingo (próx.)",
+] as const;
+
+function FrasesGalleryEditFields({
+  frases,
+  token,
+  onSetFraseAtIndex,
+}: {
+  frases: CmsFraseDelDia[];
+  token: string | null;
+  onSetFraseAtIndex: (index: number, src: string) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-amber-800">
+        Sube una foto para cada día de la semana. WebP, máximo 1080×1350 px.
+      </p>
+      {DIAS_SEMANA_GALLERY.map((dayName, i) => (
+        <FraseGalleryDayRow
+          key={i}
+          dayIndex={i}
+          dayName={dayName}
+          frase={frases[i] ?? null}
+          token={token}
+          onUploaded={(url) => onSetFraseAtIndex(i, url)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function FraseGalleryDayRow({
+  dayIndex,
+  dayName,
+  frase,
+  token,
+  onUploaded,
+}: {
+  dayIndex: number;
+  dayName: string;
+  frase: CmsFraseDelDia | null;
+  token: string | null;
+  onUploaded: (url: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const src = frase?.src ? (resolveCmsMediaUrl(frase.src) ?? frase.src) : "";
+
+  async function handleUpload(file: File) {
+    if (!token) return;
+    setUploading(true);
+    try {
+      const url = await uploadCmsImage("acropolis", token, file, "fraseDelDia");
+      onUploaded(url);
+    } catch (e) {
+      window.alert(String(e));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-2">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/webp,.webp"
+        className="sr-only"
+        disabled={uploading || !token}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleUpload(f);
+          e.target.value = "";
+        }}
+      />
+      <div className="w-16 shrink-0">
+        {src ? (
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded bg-slate-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={frase?.alt || dayName}
+              className="h-full w-full object-contain"
+            />
+          </div>
+        ) : (
+          <div className="flex aspect-[4/5] w-full items-center justify-center rounded bg-slate-100 text-slate-400">
+            <span className="text-lg">📷</span>
+          </div>
+        )}
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-na-heketDark">{dayName}</p>
+        <p className="text-xs text-slate-500">
+          {src ? "Foto cargada" : "Sin foto"}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading || !token}
+        className="shrink-0 rounded-lg bg-na-heket px-3 py-1.5 text-xs font-semibold text-white hover:bg-na-heketDark disabled:opacity-50"
+      >
+        {uploading ? "Subiendo…" : src ? "Cambiar" : "Subir"}
+      </button>
     </div>
   );
 }
