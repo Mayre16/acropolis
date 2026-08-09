@@ -75,6 +75,7 @@ export function cmsImageSlotHint(slotId: CmsImageSlotId = "card"): string {
   const s = CMS_IMAGE_SLOTS[slotId];
   const rec = `${s.recommended.w}×${s.recommended.h}`;
   const max = `${s.max.w}×${s.max.h}`;
-  const base = `Tamaño: ${rec} px (${s.aspectHint}). Máximo ${max} px. WebP < 100 KB.`;
+  const maxKb = slotId === "fraseDelDia" ? 150 : 100;
+  const base = `Tamaño: ${rec} px (${s.aspectHint}). Máximo ${max} px. WebP < ${maxKb} KB.`;
   return s.note ? `${base} ${s.note}` : base;
 }

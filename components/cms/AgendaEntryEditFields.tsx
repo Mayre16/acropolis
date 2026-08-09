@@ -19,6 +19,23 @@ import {
   type CmsImageSlotId,
 } from "@/lib/cms/upload-file-validate";
 
+function FormattedSizeHint({ hint }: { hint: string }) {
+  const parts = hint.split(/(\d+×\d+ px|\d+ KB)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /\d+×\d+ px|\d+ KB/.test(part) ? (
+          <strong key={i} className="font-bold">
+            {part}
+          </strong>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 export function AgendaEntryImageField({
   image,
   imageAlt,
@@ -69,7 +86,9 @@ export function AgendaEntryImageField({
         <code className="rounded bg-slate-100 px-1">/img/cultura/talleres/coro.webp</code>
         ) o la ruta de una foto ya subida.
       </p>
-      <p className="text-xs text-amber-800">{sizeHint}</p>
+      <p className="text-xs text-amber-800">
+        <FormattedSizeHint hint={sizeHint} />
+      </p>
       {previewSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
