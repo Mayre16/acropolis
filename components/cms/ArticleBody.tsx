@@ -1,3 +1,5 @@
+import { InlineRichText } from "@/components/cms/InlineRichText";
+
 /** Párrafos del cuerpo (artículos con mini-títulos y notas al pie). */
 export function ArticleBody({ paragraphs }: { paragraphs: string[] }) {
   const [lead, ...rest] = paragraphs;
@@ -6,7 +8,7 @@ export function ArticleBody({ paragraphs }: { paragraphs: string[] }) {
     <>
       {lead ? (
         <p className="text-lg font-medium leading-relaxed text-na-heketDark">
-          {lead}
+          <InlineRichText text={lead} />
         </p>
       ) : null}
       <div className={lead ? "mt-6 space-y-5" : "space-y-5"}>
@@ -29,7 +31,7 @@ export function ArticleBody({ paragraphs }: { paragraphs: string[] }) {
                 key={i}
                 className="pt-2 text-xl font-black text-na-heketDark"
               >
-                {p}
+                <InlineRichText text={p} />
               </h3>
             );
           }
@@ -42,7 +44,7 @@ export function ArticleBody({ paragraphs }: { paragraphs: string[] }) {
                   : "leading-relaxed text-na-ink/80"
               }
             >
-              {p}
+              <InlineRichText text={p} />
             </p>
           );
         })}

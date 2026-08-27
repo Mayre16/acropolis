@@ -105,3 +105,42 @@ export function getEvento(slug: string): EventoItem | undefined {
 export function isSeedEvento(slug: string): boolean {
   return EVENTOS.some((e) => e.slug === slug);
 }
+
+const SPANISH_MONTHS: Record<string, string> = {
+  enero: "01",
+  febrero: "02",
+  marzo: "03",
+  abril: "04",
+  mayo: "05",
+  junio: "06",
+  julio: "07",
+  agosto: "08",
+  septiembre: "09",
+  octubre: "10",
+  noviembre: "11",
+  diciembre: "12",
+};
+
+/** Convierte "27 de agosto de 2026" → "2026-08-27" (vacío si no se reconoce). */
+export function parseSpanishEventDateToIso(date: string): string {
+  const trimmed = date.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  const m = trimmed.match(/(\d{1,2})\s+de\s+(\p{L}+)\s+de\s+(\d{4})/iu);
+  if (!m) return "";
+  const month = SPANISH_MONTHS[m[2].toLowerCase()];
+  if (!month) return "";
+  return `${m[3]}-${month}-${m[1].padStart(2, "0")}`;
+}
+
+export function eventoSortKey(evento: Pick<EventoItem, "date" | "sortAt">): string {
+  return evento.sortAt?.trim() || parseSpanishEventDateToIso(evento.date);
+}
+
+/** Más reciente primero. */
+export function sortEventosByDateDesc<T extends Pick<EventoItem, "date" | "sortAt">>(
+  items: T[],
+): T[] {
+  return [...items].sort((a, b) =>
+    eventoSortKey(b).localeCompare(eventoSortKey(a)),
+  );
+}

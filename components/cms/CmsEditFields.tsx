@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useState, type ReactNode } from "react";
-import { Images } from "lucide-react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { Bold, Images } from "lucide-react";
 import {
   CMS_EDIT_EMBEDDED_CLASS,
   isInEditorIframe,
@@ -35,6 +35,7 @@ import {
   SpellcheckBadge,
   SpellcheckHints,
 } from "@/components/cms/SpellcheckHints";
+import { toggleMarkdownBold } from "@/lib/cms/inline-rich-text";
 
 const fieldClass =
   "mt-1 w-full rounded-lg border px-3 py-2 spellcheck-field";
@@ -195,7 +196,7 @@ export function BodyField({
 }) {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm font-medium">{label}</span>
         <button
           type="button"
@@ -205,6 +206,10 @@ export function BodyField({
           {addLabel}
         </button>
       </div>
+      <p className="text-[11px] leading-relaxed text-slate-500">
+        Negrita: selecciona texto y pulsa <kbd className="rounded border bg-white px-1">Ctrl</kbd>+
+        <kbd className="rounded border bg-white px-1">B</kbd> o el botón <strong>B</strong>.
+      </p>
       {body.map((p, pi) => (
         <BodyParagraphField
           key={pi}
@@ -234,17 +239,56 @@ function BodyParagraphField({
   onRemove: () => void;
 }) {
   const { issues, checking, hasIssues } = useSpellcheck(value, true);
+  const taRef = useRef<HTMLTextAreaElement>(null);
+  const pendingSelection = useRef<{ start: number; end: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const sel = pendingSelection.current;
+    const el = taRef.current;
+    if (!sel || !el) return;
+    el.focus();
+    el.setSelectionRange(sel.start, sel.end);
+    pendingSelection.current = null;
+  }, [value]);
+
+  function applyBold() {
+    const el = taRef.current;
+    const start = el?.selectionStart ?? value.length;
+    const end = el?.selectionEnd ?? value.length;
+    const next = toggleMarkdownBold(value, start, end);
+    pendingSelection.current = {
+      start: next.selectionStart,
+      end: next.selectionEnd,
+    };
+    onChange(next.value);
+  }
 
   return (
     <div className="flex gap-2">
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2 text-xs font-semibold text-slate-600">
-          Párrafo {index + 1}
+          <span>Párrafo {index + 1}</span>
           <SpellcheckBadge hasIssues={hasIssues} checking={checking} />
+          <button
+            type="button"
+            onClick={applyBold}
+            title="Negrita (Ctrl+B)"
+            aria-label="Negrita"
+            className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          >
+            <Bold className="h-3.5 w-3.5" aria-hidden />
+          </button>
         </div>
         <textarea
+          ref={taRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+              e.preventDefault();
+              applyBold();
+            }
+          }}
           rows={3}
           spellCheck
           lang="es"

@@ -26,6 +26,7 @@ import { getMergedViaje, getViajeStaticParams } from "@/lib/cms/static-params";
 
 import { ViajeInquiryButton } from "@/components/ViajeInquiryButton";
 import { LeaveSiteLink } from "@/components/LeaveSiteLink";
+import { InlineRichText } from "@/components/cms/InlineRichText";
 
 
 
@@ -286,9 +287,9 @@ export default async function ViajeDestinoPage({
         <div className="mt-8 space-y-5 text-base leading-relaxed text-na-muted">
 
           {destino.body.map((p) => (
-
-            <p key={p.slice(0, 40)}>{p}</p>
-
+            <p key={p.slice(0, 40)}>
+              <InlineRichText text={p} />
+            </p>
           ))}
 
         </div>

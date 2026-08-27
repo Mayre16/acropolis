@@ -1,5 +1,9 @@
 import type { Articulo } from "@/lib/articulos";
-import type { EventoItem } from "@/lib/eventos";
+import {
+  parseSpanishEventDateToIso,
+  sortEventosByDateDesc,
+  type EventoItem,
+} from "@/lib/eventos";
 import type { MedioItem } from "@/lib/medios";
 import type { ViajeDestino } from "@/lib/viajes";
 import { viajeKey } from "@/lib/viajes";
@@ -49,10 +53,12 @@ export function cmsToArticulo(a: CmsArticulo): Articulo {
 
 export function cmsToEvento(e: CmsEvento): EventoItem {
   const categoryId = normalizeCmsEventoCategory(e.category);
+  const sortAt = parseSpanishEventDateToIso(e.date);
   return {
     slug: e.slug,
     title: e.title,
     date: e.date,
+    ...(sortAt ? { sortAt } : {}),
     category: eventoCategoryLabel(categoryId),
     categoryId,
     seoTags: mergeSeoTags(categoryId, e.seoTags),
@@ -100,7 +106,7 @@ export function mergeEventos(
     if (!isEventoPublished(e)) continue;
     map.set(e.slug, cmsToEvento(e));
   }
-  return Array.from(map.values());
+  return sortEventosByDateDesc(Array.from(map.values()));
 }
 
 export function mergeMedios(

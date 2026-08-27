@@ -14,7 +14,7 @@ import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 
 import { cmsToEvento } from "@/lib/cms/merge-content";
 
-import { EVENTOS, isSeedEvento } from "@/lib/eventos";
+import { EVENTOS, isSeedEvento, sortEventosByDateDesc } from "@/lib/eventos";
 
 import { isCmsEnabled } from "@/lib/cms/provider";
 
@@ -28,22 +28,24 @@ export function EventosListing() {
 
   const merged = useMergedEventos();
 
-  const list = edit?.ready
-    ? edit.items.map((e) => {
-        const display = cmsToEvento(e);
-        return {
-          ...display,
-          published: e.published,
-          excerpt: display.excerpt.trim() || EXCERPT_PLACEHOLDER,
-          image: {
-            ...display.image,
-            src: resolveCmsMediaUrl(display.image.src) ?? display.image.src,
-          },
-        };
-      })
-    : isCmsEnabled()
-      ? merged
-      : EVENTOS;
+  const list = sortEventosByDateDesc(
+    edit?.ready
+      ? edit.items.map((e) => {
+          const display = cmsToEvento(e);
+          return {
+            ...display,
+            published: e.published,
+            excerpt: display.excerpt.trim() || EXCERPT_PLACEHOLDER,
+            image: {
+              ...display.image,
+              src: resolveCmsMediaUrl(display.image.src) ?? display.image.src,
+            },
+          };
+        })
+      : isCmsEnabled()
+        ? merged
+        : EVENTOS,
+  );
 
   const cmsOnly = edit?.ready
     ? edit.items.filter((e) => !isSeedEvento(e.slug))

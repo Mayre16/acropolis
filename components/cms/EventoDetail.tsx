@@ -15,6 +15,7 @@ import { useEventoGallery, useMergedEventos } from "@/lib/cms/hooks";
 import { isCmsEnabled, useCmsDocument } from "@/lib/cms/provider";
 import { SOCIAL_LINKS } from "@/lib/site-config";
 import { ContentGallery } from "@/components/cms/ContentGallery";
+import { InlineRichText } from "@/components/cms/InlineRichText";
 
 export function EventoDetail({ slug }: { slug: string }) {
   const cms = useCmsDocument();
@@ -102,13 +103,13 @@ export function EventoDetail({ slug }: { slug: string }) {
       <div className="mx-auto mt-10 max-w-2xl px-4 sm:px-6">
         {lead ? (
           <p className="text-lg font-medium leading-relaxed text-na-heketDark">
-            {lead}
+            <InlineRichText text={lead} />
           </p>
         ) : null}
         <div className={lead ? "mt-6 space-y-5" : "space-y-5"}>
           {rest.map((p, i) => (
             <p key={i} className="leading-relaxed text-na-ink/80">
-              {p}
+              <InlineRichText text={p} />
             </p>
           ))}
         </div>
