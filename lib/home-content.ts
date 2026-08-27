@@ -52,6 +52,26 @@ export type InstagramPost = {
 /** Publicaciones recientes — @nuevaacropolisdominicana (imágenes locales WebP). */
 export const INSTAGRAM_POSTS: InstagramPost[] = [
   {
+    src: "/img/instagram/Dbml5r3ljFj.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/Dbml5r3ljFj/",
+  },
+  {
+    src: "/img/instagram/Dbb9PXcO6QU.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/Dbb9PXcO6QU/",
+  },
+  {
+    src: "/img/instagram/DbrRdcHCJLq.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DbrRdcHCJLq/",
+  },
+  {
+    src: "/img/instagram/DcUOMulGyJs.webp",
+    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
+    href: "https://www.instagram.com/p/DcUOMulGyJs/",
+  },
+  {
     src: "/img/instagram/DbZKn1SEo-K.webp",
     alt: "Publicación de @nuevaacropolisdominicana en Instagram",
     href: "https://www.instagram.com/p/DbZKn1SEo-K/",
@@ -75,25 +95,5 @@ export const INSTAGRAM_POSTS: InstagramPost[] = [
     src: "/img/instagram/DbHMYWzkrhL.webp",
     alt: "Publicación de @nuevaacropolisdominicana en Instagram",
     href: "https://www.instagram.com/p/DbHMYWzkrhL/",
-  },
-  {
-    src: "/img/instagram/DbA6LIXEhMZ.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DbA6LIXEhMZ/",
-  },
-  {
-    src: "/img/instagram/Da3ih2UkmeF.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/Da3ih2UkmeF/",
-  },
-  {
-    src: "/img/instagram/Da3cNbQErY9.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/Da3cNbQErY9/",
-  },
-  {
-    src: "/img/instagram/DZuvpbzkqax.webp",
-    alt: "Publicación de @nuevaacropolisdominicana en Instagram",
-    href: "https://www.instagram.com/p/DZuvpbzkqax/",
   }
 ];
