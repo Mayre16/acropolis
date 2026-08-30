@@ -1,0 +1,300 @@
+{
+  "libreria": "Centro Cultural CIVIS",
+  "totalLibros": 73,
+  "totalPrecioVenta": 22600.00,
+  "totalVendidos": 42,
+  "totalIngresos": 35250.00,
+  "totalStock": 31,
+  "libros": [
+    {
+      "item": 1,
+      "titulo": "Que hacemos con el corazón?",
+      "cantidad": 1,
+      "precio": 700.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 1,
+      "asignado": ""
+    },
+    {
+      "item": 2,
+      "titulo": "Ankor",
+      "cantidad": 2,
+      "precio": 1100.00,
+      "vendidos": 1,
+      "total": 1100.00,
+      "stock": 1,
+      "asignado": "Aaron-P"
+    },
+    {
+      "item": 3,
+      "titulo": "El Alquimista",
+      "cantidad": 2,
+      "precio": 900.00,
+      "vendidos": 2,
+      "total": 1800.00,
+      "stock": 0,
+      "asignado": "Eddy-P"
+    },
+    {
+      "item": 4,
+      "titulo": "El arte de vivir",
+      "cantidad": 2,
+      "precio": 500.00,
+      "vendidos": 1,
+      "total": 500.00,
+      "stock": 1,
+      "asignado": "Eddy-P"
+    },
+    {
+      "item": 5,
+      "titulo": "El poder de los símbolos",
+      "cantidad": 2,
+      "precio": 500.00,
+      "vendidos": 2,
+      "total": 1000.00,
+      "stock": 0,
+      "asignado": ""
+    },
+    {
+      "item": 6,
+      "titulo": "El regalo de la música",
+      "cantidad": 2,
+      "precio": 1000.00,
+      "vendidos": 1,
+      "total": 1000.00,
+      "stock": 0,
+      "asignado": "Isabel-P"
+    },
+    {
+      "item": 7,
+      "titulo": "Filosofía para vivir",
+      "cantidad": 3,
+      "precio": 700.00,
+      "vendidos": 1,
+      "total": 700.00,
+      "stock": 1,
+      "asignado": "Eddy"
+    },
+    {
+      "item": 8,
+      "titulo": "Guía para entender Platón",
+      "cantidad": 3,
+      "precio": 650.00,
+      "vendidos": 2,
+      "total": 1300.00,
+      "stock": 0,
+      "asignado": "Eddy"
+    },
+    {
+      "item": 9,
+      "titulo": "La alquimia de la pareja",
+      "cantidad": 3,
+      "precio": 750.00,
+      "vendidos": 1,
+      "total": 750.00,
+      "stock": 0,
+      "asignado": "Eva-Pie"
+    },
+    {
+      "item": 10,
+      "titulo": "Las 7 leyes de la naturaleza",
+      "cantidad": 3,
+      "precio": 800.00,
+      "vendidos": 2,
+      "total": 1600.00,
+      "stock": 0,
+      "asignado": "Leslie-Pi"
+    },
+    {
+      "item": 11,
+      "titulo": "Las Parábolas del Buda",
+      "cantidad": 2,
+      "precio": 600.00,
+      "vendidos": 1,
+      "total": 600.00,
+      "stock": 0,
+      "asignado": "Eddy-P"
+    },
+    {
+      "item": 12,
+      "titulo": "Los espíritus elementales",
+      "cantidad": 3,
+      "precio": 750.00,
+      "vendidos": 1,
+      "total": 750.00,
+      "stock": 0,
+      "asignado": "Eddy-P"
+    },
+    {
+      "item": 13,
+      "titulo": "Los secretos del Olimpo",
+      "cantidad": 2,
+      "precio": 900.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 2,
+      "asignado": "????"
+    },
+    {
+      "item": 14,
+      "titulo": "Memorias",
+      "cantidad": 2,
+      "precio": 550.00,
+      "vendidos": 1,
+      "total": 550.00,
+      "stock": 0,
+      "asignado": "Isabel-P"
+    },
+    {
+      "item": 15,
+      "titulo": "Misterios de los Inkas",
+      "cantidad": 2,
+      "precio": 450.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 1,
+      "asignado": ""
+    },
+    {
+      "item": 16,
+      "titulo": "Mossy",
+      "cantidad": 3,
+      "precio": 800.00,
+      "vendidos": 2,
+      "total": 1600.00,
+      "stock": 0,
+      "asignado": "Leslie-Pi"
+    },
+    {
+      "item": 17,
+      "titulo": "Nacidos para triunfar",
+      "cantidad": 2,
+      "precio": 450.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 0,
+      "asignado": "Eddy-P"
+    },
+    {
+      "item": 18,
+      "titulo": "Para conocerse mejor",
+      "cantidad": 2,
+      "precio": 700.00,
+      "vendidos": 1,
+      "total": 700.00,
+      "stock": 1,
+      "asignado": "Patria-P"
+    },
+    {
+      "item": 19,
+      "titulo": "Poemas épicos",
+      "cantidad": 2,
+      "precio": 450.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 1,
+      "asignado": ""
+    },
+    {
+      "item": 20,
+      "titulo": "Poemas filosóficos",
+      "cantidad": 2,
+      "precio": 450.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 0,
+      "asignado": ""
+    },
+    {
+      "item": 21,
+      "titulo": "Las esferas de la conciencia",
+      "cantidad": 16,
+      "precio": 1450.00,
+      "vendidos": 3,
+      "total": 4350.00,
+      "stock": 13,
+      "asignado": "Mario-P"
+    },
+    {
+      "item": 22,
+      "titulo": "Pythagoras la música de las esferas",
+      "cantidad": 3,
+      "precio": 1000.00,
+      "vendidos": 2,
+      "total": 2000.00,
+      "stock": 0,
+      "asignado": "Leslie-Pi"
+    },
+    {
+      "item": 23,
+      "titulo": "Reflexiones de un filósofo",
+      "cantidad": 2,
+      "precio": 900.00,
+      "vendidos": 1,
+      "total": 900.00,
+      "stock": 1,
+      "asignado": "Aaron-P"
+    },
+    {
+      "item": 24,
+      "titulo": "Dhammapada",
+      "cantidad": 5,
+      "precio": 550.00,
+      "vendidos": 5,
+      "total": 2750.00,
+      "stock": 0,
+      "asignado": "Leslie-Pi"
+    },
+    {
+      "item": 26,
+      "titulo": "Estoicos",
+      "cantidad": 9,
+      "precio": 900.00,
+      "vendidos": 9,
+      "total": 8100.00,
+      "stock": 0,
+      "asignado": "Mario-P"
+    },
+    {
+      "item": 31,
+      "titulo": "Manuales Esferas",
+      "cantidad": 2,
+      "precio": 1500.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 2,
+      "asignado": ""
+    },
+    {
+      "item": 32,
+      "titulo": "El Ideal: Secreto de los Templarios D.S.G",
+      "cantidad": 2,
+      "precio": 600.00,
+      "vendidos": 0,
+      "total": 0.00,
+      "stock": 0,
+      "asignado": ""
+    },
+    {
+      "item": 33,
+      "titulo": "ISO REEDICIÓN REVISADA DELIA S. G",
+      "cantidad": 2,
+      "precio": 1200.00,
+      "vendidos": 2,
+      "total": 2400.00,
+      "stock": 0,
+      "asignado": "Mario-P"
+    },
+    {
+      "item": 34,
+      "titulo": "An Invitation to Think",
+      "cantidad": 3,
+      "precio": 800.00,
+      "vendidos": 1,
+      "total": 800.00,
+      "stock": 2,
+      "asignado": "Beatriz-P"
+    }
+  ]
+}
