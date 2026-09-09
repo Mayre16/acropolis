@@ -14,7 +14,6 @@ const STATIC_PATHS = [
   "/",
   "/filosofia/",
   "/diplomado/",
-  "/circulo-de-amigos/",
   "/cultura/",
   "/voluntariado/",
   "/esfera/",

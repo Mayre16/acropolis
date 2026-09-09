@@ -30,6 +30,11 @@ Options -Indexes
   RewriteRule ^data/(acropolis|civis|editorial|auth|system)(/|$) - [F,L]
   RewriteRule ^(vendor|node_modules|\.git|scripts|\.vscode|\.idea)/ - [F,L]
 
+  # Círculo de Amigos → solo subdominio oficial (evitar duplicado en /circulo-de-amigos)
+  RewriteRule ^circulo-de-amigos/?$ http://circulodeamigos.acropolis.org.do/ [R=301,L]
+  RewriteRule ^circulo-de-amigos/quienes-somos/?$ http://circulodeamigos.acropolis.org.do/quienes-somos/ [R=301,L]
+  RewriteRule ^circulo-de-amigos/(.*)$ http://circulodeamigos.acropolis.org.do/$1 [R=301,L]
+
   # Assets Next.js (build: na-assets/; alias _next/ por compatibilidad)
   RewriteRule ^na-assets/ - [L]
   RewriteRule ^_next/(.*)$ na-assets/$1 [L]

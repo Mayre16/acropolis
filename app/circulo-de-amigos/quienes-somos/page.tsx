@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
-import { CirculoQuienesSomos } from "@/components/circulo-amigos/CirculoQuienesSomos";
-import { CirculoAmigosPageShell } from "@/components/cms/CirculoAmigosPageShell";
-import { CirculoAmigosShell } from "@/components/circulo-amigos/CirculoAmigosShell";
-import { CIRCULO_QUIENES_SOMOS_PATH } from "@/lib/circulo-amigos-content";
+import { CirculoSubdomainRedirect } from "@/components/circulo-amigos/CirculoSubdomainRedirect";
+import { PLATFORM_PRODUCTION_URLS } from "@/lib/site-config";
+
+const CIRCULO_ORIGIN = PLATFORM_PRODUCTION_URLS.circulo.replace(/\/$/, "");
 
 export const metadata: Metadata = {
   title: "Quiénes somos — Círculo de Amigos",
   description:
-    "Conoce el Círculo de Amigos OINADOM y su vínculo con Nueva Acrópolis en República Dominicana.",
-  alternates: { canonical: CIRCULO_QUIENES_SOMOS_PATH },
+    "Conoce el Círculo de Amigos OINADOM. Sitio oficial en el subdominio Círculo de Amigos.",
+  robots: { index: false, follow: true },
+  alternates: { canonical: `${CIRCULO_ORIGIN}/quienes-somos/` },
 };
 
-export default function CirculoQuienesSomosPage() {
-  return (
-    <CirculoAmigosShell>
-      <CirculoAmigosPageShell>
-        <CirculoQuienesSomos />
-      </CirculoAmigosPageShell>
-    </CirculoAmigosShell>
-  );
+export default function CirculoQuienesSomosRedirectPage() {
+  return <CirculoSubdomainRedirect toPath="/quienes-somos/" />;
 }
