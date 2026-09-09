@@ -23,6 +23,7 @@ import {
   submitSiteInquiry,
   subjectFromMailto,
 } from "@/lib/submit-site-inquiry";
+import { appendCirculoInscriptionToSheet } from "@/lib/circulo-google-sheet";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -235,6 +236,9 @@ export function CirculoAmigosInscriptionForm({
       resetTurnstileWidget();
       return;
     }
+
+    // Correo OK → también volcar fila al Google Sheet (no bloquea si falla).
+    void appendCirculoInscriptionToSheet(values);
 
     setDoneDev(result.dev === true);
     setDone(true);
