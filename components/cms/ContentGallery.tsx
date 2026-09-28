@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { resolveCmsMediaUrl } from "@/lib/cms/api-client";
 import type { CmsMedia } from "@/lib/cms/types";
 
-/** Galería de fotos adicionales (estilo artículo/evento estándar). */
+/** Galería de fotos adicionales (artículos y crónicas). */
 export function ContentGallery({ images }: { images: CmsMedia[] }) {
   if (!images.length) return null;
 
@@ -12,34 +11,29 @@ export function ContentGallery({ images }: { images: CmsMedia[] }) {
     <div
       className={
         images.length === 1
-          ? "mt-8 space-y-2"
-          : "mt-8 grid gap-6 sm:grid-cols-2"
+          ? "mt-8"
+          : "mt-8 grid items-start gap-6 sm:grid-cols-2"
       }
     >
       {images.map((img, i) => {
         const src = resolveCmsMediaUrl(img.src) ?? img.src;
         return (
-        <figure key={`${img.src}-${i}`} className="overflow-hidden rounded-2xl">
-          <div
-            className={`relative w-full bg-na-heket/5 ${
-              images.length === 1 ? "aspect-[16/9]" : "aspect-[4/3]"
-            }`}
+          <figure
+            key={`${img.src}-${i}`}
+            className="overflow-hidden rounded-2xl bg-na-heket/[0.04]"
           >
-            <Image
+            {/* object-contain + alto natural: vertical y horizontal se ven enteras. */}
+            <img
               src={src}
               alt={img.alt}
-              fill
-              unoptimized
-              sizes="(max-width: 768px) 100vw, 40rem"
-              className="object-cover"
+              className="mx-auto block h-auto max-h-[800px] w-auto max-w-full"
             />
-          </div>
-          {img.credit ? (
-            <figcaption className="mt-1.5 text-right text-xs text-na-muted">
-              Imagen: {img.credit}
-            </figcaption>
-          ) : null}
-        </figure>
+            {img.credit ? (
+              <figcaption className="px-2 py-1.5 text-right text-xs text-na-muted">
+                Imagen: {img.credit}
+              </figcaption>
+            ) : null}
+          </figure>
         );
       })}
     </div>

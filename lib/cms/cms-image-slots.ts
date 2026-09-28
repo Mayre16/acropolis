@@ -46,9 +46,10 @@ export const CMS_IMAGE_SLOTS: Record<CmsImageSlotId, CmsImageSlot> = {
   gallery: {
     id: "gallery",
     label: "Galería",
-    recommended: { w: 1200, h: 750 },
-    max: { w: 1600, h: 1000 },
-    aspectHint: "8:5",
+    recommended: { w: 800, h: 800 },
+    max: { w: 1600, h: 1600 },
+    aspectHint: "vertical u horizontal",
+    note: "Se muestra completa, sin recortar arriba ni abajo. El lado largo puede llegar a 1600 px.",
   },
   thumb: {
     id: "thumb",

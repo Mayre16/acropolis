@@ -346,6 +346,7 @@ export function GalleryField({
             label={`Foto ${gi + 1}`}
             media={img}
             token={token}
+            imageSlot="gallery"
             onChange={(m) => {
               const next = [...images];
               next[gi] = m;
