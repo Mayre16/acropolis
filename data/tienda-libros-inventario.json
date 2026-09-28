@@ -1,0 +1,245 @@
+{
+  "catalogo": "Librería Centro Cultural CIVIS",
+  "fechaActualizacion": "2026-07-31",
+  "moneda": "RD$",
+  "productos": [
+    {
+      "sku": "LIB-001",
+      "titulo": "Que hacemos con el corazón?",
+      "precio": 700.00,
+      "stock": 1,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-002",
+      "titulo": "Ankor",
+      "precio": 1100.00,
+      "stock": 1,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-003",
+      "titulo": "El Alquimista",
+      "precio": 900.00,
+      "stock": 0,
+      "categoria": "Filosofía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-004",
+      "titulo": "El arte de vivir",
+      "precio": 500.00,
+      "stock": 1,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-005",
+      "titulo": "El poder de los símbolos",
+      "precio": 500.00,
+      "stock": 0,
+      "categoria": "Filosofía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-006",
+      "titulo": "El regalo de la música",
+      "precio": 1000.00,
+      "stock": 0,
+      "categoria": "Arte y Cultura",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-007",
+      "titulo": "Filosofía para vivir",
+      "precio": 700.00,
+      "stock": 1,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-008",
+      "titulo": "Guía para entender Platón",
+      "precio": 650.00,
+      "stock": 0,
+      "categoria": "Filosofía Clásica",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-009",
+      "titulo": "La alquimia de la pareja",
+      "precio": 750.00,
+      "stock": 0,
+      "categoria": "Desarrollo Personal",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-010",
+      "titulo": "Las 7 leyes de la naturaleza",
+      "precio": 800.00,
+      "stock": 0,
+      "categoria": "Filosofía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-011",
+      "titulo": "Las Parábolas del Buda",
+      "precio": 600.00,
+      "stock": 0,
+      "categoria": "Filosofía Oriental",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-012",
+      "titulo": "Los espíritus elementales",
+      "precio": 750.00,
+      "stock": 0,
+      "categoria": "Esoterismo",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-013",
+      "titulo": "Los secretos del Olimpo",
+      "precio": 900.00,
+      "stock": 2,
+      "categoria": "Mitología",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-014",
+      "titulo": "Memorias",
+      "precio": 550.00,
+      "stock": 0,
+      "categoria": "Biografía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-015",
+      "titulo": "Misterios de los Inkas",
+      "precio": 450.00,
+      "stock": 1,
+      "categoria": "Historia",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-016",
+      "titulo": "Mossy",
+      "precio": 800.00,
+      "stock": 0,
+      "categoria": "Literatura",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-017",
+      "titulo": "Nacidos para triunfar",
+      "precio": 450.00,
+      "stock": 0,
+      "categoria": "Desarrollo Personal",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-018",
+      "titulo": "Para conocerse mejor",
+      "precio": 700.00,
+      "stock": 1,
+      "categoria": "Desarrollo Personal",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-019",
+      "titulo": "Poemas épicos",
+      "precio": 450.00,
+      "stock": 1,
+      "categoria": "Poesía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-020",
+      "titulo": "Poemas filosóficos",
+      "precio": 450.00,
+      "stock": 0,
+      "categoria": "Poesía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-021",
+      "titulo": "Las esferas de la conciencia",
+      "precio": 1450.00,
+      "stock": 13,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-022",
+      "titulo": "Pythagoras la música de las esferas",
+      "precio": 1000.00,
+      "stock": 0,
+      "categoria": "Filosofía Clásica",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-023",
+      "titulo": "Reflexiones de un filósofo",
+      "precio": 900.00,
+      "stock": 1,
+      "categoria": "Filosofía",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-024",
+      "titulo": "Dhammapada",
+      "precio": 550.00,
+      "stock": 0,
+      "categoria": "Filosofía Oriental",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-026",
+      "titulo": "Estoicos",
+      "precio": 900.00,
+      "stock": 0,
+      "categoria": "Filosofía Clásica",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-031",
+      "titulo": "Manuales Esferas",
+      "precio": 1500.00,
+      "stock": 2,
+      "categoria": "Manuales",
+      "disponible": true
+    },
+    {
+      "sku": "LIB-032",
+      "titulo": "El Ideal: Secreto de los Templarios D.S.G",
+      "precio": 600.00,
+      "stock": 0,
+      "categoria": "Historia",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-033",
+      "titulo": "ISO REEDICIÓN REVISADA DELIA S. G",
+      "precio": 1200.00,
+      "stock": 0,
+      "categoria": "Filosofía",
+      "disponible": false
+    },
+    {
+      "sku": "LIB-034",
+      "titulo": "An Invitation to Think",
+      "precio": 800.00,
+      "stock": 2,
+      "categoria": "Filosofía",
+      "disponible": true
+    }
+  ],
+  "resumen": {
+    "totalProductos": 29,
+    "productosDisponibles": 12,
+    "productosSinStock": 17,
+    "stockTotal": 31
+  }
+}

@@ -1,0 +1,30 @@
+ITEM,DESCRIPCION,CANTIDAD,PRECIO_VENTA,CANT_VENTA,TOTAL,STOCK_INVENTARIO,ASIGNADO
+1,Que hacemos con el corazón?,1,700.00,0,0.00,1,
+2,Ankor,2,1100.00,1,1100.00,1,Aaron-P
+3,El Alquimista,2,900.00,2,1800.00,0,Eddy-P
+4,El arte de vivir,2,500.00,1,500.00,1,Eddy-P
+5,El poder de los símbolos,2,500.00,2,1000.00,0,
+6,El regalo de la música,2,1000.00,1,1000.00,0,Isabel-P
+7,Filosofía para vivir,3,700.00,1,700.00,1,Eddy
+8,Guía para entender Platón,3,650.00,2,1300.00,0,Eddy
+9,La alquimia de la pareja,3,750.00,1,750.00,0,Eva-Pie
+10,Las 7 leyes de la naturaleza,3,800.00,2,1600.00,0,Leslie-Pi
+11,Las Parábolas del Buda,2,600.00,1,600.00,0,Eddy-P
+12,Los espíritus elementales,3,750.00,1,750.00,0,Eddy-P
+13,Los secretos del Olimpo,2,900.00,0,0.00,2,????
+14,Memorias,2,550.00,1,550.00,0,Isabel-P
+15,Misterios de los Inkas,2,450.00,0,0.00,1,
+16,Mossy,3,800.00,2,1600.00,0,Leslie-Pi
+17,Nacidos para triunfar,2,450.00,0,0.00,0,Eddy-P
+18,Para conocerse mejor,2,700.00,1,700.00,1,Patria-P
+19,Poemas épicos,2,450.00,0,0.00,1,
+20,Poemas filosóficos,2,450.00,0,0.00,0,
+21,Las esferas de la conciencia,16,1450.00,3,4350.00,13,Mario-P
+22,Pythagoras la música de las esferas,3,1000.00,2,2000.00,0,Leslie-Pi
+23,Reflexiones de un filósofo,2,900.00,1,900.00,1,Aaron-P
+24,Dhammapada,5,550.00,5,2750.00,0,Leslie-Pi
+26,Estoicos,9,900.00,9,8100.00,0,Mario-P
+31,Manuales Esferas,2,1500.00,0,0.00,2,
+32,El Ideal: Secreto de los Templarios D.S.G,2,600.00,0,0.00,0,
+33,ISO REEDICIÓN REVISADA DELIA S. G,2,1200.00,2,2400.00,0,Mario-P
+34,An Invitation to Think,3,800.00,1,800.00,2,Beatriz-P

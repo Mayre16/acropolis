@@ -139,15 +139,15 @@ export function CirculoAmigosLanding() {
               onClick={() => edit.setSelectedId(CIRCULO_INTRO_SECTION_ID)}
             />
           ) : null}
-          <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1fr]">
-            <div className="relative aspect-[655/511] overflow-hidden rounded-2xl bg-[var(--ca-panel)] shadow-[0_10px_30px_rgba(58,154,212,0.12)]">
+          <div className="grid items-center gap-10 lg:grid-cols-[0.75fr_1fr]">
+            <div className="relative mx-auto aspect-[655/511] max-w-sm overflow-hidden rounded-2xl bg-[var(--ca-panel)] shadow-[0_10px_30px_rgba(58,154,212,0.12)] lg:max-w-none lg:w-full">
               <Image
                 src={page.introBannerSrc ?? ""}
                 alt={page.introBannerAlt ?? ""}
                 fill
                 unoptimized
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 420px"
+                sizes="(max-width: 768px) 320px, 380px"
               />
             </div>
             <div className="text-center lg:text-left">

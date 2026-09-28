@@ -6,6 +6,7 @@ import {
   type CirculoAmigosInscriptionValues,
 } from "@/lib/circulo-amigos-content";
 import {
+  CIRCULO_AMIGOS_CC_EMAIL,
   CURSOS_EMAIL,
   ESFERA_CC_EMAIL,
   ESFERA_SOLICITUD_EMAIL,
@@ -449,5 +450,6 @@ export function buildCirculoAmigosInscriptionMailto(
     [CIRCULO_AMIGOS_EMAIL],
     `Círculo de Amigos — Solicitud de inscripción — ${values.nombre.trim()}`,
     buildCirculoAmigosInscriptionMessage(values),
+    [CIRCULO_AMIGOS_CC_EMAIL],
   );
 }
