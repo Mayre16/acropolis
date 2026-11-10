@@ -51,13 +51,6 @@ const HomeActivityPhotosSection = dynamic(
     })),
   { loading: () => null },
 );
-const HomeSalonesCarousel = dynamic(
-  () =>
-    import("@/components/home/HomeSalonesCarousel").then((m) => ({
-      default: m.HomeSalonesCarousel,
-    })),
-  { loading: () => null },
-);
 const HomeFrasesDelDiaSection = dynamic(
   () =>
     import("@/components/home/HomeFrasesDelDiaSection").then((m) => ({
@@ -120,7 +113,6 @@ export default function Home() {
       <UpcomingActivitiesHome />
       <HomeTalleresYCursosSection />
       <HomeActivityPhotosSection />
-      <HomeSalonesCarousel />
       <HomeFrasesDelDiaSection />
       <ContentDigitalSection />
       <InstagramFeedSection variant="carousel" showSocialHeader={false} />
