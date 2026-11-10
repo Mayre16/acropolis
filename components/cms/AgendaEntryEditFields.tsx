@@ -196,6 +196,24 @@ export function AgendaEntryEditFields({
         token={token}
         onChange={onChange}
       />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <EditField
+          label="Enlace de detalle (href)"
+          value={entry.detailHref ?? ""}
+          onChange={(v) => onChange({ detailHref: v })}
+        />
+        <EditField
+          label="Etiqueta del enlace"
+          value={entry.detailLabel ?? ""}
+          onChange={(v) => onChange({ detailLabel: v })}
+        />
+      </div>
+      <p className="text-xs text-slate-600">
+        El enlace y la etiqueta aparecen en el carrusel del home (ej.{" "}
+        <code className="rounded bg-slate-100 px-1">/voluntariado</code> →{" "}
+        <code className="rounded bg-slate-100 px-1">Ver voluntariado</code>).
+        Déjalos vacíos para usar los valores por defecto de la categoría.
+      </p>
       {showHomeToggle ? (
         <label className="flex items-center gap-2 text-sm">
           <input
